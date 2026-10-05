@@ -1,29 +1,33 @@
-#!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
 # SPDX-License-Identifier: AGPL-3.0-or-later
-"""Experiment 0001: structure of a published ONNX language model, as RDF, checked in SPARQL.
+"""The structure of a published ONNX language model, as RDF, checked in SPARQL.
 
-What is registered, and what each verdict means, is in
-docs/experiments/0001-onnx-structure-graph.md. This script only carries it out.
+A cell names an ONNX file in a model repository, the repository that holds the
+PyTorch weights it was exported from, and a prompt. The run:
 
-Exit status: 0 when every registered hypothesis was evaluated (whatever the
-verdicts), 2 when the run is inconclusive. Anything else is a crash.
+1. fetches the file at the revision published now, and records that revision;
+2. renders the graph as RDF and checks the rendering against the file (H1);
+3. compares the tensors the graph stores with the safetensors header (H2);
+4. runs the prompt through the graph and through the PyTorch weights (H5).
+
+What each hypothesis means, and when it holds, is registered in the batch's
+document under docs/batches/. This module only carries it out.
 """
 
-import argparse
 import gc
 import hashlib
 import importlib.metadata
 import json
 import platform
-import sys
+import tempfile
 from pathlib import Path
 
-REPOSITORY = "HuggingFaceTB/SmolLM2-135M-Instruct"
-ONNX_FILE = "onnx/model.onnx"
-PROMPT = "The capital of France is"
-PROBABILITY_TOLERANCE = 1e-3
+from .. import feeds, graphstore, inventory
+from ..check import check
+
 INCONCLUSIVE = 2
+NOT_EVALUATED = "NOT EVALUATED"
+PROBABILITY_TOLERANCE = 1e-3
 
 H1 = "H1 no control flow, no cycle"
 H2 = "H2 every parameter is stored in the graph"
@@ -70,17 +74,15 @@ def top(logits, tokenizer, count=5):
     ]
 
 
-def reference_forward(onnx_path, revision):
-    """The same prompt through the ONNX graph and through the repository's PyTorch weights."""
+def reference_forward(onnx_path, repository, revision, prompt):
+    """One prompt through the ONNX graph and through the PyTorch weights it was exported from."""
     import numpy as np
     import onnxruntime
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
-    from lmnf import feeds
-
-    tokenizer = AutoTokenizer.from_pretrained(REPOSITORY, revision=revision)
-    default = list(tokenizer(PROMPT)["input_ids"])
+    tokenizer = AutoTokenizer.from_pretrained(repository, revision=revision)
+    default = list(tokenizer(prompt)["input_ids"])
     encodings = {"tokenizer default": default}
     bos = tokenizer.bos_token_id
     if bos is not None and default[:1] != [bos]:
@@ -93,10 +95,10 @@ def reference_forward(onnx_path, revision):
     outputs = [o.name for o in session.get_outputs()]
     if "logits" not in outputs:
         raise feeds.UnknownInput(f"the graph has no output named logits (outputs: {outputs[:6]})")
-    model = AutoModelForCausalLM.from_pretrained(REPOSITORY, revision=revision).float()
+    model = AutoModelForCausalLM.from_pretrained(repository, revision=revision).float()
     model.eval()
 
-    result = {"prompt": PROMPT, "bos_token_id": bos, "encodings": {}}
+    result = {"prompt": prompt, "bos_token_id": bos, "encodings": {}}
     for label, ids in encodings.items():
         from_onnx = session.run(["logits"], feeds.first_step(declared, ids))[0][0, -1]
         with torch.no_grad():
@@ -115,24 +117,41 @@ def reference_forward(onnx_path, revision):
     return result
 
 
+def headline(report):
+    """One sentence for the batch summary."""
+    subject = report["subject"]
+    direct = report.get("direct")
+    if not direct or "nodes" not in direct:
+        return f"`{subject['repository']}` `{subject['file']}`: the structure check did not complete."
+    stored = direct["initializers"]
+    return (
+        f"`{subject['repository']}` `{subject['file']}` ({subject['bytes']:,} bytes): {direct['nodes']:,} nodes, "
+        f"{len(direct['op_histogram'])} kinds of operator, {stored['count']:,} initializers "
+        f"({stored['elements']:,} elements), {report['rdf']['stored_quads']:,} quads."
+    )
+
+
 def summary(report):
     """The report as Markdown. Lists, not tables: it is also read in a terminal."""
     subject = report["subject"]
     lines = [
-        "# Experiment 0001: ONNX structure graph",
+        f"# {report['cell']}",
         "",
-        f"Subject: `{subject['repository']}` at revision `{subject['revision']}`, file `{subject['file']}` "
-        f"({subject['bytes']:,} bytes, SHA-256 `{subject['sha256']}`).",
+        "Structure of a published ONNX file.",
         "",
-        "## Verdicts",
-        "",
+        f"- File: `{subject['repository']}` at revision `{subject['revision']}`, `{subject['file']}` "
+        f"({subject['bytes']:,} bytes, SHA-256 `{subject['sha256']}`)",
+        f"- Reference weights: `{subject['reference_repository']}` at revision `{subject['reference_revision']}`",
     ]
+    if subject.get("companions"):
+        lines.append(f"- Companion files: {', '.join(f'`{name}`' for name in subject['companions'])}")
+    lines += ["", "## Verdicts", ""]
     lines += [f"- {name}: {verdict}" for name, verdict in report["verdicts"].items()]
     if report.get("inconclusive"):
         lines += ["", f"**Inconclusive:** {report['inconclusive']}"]
 
     direct = report.get("direct")
-    if direct:
+    if direct and "nodes" in direct:
         stored = direct["initializers"]
         lines += [
             "",
@@ -166,12 +185,12 @@ def summary(report):
             "## Parameters",
             "",
             f"{parameters['reference_tensors']} reference tensors, {parameters['matched']} matched in the graph, "
-            f"{len(parameters['missing_from_onnx'])} missing, {len(parameters['only_in_onnx'])} stored tensors "
-            f"beyond the reference. Elements: reference {parameters['elements_reference']:,}, "
+            f"{len(parameters['missing_from_onnx'])} missing, {len(parameters['only_in_onnx'])} stored "
+            f"floating-point tensors beyond the reference. Elements: reference {parameters['elements_reference']:,}, "
             f"graph {parameters['elements_onnx']:,}.",
         ]
         if parameters["missing_from_onnx"]:
-            lines += ["", f"Missing shapes: {parameters['missing_from_onnx'][:20]}"]
+            lines += ["", f"Missing shapes (the first twenty): {parameters['missing_from_onnx'][:20]}"]
 
     forward = report.get("forward")
     if forward:
@@ -191,80 +210,68 @@ def summary(report):
                     f"PyTorch `{b['token']!r}` {b['probability']:.4f}"
                 )
 
-    if "exploratory" in report:
+    exploratory = report.get("exploratory")
+    if exploratory:
         lines += [
             "",
             "## Exploratory, no verdict registered",
             "",
-            f"- Stored matrices matching the gate-by-wiring query: {report['exploratory']['silu_gate_matches']}",
+            f"- Stored matrices matching the gate-by-wiring query: {exploratory['silu_gate_matches']}",
+            "- Reference tensors matched when stored tensors of every element type are counted: "
+            f"{exploratory['parameters_matched_counting_every_element_type']}",
         ]
-    if report.get("versions"):
-        lines += ["", "Versions: " + ", ".join(f"{name} {version}" for name, version in report["versions"].items()) + "."]
+    lines += ["", "Versions: " + ", ".join(f"{name} {version}" for name, version in report["versions"].items()) + "."]
     return "\n".join(lines) + "\n"
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--out", type=Path, required=True)
-    out = parser.parse_args().out
-    out.mkdir(parents=True, exist_ok=True)
+def evaluate(cell, subject, path, iri, reference_shapes, forward, out):
+    """Everything after the downloads.
 
-    from huggingface_hub import HfApi, get_safetensors_metadata, hf_hub_download
-
-    from lmnf import feeds, graphstore, inventory
-    from lmnf.__main__ import check
-
-    # The model is taken at whatever revision is published now; that revision is recorded.
-    info = HfApi().model_info(REPOSITORY)
-    revision = info.sha
-    # A graph may keep its tensors in companion files next to it; fetch those too.
-    companions = sorted(s.rfilename for s in info.siblings if s.rfilename.startswith(ONNX_FILE + "_"))
-    for name in companions:
-        hf_hub_download(REPOSITORY, name, revision=revision)
-    path = Path(hf_hub_download(REPOSITORY, ONNX_FILE, revision=revision))
-    subject = {
-        "repository": REPOSITORY,
-        "revision": revision,
-        "file": ONNX_FILE,
-        "companions": companions,
-        "bytes": path.stat().st_size,
-        "sha256": file_digest(path),
-    }
-    iri = f"https://huggingface.co/{REPOSITORY}/resolve/{revision}/{ONNX_FILE}"
-
+    `reference_shapes` is the parameter inventory from an independent source.
+    `forward` is called with no arguments and returns the forward-pass
+    comparison; it raises `feeds.UnknownInput` when the graph cannot be fed.
+    """
+    out = Path(out)
     status = check(path, iri, out)
     report = json.loads((out / "report.json").read_text(encoding="utf-8"))
-    report["subject"] = subject
-    report["versions"] = versions()
-    verdicts = {H1: report.get("verdicts", {}).get("H1", "NOT EVALUATED"), H2: "NOT EVALUATED", H5: "NOT EVALUATED"}
+    report.update(cell=cell["id"], experiment="structure", subject=subject, versions=versions())
+    verdicts = {H1: report.get("verdicts", {}).get("H1", NOT_EVALUATED), H2: NOT_EVALUATED, H5: NOT_EVALUATED}
     unevaluated = []
 
     if status == 0:
         store = graphstore.load(out / "model.nq")
-        metadata = get_safetensors_metadata(REPOSITORY, revision=revision)
-        reference = [tuple(t.shape) for f in metadata.files_metadata.values() for t in f.tensors.values()]
-        comparison = inventory.compare(graphstore.stored_float_shapes(store), reference)
-        report["parameters"] = dict(comparison, reference_tensors=len(reference))
-        if reference:
+        stored = graphstore.stored_tensors(store)
+        floats = [shape for kind, shape in stored if kind in graphstore.FLOAT_TYPES]
+        comparison = inventory.compare(floats, reference_shapes)
+        report["parameters"] = dict(comparison, reference_tensors=len(reference_shapes))
+        report["exploratory"] = {
+            "silu_gate_matches": len(graphstore.rows(store, "silu_gate")),
+            "parameters_matched_counting_every_element_type": inventory.compare(
+                [shape for _, shape in stored], reference_shapes
+            )["matched"],
+        }
+        if reference_shapes:
             verdicts[H2] = "HOLDS" if not comparison["missing_from_onnx"] else "FAILS"
         else:
             unevaluated.append("H2: the reference inventory is empty")
-        report["exploratory"] = {"silu_gate_matches": len(graphstore.rows(store, "silu_gate"))}
         del store
         gc.collect()
 
         try:
-            forward = reference_forward(path, revision)
-            report["forward"] = forward
-            default = forward["encodings"]["tokenizer default"]
-            agrees = default["same_top5_ids"] and default["max_abs_probability_difference"] <= PROBABILITY_TOLERANCE
-            verdicts[H5] = "HOLDS" if agrees else "FAILS"
+            result = forward()
         except feeds.UnknownInput as error:
             unevaluated.append(f"H5: {error}")
+        else:
+            report["forward"] = result
+            default = result["encodings"]["tokenizer default"]
+            agrees = default["same_top5_ids"] and default["max_abs_probability_difference"] <= PROBABILITY_TOLERANCE
+            verdicts[H5] = "HOLDS" if agrees else "FAILS"
     else:
         unevaluated.append(report.get("inconclusive", "the structure check did not complete"))
 
     report["verdicts"] = verdicts
+    report["headline"] = headline(report)
+    report.pop("inconclusive", None)
     if unevaluated:
         report["inconclusive"] = "; ".join(unevaluated)
     (out / "report.json").write_text(json.dumps(report, indent=1, sort_keys=True) + "\n", encoding="utf-8")
@@ -277,5 +284,50 @@ def main():
     return 0
 
 
-if __name__ == "__main__":
-    sys.exit(main())
+def run(cell, out):
+    """Fetch what the cell names, then evaluate it."""
+    onnx_repository = cell["onnx_repository"]
+    onnx_file = cell["onnx_file"]
+    reference_repository = cell["reference_repository"]
+    prompt = cell["prompt"]
+
+    from huggingface_hub import HfApi, get_safetensors_metadata, hf_hub_download
+
+    out = Path(out)
+    out.mkdir(parents=True, exist_ok=True)
+    api = HfApi()
+    # Models are taken at whatever revision is published now; the revisions are recorded.
+    info = api.model_info(onnx_repository)
+    revision = info.sha
+    reference_revision = revision
+    if reference_repository != onnx_repository:
+        reference_revision = api.model_info(reference_repository).sha
+    # A graph may keep its tensors in companion files next to it; they are part of the model.
+    companions = sorted(s.rfilename for s in info.siblings if s.rfilename.startswith(onnx_file + "_"))
+
+    with tempfile.TemporaryDirectory(prefix="lmnf-model-") as work:
+        for name in companions:
+            hf_hub_download(onnx_repository, name, revision=revision, local_dir=work)
+        path = Path(hf_hub_download(onnx_repository, onnx_file, revision=revision, local_dir=work))
+        subject = {
+            "repository": onnx_repository,
+            "revision": revision,
+            "file": onnx_file,
+            "companions": companions,
+            "bytes": path.stat().st_size,
+            "sha256": file_digest(path),
+            "reference_repository": reference_repository,
+            "reference_revision": reference_revision,
+        }
+        metadata = get_safetensors_metadata(reference_repository, revision=reference_revision)
+        reference_shapes = [tuple(t.shape) for f in metadata.files_metadata.values() for t in f.tensors.values()]
+        iri = f"https://huggingface.co/{onnx_repository}/resolve/{revision}/{onnx_file}"
+        return evaluate(
+            cell,
+            subject,
+            path,
+            iri,
+            reference_shapes,
+            lambda: reference_forward(path, reference_repository, reference_revision, prompt),
+            out,
+        )

@@ -1,7 +1,9 @@
 # SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Stored tensors: how many, how many elements, how many bytes.
+# Initializers: how many, how many elements, how many bytes. A tensor kept in
+# another file, or one of strings, has elements and no bytes here.
 PREFIX lmnf: <https://metavacua.github.io/lm-normal-form/ns#>
-SELECT (COUNT(?v) AS ?count) (SUM(?e) AS ?elements) (SUM(?b) AS ?bytes) WHERE {
-  ?v a lmnf:Initializer ; lmnf:elementCount ?e ; lmnf:byteLength ?b .
+SELECT (COUNT(?v) AS ?count) (SUM(?e) AS ?elements) (SUM(COALESCE(?b, 0)) AS ?bytes) WHERE {
+  ?v a lmnf:Initializer ; lmnf:elementCount ?e .
+  OPTIONAL { ?v lmnf:byteLength ?b }
 }

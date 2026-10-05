@@ -72,7 +72,7 @@ def report(model):
             totals["initializers"] += 1
             totals["elements"] += tensors.element_count(tensor)
             types[TensorProto.DataType.Name(tensor.data_type)] += 1
-            if not tensors.is_external(tensor):
+            if tensors.has_bytes(tensor):
                 totals["bytes"] += len(tensors.content(tensor))
         for index, node in enumerate(graph.node):
             totals["nodes"] += 1

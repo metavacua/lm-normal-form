@@ -29,6 +29,9 @@ def first_step(inputs, token_ids):
             feeds[name] = np.ones((1, length), dtype=np.int64)
         elif name == "position_ids":
             feeds[name] = np.arange(length, dtype=np.int64)[None, :]
+        elif name == "use_cache_branch":
+            # A merged decoder holds two graphs behind an If; false selects the one that needs no past.
+            feeds[name] = np.zeros([d if isinstance(d, int) else 1 for d in declared["dims"]], dtype=np.bool_)
         elif name.startswith(PAST) and dtype is not None:
             # Batch is one; every other symbolic axis is the length of a past that does not exist yet.
             shape = [d if isinstance(d, int) else (1 if axis == 0 else 0) for axis, d in enumerate(declared["dims"])]

@@ -1,12 +1,12 @@
 # SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Floating-point tensors the graph stores, as initializers or inside Constant
-# nodes, with their dimensions: one row per axis (a scalar has one row, no axis).
+# Every tensor the graph stores, as an initializer or inside a Constant node,
+# with its element type and dimensions: one row per axis (a scalar has one row
+# and no axis).
 PREFIX lmnf: <https://metavacua.github.io/lm-normal-form/ns#>
-SELECT ?tensor ?axis ?size WHERE {
+SELECT ?tensor ?type ?axis ?size WHERE {
   { ?tensor a lmnf:Initializer } UNION { ?tensor a lmnf:Tensor }
   ?tensor lmnf:elemType ?type .
-  FILTER(?type IN ("FLOAT", "FLOAT16", "DOUBLE", "BFLOAT16"))
   OPTIONAL { ?tensor lmnf:dim ?d . ?d lmnf:axis ?axis ; lmnf:size ?size }
 }
 ORDER BY ?tensor ?axis

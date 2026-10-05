@@ -11,9 +11,8 @@ dependencies = ["numpy", "onnx", "pyoxigraph"]
 
 # One extra per kind of experiment, named as the batch files name them.
 [project.optional-dependencies]
-test = ["pytest", "duckdb"]
+test = ["pytest"]
 structure = ["huggingface_hub", "onnxruntime", "torch", "transformers"]
-forward = ["duckdb"]
 
 [build-system]
 requires = ["setuptools>=77"]

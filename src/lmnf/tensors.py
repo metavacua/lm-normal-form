@@ -28,6 +28,11 @@ def is_external(tensor):
     return tensor.data_location == TensorProto.EXTERNAL and not tensor.HasField("raw_data")
 
 
+def has_bytes(tensor):
+    """Whether the elements are in this file as fixed-size numbers, so that they can be hashed."""
+    return not is_external(tensor) and tensor.data_type != TensorProto.STRING
+
+
 def content(tensor):
     """The tensor's elements as little-endian bytes, whichever field the file used."""
     if tensor.HasField("raw_data"):

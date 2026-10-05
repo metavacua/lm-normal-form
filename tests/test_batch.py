@@ -16,7 +16,7 @@ STRUCTURE = {
     "reference_repository": "owner/name",
     "prompt": "A prompt",
 }
-FORWARD = {"id": "02-b", "experiment": "forward", "engine": "sqlite", "sizes": [[8, 4, 6]], "budget_seconds": 5}
+OTHER = dict(STRUCTURE, id="02-b", onnx_file="onnx/model_q4.onnx")
 
 
 def write(tmp_path, cells, number="0007"):
@@ -26,10 +26,10 @@ def write(tmp_path, cells, number="0007"):
     return path
 
 
-def report(tmp_path, cell, verdicts, **extra):
-    folder = tmp_path / "reports" / cell
+def report(tmp_path, name, verdicts, **extra):
+    folder = tmp_path / "reports" / name
     folder.mkdir(parents=True, exist_ok=True)
-    data = dict({"cell": cell, "verdicts": verdicts, "headline": f"headline of {cell}"}, **extra)
+    data = dict({"cell": name, "verdicts": verdicts, "headline": f"headline of {name}"}, **extra)
     (folder / "report.json").write_text(json.dumps(data), encoding="utf-8")
     return tmp_path / "reports"
 
@@ -52,15 +52,15 @@ def measurement(folder, name, label, **changes):
 
 
 def test_a_batch_gives_one_job_for_each_cell(tmp_path):
-    loaded = batch.load(write(tmp_path, [STRUCTURE, FORWARD]))
+    loaded = batch.load(write(tmp_path, [STRUCTURE, OTHER]))
     assert batch.matrix(loaded) == {
-        "include": [{"id": "01-a", "experiment": "structure"}, {"id": "02-b", "experiment": "forward"}]
+        "include": [{"id": "01-a", "experiment": "structure"}, {"id": "02-b", "experiment": "structure"}]
     }
-    assert batch.cell(loaded, "02-b")["engine"] == "sqlite"
+    assert batch.cell(loaded, "02-b")["onnx_file"] == "onnx/model_q4.onnx"
 
 
 def test_a_batch_holds_at_most_twelve_cells(tmp_path):
-    cells = [dict(FORWARD, id=f"{n:02d}-x") for n in range(13)]
+    cells = [dict(OTHER, id=f"{n:02d}-x") for n in range(13)]
     assert len(batch.load(write(tmp_path, cells[:12]))["cells"]) == 12
     with pytest.raises(batch.BatchError, match="13 cells"):
         batch.load(write(tmp_path, cells))
@@ -73,10 +73,10 @@ def test_an_empty_batch_is_refused(tmp_path):
 
 def test_cell_names_are_unique_and_safe_to_use_as_file_names(tmp_path):
     with pytest.raises(batch.BatchError, match="01-a"):
-        batch.load(write(tmp_path, [STRUCTURE, dict(FORWARD, id="01-a")]))
+        batch.load(write(tmp_path, [STRUCTURE, dict(OTHER, id="01-a")]))
     for unsafe in ("../up", "has space", "Upper", "a/b", ""):
         with pytest.raises(batch.BatchError, match="name"):
-            batch.load(write(tmp_path, [dict(FORWARD, id=unsafe)]))
+            batch.load(write(tmp_path, [dict(OTHER, id=unsafe)]))
 
 
 def test_a_cell_says_everything_its_experiment_needs(tmp_path):
@@ -84,9 +84,7 @@ def test_a_cell_says_everything_its_experiment_needs(tmp_path):
     with pytest.raises(batch.BatchError, match="onnx_file"):
         batch.load(write(tmp_path, [incomplete]))
     with pytest.raises(batch.BatchError, match="experiment"):
-        batch.load(write(tmp_path, [dict(FORWARD, experiment="guess")]))
-    with pytest.raises(batch.BatchError, match="sizes"):
-        batch.load(write(tmp_path, [dict(FORWARD, sizes=[[8, 4]])]))
+        batch.load(write(tmp_path, [dict(OTHER, experiment="guess")]))
 
 
 def test_asking_for_a_cell_that_is_not_in_the_batch_is_an_error(tmp_path):
@@ -113,7 +111,7 @@ def test_outside_a_batch_branch_no_cells_run(tmp_path):
 
 
 def test_on_a_batch_branch_the_cells_of_that_batch_run(tmp_path):
-    write(tmp_path, [STRUCTURE, FORWARD], number="0007")
+    write(tmp_path, [STRUCTURE, OTHER], number="0007")
     planned = batch.plan(tmp_path, ref="batch/0007-anything")
     assert planned["count"] == 2
     assert planned["file"] == "batches/0007.json"
@@ -155,9 +153,9 @@ def test_when_the_changes_are_unknown_the_cells_run(tmp_path):
 
 
 def test_the_summary_lists_every_cell_with_its_verdicts(tmp_path):
-    loaded = batch.load(write(tmp_path, [STRUCTURE, FORWARD]))
+    loaded = batch.load(write(tmp_path, [STRUCTURE, OTHER]))
     report(tmp_path, "01-a", {"H1 no control flow": "HOLDS", "H2 parameters": "FAILS"})
-    reports = report(tmp_path, "02-b", {"E1 agreement": "HOLDS"})
+    reports = report(tmp_path, "02-b", {"H1 no control flow": "HOLDS"})
     status, text, data = batch.collect(loaded, reports)
     assert status == 0
     assert "## 01-a" in text and "## 02-b" in text
@@ -175,7 +173,7 @@ def test_a_failed_hypothesis_does_not_fail_the_batch(tmp_path):
 
 
 def test_a_cell_without_a_report_makes_the_batch_inconclusive(tmp_path):
-    loaded = batch.load(write(tmp_path, [STRUCTURE, FORWARD]))
+    loaded = batch.load(write(tmp_path, [STRUCTURE, OTHER]))
     reports = report(tmp_path, "01-a", {"H1 no control flow": "HOLDS"})
     status, text, data = batch.collect(loaded, reports)
     assert status == 2
@@ -193,18 +191,18 @@ def test_an_inconclusive_cell_makes_the_batch_inconclusive(tmp_path):
 
 
 def test_a_report_without_verdicts_or_for_another_cell_does_not_count(tmp_path):
-    loaded = batch.load(write(tmp_path, [STRUCTURE, FORWARD]))
+    loaded = batch.load(write(tmp_path, [STRUCTURE, OTHER]))
     report(tmp_path, "01-a", {})
-    reports = report(tmp_path, "02-b", {"E1 agreement": "HOLDS"}, cell="somewhere-else")
+    reports = report(tmp_path, "02-b", {"H1 no control flow": "HOLDS"}, cell="somewhere-else")
     status, _, data = batch.collect(loaded, reports)
     assert status == 2
     assert data["inconclusive"] == ["01-a", "02-b"]
 
 
 def test_the_summary_says_what_each_job_used_and_whether_it_fits_the_development_machine(tmp_path):
-    loaded = batch.load(write(tmp_path, [STRUCTURE, FORWARD]))
+    loaded = batch.load(write(tmp_path, [STRUCTURE, OTHER]))
     report(tmp_path, "01-a", {"H1 no control flow": "HOLDS"})
-    reports = report(tmp_path, "02-b", {"E1 agreement": "HOLDS"})
+    reports = report(tmp_path, "02-b", {"H1 no control flow": "HOLDS"})
     measurement(reports / "01-a", "resources.json", "01-a", peak_rss_mib=6200.0, wall_seconds=310.0)
     measurement(reports / "02-b", "resources.json", "02-b")
     measurement(reports / "measurements", "unit-tests.json", "unit tests")

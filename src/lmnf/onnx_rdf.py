@@ -120,8 +120,9 @@ class _Emitter:
         yield self.quad(subject, "elemType", TensorProto.DataType.Name(tensor.data_type))
         yield from self.dims(suffix, list(tensor.dims))
         yield self.quad(subject, "elementCount", _int(count))
-        if tensors.is_external(tensor):
-            yield self.quad(subject, "external", _true())
+        if not tensors.has_bytes(tensor):
+            if tensors.is_external(tensor):
+                yield self.quad(subject, "external", _true())
             return
         data = tensors.content(tensor)
         yield self.quad(subject, "byteLength", _int(len(data)))

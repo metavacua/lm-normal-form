@@ -12,6 +12,8 @@ from .vocab import XSD
 # The query files live at the repository root; LMNF_QUERIES points somewhere else.
 QUERIES = Path(os.environ.get("LMNF_QUERIES") or Path(__file__).resolve().parents[2] / "queries")
 
+FLOAT_TYPES = ("FLOAT", "FLOAT16", "DOUBLE", "BFLOAT16")
+
 _INTEGERS = {XSD + name for name in ("integer", "int", "long", "nonNegativeInteger")}
 _REALS = {XSD + name for name in ("double", "decimal", "float")}
 
@@ -55,11 +57,16 @@ def ask(store, name):
     return bool(store.query(text(name), use_default_graph_as_union=True))
 
 
-def stored_float_shapes(store):
-    """The shape of every floating-point tensor the graph stores, read back from the graph."""
-    shapes = {}
-    for row in rows(store, "stored_float_tensors"):
-        shape = shapes.setdefault(row["tensor"], [])
+def stored_tensors(store):
+    """(element type, shape) of every tensor the graph stores, read back from the graph."""
+    found = {}
+    for row in rows(store, "stored_tensors"):
+        _, shape = found.setdefault(row["tensor"], (row["type"], []))
         if row["axis"] is not None:
             shape.append(row["size"])
-    return [tuple(shape) for shape in shapes.values()]
+    return [(kind, tuple(shape)) for kind, shape in found.values()]
+
+
+def stored_float_shapes(store):
+    """The shapes of the floating-point tensors among them."""
+    return [shape for kind, shape in stored_tensors(store) if kind in FLOAT_TYPES]
