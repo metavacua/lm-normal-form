@@ -1,11 +1,30 @@
 # SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
 # SPDX-License-Identifier: AGPL-3.0-or-later
+
+# How this workflow is meant to be read (the rules are in docs/operations.md):
+#
+# - Experiments run here and nowhere else. A batch is at most twelve cells, one
+#   job each, on a batch/NNNN-* branch with its own pull request.
+# - Every job runs under a resource meter, so that what a tool or an experiment
+#   needs is measured on a hosted runner before it is ever run anywhere smaller.
+# - A job fails for two reasons only: the tooling broke, or a run could not
+#   evaluate what it registered (exit status 2). A check that fails is a
+#   result: it is reported and the job passes.
+# - A push that changes only documents or tests starts no experiment cells.
+# - The token is read-only. No job writes to the repository, comments, or calls
+#   the GitHub API beyond checkout and artifacts.
 name: ci
 
 on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      batch:
+        description: "Batch to run, by number (for example 0001)"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -21,6 +40,9 @@ defaults:
 env:
   PYTHON_VERSION: "3.14"
   PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  TOKENIZERS_PARALLELISM: "false"
 
 jobs:
   checks:
@@ -37,9 +59,157 @@ jobs:
           python -m pip install --quiet -e ".[test]" reuse
           python -m pip freeze --exclude-editable
       - name: Every file states its licence (REUSE)
-        run: reuse lint
+        run: >
+          python -m lmnf measure --label "reuse lint" --out measurements/reuse-lint.json
+          --append "$GITHUB_STEP_SUMMARY" -- reuse lint
       - name: Workflows are well formed (actionlint)
-        run: docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:latest -color
+        if: always()
+        run: >
+          python -m lmnf measure --label "actionlint (in a container)" --out measurements/actionlint.json
+          --append "$GITHUB_STEP_SUMMARY" --
+          docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:latest -color
       - name: Tests
         if: always()
-        run: python -m pytest -q --continue-on-collection-errors
+        run: >
+          python -m lmnf measure --label "unit tests" --out measurements/unit-tests.json
+          --append "$GITHUB_STEP_SUMMARY" --
+          python -m pytest -q --continue-on-collection-errors
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: measurements-checks
+          path: measurements/
+          retention-days: 1
+          if-no-files-found: warn
+
+  plan:
+    name: plan the batch
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      count: ${{ steps.plan.outputs.count }}
+      file: ${{ steps.plan.outputs.file }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Decide which cells run
+        id: plan
+        env:
+          REF: ${{ github.head_ref || github.ref_name }}
+          REQUESTED: ${{ inputs.batch }}
+          ACTION: ${{ github.event.action }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.event.pull_request.head.sha }}
+        run: |
+          arguments=(--ref "$REF" --requested "$REQUESTED")
+          # After a push to an open pull request, look at what that push changed.
+          # If either commit is unknown here (a forced push, say), the cells run.
+          if [ "$ACTION" = "synchronize" ] \
+            && git cat-file -e "${BEFORE}^{commit}" 2>/dev/null \
+            && git cat-file -e "${AFTER}^{commit}" 2>/dev/null; then
+            git diff --name-only "$BEFORE" "$AFTER" > "$RUNNER_TEMP/changed.txt"
+            echo "This push changed:"
+            cat "$RUNNER_TEMP/changed.txt"
+            arguments+=(--changed "$RUNNER_TEMP/changed.txt")
+          fi
+          PYTHONPATH=src python -m lmnf plan "${arguments[@]}" | tee -a "$GITHUB_OUTPUT"
+
+  cells:
+    name: ${{ matrix.id }}
+    needs: [checks, plan]
+    if: needs.plan.outputs.count != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 12
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    env:
+      CELL: ${{ matrix.id }}
+      EXPERIMENT: ${{ matrix.experiment }}
+      BATCH_FILE: ${{ needs.plan.outputs.file }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install
+        run: |
+          # The CPU build of PyTorch: these runners have no GPU, and it is a fraction of the size.
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet -e ".[$EXPERIMENT]"
+          mkdir -p "out/$CELL"
+          python -m pip freeze --exclude-editable > "out/$CELL/versions.txt"
+      - name: Run
+        run: >
+          python -m lmnf measure --label "$CELL" --out "out/$CELL/resources.json" --
+          python -m lmnf cell --batch "$BATCH_FILE" --id "$CELL" --out "out/$CELL"
+      - name: Summary
+        if: always()
+        run: |
+          if [ -f "out/$CELL/SUMMARY.md" ]; then
+            tee -a "$GITHUB_STEP_SUMMARY" < "out/$CELL/SUMMARY.md"
+          else
+            echo "Cell $CELL stopped before it wrote a summary." | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ -f "out/$CELL/resources.json" ]; then
+            python -c 'import json, sys; from lmnf import measure; print(measure.line(json.load(open(sys.argv[1]))))' \
+              "out/$CELL/resources.json" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+          # The graph is kept as an artifact for a day; compressed, it is a small fraction of its size.
+          if [ -f "out/$CELL/model.nq" ]; then
+            gzip -9 "out/$CELL/model.nq"
+            ls -l "out/$CELL"
+          fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-${{ matrix.id }}
+          path: out/
+          retention-days: 1
+          if-no-files-found: warn
+
+  collect:
+    name: batch summary
+    needs: [plan, cells]
+    if: always() && needs.plan.outputs.count != '0' && needs.cells.result != 'skipped'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BATCH_FILE: ${{ needs.plan.outputs.file }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: cell-*
+          path: reports
+          merge-multiple: true
+      - uses: actions/download-artifact@v8
+        with:
+          name: measurements-checks
+          path: reports/measurements
+      - name: Collect
+        run: PYTHONPATH=src python -m lmnf collect --batch "$BATCH_FILE" --reports reports --out out
+      - name: Summary
+        if: always()
+        run: |
+          if [ -f out/BATCH.md ]; then
+            tee -a "$GITHUB_STEP_SUMMARY" < out/BATCH.md
+          else
+            echo "The batch summary was not written." | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: batch
+          path: out/
+          retention-days: 1
+          if-no-files-found: warn
