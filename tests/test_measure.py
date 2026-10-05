@@ -3,9 +3,14 @@
 """The resource meter: what a command used, measured where it ran."""
 
 import json
+import os
+import subprocess
 import sys
+from pathlib import Path
 
 from lmnf import measure
+
+ROOT = Path(__file__).resolve().parent.parent
 
 # Touch every page, or the memory is reserved and never resident.
 ALLOCATE = "block = bytearray(96 * 1024 * 1024)\nfor i in range(0, len(block), 4096):\n    block[i] = 1\n"
@@ -16,11 +21,36 @@ def test_the_exit_status_of_the_command_is_kept():
     assert measure.run([sys.executable, "-c", "pass"])["exit_status"] == 0
 
 
-def test_peak_memory_is_that_of_this_command_and_not_of_an_earlier_one():
-    large = measure.run([sys.executable, "-c", ALLOCATE])
+def test_peak_memory_reflects_what_the_command_allocated():
+    assert measure.run([sys.executable, "-c", ALLOCATE])["peak_rss_mib"] > 96
+
+
+def test_the_size_of_the_measuring_process_is_recorded_because_it_is_a_floor():
+    # Linux counts the memory a child inherits before it starts its own program,
+    # so no reading can be lower than the measuring process itself. First seen in
+    # CI: `python -c pass` read 75 MiB when measured from inside the test runner.
     small = measure.run([sys.executable, "-c", "pass"])
-    assert large["peak_rss_mib"] > 96
-    assert small["peak_rss_mib"] < large["peak_rss_mib"] - 64
+    assert small["measurer_rss_mib"] > 0
+    assert small["peak_rss_mib"] <= small["measurer_rss_mib"] + 16
+
+
+def test_measured_from_the_command_line_a_small_command_reads_small(tmp_path):
+    # The command line is how jobs are measured: the measuring process is then
+    # small, and one command's reading does not leak into the next.
+    readings = {}
+    for label, code in (("large", ALLOCATE), ("small", "pass")):
+        out = tmp_path / f"{label}.json"
+        done = subprocess.run(
+            [sys.executable, "-m", "lmnf", "measure", "--label", label, "--out", str(out), "--", sys.executable, "-c", code],
+            env=dict(os.environ, PYTHONPATH=str(ROOT / "src")),
+            capture_output=True,
+            text=True,
+        )
+        assert done.returncode == 0, done.stderr
+        readings[label] = json.loads(out.read_text(encoding="utf-8"))
+    assert readings["large"]["peak_rss_mib"] > 96
+    assert readings["small"]["peak_rss_mib"] < 48
+    assert readings["small"]["measurer_rss_mib"] < 48
 
 
 def test_time_is_measured():

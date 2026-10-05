@@ -5,6 +5,10 @@
 Runs a command and records what it used: peak memory, time, disk. The exit
 status is the command's own.
 
+Measure from the command line, as the workflow does. A reading of peak memory
+cannot be lower than the size of the measuring process (see `measurer_rss_mib`),
+and from the command line that process is small.
+
 The purpose is a rule of this repository: what a tool or an experiment needs is
 measured on a GitHub-hosted runner before anything like it is run on the
 development machine, which is small and has no swap.
@@ -13,6 +17,7 @@ development machine, which is small and has no swap.
 import argparse
 import json
 import os
+import resource
 import shutil
 import subprocess
 import sys
@@ -88,6 +93,10 @@ def run(command, label=None):
         "cpu_seconds": round(usage.ru_utime + usage.ru_stime, 3),
         # Linux reports ru_maxrss in KiB: the largest resident size of any one process.
         "peak_rss_mib": round(usage.ru_maxrss / 1024, 1),
+        # A child inherits its parent's memory until it starts its own program, and
+        # Linux counts that. So no reading is lower than the measuring process was.
+        # From the command line that is a few MiB; from inside a large program it is not.
+        "measurer_rss_mib": round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024, 1),
         # How far the whole machine's available memory fell while the command ran.
         "memory_drop_mib": round(max(0.0, before["memory_available_mib"] - lowest["available"]), 1),
         "disk_used_mib": round(max(0.0, before["disk_free_mib"] - lowest["free"]), 1),
