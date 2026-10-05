@@ -80,6 +80,14 @@ def test_the_order_certificate_fails_for_a_shuffled_graph(tmp_path):
     assert structure.report(model)["order_violations"] == 1
 
 
+def test_a_node_that_consumes_its_own_output_breaks_the_certificate(tmp_path):
+    model = gated_block()
+    model.graph.node[2].input[1] = "a"  # Mul(g, a) -> a
+    _, store = load(model, tmp_path)
+    assert graphstore.ask(store, "order_violation") is True
+    assert structure.report(model)["order_violations"] == 1
+
+
 def test_initializer_facts_match_the_bytes(tmp_path):
     model = gated_block()
     _, store = load(model, tmp_path)
@@ -140,8 +148,8 @@ def test_emission_is_deterministic(tmp_path):
     assert a.read_bytes() == b.read_bytes()
 
 
-def run_check(model_path, out_dir):
-    env = dict(os.environ, PYTHONPATH=str(ROOT / "src"))
+def run_check(model_path, out_dir, **extra):
+    env = dict(os.environ, PYTHONPATH=str(ROOT / "src"), **extra)
     return subprocess.run(
         [sys.executable, "-m", "lmnf", "check", str(model_path), "--iri", MODEL_IRI, "--out", str(out_dir)],
         capture_output=True,
@@ -175,3 +183,15 @@ def test_check_is_inconclusive_when_the_onnx_checker_rejects_the_model(save, tmp
     done = run_check(save(gated_block(order=shuffled)), tmp_path / "out")
     assert done.returncode == 2, done.stdout + done.stderr
     assert "INCONCLUSIVE" in done.stdout
+
+
+def test_check_is_inconclusive_when_sparql_and_the_direct_report_disagree(save, tmp_path):
+    queries = tmp_path / "queries"
+    queries.mkdir()
+    for source in (ROOT / "queries").glob("*.rq"):
+        queries.joinpath(source.name).write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+    wrong = queries / "node_count.rq"
+    wrong.write_text(wrong.read_text(encoding="utf-8").replace("a lmnf:Node", "a lmnf:Value"), encoding="utf-8")
+    done = run_check(save(gated_block()), tmp_path / "out", LMNF_QUERIES=str(queries))
+    assert done.returncode == 2, done.stdout + done.stderr
+    assert "disagree on: nodes" in done.stdout

@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# A stored matrix whose product is gated by its own sigmoid (x * sigmoid(x)).
+# The matrix is identified by how it is wired, not by what it is called.
+PREFIX lmnf: <https://metavacua.github.io/lm-normal-form/ns#>
+SELECT ?name ?sha WHERE {
+  ?product lmnf:opType "MatMul" ; lmnf:consumes ?matrix ; lmnf:produces ?g .
+  ?matrix a lmnf:Initializer ; lmnf:name ?name ; lmnf:sha256 ?sha .
+  ?sigmoid lmnf:opType "Sigmoid" ; lmnf:consumes ?g ; lmnf:produces ?s .
+  ?gate lmnf:opType "Mul" ; lmnf:consumes ?g ; lmnf:consumes ?s .
+}
+ORDER BY ?name

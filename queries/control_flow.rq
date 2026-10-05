@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Nodes that carry a graph as an attribute: If, Loop, Scan and anything like them.
+PREFIX lmnf: <https://metavacua.github.io/lm-normal-form/ns#>
+SELECT DISTINCT ?node ?op WHERE {
+  ?node a lmnf:Node ; lmnf:opType ?op ; lmnf:attribute ?attribute .
+  ?attribute lmnf:subgraph ?graph .
+}
+ORDER BY ?node

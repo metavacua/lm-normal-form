@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Is any value consumed at or before the position of the node that produces it?
+# If not, the node order of each graph is a topological order, so the graph has no cycle.
+PREFIX lmnf: <https://metavacua.github.io/lm-normal-form/ns#>
+ASK {
+  ?consumer lmnf:inGraph ?graph ; lmnf:index ?i ; lmnf:consumes ?value .
+  ?producer lmnf:inGraph ?graph ; lmnf:index ?j ; lmnf:produces ?value .
+  FILTER(?j >= ?i)
+}

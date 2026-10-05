@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Operators by domain and name, most frequent first.
+PREFIX lmnf: <https://metavacua.github.io/lm-normal-form/ns#>
+SELECT ?domain ?op (COUNT(?n) AS ?count) WHERE {
+  ?n a lmnf:Node ; lmnf:domain ?domain ; lmnf:opType ?op .
+}
+GROUP BY ?domain ?op
+ORDER BY DESC(?count) ?domain ?op

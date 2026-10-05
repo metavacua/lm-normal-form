@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Stored tensors: how many, how many elements, how many bytes.
+PREFIX lmnf: <https://metavacua.github.io/lm-normal-form/ns#>
+SELECT (COUNT(?v) AS ?count) (SUM(?e) AS ?elements) (SUM(?b) AS ?bytes) WHERE {
+  ?v a lmnf:Initializer ; lmnf:elementCount ?e ; lmnf:byteLength ?b .
+}
