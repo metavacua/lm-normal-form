@@ -8,7 +8,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-from onnx import numpy_helper
+import numpy as np
+from onnx import helper, numpy_helper
 
 from conftest import MODEL_IRI, SORTED, branching, empty, gated_block
 from lmnf import graphstore, onnx_rdf, structure
@@ -195,3 +196,21 @@ def test_check_is_inconclusive_when_sparql_and_the_direct_report_disagree(save, 
     done = run_check(save(gated_block()), tmp_path / "out", LMNF_QUERIES=str(queries))
     assert done.returncode == 2, done.stdout + done.stderr
     assert "disagree on: nodes" in done.stdout
+
+
+def test_an_undefined_name_is_counted_once_however_often_it_is_used(tmp_path):
+    model = gated_block()
+    model.graph.node[1].input[0] = "ghost"  # Sigmoid(ghost)
+    model.graph.node[2].input[0] = "ghost"  # Mul(ghost, s)
+    _, store = load(model, tmp_path)
+    assert graphstore.rows(store, "undefined_values") == [{"count": 1}]
+    assert structure.report(model)["undefined_inputs"] == 1
+
+
+def test_stored_float_shapes_cover_initializers_and_constant_nodes(tmp_path):
+    model = gated_block()
+    model.graph.initializer.add().CopyFrom(numpy_helper.from_array(np.float32(0.5), "half"))
+    table = numpy_helper.from_array(np.zeros((2, 3, 5), dtype=np.float32), "table")
+    model.graph.node.append(helper.make_node("Constant", [], ["c"], value=table))
+    _, store = load(model, tmp_path)
+    assert sorted(graphstore.stored_float_shapes(store)) == [(), (2, 3, 5), (4, 6), (6, 4)]
