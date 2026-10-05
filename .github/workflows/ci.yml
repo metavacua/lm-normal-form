@@ -1,0 +1,45 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash # with -o pipefail, so a failing command in a pipe fails the step
+
+env:
+  PYTHON_VERSION: "3.14"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
+jobs:
+  checks:
+    name: licences, workflow lint, tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install
+        run: |
+          python -m pip install --quiet -e ".[test]" reuse
+          python -m pip freeze --exclude-editable
+      - name: Every file states its licence (REUSE)
+        run: reuse lint
+      - name: Workflows are well formed (actionlint)
+        run: docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:latest -color
+      - name: Tests
+        if: always()
+        run: python -m pytest -q --continue-on-collection-errors

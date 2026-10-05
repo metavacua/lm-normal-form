@@ -9,9 +9,11 @@ requires-python = ">=3.11"
 license = "AGPL-3.0-or-later"
 dependencies = ["numpy", "onnx", "pyoxigraph"]
 
+# One extra per kind of experiment, named as the batch files name them.
 [project.optional-dependencies]
-test = ["pytest"]
-experiment = ["huggingface_hub", "onnxruntime", "torch", "transformers"]
+test = ["pytest", "duckdb"]
+structure = ["huggingface_hub", "onnxruntime", "torch", "transformers"]
+forward = ["duckdb"]
 
 [build-system]
 requires = ["setuptools>=77"]
@@ -21,5 +23,5 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "experiments"]
+testpaths = ["tests"]
 pythonpath = ["src"]

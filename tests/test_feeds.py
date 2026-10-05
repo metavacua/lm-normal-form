@@ -36,3 +36,10 @@ def test_an_input_the_rules_do_not_cover_is_refused_by_name():
 def test_a_graph_without_token_ids_is_refused():
     with pytest.raises(feeds.UnknownInput, match="input_ids"):
         feeds.first_step(INPUTS[1:], [1])
+
+
+def test_a_merged_decoder_is_told_to_take_the_branch_without_a_past():
+    switch = {"name": "use_cache_branch", "type": "BOOL", "dims": [1]}
+    plan = feeds.first_step(INPUTS + [switch], [5, 6])
+    assert plan["use_cache_branch"].tolist() == [False]
+    assert plan["use_cache_branch"].dtype == np.bool_

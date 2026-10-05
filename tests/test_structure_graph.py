@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
-from onnx import helper, numpy_helper
+from onnx import TensorProto, helper, numpy_helper
 
 from conftest import MODEL_IRI, SORTED, branching, empty, gated_block
 from lmnf import graphstore, onnx_rdf, structure
@@ -214,3 +214,27 @@ def test_stored_float_shapes_cover_initializers_and_constant_nodes(tmp_path):
     model.graph.node.append(helper.make_node("Constant", [], ["c"], value=table))
     _, store = load(model, tmp_path)
     assert sorted(graphstore.stored_float_shapes(store)) == [(), (2, 3, 5), (4, 6), (6, 4)]
+
+
+def test_every_stored_tensor_comes_back_with_its_element_type(tmp_path):
+    _, store = load(gated_block(), tmp_path)
+    assert sorted(graphstore.stored_tensors(store)) == [("FLOAT", (4, 6)), ("FLOAT", (6, 4)), ("INT64", (4,))]
+
+
+def test_a_string_tensor_is_described_without_a_digest(tmp_path):
+    model = gated_block()
+    words = helper.make_tensor("words", TensorProto.STRING, [2], [b"a", b"b"])
+    model.graph.node.append(helper.make_node("Constant", [], ["c"], value=words))
+    model.graph.initializer.add().CopyFrom(words)
+    counts, store = load(model, tmp_path)
+    assert counts["quads"] == len(store)
+    facts = graphstore.select(
+        store,
+        "PREFIX lmnf: <https://metavacua.github.io/lm-normal-form/ns#> "
+        'SELECT ?n ?sha WHERE { ?t a lmnf:Tensor ; lmnf:elemType "STRING" ; lmnf:elementCount ?n . '
+        "OPTIONAL { ?t lmnf:sha256 ?sha } }",
+    )
+    assert facts == [{"n": 2, "sha": None}]
+    # The string initializer is counted, and its bytes are not: the two reports must still agree.
+    assert graphstore.rows(store, "initializers") == [{"count": 4, "elements": 54, "bytes": 224}]
+    assert structure.report(model)["initializers"] == {"count": 4, "elements": 54, "bytes": 224}
