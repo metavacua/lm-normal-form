@@ -1,0 +1,62 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: CC-BY-SA-4.0
+#
+# REUSE 3.3 configuration for lm-normal-form.
+#
+# Licensing model:
+#   * General default:   CC-BY-SA-4.0      (documentation and other creative works)
+#   * Specific override: AGPL-3.0-or-later (software, and data that corresponds
+#                        to a program: queries, vocabularies, workflows, config)
+#
+# A per-file SPDX header always wins over an annotation declared here.
+
+version = 1
+SPDX-PackageName = "lm-normal-form"
+SPDX-PackageSupplier = "metavacua <https://github.com/metavacua>"
+SPDX-PackageDownloadLocation = "https://github.com/metavacua/lm-normal-form"
+
+# --- Default: documentation and other creative works ------------------------
+
+[[annotations]]
+path = "**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Ian Douglas Lawrence Norman McLean"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+# --- Override: software and program-corresponding data ----------------------
+
+[[annotations]]
+path = [
+    "src/**",
+    "tests/**",
+    "queries/**",
+    ".github/**",
+    "pyproject.toml",
+    "**/*.py",
+    "**/*.rq",
+    "**/*.ttl",
+    "**/*.sh",
+    "**/*.rs",
+    "**/*.toml",
+    "**/*.yml",
+    "**/*.yaml",
+]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Ian Douglas Lawrence Norman McLean"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+# --- This file and the licence texts keep the general default ---------------
+
+[[annotations]]
+path = ["REUSE.toml"]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Ian Douglas Lawrence Norman McLean"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+# --- Trivial / non-copyrightable files ---------------------------------------
+
+[[annotations]]
+path = ["**/.gitkeep", "**/.gitignore", "**/.gitattributes"]
+precedence = "override"
+SPDX-FileCopyrightText = "NONE"
+SPDX-License-Identifier = "CC0-1.0"

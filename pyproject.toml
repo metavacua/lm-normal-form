@@ -1,0 +1,25 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+[project]
+name = "lmnf"
+version = "0.0.0"
+description = "Tooling for the lm-normal-form experiments"
+requires-python = ">=3.11"
+license = "AGPL-3.0-or-later"
+dependencies = ["onnx", "pyoxigraph"]
+
+[project.optional-dependencies]
+test = ["pytest"]
+experiment = ["huggingface_hub", "numpy", "onnxruntime", "torch", "transformers"]
+
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "experiments"]
+pythonpath = ["src"]
