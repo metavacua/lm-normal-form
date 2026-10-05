@@ -1,0 +1,92 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0002, cell 12, run again on its own. In the first run the builder's
+# --help crashed inside a setup step, so the cell was never evaluated.
+#
+# This file also tries a better way of recording outcomes: every observation
+# has an id, and the last step writes the workflow's own `steps` context, which
+# keeps each step's real outcome.
+#
+# Second attempt: the builder asks for a Hugging Face login by default. The
+# model is public, so authentication is switched off with the builder's own
+# option. No token is used anywhere in this repository.
+name: batch 0002 cell 12
+
+on:
+  push:
+    branches: ["batch/0002-**"]
+    paths: [".github/workflows/batch-0002-cell-12.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-0002-cell-12-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+
+jobs:
+  ort-genai-builder:
+    name: 12 ONNX Runtime model builder
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install the builder and an inspector
+        run: |
+          mkdir -p out work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet onnxruntime-genai onnxruntime onnx onnx-ir transformers huggingface_hub onnxslim
+          python -m pip freeze > out/versions.txt
+      - id: help
+        name: "builder: its own help text"
+        continue-on-error: true
+        run: python -m onnxruntime_genai.models.builder --help > out/builder-help.txt
+      - id: build
+        name: "builder: SmolLM2-135M-Instruct, float32, for the CPU"
+        continue-on-error: true
+        run: >
+          /usr/bin/time -v python -m onnxruntime_genai.models.builder
+          -m HuggingFaceTB/SmolLM2-135M-Instruct -o work/smollm2-genai -p fp32 -e cpu -c work/cache
+          --extra_options hf_token=false
+          2>&1 | tee out/smollm2.builder.log
+      - id: check
+        name: "check-model: the graph the builder wrote"
+        continue-on-error: true
+        run: /usr/bin/time -v check-model work/smollm2-genai/model.onnx
+      - id: operators
+        name: "onnxslim: the operators in the graph the builder wrote"
+        continue-on-error: true
+        run: /usr/bin/time -v onnxslim work/smollm2-genai/model.onnx work/smollm2-genai-slim.onnx 2>&1 | tee out/smollm2.onnxslim.txt
+      - name: What the builder wrote
+        if: always()
+        run: |
+          ls -l work/smollm2-genai > out/files.txt || true
+          cat out/files.txt
+          cp work/smollm2-genai/genai_config.json out/ || true
+          free -m
+          df -h .
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-12-ort-genai-builder-rerun
+          path: out/
+          retention-days: 1

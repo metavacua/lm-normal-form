@@ -1,0 +1,30 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Two existing linters, on every pull request and on main.
+name: checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: licences and workflows
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: "reuse: every file states its licence"
+        run: pipx run reuse lint
+      - name: "actionlint: the workflows are well formed"
+        if: always()
+        run: docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:latest -color

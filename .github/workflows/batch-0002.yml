@@ -1,0 +1,642 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0002: existing tools on sampled models. Written down in docs/batches/0002.md.
+#
+# Nothing here is code of this repository's own. Every step invokes a tool that
+# already exists. What is hand-written is the choice of tools, options and samples.
+#
+# How to read a job:
+# - A step marked continue-on-error is an observation. Its outcome, success or
+#   failure, is the result; the job stays green either way.
+# - Any other step is setup. If setup fails, the job fails: the tooling broke.
+# - Tool runs go through GNU time, so that what each one needs is on record
+#   before anything like it is run on a smaller machine.
+name: batch 0002
+
+on:
+  push:
+    branches: ["batch/0002-**"]
+    paths: [".github/workflows/batch-0002.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-0002-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PROMPT: "The capital of France is"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  POLYGRAPHY_AUTOINSTALL_DEPS: "1"
+
+jobs:
+  hub-api:
+    name: "01 Hub API: what a repository says about itself"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      REPOS: >-
+        HuggingFaceTB/SmolLM2-135M-Instruct HuggingFaceTB/SmolLM2-360M-Instruct
+        openai-community/gpt2 Qwen/Qwen3-0.6B onnx-community/Qwen3-0.6B-ONNX Qwen/Qwen3-0.6B-GGUF
+    steps:
+      - name: Fetch model information and commit history
+        run: |
+          mkdir -p out
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          read -ra repos <<< "$REPOS"
+          for repo in "${repos[@]}"; do
+            name="${repo//\//__}"
+            curl -sSfL "https://huggingface.co/api/models/$repo?blobs=true" -o "out/$name.model.json"
+            curl -sSfL "https://huggingface.co/api/models/$repo/commits/main" -o "out/$name.commits.json"
+          done
+      - name: "jq: identity, declared architecture and files of each repository"
+        continue-on-error: true
+        run: >
+          jq '{id, sha, library_name, pipeline_tag, gated, model_type: .config.model_type,
+          architectures: .config.architectures, safetensors, gguf,
+          files: [.siblings[] | {rfilename, size}]}' out/*.model.json | tee out/summary.json
+      - name: "jq: revisions of each repository"
+        continue-on-error: true
+        run: >
+          jq -c '[.[] | {commit: .id[0:10], date, title}]' out/*.commits.json | tee out/revisions.jsonl
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-01-hub-api
+          path: out/
+          retention-days: 1
+
+  safetensors-header:
+    name: "02 safetensors: the header, without the weights"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      REPOS: >-
+        HuggingFaceTB/SmolLM2-135M-Instruct HuggingFaceTB/SmolLM2-360M-Instruct
+        openai-community/gpt2 Qwen/Qwen3-0.6B
+    steps:
+      - name: Read each header by range request
+        run: |
+          mkdir -p out
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          read -ra repos <<< "$REPOS"
+          for repo in "${repos[@]}"; do
+            name="${repo//\//__}"
+            url="https://huggingface.co/$repo/resolve/main/model.safetensors"
+            length="$(curl -sSfL -r 0-7 "$url" | od -An -tu8 | tr -d ' ')"
+            curl -sSfL -r "8-$((length + 7))" "$url" -o "out/$name.header.json"
+            echo "$repo: header of $length bytes"
+          done
+      - name: "jq: tensors, element types and distinct shapes in each header"
+        continue-on-error: true
+        run: >
+          jq -c '{file: input_filename, tensors: (del(.__metadata__) | length),
+          dtypes: (del(.__metadata__) | [.[].dtype] | group_by(.) | map({key: .[0], value: length}) | from_entries),
+          distinct_shapes: (del(.__metadata__) | [.[].shape] | unique | length),
+          metadata: .__metadata__}' out/*.header.json | tee out/summary.jsonl
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-02-safetensors-header
+          path: out/
+          retention-days: 1
+
+  quicktype:
+    name: "03 quicktype: a schema and typed code from sampled configurations"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Sample three configurations of each of three architectures
+        run: |
+          mkdir -p samples/llama samples/gpt2 samples/qwen3 arrays out
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          curl -sSfL https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct/resolve/main/config.json -o samples/llama/smollm2-135m-instruct.json
+          curl -sSfL https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct/resolve/main/config.json -o samples/llama/smollm2-360m-instruct.json
+          curl -sSfL https://huggingface.co/HuggingFaceTB/SmolLM2-1.7B-Instruct/resolve/main/config.json -o samples/llama/smollm2-1.7b-instruct.json
+          curl -sSfL https://huggingface.co/openai-community/gpt2/resolve/main/config.json -o samples/gpt2/gpt2.json
+          curl -sSfL https://huggingface.co/openai-community/gpt2-medium/resolve/main/config.json -o samples/gpt2/gpt2-medium.json
+          curl -sSfL https://huggingface.co/distilbert/distilgpt2/resolve/main/config.json -o samples/gpt2/distilgpt2.json
+          curl -sSfL https://huggingface.co/Qwen/Qwen3-0.6B/resolve/main/config.json -o samples/qwen3/qwen3-0.6b.json
+          curl -sSfL https://huggingface.co/Qwen/Qwen3-1.7B/resolve/main/config.json -o samples/qwen3/qwen3-1.7b.json
+          curl -sSfL https://huggingface.co/Qwen/Qwen3-4B/resolve/main/config.json -o samples/qwen3/qwen3-4b.json
+          jq -s . samples/llama/*.json > arrays/LlamaConfig.json
+          jq -s . samples/gpt2/*.json > arrays/Gpt2Config.json
+          jq -s . samples/qwen3/*.json > arrays/Qwen3Config.json
+          cp -r samples arrays out/
+      - name: "quicktype: version"
+        run: npx --yes quicktype --version
+      - name: "quicktype: JSON Schema for llama configurations"
+        continue-on-error: true
+        run: /usr/bin/time -v npx --yes quicktype arrays/LlamaConfig.json --lang schema --out out/LlamaConfig.schema.json
+      - name: "quicktype: JSON Schema for gpt2 configurations"
+        continue-on-error: true
+        run: /usr/bin/time -v npx --yes quicktype arrays/Gpt2Config.json --lang schema --out out/Gpt2Config.schema.json
+      - name: "quicktype: JSON Schema for qwen3 configurations"
+        continue-on-error: true
+        run: /usr/bin/time -v npx --yes quicktype arrays/Qwen3Config.json --lang schema --out out/Qwen3Config.schema.json
+      - name: "quicktype: Rust types for llama configurations"
+        continue-on-error: true
+        run: /usr/bin/time -v npx --yes quicktype arrays/LlamaConfig.json --lang rust --out out/llama_config.rs
+      - name: "quicktype: Python types for llama configurations"
+        continue-on-error: true
+        run: /usr/bin/time -v npx --yes quicktype arrays/LlamaConfig.json --lang python --out out/llama_config.py
+      - name: "check-jsonschema: the llama samples satisfy the llama schema (expected to pass)"
+        continue-on-error: true
+        run: pipx run check-jsonschema --schemafile out/LlamaConfig.schema.json arrays/LlamaConfig.json
+      - name: "check-jsonschema, control: the gpt2 samples against the llama schema (expected to fail)"
+        continue-on-error: true
+        run: pipx run check-jsonschema --schemafile out/LlamaConfig.schema.json arrays/Gpt2Config.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-03-quicktype
+          path: out/
+          retention-days: 1
+
+  linkml:
+    name: "04 LinkML: OWL, SHACL and JSON-LD from the same sampled configurations"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Sample three configurations of each of two architectures
+        run: |
+          mkdir -p samples/llama samples/gpt2 wrapped out
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          curl -sSfL https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct/resolve/main/config.json -o samples/llama/smollm2-135m-instruct.json
+          curl -sSfL https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct/resolve/main/config.json -o samples/llama/smollm2-360m-instruct.json
+          curl -sSfL https://huggingface.co/HuggingFaceTB/SmolLM2-1.7B-Instruct/resolve/main/config.json -o samples/llama/smollm2-1.7b-instruct.json
+          curl -sSfL https://huggingface.co/openai-community/gpt2/resolve/main/config.json -o samples/gpt2/gpt2.json
+          curl -sSfL https://huggingface.co/openai-community/gpt2-medium/resolve/main/config.json -o samples/gpt2/gpt2-medium.json
+          curl -sSfL https://huggingface.co/distilbert/distilgpt2/resolve/main/config.json -o samples/gpt2/distilgpt2.json
+          jq -s '{configs: .}' samples/llama/*.json > wrapped/llama.json
+          jq -s '{configs: .}' samples/gpt2/*.json > wrapped/gpt2.json
+          cp -r wrapped out/
+      - name: Install schema-automator and LinkML
+        run: |
+          python -m pip install --quiet schema-automator
+          python -m pip freeze > out/versions.txt
+      - name: "schemauto: generalise the llama samples to a LinkML schema"
+        continue-on-error: true
+        run: /usr/bin/time -v schemauto generalize-json wrapped/llama.json --schema-name llama_config -o out/llama.linkml.yaml
+      - name: "gen-owl: OWL from the schema"
+        continue-on-error: true
+        run: gen-owl out/llama.linkml.yaml > out/llama.owl.ttl
+      - name: "gen-shacl: SHACL shapes from the schema"
+        continue-on-error: true
+        run: gen-shacl out/llama.linkml.yaml > out/llama.shacl.ttl
+      - name: "gen-jsonld-context: a JSON-LD context from the schema"
+        continue-on-error: true
+        run: gen-jsonld-context out/llama.linkml.yaml > out/llama.context.jsonld
+      - name: "gen-json-schema: JSON Schema from the schema"
+        continue-on-error: true
+        run: gen-json-schema out/llama.linkml.yaml > out/llama.schema.json
+      - name: "gen-pydantic: Python classes from the schema"
+        continue-on-error: true
+        run: gen-pydantic out/llama.linkml.yaml > out/llama_model.py
+      - name: "linkml-validate: the llama samples satisfy the schema (expected to pass)"
+        continue-on-error: true
+        run: linkml-validate --schema out/llama.linkml.yaml --target-class Container wrapped/llama.json
+      - name: "linkml-validate, control: the gpt2 samples against the llama schema (expected to fail)"
+        continue-on-error: true
+        run: linkml-validate --schema out/llama.linkml.yaml --target-class Container wrapped/gpt2.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-04-linkml
+          path: out/
+          retention-days: 1
+
+  llamacpp-published:
+    name: "05 llama.cpp runs a published GGUF file (baseline)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Machine
+        run: |
+          mkdir -p out work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          nproc
+          free -m
+          df -h .
+      - name: Build the llama.cpp server from source
+        run: |
+          git clone --depth 1 https://github.com/ggml-org/llama.cpp work/llama.cpp
+          git -C work/llama.cpp rev-parse HEAD | tee out/llama.cpp.revision.txt
+          cmake -S work/llama.cpp -B work/build -DCMAKE_BUILD_TYPE=Release -DLLAMA_CURL=OFF -DLLAMA_BUILD_TESTS=OFF
+          /usr/bin/time -v cmake --build work/build --target llama-server -j "$(nproc)"
+      - name: Download a published GGUF file
+        run: |
+          python -m pip install --quiet huggingface_hub gguf
+          hf download Qwen/Qwen3-0.6B-GGUF Qwen3-0.6B-Q8_0.gguf --local-dir work/qwen3
+          sha256sum work/qwen3/Qwen3-0.6B-Q8_0.gguf | tee out/qwen3.gguf.sha256
+      - name: "gguf-dump: what the file says about itself"
+        continue-on-error: true
+        run: /usr/bin/time -v gguf-dump --json work/qwen3/Qwen3-0.6B-Q8_0.gguf > out/qwen3.gguf.json
+      - name: "llama.cpp: load the file and serve it"
+        continue-on-error: true
+        run: |
+          work/build/bin/llama-server -m work/qwen3/Qwen3-0.6B-Q8_0.gguf --host 127.0.0.1 --port 8080 -c 512 > out/qwen3.server.log 2>&1 &
+          curl -sSf --retry 90 --retry-delay 1 --retry-connrefused --retry-all-errors http://127.0.0.1:8080/health
+      - name: "llama.cpp: how it tokenises the prompt"
+        continue-on-error: true
+        run: >
+          jq -n --arg content "$PROMPT" '{content: $content, add_special: true, with_pieces: true}'
+          | curl -sSf http://127.0.0.1:8080/tokenize -H 'Content-Type: application/json' -d @-
+          | tee out/qwen3.tokens.json
+      - name: "llama.cpp: the next token and its five most probable alternatives"
+        continue-on-error: true
+        run: >
+          jq -n --arg prompt "$PROMPT" '{prompt: $prompt, n_predict: 1, temperature: 0, n_probs: 5, cache_prompt: false}'
+          | curl -sSf http://127.0.0.1:8080/completion -H 'Content-Type: application/json' -d @-
+          | tee out/qwen3.completion.json
+      - name: What the run used
+        if: always()
+        run: |
+          free -m
+          df -h .
+          tail -n 40 out/qwen3.server.log || true
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-05-llamacpp-published
+          path: out/
+          retention-days: 1
+
+  llamacpp-converted:
+    name: "06 llama.cpp converts safetensors to GGUF and runs the result (baseline)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Machine
+        run: |
+          mkdir -p out work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          nproc
+          free -m
+          df -h .
+      - name: Build the llama.cpp server from source
+        run: |
+          git clone --depth 1 https://github.com/ggml-org/llama.cpp work/llama.cpp
+          git -C work/llama.cpp rev-parse HEAD | tee out/llama.cpp.revision.txt
+          cmake -S work/llama.cpp -B work/build -DCMAKE_BUILD_TYPE=Release -DLLAMA_CURL=OFF -DLLAMA_BUILD_TESTS=OFF
+          /usr/bin/time -v cmake --build work/build --target llama-server -j "$(nproc)"
+      - name: Install what the converter asks for
+        run: |
+          python -m pip install --quiet -r work/llama.cpp/requirements/requirements-convert_hf_to_gguf.txt
+          python -m pip freeze > out/versions.txt
+      - name: Download two models as safetensors
+        run: |
+          hf download openai-community/gpt2 --include "*.json" "*.txt" "model.safetensors" --local-dir work/gpt2
+          hf download HuggingFaceTB/SmolLM2-135M-Instruct --include "*.json" "*.txt" "model.safetensors" --local-dir work/smollm2
+          ls -l work/gpt2 work/smollm2
+      - name: "convert_hf_to_gguf: the architectures the converter knows"
+        continue-on-error: true
+        run: python work/llama.cpp/convert_hf_to_gguf.py --print-supported-models | tee out/supported-models.txt
+      - name: "convert_hf_to_gguf: GPT-2, safetensors to GGUF, float32"
+        continue-on-error: true
+        run: /usr/bin/time -v python work/llama.cpp/convert_hf_to_gguf.py work/gpt2 --outfile work/gpt2.gguf --outtype f32
+      - name: "gguf-dump: the converted GPT-2 file"
+        continue-on-error: true
+        run: python work/llama.cpp/gguf-py/gguf/scripts/gguf_dump.py --json work/gpt2.gguf > out/gpt2.gguf.json
+      - name: "llama.cpp: load the converted GPT-2 and serve it"
+        continue-on-error: true
+        run: |
+          work/build/bin/llama-server -m work/gpt2.gguf --host 127.0.0.1 --port 8080 -c 512 > out/gpt2.server.log 2>&1 &
+          curl -sSf --retry 90 --retry-delay 1 --retry-connrefused --retry-all-errors http://127.0.0.1:8080/health
+      - name: "llama.cpp: how it tokenises the prompt for GPT-2"
+        continue-on-error: true
+        run: >
+          jq -n --arg content "$PROMPT" '{content: $content, add_special: true, with_pieces: true}'
+          | curl -sSf http://127.0.0.1:8080/tokenize -H 'Content-Type: application/json' -d @-
+          | tee out/gpt2.tokens.json
+      - name: "llama.cpp: GPT-2's next token and its five most probable alternatives"
+        continue-on-error: true
+        run: >
+          jq -n --arg prompt "$PROMPT" '{prompt: $prompt, n_predict: 1, temperature: 0, n_probs: 5, cache_prompt: false}'
+          | curl -sSf http://127.0.0.1:8080/completion -H 'Content-Type: application/json' -d @-
+          | tee out/gpt2.completion.json
+      - name: "convert_hf_to_gguf: SmolLM2-135M-Instruct, safetensors to GGUF, float32"
+        continue-on-error: true
+        run: /usr/bin/time -v python work/llama.cpp/convert_hf_to_gguf.py work/smollm2 --outfile work/smollm2.gguf --outtype f32
+      - name: "gguf-dump: the converted SmolLM2 file"
+        continue-on-error: true
+        run: python work/llama.cpp/gguf-py/gguf/scripts/gguf_dump.py --json work/smollm2.gguf > out/smollm2.gguf.json
+      - name: "llama.cpp: load the converted SmolLM2 and serve it"
+        continue-on-error: true
+        run: |
+          work/build/bin/llama-server -m work/smollm2.gguf --host 127.0.0.1 --port 8081 -c 512 > out/smollm2.server.log 2>&1 &
+          curl -sSf --retry 90 --retry-delay 1 --retry-connrefused --retry-all-errors http://127.0.0.1:8081/health
+      - name: "llama.cpp: how it tokenises the prompt for SmolLM2"
+        continue-on-error: true
+        run: >
+          jq -n --arg content "$PROMPT" '{content: $content, add_special: true, with_pieces: true}'
+          | curl -sSf http://127.0.0.1:8081/tokenize -H 'Content-Type: application/json' -d @-
+          | tee out/smollm2.tokens.json
+      - name: "llama.cpp: SmolLM2's next token and its five most probable alternatives"
+        continue-on-error: true
+        run: >
+          jq -n --arg prompt "$PROMPT" '{prompt: $prompt, n_predict: 1, temperature: 0, n_probs: 5, cache_prompt: false}'
+          | curl -sSf http://127.0.0.1:8081/completion -H 'Content-Type: application/json' -d @-
+          | tee out/smollm2.completion.json
+      - name: What the run used
+        if: always()
+        run: |
+          ls -l work/*.gguf || true
+          free -m
+          df -h .
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-06-llamacpp-converted
+          path: out/
+          retention-days: 1
+
+  onnx-published:
+    name: "07 ONNX: the checker and two inspectors on published files"
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install the tools and download two published graphs
+        run: |
+          mkdir -p out work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet onnx onnxruntime polygraphy onnx_graphsurgeon onnxslim huggingface_hub
+          python -m pip freeze > out/versions.txt
+          hf download HuggingFaceTB/SmolLM2-135M-Instruct onnx/model.onnx --local-dir work/smollm2
+          hf download openai-community/gpt2 onnx/decoder_model.onnx --local-dir work/gpt2
+      - name: "check-model: SmolLM2-135M-Instruct, published (batch 0001 saw this rejected)"
+        continue-on-error: true
+        run: /usr/bin/time -v check-model work/smollm2/onnx/model.onnx
+      - name: "check-model: GPT-2 decoder, published (batch 0001 saw this accepted)"
+        continue-on-error: true
+        run: /usr/bin/time -v check-model work/gpt2/onnx/decoder_model.onnx
+      - name: "polygraphy inspect: SmolLM2-135M-Instruct"
+        continue-on-error: true
+        run: /usr/bin/time -v -o out/smollm2.polygraphy.time polygraphy inspect model work/smollm2/onnx/model.onnx > out/smollm2.polygraphy.txt
+      - name: "polygraphy inspect: GPT-2 decoder"
+        continue-on-error: true
+        run: /usr/bin/time -v -o out/gpt2.polygraphy.time polygraphy inspect model work/gpt2/onnx/decoder_model.onnx > out/gpt2.polygraphy.txt
+      - name: "onnxslim: GPT-2 decoder, what it reports and what it rewrites"
+        continue-on-error: true
+        run: /usr/bin/time -v onnxslim work/gpt2/onnx/decoder_model.onnx work/gpt2-slim.onnx 2>&1 | tee out/gpt2.onnxslim.txt
+      - name: "check-model: GPT-2 decoder after onnxslim"
+        continue-on-error: true
+        run: check-model work/gpt2-slim.onnx
+      - name: "onnxslim: SmolLM2-135M-Instruct"
+        continue-on-error: true
+        run: /usr/bin/time -v onnxslim work/smollm2/onnx/model.onnx work/smollm2-slim.onnx 2>&1 | tee out/smollm2.onnxslim.txt
+      - name: What the inspectors wrote
+        if: always()
+        run: |
+          head -n 60 out/*.polygraphy.txt || true
+          cat out/*.time || true
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-07-onnx-published
+          path: out/
+          retention-days: 1
+
+  onnx-export:
+    name: "08 Optimum exports ONNX from the library and checks it against PyTorch"
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install the exporter
+        run: |
+          mkdir -p out work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet "optimum[onnxruntime]" onnx
+          python -m pip freeze > out/versions.txt
+          optimum-cli export onnx --help > out/optimum-export-help.txt
+      - name: "optimum-cli: export SmolLM2-135M-Instruct, with its own comparison against PyTorch"
+        continue-on-error: true
+        run: /usr/bin/time -v optimum-cli export onnx --model HuggingFaceTB/SmolLM2-135M-Instruct --task text-generation-with-past work/smollm2-export 2>&1 | tee out/smollm2.export.log
+      - name: "check-model: the exported SmolLM2 graph"
+        continue-on-error: true
+        run: check-model work/smollm2-export/model.onnx
+      - name: "optimum-cli: export GPT-2, with its own comparison against PyTorch"
+        continue-on-error: true
+        run: /usr/bin/time -v optimum-cli export onnx --model openai-community/gpt2 --task text-generation-with-past work/gpt2-export 2>&1 | tee out/gpt2.export.log
+      - name: "check-model: the exported GPT-2 graph"
+        continue-on-error: true
+        run: check-model work/gpt2-export/model.onnx
+      - name: What the exporter wrote
+        if: always()
+        run: |
+          ls -l work/smollm2-export work/gpt2-export > out/files.txt || true
+          cat out/files.txt
+          sha256sum work/smollm2-export/model.onnx work/gpt2-export/model.onnx | tee out/sha256.txt || true
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-08-onnx-export
+          path: out/
+          retention-days: 1
+
+  onnx2rdf:
+    name: "09 ONNX2RDF: a published graph as RDF, loaded into Oxigraph"
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Install ONNX2RDF, its mapper and Oxigraph
+        run: |
+          mkdir -p out work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          java -version
+          npm install --global @rmlio/yarrrml-parser
+          python -m pip install --quiet onnx-2-rdf oxigraph huggingface_hub
+          python -m pip freeze > out/versions.txt
+          onnx-parser --help > out/onnx-parser-help.txt
+          oxigraph --help > out/oxigraph-help.txt
+          hf download openai-community/gpt2 onnx/decoder_model.onnx --local-dir work/gpt2
+          hf download HuggingFaceTB/SmolLM2-135M-Instruct onnx/model.onnx --local-dir work/smollm2
+      - name: "onnx-parser: GPT-2 decoder to N-Quads"
+        continue-on-error: true
+        run: /usr/bin/time -v onnx-parser work/gpt2/onnx/decoder_model.onnx --target_path work/rdf-gpt2 --rdf_format nquads 2>&1 | tee out/gpt2.onnx2rdf.log
+      - name: "What ONNX2RDF wrote for GPT-2"
+        continue-on-error: true
+        run: |
+          find work/rdf-gpt2 -type f -exec ls -l {} + | tee out/gpt2.files.txt
+          find work/rdf-gpt2 -type f -exec wc -l {} + | tee -a out/gpt2.files.txt
+          find work/rdf-gpt2 -type f -exec head -n 200 {} \; > out/gpt2.sample.nq
+      - name: "oxigraph: load the GPT-2 graph"
+        continue-on-error: true
+        run: find work/rdf-gpt2 -type f -exec /usr/bin/time -v oxigraph load --location work/store-gpt2 --file {} \;
+      - name: "oxigraph: instances per class in the GPT-2 graph"
+        continue-on-error: true
+        run: >
+          oxigraph query --location work/store-gpt2 --results-format tsv
+          --query 'SELECT ?class (COUNT(?s) AS ?instances) WHERE { { ?s a ?class } UNION { GRAPH ?g { ?s a ?class } } } GROUP BY ?class ORDER BY DESC(?instances)'
+          | tee out/gpt2.classes.tsv
+      - name: "onnx-parser: SmolLM2-135M-Instruct, which uses an operator ONNX does not define"
+        continue-on-error: true
+        run: /usr/bin/time -v onnx-parser work/smollm2/onnx/model.onnx --target_path work/rdf-smollm2 --rdf_format nquads 2>&1 | tee out/smollm2.onnx2rdf.log
+      - name: "What ONNX2RDF wrote for SmolLM2"
+        continue-on-error: true
+        run: |
+          find work/rdf-smollm2 -type f -exec ls -l {} + | tee out/smollm2.files.txt
+          find work/rdf-smollm2 -type f -exec wc -l {} + | tee -a out/smollm2.files.txt
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-09-onnx2rdf
+          path: out/
+          retention-days: 1
+
+  onnx-proto-schema:
+    name: "10 ONNX's protobuf schema to JSON Schema, LinkML, OWL and SHACL"
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Fetch the schema and install the generators
+        run: |
+          mkdir -p out/jsonschema work/onnx
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          curl -sSfL https://raw.githubusercontent.com/onnx/onnx/main/onnx/onnx.proto -o work/onnx/onnx.proto
+          sha256sum work/onnx/onnx.proto | tee out/onnx.proto.sha256
+          go install github.com/bufbuild/protoschema-plugins/cmd/protoc-gen-jsonschema@latest
+          python -m pip install --quiet grpcio-tools schema-automator
+          python -m pip freeze > out/versions.txt
+      - name: "protoc-gen-jsonschema: JSON Schema from onnx.proto"
+        continue-on-error: true
+        run: >
+          /usr/bin/time -v python -m grpc_tools.protoc -I work/onnx
+          --plugin=protoc-gen-jsonschema="$(go env GOPATH)/bin/protoc-gen-jsonschema"
+          --jsonschema_out=out/jsonschema work/onnx/onnx.proto
+      - name: What the plugin wrote
+        continue-on-error: true
+        run: |
+          ls -l out/jsonschema > out/jsonschema-files.txt
+          cat out/jsonschema-files.txt
+      - name: "schemauto: import the JSON Schema of ModelProto into LinkML"
+        continue-on-error: true
+        run: /usr/bin/time -v schemauto import-json-schema out/jsonschema/onnx.ModelProto.schema.json --schema-name onnx -o out/onnx.linkml.yaml
+      - name: "schemauto: import the bundled JSON Schema of ModelProto into LinkML"
+        continue-on-error: true
+        run: /usr/bin/time -v schemauto import-json-schema out/jsonschema/onnx.ModelProto.schema.bundle.json --schema-name onnx -o out/onnx.bundle.linkml.yaml
+      - name: "gen-owl: OWL from the imported schema"
+        continue-on-error: true
+        run: gen-owl out/onnx.linkml.yaml > out/onnx.owl.ttl
+      - name: "gen-shacl: SHACL shapes from the imported schema"
+        continue-on-error: true
+        run: gen-shacl out/onnx.linkml.yaml > out/onnx.shacl.ttl
+      - name: "gen-owl: OWL from the bundled import"
+        continue-on-error: true
+        run: gen-owl out/onnx.bundle.linkml.yaml > out/onnx.bundle.owl.ttl
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-10-onnx-proto-schema
+          path: out/
+          retention-days: 1
+
+  mlir-import:
+    name: "11 IREE imports published ONNX graphs into MLIR"
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install the importer and download two published graphs
+        run: |
+          mkdir -p out work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet "iree-base-compiler[onnx]" huggingface_hub
+          python -m pip freeze > out/versions.txt
+          iree-import-onnx --help > out/iree-import-onnx-help.txt
+          hf download openai-community/gpt2 onnx/decoder_model.onnx --local-dir work/gpt2
+          hf download HuggingFaceTB/SmolLM2-135M-Instruct onnx/model.onnx --local-dir work/smollm2
+      - name: "iree-import-onnx: GPT-2 decoder"
+        continue-on-error: true
+        run: /usr/bin/time -v iree-import-onnx work/gpt2/onnx/decoder_model.onnx -o work/gpt2.mlir 2>&1 | tee out/gpt2.import.log
+      - name: "iree-import-onnx: SmolLM2-135M-Instruct, which uses an operator ONNX does not define"
+        continue-on-error: true
+        run: /usr/bin/time -v iree-import-onnx work/smollm2/onnx/model.onnx -o work/smollm2.mlir 2>&1 | tee out/smollm2.import.log
+      - name: What the importer wrote
+        if: always()
+        run: |
+          ls -l work/*.mlir > out/files.txt || true
+          cat out/files.txt
+          head -c 4000 work/gpt2.mlir > out/gpt2.mlir.head.txt || true
+          head -c 4000 work/smollm2.mlir > out/smollm2.mlir.head.txt || true
+          free -m
+          df -h .
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-11-mlir-import
+          path: out/
+          retention-days: 1
+
+  ort-genai-builder:
+    name: "12 ONNX Runtime's model builder: where a non-standard operator comes from"
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install the builder
+        run: |
+          mkdir -p out work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet onnxruntime-genai onnxruntime onnx onnx-ir transformers huggingface_hub
+          python -m pip freeze > out/versions.txt
+          python -m onnxruntime_genai.models.builder --help > out/builder-help.txt
+      - name: "builder: SmolLM2-135M-Instruct, float32, for the CPU"
+        continue-on-error: true
+        run: >
+          /usr/bin/time -v python -m onnxruntime_genai.models.builder
+          -m HuggingFaceTB/SmolLM2-135M-Instruct -o work/smollm2-genai -p fp32 -e cpu -c work/cache
+          2>&1 | tee out/smollm2.builder.log
+      - name: "check-model: the graph the builder wrote"
+        continue-on-error: true
+        run: check-model work/smollm2-genai/model.onnx
+      - name: What the builder wrote
+        if: always()
+        run: |
+          ls -l work/smollm2-genai > out/files.txt || true
+          cat out/files.txt
+          cp work/smollm2-genai/genai_config.json out/ || true
+          free -m
+          df -h .
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-12-ort-genai-builder
+          path: out/
+          retention-days: 1
