@@ -30,6 +30,7 @@ path = [
     "src/**",
     "tests/**",
     "queries/**",
+    "batches/**",
     ".github/**",
     "pyproject.toml",
     "**/*.py",

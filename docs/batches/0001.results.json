@@ -1,0 +1,563 @@
+{
+ "batch": "0001",
+ "cells": {
+  "01-smollm2-135m-fp32": {
+   "experiment": "structure",
+   "headline": "`HuggingFaceTB/SmolLM2-135M-Instruct` `onnx/model.onnx`: the structure check did not complete.",
+   "inconclusive": "the ONNX checker rejected the model: No Op registered for SimplifiedLayerNormalization with domain_version of 14\n\n==> Context: Bad node spec for node. Name: /model/layers.0/input_layernorm/LayerNorm OpType: SimplifiedLayerNormalization",
+   "verdicts": {
+    "H1 no control flow, no cycle": "NOT EVALUATED",
+    "H2 every parameter is stored in the graph": "NOT EVALUATED",
+    "H5 the graph computes what the PyTorch weights compute": "NOT EVALUATED"
+   }
+  },
+  "02-smollm2-135m-fp16": {
+   "experiment": "structure",
+   "headline": "`HuggingFaceTB/SmolLM2-135M-Instruct` `onnx/model_fp16.onnx`: the structure check did not complete.",
+   "inconclusive": "the ONNX checker rejected the model: No Op registered for SimplifiedLayerNormalization with domain_version of 14\n\n==> Context: Bad node spec for node. Name: /model/layers.0/input_layernorm/LayerNorm OpType: SimplifiedLayerNormalization",
+   "verdicts": {
+    "H1 no control flow, no cycle": "NOT EVALUATED",
+    "H2 every parameter is stored in the graph": "NOT EVALUATED",
+    "H5 the graph computes what the PyTorch weights compute": "NOT EVALUATED"
+   }
+  },
+  "03-smollm2-135m-q4": {
+   "experiment": "structure",
+   "headline": "`HuggingFaceTB/SmolLM2-135M-Instruct` `onnx/model_q4.onnx`: the structure check did not complete.",
+   "inconclusive": "the ONNX checker rejected the model: No Op registered for SimplifiedLayerNormalization with domain_version of 14\n\n==> Context: Bad node spec for node. Name: /model/layers.0/input_layernorm/LayerNorm OpType: SimplifiedLayerNormalization",
+   "verdicts": {
+    "H1 no control flow, no cycle": "NOT EVALUATED",
+    "H2 every parameter is stored in the graph": "NOT EVALUATED",
+    "H5 the graph computes what the PyTorch weights compute": "NOT EVALUATED"
+   }
+  },
+  "04-smollm2-135m-q4f16": {
+   "experiment": "structure",
+   "headline": "`HuggingFaceTB/SmolLM2-135M-Instruct` `onnx/model_q4f16.onnx`: the structure check did not complete.",
+   "inconclusive": "the ONNX checker rejected the model: No Op registered for SimplifiedLayerNormalization with domain_version of 14\n\n==> Context: Bad node spec for node. Name: /model/layers.0/input_layernorm/LayerNorm OpType: SimplifiedLayerNormalization",
+   "verdicts": {
+    "H1 no control flow, no cycle": "NOT EVALUATED",
+    "H2 every parameter is stored in the graph": "NOT EVALUATED",
+    "H5 the graph computes what the PyTorch weights compute": "NOT EVALUATED"
+   }
+  },
+  "05-smollm2-135m-bnb4": {
+   "experiment": "structure",
+   "headline": "`HuggingFaceTB/SmolLM2-135M-Instruct` `onnx/model_bnb4.onnx`: the structure check did not complete.",
+   "inconclusive": "the ONNX checker rejected the model: No Op registered for SimplifiedLayerNormalization with domain_version of 14\n\n==> Context: Bad node spec for node. Name: /model/layers.0/input_layernorm/LayerNorm OpType: SimplifiedLayerNormalization",
+   "verdicts": {
+    "H1 no control flow, no cycle": "NOT EVALUATED",
+    "H2 every parameter is stored in the graph": "NOT EVALUATED",
+    "H5 the graph computes what the PyTorch weights compute": "NOT EVALUATED"
+   }
+  },
+  "06-smollm2-135m-int8": {
+   "experiment": "structure",
+   "headline": "`HuggingFaceTB/SmolLM2-135M-Instruct` `onnx/model_int8.onnx`: the structure check did not complete.",
+   "inconclusive": "the ONNX checker rejected the model: No Op registered for SimplifiedLayerNormalization with domain_version of 14\n\n==> Context: Bad node spec for node. Name: /model/layers.0/input_layernorm/LayerNorm OpType: SimplifiedLayerNormalization",
+   "verdicts": {
+    "H1 no control flow, no cycle": "NOT EVALUATED",
+    "H2 every parameter is stored in the graph": "NOT EVALUATED",
+    "H5 the graph computes what the PyTorch weights compute": "NOT EVALUATED"
+   }
+  },
+  "07-smollm2-135m-uint8": {
+   "experiment": "structure",
+   "headline": "`HuggingFaceTB/SmolLM2-135M-Instruct` `onnx/model_uint8.onnx`: the structure check did not complete.",
+   "inconclusive": "the ONNX checker rejected the model: No Op registered for SimplifiedLayerNormalization with domain_version of 14\n\n==> Context: Bad node spec for node. Name: /model/layers.0/input_layernorm/LayerNorm OpType: SimplifiedLayerNormalization",
+   "verdicts": {
+    "H1 no control flow, no cycle": "NOT EVALUATED",
+    "H2 every parameter is stored in the graph": "NOT EVALUATED",
+    "H5 the graph computes what the PyTorch weights compute": "NOT EVALUATED"
+   }
+  },
+  "08-smollm2-135m-quantized": {
+   "experiment": "structure",
+   "headline": "`HuggingFaceTB/SmolLM2-135M-Instruct` `onnx/model_quantized.onnx`: the structure check did not complete.",
+   "inconclusive": "the ONNX checker rejected the model: No Op registered for SimplifiedLayerNormalization with domain_version of 14\n\n==> Context: Bad node spec for node. Name: /model/layers.0/input_layernorm/LayerNorm OpType: SimplifiedLayerNormalization",
+   "verdicts": {
+    "H1 no control flow, no cycle": "NOT EVALUATED",
+    "H2 every parameter is stored in the graph": "NOT EVALUATED",
+    "H5 the graph computes what the PyTorch weights compute": "NOT EVALUATED"
+   }
+  },
+  "09-smollm2-360m-fp32": {
+   "experiment": "structure",
+   "headline": "`HuggingFaceTB/SmolLM2-360M-Instruct` `onnx/model.onnx`: the structure check did not complete.",
+   "inconclusive": "the ONNX checker rejected the model: No Op registered for SimplifiedLayerNormalization with domain_version of 14\n\n==> Context: Bad node spec for node. Name: /model/layers.0/input_layernorm/LayerNorm OpType: SimplifiedLayerNormalization",
+   "verdicts": {
+    "H1 no control flow, no cycle": "NOT EVALUATED",
+    "H2 every parameter is stored in the graph": "NOT EVALUATED",
+    "H5 the graph computes what the PyTorch weights compute": "NOT EVALUATED"
+   }
+  },
+  "10-gpt2-decoder": {
+   "experiment": "structure",
+   "headline": "`openai-community/gpt2` `onnx/decoder_model.onnx` (653,665,842 bytes): 3,095 nodes, 25 kinds of operator, 149 initializers (163,037,184 elements), 76,330 quads.",
+   "inconclusive": null,
+   "verdicts": {
+    "H1 no control flow, no cycle": "HOLDS",
+    "H2 every parameter is stored in the graph": "FAILS",
+    "H5 the graph computes what the PyTorch weights compute": "HOLDS"
+   }
+  },
+  "11-gpt2-merged": {
+   "experiment": "structure",
+   "headline": "`openai-community/gpt2` `onnx/decoder_model_merged.onnx` (655,189,339 bytes): 6,223 nodes, 26 kinds of operator, 149 initializers (163,037,184 elements), 152,562 quads.",
+   "inconclusive": null,
+   "verdicts": {
+    "H1 no control flow, no cycle": "FAILS",
+    "H2 every parameter is stored in the graph": "FAILS",
+    "H5 the graph computes what the PyTorch weights compute": "HOLDS"
+   }
+  },
+  "12-qwen3-0.6b-fp32": {
+   "experiment": "structure",
+   "headline": "`onnx-community/Qwen3-0.6B-ONNX` `onnx/model.onnx`: the structure check did not complete.",
+   "inconclusive": "the ONNX checker rejected the model: No Op registered for SimplifiedLayerNormalization with domain_version of 14\n\n==> Context: Bad node spec for node. Name: /model/layers.0/input_layernorm/LayerNorm OpType: SimplifiedLayerNormalization",
+   "verdicts": {
+    "H1 no control flow, no cycle": "NOT EVALUATED",
+    "H2 every parameter is stored in the graph": "NOT EVALUATED",
+    "H5 the graph computes what the PyTorch weights compute": "NOT EVALUATED"
+   }
+  }
+ },
+ "commit": "aed7a0987d25db59d5b6aa2ed0e0d0a20343b323",
+ "inconclusive": [
+  "01-smollm2-135m-fp32",
+  "02-smollm2-135m-fp16",
+  "03-smollm2-135m-q4",
+  "04-smollm2-135m-q4f16",
+  "05-smollm2-135m-bnb4",
+  "06-smollm2-135m-int8",
+  "07-smollm2-135m-uint8",
+  "08-smollm2-135m-quantized",
+  "09-smollm2-360m-fp32",
+  "12-qwen3-0.6b-fp32"
+ ],
+ "resources": {
+  "01-smollm2-135m-fp32": {
+   "command": [
+    "python",
+    "-m",
+    "lmnf",
+    "cell",
+    "--batch",
+    "batches/0001.json",
+    "--id",
+    "01-smollm2-135m-fp32",
+    "--out",
+    "out/01-smollm2-135m-fp32"
+   ],
+   "cpu_seconds": 3.777,
+   "disk_used_mib": 515.5,
+   "exit_status": 2,
+   "fits_locally": false,
+   "label": "01-smollm2-135m-fp32",
+   "machine": {
+    "cpus": 4,
+    "disk_free_mib": 86562.0,
+    "memory_available_mib": 14959.7,
+    "memory_mib": 15989.7
+   },
+   "measurer_rss_mib": 16.0,
+   "memory_drop_mib": 820.3,
+   "peak_rss_mib": 1130.4,
+   "wall_seconds": 4.618
+  },
+  "02-smollm2-135m-fp16": {
+   "command": [
+    "python",
+    "-m",
+    "lmnf",
+    "cell",
+    "--batch",
+    "batches/0001.json",
+    "--id",
+    "02-smollm2-135m-fp16",
+    "--out",
+    "out/02-smollm2-135m-fp16"
+   ],
+   "cpu_seconds": 2.491,
+   "disk_used_mib": 257.9,
+   "exit_status": 2,
+   "fits_locally": false,
+   "label": "02-smollm2-135m-fp16",
+   "machine": {
+    "cpus": 4,
+    "disk_free_mib": 86562.0,
+    "memory_available_mib": 14943.0,
+    "memory_mib": 15989.7
+   },
+   "measurer_rss_mib": 16.0,
+   "memory_drop_mib": 400.2,
+   "peak_rss_mib": 609.8,
+   "wall_seconds": 2.819
+  },
+  "03-smollm2-135m-q4": {
+   "command": [
+    "python",
+    "-m",
+    "lmnf",
+    "cell",
+    "--batch",
+    "batches/0001.json",
+    "--id",
+    "03-smollm2-135m-q4",
+    "--out",
+    "out/03-smollm2-135m-q4"
+   ],
+   "cpu_seconds": 2.09,
+   "disk_used_mib": 173.9,
+   "exit_status": 2,
+   "fits_locally": false,
+   "label": "03-smollm2-135m-q4",
+   "machine": {
+    "cpus": 4,
+    "disk_free_mib": 86562.1,
+    "memory_available_mib": 14965.1,
+    "memory_mib": 15989.7
+   },
+   "measurer_rss_mib": 16.0,
+   "memory_drop_mib": 177.8,
+   "peak_rss_mib": 446.5,
+   "wall_seconds": 2.771
+  },
+  "04-smollm2-135m-q4f16": {
+   "command": [
+    "python",
+    "-m",
+    "lmnf",
+    "cell",
+    "--batch",
+    "batches/0001.json",
+    "--id",
+    "04-smollm2-135m-q4f16",
+    "--out",
+    "out/04-smollm2-135m-q4f16"
+   ],
+   "cpu_seconds": 1.159,
+   "disk_used_mib": 112.4,
+   "exit_status": 2,
+   "fits_locally": false,
+   "label": "04-smollm2-135m-q4f16",
+   "machine": {
+    "cpus": 4,
+    "disk_free_mib": 86562.0,
+    "memory_available_mib": 14987.4,
+    "memory_mib": 15989.7
+   },
+   "measurer_rss_mib": 16.0,
+   "memory_drop_mib": 197.6,
+   "peak_rss_mib": 320.5,
+   "wall_seconds": 3.617
+  },
+  "05-smollm2-135m-bnb4": {
+   "command": [
+    "python",
+    "-m",
+    "lmnf",
+    "cell",
+    "--batch",
+    "batches/0001.json",
+    "--id",
+    "05-smollm2-135m-bnb4",
+    "--out",
+    "out/05-smollm2-135m-bnb4"
+   ],
+   "cpu_seconds": 1.944,
+   "disk_used_mib": 167.5,
+   "exit_status": 2,
+   "fits_locally": false,
+   "label": "05-smollm2-135m-bnb4",
+   "machine": {
+    "cpus": 4,
+    "disk_free_mib": 86562.1,
+    "memory_available_mib": 14946.3,
+    "memory_mib": 15989.7
+   },
+   "measurer_rss_mib": 16.0,
+   "memory_drop_mib": 366.9,
+   "peak_rss_mib": 429.3,
+   "wall_seconds": 2.7
+  },
+  "06-smollm2-135m-int8": {
+   "command": [
+    "python",
+    "-m",
+    "lmnf",
+    "cell",
+    "--batch",
+    "batches/0001.json",
+    "--id",
+    "06-smollm2-135m-int8",
+    "--out",
+    "out/06-smollm2-135m-int8"
+   ],
+   "cpu_seconds": 1.355,
+   "disk_used_mib": 131.0,
+   "exit_status": 2,
+   "fits_locally": false,
+   "label": "06-smollm2-135m-int8",
+   "machine": {
+    "cpus": 4,
+    "disk_free_mib": 86562.0,
+    "memory_available_mib": 14940.0,
+    "memory_mib": 15989.7
+   },
+   "measurer_rss_mib": 16.1,
+   "memory_drop_mib": 163.5,
+   "peak_rss_mib": 357.7,
+   "wall_seconds": 3.158
+  },
+  "07-smollm2-135m-uint8": {
+   "command": [
+    "python",
+    "-m",
+    "lmnf",
+    "cell",
+    "--batch",
+    "batches/0001.json",
+    "--id",
+    "07-smollm2-135m-uint8",
+    "--out",
+    "out/07-smollm2-135m-uint8"
+   ],
+   "cpu_seconds": 1.715,
+   "disk_used_mib": 131.0,
+   "exit_status": 2,
+   "fits_locally": false,
+   "label": "07-smollm2-135m-uint8",
+   "machine": {
+    "cpus": 4,
+    "disk_free_mib": 86562.0,
+    "memory_available_mib": 14936.2,
+    "memory_mib": 15989.7
+   },
+   "measurer_rss_mib": 16.0,
+   "memory_drop_mib": 263.6,
+   "peak_rss_mib": 356.6,
+   "wall_seconds": 2.647
+  },
+  "08-smollm2-135m-quantized": {
+   "command": [
+    "python",
+    "-m",
+    "lmnf",
+    "cell",
+    "--batch",
+    "batches/0001.json",
+    "--id",
+    "08-smollm2-135m-quantized",
+    "--out",
+    "out/08-smollm2-135m-quantized"
+   ],
+   "cpu_seconds": 1.247,
+   "disk_used_mib": 131.0,
+   "exit_status": 2,
+   "fits_locally": false,
+   "label": "08-smollm2-135m-quantized",
+   "machine": {
+    "cpus": 4,
+    "disk_free_mib": 86561.9,
+    "memory_available_mib": 14902.6,
+    "memory_mib": 15989.7
+   },
+   "measurer_rss_mib": 16.1,
+   "memory_drop_mib": 255.7,
+   "peak_rss_mib": 358.0,
+   "wall_seconds": 3.293
+  },
+  "09-smollm2-360m-fp32": {
+   "command": [
+    "python",
+    "-m",
+    "lmnf",
+    "cell",
+    "--batch",
+    "batches/0001.json",
+    "--id",
+    "09-smollm2-360m-fp32",
+    "--out",
+    "out/09-smollm2-360m-fp32"
+   ],
+   "cpu_seconds": 9.153,
+   "disk_used_mib": 1382.6,
+   "exit_status": 2,
+   "fits_locally": false,
+   "label": "09-smollm2-360m-fp32",
+   "machine": {
+    "cpus": 4,
+    "disk_free_mib": 86562.0,
+    "memory_available_mib": 14928.0,
+    "memory_mib": 15989.7
+   },
+   "measurer_rss_mib": 16.0,
+   "memory_drop_mib": 2817.5,
+   "peak_rss_mib": 2888.9,
+   "wall_seconds": 10.729
+  },
+  "10-gpt2-decoder": {
+   "command": [
+    "python",
+    "-m",
+    "lmnf",
+    "cell",
+    "--batch",
+    "batches/0001.json",
+    "--id",
+    "10-gpt2-decoder",
+    "--out",
+    "out/10-gpt2-decoder"
+   ],
+   "cpu_seconds": 15.159,
+   "disk_used_mib": 1178.9,
+   "exit_status": 0,
+   "fits_locally": false,
+   "label": "10-gpt2-decoder",
+   "machine": {
+    "cpus": 4,
+    "disk_free_mib": 86562.1,
+    "memory_available_mib": 14938.0,
+    "memory_mib": 15989.7
+   },
+   "measurer_rss_mib": 16.0,
+   "memory_drop_mib": 1564.6,
+   "peak_rss_mib": 1872.5,
+   "wall_seconds": 16.608
+  },
+  "11-gpt2-merged": {
+   "command": [
+    "python",
+    "-m",
+    "lmnf",
+    "cell",
+    "--batch",
+    "batches/0001.json",
+    "--id",
+    "11-gpt2-merged",
+    "--out",
+    "out/11-gpt2-merged"
+   ],
+   "cpu_seconds": 16.949,
+   "disk_used_mib": 1218.4,
+   "exit_status": 0,
+   "fits_locally": false,
+   "label": "11-gpt2-merged",
+   "machine": {
+    "cpus": 4,
+    "disk_free_mib": 86562.1,
+    "memory_available_mib": 14986.3,
+    "memory_mib": 15989.7
+   },
+   "measurer_rss_mib": 16.0,
+   "memory_drop_mib": 2042.7,
+   "peak_rss_mib": 2193.3,
+   "wall_seconds": 17.552
+  },
+  "12-qwen3-0.6b-fp32": {
+   "command": [
+    "python",
+    "-m",
+    "lmnf",
+    "cell",
+    "--batch",
+    "batches/0001.json",
+    "--id",
+    "12-qwen3-0.6b-fp32",
+    "--out",
+    "out/12-qwen3-0.6b-fp32"
+   ],
+   "cpu_seconds": 6.515,
+   "disk_used_mib": 2294.3,
+   "exit_status": 2,
+   "fits_locally": false,
+   "label": "12-qwen3-0.6b-fp32",
+   "machine": {
+    "cpus": 4,
+    "disk_free_mib": 86562.1,
+    "memory_available_mib": 14965.6,
+    "memory_mib": 15989.7
+   },
+   "measurer_rss_mib": 16.0,
+   "memory_drop_mib": 597.0,
+   "peak_rss_mib": 737.7,
+   "wall_seconds": 26.488
+  },
+  "actionlint (in a container)": {
+   "command": [
+    "docker",
+    "run",
+    "--rm",
+    "-v",
+    "/home/runner/work/lm-normal-form/lm-normal-form:/repo",
+    "-w",
+    "/repo",
+    "rhysd/actionlint:latest",
+    "-color"
+   ],
+   "cpu_seconds": 0.04,
+   "disk_used_mib": 76.5,
+   "exit_status": 0,
+   "fits_locally": true,
+   "label": "actionlint (in a container)",
+   "machine": {
+    "cpus": 4,
+    "disk_free_mib": 87931.4,
+    "memory_available_mib": 14823.7,
+    "memory_mib": 15989.7
+   },
+   "measurer_rss_mib": 16.0,
+   "memory_drop_mib": 0.0,
+   "peak_rss_mib": 28.4,
+   "wall_seconds": 2.783
+  },
+  "reuse lint": {
+   "command": [
+    "reuse",
+    "lint"
+   ],
+   "cpu_seconds": 0.545,
+   "disk_used_mib": 0.0,
+   "exit_status": 0,
+   "fits_locally": true,
+   "label": "reuse lint",
+   "machine": {
+    "cpus": 4,
+    "disk_free_mib": 87931.4,
+    "memory_available_mib": 14751.5,
+    "memory_mib": 15989.7
+   },
+   "measurer_rss_mib": 15.9,
+   "memory_drop_mib": 0.0,
+   "peak_rss_mib": 45.8,
+   "wall_seconds": 2.493
+  },
+  "unit tests": {
+   "command": [
+    "python",
+    "-m",
+    "pytest",
+    "-q",
+    "--continue-on-collection-errors"
+   ],
+   "cpu_seconds": 4.755,
+   "disk_used_mib": 2.8,
+   "exit_status": 0,
+   "fits_locally": true,
+   "label": "unit tests",
+   "machine": {
+    "cpus": 4,
+    "disk_free_mib": 87857.8,
+    "memory_available_mib": 14832.9,
+    "memory_mib": 15989.7
+   },
+   "measurer_rss_mib": 16.0,
+   "memory_drop_mib": 72.7,
+   "peak_rss_mib": 105.5,
+   "wall_seconds": 3.547
+  }
+ },
+ "run": "37308485185",
+ "title": "Structure graphs of twelve published ONNX files"
+}

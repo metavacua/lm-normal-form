@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# What the graph takes in and gives out, with element types.
+PREFIX lmnf: <https://metavacua.github.io/lm-normal-form/ns#>
+SELECT ?direction ?name ?type WHERE {
+  { ?g lmnf:graphInput ?v . BIND("input" AS ?direction) } UNION { ?g lmnf:graphOutput ?v . BIND("output" AS ?direction) }
+  ?g ^lmnf:mainGraph ?model .
+  ?v lmnf:name ?name .
+  OPTIONAL { ?v lmnf:elemType ?type }
+}
+ORDER BY ?direction ?name

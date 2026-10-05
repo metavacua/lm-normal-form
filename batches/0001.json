@@ -1,0 +1,103 @@
+{
+  "batch": "0001",
+  "title": "Structure graphs of twelve published ONNX files",
+  "registered": "2026-10-05",
+  "cells": [
+    {
+      "id": "01-smollm2-135m-fp32",
+      "experiment": "structure",
+      "onnx_repository": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "onnx_file": "onnx/model.onnx",
+      "reference_repository": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "prompt": "The capital of France is"
+    },
+    {
+      "id": "02-smollm2-135m-fp16",
+      "experiment": "structure",
+      "onnx_repository": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "onnx_file": "onnx/model_fp16.onnx",
+      "reference_repository": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "prompt": "The capital of France is"
+    },
+    {
+      "id": "03-smollm2-135m-q4",
+      "experiment": "structure",
+      "onnx_repository": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "onnx_file": "onnx/model_q4.onnx",
+      "reference_repository": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "prompt": "The capital of France is"
+    },
+    {
+      "id": "04-smollm2-135m-q4f16",
+      "experiment": "structure",
+      "onnx_repository": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "onnx_file": "onnx/model_q4f16.onnx",
+      "reference_repository": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "prompt": "The capital of France is"
+    },
+    {
+      "id": "05-smollm2-135m-bnb4",
+      "experiment": "structure",
+      "onnx_repository": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "onnx_file": "onnx/model_bnb4.onnx",
+      "reference_repository": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "prompt": "The capital of France is"
+    },
+    {
+      "id": "06-smollm2-135m-int8",
+      "experiment": "structure",
+      "onnx_repository": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "onnx_file": "onnx/model_int8.onnx",
+      "reference_repository": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "prompt": "The capital of France is"
+    },
+    {
+      "id": "07-smollm2-135m-uint8",
+      "experiment": "structure",
+      "onnx_repository": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "onnx_file": "onnx/model_uint8.onnx",
+      "reference_repository": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "prompt": "The capital of France is"
+    },
+    {
+      "id": "08-smollm2-135m-quantized",
+      "experiment": "structure",
+      "onnx_repository": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "onnx_file": "onnx/model_quantized.onnx",
+      "reference_repository": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "prompt": "The capital of France is"
+    },
+    {
+      "id": "09-smollm2-360m-fp32",
+      "experiment": "structure",
+      "onnx_repository": "HuggingFaceTB/SmolLM2-360M-Instruct",
+      "onnx_file": "onnx/model.onnx",
+      "reference_repository": "HuggingFaceTB/SmolLM2-360M-Instruct",
+      "prompt": "The capital of France is"
+    },
+    {
+      "id": "10-gpt2-decoder",
+      "experiment": "structure",
+      "onnx_repository": "openai-community/gpt2",
+      "onnx_file": "onnx/decoder_model.onnx",
+      "reference_repository": "openai-community/gpt2",
+      "prompt": "The capital of France is"
+    },
+    {
+      "id": "11-gpt2-merged",
+      "experiment": "structure",
+      "onnx_repository": "openai-community/gpt2",
+      "onnx_file": "onnx/decoder_model_merged.onnx",
+      "reference_repository": "openai-community/gpt2",
+      "prompt": "The capital of France is"
+    },
+    {
+      "id": "12-qwen3-0.6b-fp32",
+      "experiment": "structure",
+      "onnx_repository": "onnx-community/Qwen3-0.6B-ONNX",
+      "onnx_file": "onnx/model.onnx",
+      "reference_repository": "Qwen/Qwen3-0.6B",
+      "prompt": "The capital of France is"
+    }
+  ]
+}

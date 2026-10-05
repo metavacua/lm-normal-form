@@ -1,0 +1,5 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# How many nodes the graph has, subgraphs included.
+PREFIX lmnf: <https://metavacua.github.io/lm-normal-form/ns#>
+SELECT (COUNT(?n) AS ?nodes) WHERE { ?n a lmnf:Node }
