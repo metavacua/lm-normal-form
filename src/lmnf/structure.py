@@ -63,6 +63,7 @@ def report(model):
     types = collections.Counter()
     totals = collections.Counter()
     control_flow = []
+    undefined = set()
 
     def walk(graph, graph_id, outer):
         local = {i.name for i in graph.input} | {t.name for t in graph.initializer}
@@ -82,7 +83,7 @@ def report(model):
                 if name in produced_at:
                     totals["order_violations"] += produced_at[name] >= index
                 elif name not in local and name not in outer:
-                    totals["undefined_inputs"] += 1
+                    undefined.add(name)
             nested = list(subgraphs(node))
             if nested:
                 control_flow.append({"graph": graph_id, "index": index, "op": node.op_type})
@@ -100,7 +101,7 @@ def report(model):
         "op_histogram": dict(histogram),
         "control_flow": control_flow,
         "order_violations": totals["order_violations"],
-        "undefined_inputs": totals["undefined_inputs"],
+        "undefined_inputs": len(undefined),
         "initializers": {
             "count": totals["initializers"],
             "elements": totals["elements"],

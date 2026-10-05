@@ -2,9 +2,17 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Is any value consumed at or before the position of the node that produces it?
 # If not, the node order of each graph is a topological order, so the graph has no cycle.
+#
+# The patterns are in this order on purpose. Oxigraph joins them as written:
+# pairing consumer and producer through the value first is linear in the number
+# of nodes; pairing them through the graph first is quadratic. Seen in a probe
+# on a development machine with synthetic chains (3.2 s against 0.01 s at 2,000
+# nodes); not yet measured in CI.
 PREFIX lmnf: <https://metavacua.github.io/lm-normal-form/ns#>
 ASK {
-  ?consumer lmnf:inGraph ?graph ; lmnf:index ?i ; lmnf:consumes ?value .
-  ?producer lmnf:inGraph ?graph ; lmnf:index ?j ; lmnf:produces ?value .
+  ?consumer lmnf:consumes ?value .
+  ?producer lmnf:produces ?value .
+  ?consumer lmnf:inGraph ?graph ; lmnf:index ?i .
+  ?producer lmnf:inGraph ?graph ; lmnf:index ?j .
   FILTER(?j >= ?i)
 }

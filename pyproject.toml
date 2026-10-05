@@ -7,11 +7,11 @@ version = "0.0.0"
 description = "Tooling for the lm-normal-form experiments"
 requires-python = ">=3.11"
 license = "AGPL-3.0-or-later"
-dependencies = ["onnx", "pyoxigraph"]
+dependencies = ["numpy", "onnx", "pyoxigraph"]
 
 [project.optional-dependencies]
 test = ["pytest"]
-experiment = ["huggingface_hub", "numpy", "onnxruntime", "torch", "transformers"]
+experiment = ["huggingface_hub", "onnxruntime", "torch", "transformers"]
 
 [build-system]
 requires = ["setuptools>=77"]

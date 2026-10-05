@@ -28,7 +28,7 @@ def test_the_summary_states_every_verdict_and_every_operator(save, tmp_path):
         verdicts={"H1 no control flow, no cycle": "HOLDS", "H2 every parameter is stored in the graph": "FAILS"},
         parameters={"reference_tensors": 3, "matched": 2, "missing_from_onnx": [[8]], "only_in_onnx": [],
                     "elements_reference": 56, "elements_onnx": 52},
-        forward={"encodings": {"tokenizer default": {
+        forward={"prompt": "A prompt", "encodings": {"tokenizer default": {
             "token_ids": [1, 2], "same_top5_ids": True, "max_abs_probability_difference": 1e-6,
             "max_abs_logit_difference": 1e-5, "onnx_top5": [entry], "pytorch_top5": [entry]}}},
         exploratory={"silu_gate_matches": 1},

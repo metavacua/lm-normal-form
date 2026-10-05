@@ -53,3 +53,13 @@ def rows(store, name):
 
 def ask(store, name):
     return bool(store.query(text(name), use_default_graph_as_union=True))
+
+
+def stored_float_shapes(store):
+    """The shape of every floating-point tensor the graph stores, read back from the graph."""
+    shapes = {}
+    for row in rows(store, "stored_float_tensors"):
+        shape = shapes.setdefault(row["tensor"], [])
+        if row["axis"] is not None:
+            shape.append(row["size"])
+    return [tuple(shape) for shape in shapes.values()]
