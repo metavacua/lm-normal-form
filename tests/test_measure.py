@@ -29,6 +29,8 @@ def test_the_size_of_the_measuring_process_is_recorded_because_it_is_a_floor():
     # Linux counts the memory a child inherits before it starts its own program,
     # so no reading can be lower than the measuring process itself. First seen in
     # CI: `python -c pass` read 75 MiB when measured from inside the test runner.
+    # The floor is the measuring process's own peak, not its ru_maxrss, which
+    # inherits in the same way from whatever started it (second CI lesson).
     small = measure.run([sys.executable, "-c", "pass"])
     assert small["measurer_rss_mib"] > 0
     assert small["peak_rss_mib"] <= small["measurer_rss_mib"] + 16

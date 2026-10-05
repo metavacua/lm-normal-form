@@ -12,6 +12,7 @@ without installing anything.
 
 import json
 import re
+import subprocess
 from pathlib import Path
 
 from . import measure
@@ -88,14 +89,37 @@ def number(ref):
 
 
 def should_run(changed):
-    """Whether a push can have changed what the experiments do. Unknown changes count as yes."""
+    """Whether changes can have altered what the experiments do. Unknown changes count as yes."""
     if changed is None:
         return True
     return any(path == prefix or path.startswith(prefix) for path in changed for prefix in INPUT_PATHS)
 
 
-def plan(root, ref, requested="", changed=None):
-    """Which cells this workflow run should start."""
+def results_commit(root, number):
+    """The commit a batch's recorded results came from, or None when none are recorded."""
+    data = _read(Path(root) / "docs" / "batches" / f"{number}.results.json")
+    commit = (data or {}).get("commit")
+    return commit if isinstance(commit, str) and commit else None
+
+
+def changed_since(root, commit):
+    """Paths that differ between a commit and what is checked out, or None when git cannot say."""
+    try:
+        done = subprocess.run(
+            ["git", "-C", str(root), "diff", "--name-only", commit, "HEAD"], capture_output=True, text=True, check=True
+        )
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    return [line for line in done.stdout.splitlines() if line]
+
+
+def plan(root, ref, requested="", changed=None, since=changed_since):
+    """Which cells this workflow run should start.
+
+    Until a batch's results are recorded, every run starts its cells. After
+    that, cells start only when something the experiments depend on has changed
+    since the commit the results came from.
+    """
     nothing = {"count": 0, "file": "", "matrix": {"include": []}}
     chosen = requested or number(ref)
     if not chosen:
@@ -105,8 +129,17 @@ def plan(root, ref, requested="", changed=None):
     if not path.is_file():
         raise BatchError(f"batch {chosen} was asked for, but {relative} does not exist")
     batch = load(path)
-    if not should_run(changed):
-        return dict(nothing, file=relative, reason="this push changed nothing the experiments depend on")
+    recorded = results_commit(root, chosen)
+    if recorded:
+        if changed is None:
+            changed = since(root, recorded)
+        if not should_run(changed):
+            return dict(
+                nothing,
+                file=relative,
+                reason=f"results are recorded for commit {recorded[:7]} and nothing the experiments depend on "
+                "has changed since",
+            )
     return {
         "count": len(batch["cells"]),
         "file": relative,
@@ -132,7 +165,7 @@ def _measurement(path):
     return data
 
 
-def collect(batch, reports):
+def collect(batch, reports, commit=None, run=None):
     """Sum a batch up from its cells' reports.
 
     Returns (exit status, Markdown, data). The status is 2 when any cell did not
@@ -212,6 +245,9 @@ def collect(batch, reports):
     data = {
         "batch": batch.get("batch"),
         "title": batch.get("title"),
+        # The commit and the workflow run these results came from.
+        "commit": commit,
+        "run": run,
         "cells": cells,
         "inconclusive": inconclusive,
         "resources": resources,

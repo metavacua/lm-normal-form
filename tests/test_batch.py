@@ -128,25 +128,56 @@ def test_a_batch_asked_for_by_number_runs_whatever_the_branch(tmp_path):
     assert batch.plan(tmp_path, ref="main", requested="0007")["count"] == 1
 
 
-def test_a_push_that_changes_only_documents_or_tests_runs_no_cells(tmp_path):
+def record(tmp_path, commit="abc1234def", number="0007"):
+    path = tmp_path / "docs" / "batches" / f"{number}.results.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({"batch": number, "commit": commit, "run": 1}), encoding="utf-8")
+
+
+def test_until_results_are_recorded_every_push_runs_the_cells(tmp_path):
     write(tmp_path, [STRUCTURE], number="0007")
+    assert batch.results_commit(tmp_path, "0007") is None
+    assert batch.plan(tmp_path, ref="batch/0007-x", changed=["README.md"])["count"] == 1
+
+
+def test_once_results_are_recorded_a_push_that_changes_only_documents_or_tests_runs_no_cells(tmp_path):
+    write(tmp_path, [STRUCTURE], number="0007")
+    record(tmp_path)
+    assert batch.results_commit(tmp_path, "0007") == "abc1234def"
     quiet = batch.plan(tmp_path, ref="batch/0007-x", changed=["docs/batches/0007.md", "README.md", "tests/test_batch.py"])
     assert quiet["count"] == 0
-    assert "changed nothing" in quiet["reason"]
+    assert "abc1234" in quiet["reason"]
 
 
 @pytest.mark.parametrize(
     "path",
     ["src/lmnf/feeds.py", "queries/silu_gate.rq", "batches/0007.json", "pyproject.toml", ".github/workflows/ci.yml"],
 )
-def test_a_push_that_changes_what_the_experiments_depend_on_runs_them(tmp_path, path):
+def test_a_change_to_what_the_experiments_depend_on_runs_them_again(tmp_path, path):
     write(tmp_path, [STRUCTURE], number="0007")
+    record(tmp_path)
     assert batch.plan(tmp_path, ref="batch/0007-x", changed=["README.md", path])["count"] == 1
 
 
-def test_when_the_changes_are_unknown_the_cells_run(tmp_path):
+def test_changes_are_counted_from_the_commit_the_results_came_from(tmp_path):
     write(tmp_path, [STRUCTURE], number="0007")
-    assert batch.plan(tmp_path, ref="batch/0007-x", changed=None)["count"] == 1
+    record(tmp_path, commit="abc1234def")
+    asked = []
+
+    def since(root, commit):
+        asked.append((root, commit))
+        return ["docs/batches/0007.md"]
+
+    assert batch.plan(tmp_path, ref="batch/0007-x", since=since)["count"] == 0
+    assert asked == [(tmp_path, "abc1234def")]
+
+
+def test_when_the_changes_cannot_be_told_the_cells_run(tmp_path):
+    write(tmp_path, [STRUCTURE], number="0007")
+    record(tmp_path)
+    assert batch.plan(tmp_path, ref="batch/0007-x", since=lambda root, commit: None)["count"] == 1
+    # Outside a git repository nothing can be told.
+    assert batch.changed_since(tmp_path, "abc1234def") is None
 
 
 # ── the batch summary ──
@@ -163,6 +194,7 @@ def test_the_summary_lists_every_cell_with_its_verdicts(tmp_path):
     assert "headline of 02-b" in text
     assert "2 cells registered, 2 reported, 0 inconclusive" in text
     assert data["cells"]["01-a"]["verdicts"]["H1 no control flow"] == "HOLDS"
+    assert data["batch"] == "0007"
     assert "|" not in text
 
 

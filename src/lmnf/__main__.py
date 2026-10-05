@@ -42,7 +42,7 @@ def _plan(argv):
     parser.add_argument("--root", type=Path, default=Path("."), help="the repository root")
     parser.add_argument("--ref", required=True, help="the branch the run is for")
     parser.add_argument("--requested", default="", help="a batch number asked for by hand")
-    parser.add_argument("--changed", type=Path, help="a file listing the paths this push changed, one per line")
+    parser.add_argument("--changed", type=Path, help="a file listing changed paths, one per line (default: ask git)")
     arguments = parser.parse_args(argv)
     changed = None
     if arguments.changed is not None:
@@ -76,8 +76,12 @@ def _collect(argv):
     parser.add_argument("--batch", type=Path, required=True)
     parser.add_argument("--reports", type=Path, required=True, help="a folder with one folder of reports per cell")
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--commit", help="the commit the reports came from")
+    parser.add_argument("--run", help="the workflow run the reports came from")
     arguments = parser.parse_args(argv)
-    status, text, data = batch.collect(batch.load(arguments.batch), arguments.reports)
+    status, text, data = batch.collect(
+        batch.load(arguments.batch), arguments.reports, commit=arguments.commit, run=arguments.run
+    )
     arguments.out.mkdir(parents=True, exist_ok=True)
     (arguments.out / "BATCH.md").write_text(text, encoding="utf-8")
     (arguments.out / "batch.json").write_text(json.dumps(data, indent=1, sort_keys=True) + "\n", encoding="utf-8")

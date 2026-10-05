@@ -17,7 +17,6 @@ development machine, which is small and has no swap.
 import argparse
 import json
 import os
-import resource
 import shutil
 import subprocess
 import sys
@@ -25,8 +24,8 @@ import threading
 import time
 from pathlib import Path
 
-# What the development machine can spare. It has 6.4 GiB of memory, most of it
-# in use, and no swap; a job that needs more than this stays in CI.
+# What the development machine can spare. It is small, most of its memory is in
+# use, and it has no swap; a job that needs more than this stays in CI.
 LOCAL_MEMORY_MIB = 1024
 LOCAL_DISK_MIB = 1024
 
@@ -46,6 +45,18 @@ def _meminfo():
     except OSError:
         pass
     return found
+
+
+def _own_peak_mib():
+    """The peak resident size of this process's own program image, in MiB (VmHWM)."""
+    try:
+        with open("/proc/self/status", encoding="ascii") as handle:
+            for line in handle:
+                if line.startswith("VmHWM:"):
+                    return int(line.split()[1]) / 1024
+    except (OSError, ValueError, IndexError):
+        pass
+    return 0.0
 
 
 def _disk_free_mib():
@@ -74,6 +85,9 @@ def run(command, label=None):
             lowest["free"] = min(lowest["free"], _disk_free_mib())
 
     sampler = threading.Thread(target=sample, daemon=True)
+    # Not this process's ru_maxrss: that figure carries the same inheritance from
+    # whatever started this process (seen in CI: 75 MiB for a fresh interpreter).
+    floor = _own_peak_mib()
     started = time.perf_counter()
     process = subprocess.Popen(command)
     sampler.start()
@@ -96,7 +110,7 @@ def run(command, label=None):
         # A child inherits its parent's memory until it starts its own program, and
         # Linux counts that. So no reading is lower than the measuring process was.
         # From the command line that is a few MiB; from inside a large program it is not.
-        "measurer_rss_mib": round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024, 1),
+        "measurer_rss_mib": round(floor, 1),
         # How far the whole machine's available memory fell while the command ran.
         "memory_drop_mib": round(max(0.0, before["memory_available_mib"] - lowest["available"]), 1),
         "disk_used_mib": round(max(0.0, before["disk_free_mib"] - lowest["free"]), 1),

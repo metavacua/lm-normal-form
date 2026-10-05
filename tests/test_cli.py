@@ -61,8 +61,11 @@ def test_plan_prints_what_the_workflow_reads(tmp_path):
     }
 
 
-def test_plan_runs_no_cells_for_a_push_that_changed_only_documents(tmp_path):
+def test_plan_runs_no_cells_once_results_are_recorded_and_only_documents_changed(tmp_path):
     batch_file(tmp_path, [CELL])
+    recorded = tmp_path / "docs" / "batches" / "0007.results.json"
+    recorded.parent.mkdir(parents=True)
+    recorded.write_text(json.dumps({"batch": "0007", "commit": "abc1234def", "run": 1}), encoding="utf-8")
     changed = tmp_path / "changed.txt"
     changed.write_text("docs/batches/0007.md\nREADME.md\n", encoding="utf-8")
     planned = outputs(lmnf("plan", "--root", tmp_path, "--ref", "batch/0007-x", "--changed", changed))
@@ -88,9 +91,14 @@ def test_collect_sums_the_batch_up_and_fails_while_a_cell_is_missing(tmp_path):
     assert json.loads((tmp_path / "out" / "batch.json").read_text(encoding="utf-8"))["inconclusive"] == ["02-b"]
 
     report_file(reports, "02-b")
-    collected = lmnf("collect", "--batch", path, "--reports", reports, "--out", tmp_path / "out")
+    collected = lmnf(
+        "collect", "--batch", path, "--reports", reports, "--out", tmp_path / "out", "--commit", "abc1234def", "--run", "42"
+    )
     assert collected.returncode == 0, collected.stdout + collected.stderr
     assert "2 cells registered, 2 reported, 0 inconclusive" in (tmp_path / "out" / "BATCH.md").read_text(encoding="utf-8")
+    # What the run was, so that the results can be recorded against it.
+    data = json.loads((tmp_path / "out" / "batch.json").read_text(encoding="utf-8"))
+    assert (data["commit"], data["run"]) == ("abc1234def", "42")
 
 
 def test_cell_refuses_a_name_that_is_not_in_the_batch(tmp_path):
@@ -125,8 +133,9 @@ def test_an_unknown_command_is_an_error_and_says_what_exists():
 
 
 def test_the_first_batch_is_a_valid_batch_of_twelve():
-    planned = outputs(lmnf("plan", "--root", ROOT, "--ref", "batch/0001-structure-graphs"))
-    assert planned["count"] == "12"
-    cells = json.loads((ROOT / "batches" / "0001.json").read_text(encoding="utf-8"))["cells"]
+    from lmnf import batch
+
+    cells = batch.load(ROOT / "batches" / "0001.json")["cells"]
+    assert len(cells) == 12
     assert len({(cell["onnx_repository"], cell["onnx_file"]) for cell in cells}) == 12
     assert {cell["prompt"] for cell in cells} == {"The capital of France is"}

@@ -6,8 +6,8 @@
   else.** That covers anything unstable, unsafe or uncertain: trying a tool, a
   library or a model, comparing them, compiling, and anything that needs much
   memory or disk.
-- **The development machine edits files and uses git.** It has 6.4 GiB of
-  memory and no swap, and it must not be crashed.
+- **The development machine edits files and uses git.** It is small, has no
+  swap, and must not be crashed.
 - **Nothing is run on the development machine until a hosted runner has
   measured what it needs.** See "Measuring first" below.
 
@@ -23,10 +23,11 @@
 - The workflow has three service jobs besides the cells: `checks` (licences,
   workflow lint, unit tests), `plan` (reads the batch file) and `collect`
   (one summary for the batch).
-- Cells start when a pull request is opened, and after a push that changes
-  something the experiments depend on: `src/`, `queries/`, `batches/`,
-  `pyproject.toml` or the workflow. A push that changes only documents or
-  tests starts no cells.
+- Cells start on every run until the batch's results are recorded in
+  `docs/batches/NNNN.results.json`, which names the commit they came from.
+  After that, cells start only when something the experiments depend on has
+  changed since that commit: `src/`, `queries/`, `batches/`, `pyproject.toml`
+  or the workflow.
 
 ## What makes a job fail
 
@@ -40,7 +41,8 @@
 
 - Every job runs under `python -m lmnf measure`, which records the peak
   resident memory of the largest process, how far the machine's available
-  memory fell, elapsed and CPU time, and disk used.
+  memory fell, elapsed and CPU time, and disk used. A reading cannot be lower
+  than the size of the measuring process, which is recorded with it.
 - The batch summary lists every measurement and says whether it is within the
   limits for the development machine: 1,024 MiB of memory and 1,024 MiB of
   disk (`src/lmnf/measure.py`). These limits are a proposal; the owner of the
@@ -77,8 +79,8 @@ read again when the terms change.
   to the benefits provided to users".
   *Here:* every job tests this repository's software against published
   models. A batch is at most twelve jobs of at most an hour each. A newer run
-  cancels the one before it. Documents-only pushes start no cells. Nothing is
-  scheduled.
+  cancels the one before it. Once results are recorded, cells do not run again
+  unless their inputs change. Nothing is scheduled.
 - **Automation** ([Acceptable Use Policies](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies),
   section 4). No "automated excessive bulk activity", and no "undue burden on
   our servers through automated means".

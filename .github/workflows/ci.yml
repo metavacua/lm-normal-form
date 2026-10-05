@@ -10,7 +10,8 @@
 # - A job fails for two reasons only: the tooling broke, or a run could not
 #   evaluate what it registered (exit status 2). A check that fails is a
 #   result: it is reported and the job passes.
-# - A push that changes only documents or tests starts no experiment cells.
+# - Cells run until a batch's results are recorded, and after that only when
+#   something the experiments depend on has changed.
 # - The token is read-only. No job writes to the repository, comments, or calls
 #   the GitHub API beyond checkout and artifacts.
 name: ci
@@ -102,22 +103,10 @@ jobs:
         env:
           REF: ${{ github.head_ref || github.ref_name }}
           REQUESTED: ${{ inputs.batch }}
-          ACTION: ${{ github.event.action }}
-          BEFORE: ${{ github.event.before }}
-          AFTER: ${{ github.event.pull_request.head.sha }}
-        run: |
-          arguments=(--ref "$REF" --requested "$REQUESTED")
-          # After a push to an open pull request, look at what that push changed.
-          # If either commit is unknown here (a forced push, say), the cells run.
-          if [ "$ACTION" = "synchronize" ] \
-            && git cat-file -e "${BEFORE}^{commit}" 2>/dev/null \
-            && git cat-file -e "${AFTER}^{commit}" 2>/dev/null; then
-            git diff --name-only "$BEFORE" "$AFTER" > "$RUNNER_TEMP/changed.txt"
-            echo "This push changed:"
-            cat "$RUNNER_TEMP/changed.txt"
-            arguments+=(--changed "$RUNNER_TEMP/changed.txt")
-          fi
-          PYTHONPATH=src python -m lmnf plan "${arguments[@]}" | tee -a "$GITHUB_OUTPUT"
+        # Cells run until the batch's results are recorded. After that they run
+        # only if something the experiments depend on has changed since the
+        # commit the results came from; the full history is fetched for that.
+        run: PYTHONPATH=src python -m lmnf plan --ref "$REF" --requested "$REQUESTED" | tee -a "$GITHUB_OUTPUT"
 
   cells:
     name: ${{ matrix.id }}
@@ -182,6 +171,8 @@ jobs:
     timeout-minutes: 10
     env:
       BATCH_FILE: ${{ needs.plan.outputs.file }}
+      # The commit of the branch, not the merge commit a pull request is tested on.
+      HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -197,7 +188,9 @@ jobs:
           name: measurements-checks
           path: reports/measurements
       - name: Collect
-        run: PYTHONPATH=src python -m lmnf collect --batch "$BATCH_FILE" --reports reports --out out
+        run: >
+          PYTHONPATH=src python -m lmnf collect --batch "$BATCH_FILE" --reports reports --out out
+          --commit "$HEAD_SHA" --run "$GITHUB_RUN_ID"
       - name: Summary
         if: always()
         run: |
