@@ -1,0 +1,7 @@
+untied-eps0-logits         parameters   978 deficiency  142 expected  142 MATCH  singular values at the cut: 0.0111 | 4.01e-14  (5.8s)
+untied-eps0-logprobs       parameters   978 deficiency  148 expected  148 MATCH  singular values at the cut: 0.00907 | 4.39e-14  (6.0s)
+untied-eps-logits          parameters   978 deficiency  141 expected  141 MATCH  singular values at the cut: 5.57e-05 | 3.7e-14  (5.8s)
+tied-eps0-logits           parameters   936 deficiency  121 expected  121 MATCH  singular values at the cut: 0.0029 | 4.42e-14  (5.4s)
+tied-eps-logits            parameters   936 deficiency  120 expected  120 MATCH  singular values at the cut: 2.55e-05 | 4.79e-14  (5.4s)
+mha-untied-eps0-logits     parameters   438 deficiency   82 expected   82 MATCH  singular values at the cut: 0.0133 | 1.56e-14  (0.9s)
+nope-untied-eps0-logits    parameters   978 deficiency  190 expected  190 MATCH  singular values at the cut: 0.00186 | 5.09e-14  (4.2s)

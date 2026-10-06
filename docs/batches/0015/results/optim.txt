@@ -1,0 +1,6 @@
+sgd   signed permutation of the hidden coordinates     max|dloss| 3.55e-15  parameters 1.41e-15  (loss 4.223 -> 0.587)
+sgd   orthogonal rotation of the stream                max|dloss| 6.88e-15  parameters 2.78e-15  (loss 4.223 -> 0.587)
+sgd   scaling of the feed-forward units by +-2^k       max|dloss| 5.38e-01  parameters 2.78e-01  (loss 4.223 -> 0.587)
+adam  signed permutation of the hidden coordinates     max|dloss| 1.49e-12  parameters 3.60e-12  (loss 4.223 -> 0.044)
+adam  orthogonal rotation of the stream                max|dloss| 2.82e-02  parameters 7.18e-01  (loss 4.223 -> 0.044)
+adam  scaling of the feed-forward units by +-2^k       max|dloss| 7.34e-02  parameters 7.21e-01  (loss 4.223 -> 0.044)

@@ -1,0 +1,47 @@
+{
+ "steps": 100,
+ "results": {
+  "sgd": {
+   "original": {
+    "first_loss": 4.223136357122377,
+    "last_loss": 0.5874650848486241
+   },
+   "signed permutation of the hidden coordinates": {
+    "max_loss_difference": 3.552713678800501e-15,
+    "last_loss": 0.5874650848486265,
+    "relative_parameter_difference": 1.4106703225043766e-15
+   },
+   "orthogonal rotation of the stream": {
+    "max_loss_difference": 6.8833827526759706e-15,
+    "last_loss": 0.5874650848486298,
+    "relative_parameter_difference": 2.775377074566516e-15
+   },
+   "scaling of the feed-forward units by +-2^k": {
+    "max_loss_difference": 0.5382844093456054,
+    "last_loss": 0.5536533141655919,
+    "relative_parameter_difference": 0.27832449842552875
+   }
+  },
+  "adam": {
+   "original": {
+    "first_loss": 4.223136357122377,
+    "last_loss": 0.04444888532485536
+   },
+   "signed permutation of the hidden coordinates": {
+    "max_loss_difference": 1.486415157625487e-12,
+    "last_loss": 0.04444888532435806,
+    "relative_parameter_difference": 3.599198858358936e-12
+   },
+   "orthogonal rotation of the stream": {
+    "max_loss_difference": 0.028162852486745882,
+    "last_loss": 0.044095239027828206,
+    "relative_parameter_difference": 0.717912489126262
+   },
+   "scaling of the feed-forward units by +-2^k": {
+    "max_loss_difference": 0.07340102359684719,
+    "last_loss": 0.04424181270075862,
+    "relative_parameter_difference": 0.7208545787255513
+   }
+  }
+ }
+}

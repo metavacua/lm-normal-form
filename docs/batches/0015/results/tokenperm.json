@@ -1,0 +1,25 @@
+{
+ "smollm2_causal_rope_float32": {
+  "max_relative_equivariance_error": 1.4515717381529203,
+  "median_relative_equivariance_error": 1.0238788075877436,
+  "permutations": 32,
+  "mean_kl": 2.5032981377412056,
+  "argmax_agreement": 0.28025116478701034
+ },
+ "smollm2_last_position_under_permutation_of_earlier_tokens": {
+  "max_logit_difference": 35.34822082519531,
+  "median_logit_difference": 19.77852725982666,
+  "mean_kl": 1.1861515637166755,
+  "argmax_agreement": 0.5
+ },
+ "bert_tiny_as_shipped_float64": {
+  "max_relative_equivariance_error": 0.9185813619045602,
+  "median_relative_equivariance_error": 0.7048343260534847,
+  "permutations": 32
+ },
+ "bert_tiny_position_embeddings_zero_float64": {
+  "max_relative_equivariance_error": 1.3330598878203574e-15,
+  "median_relative_equivariance_error": 1.0168971786524027e-15,
+  "permutations": 32
+ }
+}
