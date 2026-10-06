@@ -1,0 +1,12 @@
+# The two graphs as nodes.py reads them. Run 37462129427.
+## SmolLM2-135M-Instruct (Optimum export, no past)
+ir 8 opsets [('', 18)] producer pytorch 2.14.1
+inputs [('input_ids', ['batch_size', 'sequence_length']), ('attention_mask', ['batch_size', 'sequence_length']), ('position_ids', ['batch_size', 'sequence_length'])] outputs [('logits', ['batch_size', 'sequence_length', 49152])]
+7360 nodes 273 initializers 162826560 elements
+operators [(('', 'Constant'), 2713), (('', 'Unsqueeze'), 946), (('', 'Mul'), 487), (('', 'Shape'), 458), (('', 'Gather'), 397), (('', 'Concat'), 304), (('', 'MatMul'), 272), (('', 'Cast'), 254), (('', 'Reshape'), 244), (('', 'Add'), 212), (('', 'Transpose'), 151), (('', 'Slice'), 150), (('', 'Where'), 122), (('', 'Div'), 121), (('', 'ConstantOfShape'), 63), (('', 'Equal'), 62), (('', 'Expand'), 62), (('', 'Pow'), 61), (('', 'ReduceMean'), 61), (('', 'Sqrt'), 61), (('', 'Neg'), 60), (('', 'Softmax'), 30), (('', 'IsNaN'), 30), (('', 'Sigmoid'), 30), (('', 'Range'), 3), (('', 'And'), 2), (('', 'LessOrEqual'), 1), (('', 'Flatten'), 1), (('', 'Cos'), 1), (('', 'Sin'), 1)]
+
+## tiny random Llama
+ir 8 opsets [('', 18)] producer pytorch 2.14.1
+inputs [('input_ids', ['batch_size', 'sequence_length']), ('attention_mask', ['batch_size', 'sequence_length']), ('position_ids', ['batch_size', 'sequence_length'])] outputs [('logits', ['batch_size', 'sequence_length', 32000])]
+436 nodes 17 initializers 1032208 elements
+operators [(('', 'Constant'), 153), (('', 'Unsqueeze'), 42), (('', 'Mul'), 31), (('', 'Cast'), 30), (('', 'MatMul'), 20), (('', 'Shape'), 18), (('', 'Gather'), 17), (('', 'Add'), 16), (('', 'Concat'), 16), (('', 'Reshape'), 12), (('', 'Transpose'), 11), (('', 'Slice'), 10), (('', 'Div'), 9), (('', 'Where'), 6), (('', 'Pow'), 5), (('', 'ReduceMean'), 5), (('', 'Sqrt'), 5), (('', 'Identity'), 4), (('', 'Neg'), 4), (('', 'Range'), 3), (('', 'ConstantOfShape'), 3), (('', 'And'), 2), (('', 'Equal'), 2), (('', 'Expand'), 2), (('', 'Softmax'), 2), (('', 'IsNaN'), 2), (('', 'Sigmoid'), 2), (('', 'LessOrEqual'), 1), (('', 'Flatten'), 1), (('', 'Cos'), 1), (('', 'Sin'), 1)]

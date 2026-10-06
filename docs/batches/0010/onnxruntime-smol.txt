@@ -1,0 +1,24 @@
+# ONNX Runtime alone. Run 37462129427.
+# token ids of the three prompts (SmolLM2's tokenizer), then the five most probable next tokens (id, probability) per prompt
+504,3575,282,4649,314
+38634
+12615,36411,418,582,3822,5027,20590,418,3426,1106,28,284,260,3575,282,4649,314
+
+## graph optimization on
+0 (5, 49152) [(7042, 0.4693), (260, 0.2657), (3807, 0.0831), (1217, 0.0175), (2250, 0.0149)]
+1 (1, 49152) [(198, 0.0412), (28, 0.0372), (260, 0.029), (30, 0.0245), (284, 0.0191)]
+2 (17, 49152) [(7042, 0.3113), (260, 0.1363), (216, 0.0764), (563, 0.0407), (3807, 0.0321)]
+## graph optimization off
+0 (5, 49152) [(7042, 0.4693), (260, 0.2657), (3807, 0.0832), (1217, 0.0175), (2250, 0.0149)]
+1 (1, 49152) [(198, 0.0412), (28, 0.0372), (260, 0.029), (30, 0.0245), (284, 0.0191)]
+2 (17, 49152) [(7042, 0.3113), (260, 0.1363), (216, 0.0764), (563, 0.0407), (3807, 0.0321)]
+
+## the two compared (P5)
+0.f32 (5, 49152) max 4.38690185546875e-05 mean 1.025116944219917e-05 argmax equal 5 of 5 top5 same order True max dp 6.094084137320266e-07
+1.f32 (1, 49152) max 1.1444091796875e-05 mean 1.624626179363986e-06 argmax equal 1 of 1 top5 same order True max dp 1.8168584001165833e-07
+2.f32 (17, 49152) max 4.100799560546875e-05 mean 5.4593947425019e-06 argmax equal 17 of 17 top5 same order True max dp 1.0847200792030165e-06
+
+## compare.py on the same logits with one value moved by 0.5 (the control)
+0.f32 (5, 49152) max 0.5 mean 2.0345053144410485e-06 argmax equal 5 of 5 top5 same order True max dp 0.0
+1.f32 (1, 49152) max 0.0 mean 0.0 argmax equal 1 of 1 top5 same order True max dp 0.0
+2.f32 (17, 49152) max 0.0 mean 0.0 argmax equal 17 of 17 top5 same order True max dp 0.0

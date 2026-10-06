@@ -1,0 +1,12 @@
+# onnx2burn on the published onnx/model.onnx of SmolLM2-135M-Instruct (sha256 below). Run 37462129427. Exit status 101.
+1e790f1d6fac94097a6516ed1f07c29049097271d536d538562cd31ffc011a71  work/published.onnx
+
+ERROR burn_onnx::import::logger: PANIC => panicked at crates/burn-onnx/src/import/model_gen.rs:416:33:
+Failed to parse ONNX file 'work/published.onnx': model contains 4 custom op(s) with no covering inference hook:
+  - SimplifiedLayerNormalization used by 1 node(s)
+  - com.microsoft::GroupQueryAttention used by 30 node(s)
+  - com.microsoft::RotaryEmbedding used by 60 node(s)
+  - com.microsoft::SkipSimplifiedLayerNormalization used by 60 node(s)
+Register hooks via ModelGen::register_custom_op.
+
+thread 'main' (8933) panicked at crates/burn-onnx/src/import/model_gen.rs:416:33:
