@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Every first-ranked answer, for the record: model, kind, country, token, mass.
+PREFIX b: <urn:lmnf:b4:>
+SELECT ?model ?kind ?label ?token ?prob WHERE {
+  ?p a b:Prompt ; b:kind ?kind .
+  OPTIONAL { ?p b:country ?c . ?c b:label ?label }
+  ?a b:prompt ?p ; b:model ?model ; b:rank 1 ; b:token ?token ; b:prob ?prob .
+} ORDER BY ?model ?kind ?label

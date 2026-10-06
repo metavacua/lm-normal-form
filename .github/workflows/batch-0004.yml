@@ -1,0 +1,298 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0004: integrity of the stored relation "capital of", on a finite domain
+# with an authority. Written down in docs/batches/0004.md.
+#
+# prepare   fetches the authority from Wikidata and writes the prompts
+# cells     read every prompt out of one model each: twelve cells
+# judge     loads authority, prompts and answers into Oxigraph and asks the
+#           questions in queries/0004/
+#
+# Existing tools throughout; the only code is one PyTorch invocation for the
+# two GPT-2 cells, which llama.cpp's converter refuses. Every observation has an
+# id, and each job records the workflow's own account of its outcomes.
+name: batch 0004
+
+on:
+  push:
+    branches: ["batch/0004-**"]
+    paths: [".github/workflows/batch-0004.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-0004-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  USER_AGENT: "lm-normal-form batch 0004 (https://github.com/metavacua/lm-normal-form)"
+
+jobs:
+  prepare:
+    name: authority and prompts
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Ask Wikidata for the capitals of sovereign states
+        run: |
+          mkdir -p out
+          curl -sSfG -A "$USER_AGENT" -H "Accept: application/sparql-results+json" \
+            --data-urlencode "query@batches/0004/authority.rq" https://query.wikidata.org/sparql -o out/wikidata.json
+          date -u +%Y-%m-%dT%H:%M:%SZ > out/fetched-at.txt
+          jq '.results.bindings | length' out/wikidata.json
+      - name: Countries, prompts and the authority as RDF
+        run: |
+          jq -f batches/0004/countries.jq out/wikidata.json > out/countries.json
+          jq -r --rawfile inv batches/0004/invented.txt -f batches/0004/prompts.jq out/countries.json > out/prompts.json
+          jq -r '.[] | [.id, .prompt] | @tsv' out/prompts.json > out/prompts.tsv
+          jq -r -f batches/0004/prompts-to-nt.jq out/prompts.json > out/prompts.nt
+          jq -r -f batches/0004/authority-to-nt.jq out/countries.json > out/authority.nt
+          jq -c '{countries: length, determined: (map(select(.determined)) | length)}' out/countries.json | tee out/counts.json
+          wc -l out/prompts.tsv out/prompts.nt out/authority.nt
+          jq -r '.[] | select(.kind == "fwd") | .prompt' out/prompts.json | head -n 5
+      - uses: actions/upload-artifact@v7
+        with:
+          name: prepare
+          path: out/
+          retention-days: 1
+
+  llamacpp:
+    name: "${{ matrix.cell }} ${{ matrix.repo }}"
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { cell: "01", repo: "HuggingFaceTB/SmolLM2-135M-Instruct", outtype: f32 }
+          - { cell: "02", repo: "HuggingFaceTB/SmolLM2-360M-Instruct", outtype: f32 }
+          - { cell: "03", repo: "HuggingFaceTB/SmolLM2-1.7B-Instruct", outtype: f32 }
+          - { cell: "04", repo: "Qwen/Qwen3-0.6B", outtype: f32 }
+          - { cell: "05", repo: "Qwen/Qwen3-1.7B", outtype: f32 }
+          - { cell: "06", repo: "Qwen/Qwen3-4B", outtype: f16 }
+          - { cell: "07", repo: "SpectraSuite/TriLM_99M_Unpacked", outtype: f16 }
+          - { cell: "08", repo: "SpectraSuite/TriLM_390M_Unpacked", outtype: f16 }
+          - { cell: "09", repo: "SpectraSuite/TriLM_1.1B_Unpacked", outtype: f16 }
+          - { cell: "10", repo: "HuggingFaceTB/SmolLM2-135M", outtype: f32 }
+    env:
+      MODEL: ${{ matrix.repo }}
+      OUTTYPE: ${{ matrix.outtype }}
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v8
+        with:
+          name: prepare
+          path: prepare
+      - name: Build llama.cpp, install its converter's requirements, download the model
+        run: |
+          mkdir -p out work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          echo "$MODEL" > out/model.txt
+          git clone --depth 1 https://github.com/ggml-org/llama.cpp work/llama.cpp
+          git -C work/llama.cpp rev-parse HEAD | tee out/llama.cpp.revision.txt
+          cmake -S work/llama.cpp -B work/build -DCMAKE_BUILD_TYPE=Release -DLLAMA_CURL=OFF -DLLAMA_BUILD_TESTS=OFF
+          /usr/bin/time -v cmake --build work/build --target llama-server -j "$(nproc)" 2> out/build.time
+          python -m pip install --quiet -r work/llama.cpp/requirements/requirements-convert_hf_to_gguf.txt
+          python -m pip freeze > out/versions.txt
+          hf download "$MODEL" --include "*.safetensors" "*.json" "*.txt" "*.model" --local-dir work/model
+          nproc; free -m; df -h .
+      - id: convert
+        name: "convert_hf_to_gguf: safetensors to GGUF"
+        continue-on-error: true
+        run: /usr/bin/time -v python work/llama.cpp/convert_hf_to_gguf.py work/model --outfile work/model.gguf --outtype "$OUTTYPE" 2> out/convert.time
+      - id: dump
+        name: "gguf-dump: the converted file's metadata"
+        continue-on-error: true
+        run: python work/llama.cpp/gguf-py/gguf/scripts/gguf_dump.py --no-tensors --json work/model.gguf > out/model.gguf.json
+      - id: serve
+        name: "llama.cpp: load and serve"
+        continue-on-error: true
+        run: |
+          work/build/bin/llama-server -m work/model.gguf --host 127.0.0.1 --port 8080 -c 256 > out/server.log 2>&1 &
+          curl -sSf --retry 120 --retry-delay 1 --retry-connrefused --retry-all-errors http://127.0.0.1:8080/health
+      - id: tokens
+        name: "llama.cpp: how the first prompt is tokenised"
+        continue-on-error: true
+        run: >
+          jq -n --arg content "$(head -n 1 prepare/prompts.tsv | cut -f2)" '{content: $content, add_special: true, with_pieces: true}'
+          | curl -sSf http://127.0.0.1:8080/tokenize -H 'Content-Type: application/json' -d @-
+          | tee out/first-prompt-tokens.json
+      - id: answers
+        name: "llama.cpp: the next-token distribution for every prompt"
+        continue-on-error: true
+        run: |
+          SECONDS=0
+          while IFS=$'\t' read -r id prompt; do
+            jq -cn --arg p "$prompt" '{prompt: $p, n_predict: 1, temperature: 0, n_probs: 20, cache_prompt: false}' \
+            | curl -sS http://127.0.0.1:8080/completion -H 'Content-Type: application/json' -d @- \
+            | jq -c --arg id "$id" '{id: $id, probs: (.completion_probabilities[0].top_logprobs | map({token, logprob}))}'
+          done < prepare/prompts.tsv > out/answers.jsonl
+          echo "answers: $(wc -l < out/answers.jsonl) of $(wc -l < prepare/prompts.tsv) prompts in $SECONDS s" | tee out/answers.time
+      - name: What the run used
+        if: always()
+        run: |
+          grep -h "Maximum resident\|Elapsed (wall" out/*.time || true
+          cat out/answers.time || true
+          free -m
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: answers-${{ matrix.cell }}
+          path: out/
+          retention-days: 1
+
+  torch:
+    name: "${{ matrix.cell }} ${{ matrix.repo }}"
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { cell: "11", repo: "openai-community/gpt2" }
+          - { cell: "12", repo: "openai-community/gpt2-medium" }
+    env:
+      MODEL: ${{ matrix.repo }}
+      # PyTorch through transformers: for every prompt in the file, the twenty most probable next tokens.
+      CODE: |
+        import sys,json,torch,transformers as t;torch.set_grad_enabled(False);m=sys.argv[1];k=t.AutoTokenizer.from_pretrained(m);g=t.AutoModelForCausalLM.from_pretrained(m).float()
+        for l in open(sys.argv[2]):
+         i,p=l.rstrip('\n').split('\t');x=k(p,return_tensors='pt');v,j=g(**x).logits[0,-1].softmax(-1).topk(20);print(json.dumps({'id':i,'probs':[{'token':k.decode([int(a)]),'logprob':float(b.log())}for a,b in zip(j,v)]}),flush=True)
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v8
+        with:
+          name: prepare
+          path: prepare
+      - name: Install
+        run: |
+          mkdir -p out
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          echo "$MODEL" > out/model.txt
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers
+          python -m pip freeze > out/versions.txt
+          echo "CODE ${#CODE} bytes" | tee out/invocation-sizes.txt
+      - id: answers
+        name: "PyTorch: the next-token distribution for every prompt"
+        continue-on-error: true
+        run: /usr/bin/time -v python -c "$CODE" "$MODEL" prepare/prompts.tsv 2> out/answers.time > out/answers.jsonl
+      - name: What the run used
+        if: always()
+        run: |
+          echo "answers: $(wc -l < out/answers.jsonl) of $(wc -l < prepare/prompts.tsv) prompts"
+          grep -h "Maximum resident\|Elapsed (wall" out/*.time || true
+          tail -n 5 out/answers.time || true
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: answers-${{ matrix.cell }}
+          path: out/
+          retention-days: 1
+
+  judge:
+    name: judge, in Oxigraph
+    needs: [prepare, llamacpp, torch]
+    if: always() && needs.prepare.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v8
+        with:
+          name: prepare
+          path: prepare
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: answers-*
+          path: answers
+      - name: Load the authority, the prompts and every model's answers
+        run: |
+          mkdir -p out
+          python -m pip install --quiet oxigraph
+          oxigraph load --location work/store --file prepare/authority.nt
+          oxigraph load --location work/store --file prepare/prompts.nt
+          for dir in answers/answers-*; do
+            model="$(cat "$dir/model.txt")"
+            if [ -s "$dir/answers.jsonl" ]; then
+              jq -r --arg m "$model" -f batches/0004/answers-to-nt.jq "$dir/answers.jsonl" > "out/$(basename "$dir").nt"
+              oxigraph load --location work/store --file "out/$(basename "$dir").nt"
+              echo "$model: $(wc -l < "$dir/answers.jsonl") answers"
+            else
+              echo "$model: no answers"
+            fi
+          done
+          cp prepare/counts.json prepare/fetched-at.txt out/
+      - id: hits
+        name: "hits per model and kind"
+        continue-on-error: true
+        run: oxigraph query --location work/store --results-format tsv --query "$(cat queries/0004/hits.rq)" | tee out/hits.tsv
+      - id: reflexivity
+        name: "relational reflexivity: forward and back"
+        continue-on-error: true
+        run: oxigraph query --location work/store --results-format tsv --query "$(cat queries/0004/reflexivity.rq)" | tee out/reflexivity.tsv
+      - id: soundness
+        name: "soundness against the authority"
+        continue-on-error: true
+        run: oxigraph query --location work/store --results-format tsv --query "$(cat queries/0004/soundness.rq)" | tee out/soundness.tsv
+      - id: persistence
+        name: "persistence under a distractor"
+        continue-on-error: true
+        run: oxigraph query --location work/store --results-format tsv --query "$(cat queries/0004/persistence.rq)" | tee out/persistence.tsv
+      - id: story
+        name: "fiction scoping: amnesia and collapse"
+        continue-on-error: true
+        run: oxigraph query --location work/store --results-format tsv --query "$(cat queries/0004/story.rq)" | tee out/story.tsv
+      - id: invented
+        name: "invented countries"
+        continue-on-error: true
+        run: oxigraph query --location work/store --results-format tsv --query "$(cat queries/0004/invented.rq)" | tee out/invented.tsv
+      - id: calibration
+        name: "calibration of the forward readout"
+        continue-on-error: true
+        run: oxigraph query --location work/store --results-format tsv --query "$(cat queries/0004/calibration.rq)" | tee out/calibration.tsv
+      - id: top1
+        name: "every first-ranked answer, for the record"
+        continue-on-error: true
+        run: oxigraph query --location work/store --results-format tsv --query "$(cat queries/0004/top1.rq)" > out/top1.tsv; wc -l out/top1.tsv
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: judge
+          path: out/
+          retention-days: 1

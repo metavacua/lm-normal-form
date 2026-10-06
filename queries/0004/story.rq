@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Fiction scoping. Inside the story, the story's capital should be returned
+# (amnesia when it is not). Outside the story, the canonical capital should
+# return (collapse when the story's capital leaks out).
+PREFIX b: <urn:lmnf:b4:>
+SELECT ?model (COUNT(*) AS ?countries)
+       (SUM(IF(!?inside, 1, 0)) AS ?amnesia) (SUM(IF(?leak, 1, 0)) AS ?collapse) (SUM(IF(?outside, 1, 0)) AS ?outside_canonical) WHERE {
+  ?pi a b:Prompt ; b:kind "story_in" ; b:country ?c ; b:target ?ti .
+  ?ai b:prompt ?pi ; b:model ?model ; b:rank 1 ; b:token ?ki .
+  ?po a b:Prompt ; b:kind "story_out" ; b:country ?c ; b:target ?to ; b:alt ?alt .
+  ?ao b:prompt ?po ; b:model ?model ; b:rank 1 ; b:token ?ko .
+  BIND(STRSTARTS(?ti, ?ki) && STRLEN(?ki) > 1 AS ?inside)
+  BIND(STRSTARTS(?to, ?ko) && STRLEN(?ko) > 1 AS ?outside)
+  BIND(STRSTARTS(?alt, ?ko) && STRLEN(?ko) > 1 AS ?leak)
+} GROUP BY ?model ORDER BY ?model

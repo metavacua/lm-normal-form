@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# The authority for batch 0004: capitals (P36) of sovereign states that have not
+# been dissolved, every statement with its rank and validity, and whether it is
+# the "truthy" one Wikidata itself prefers. Run against query.wikidata.org.
+SELECT ?country ?countryLabel ?capital ?capitalLabel ?truthy ?rank ?start ?end WHERE {
+  ?country wdt:P31 wd:Q3624078 .
+  FILTER NOT EXISTS { ?country wdt:P576 ?dissolved }
+  ?country p:P36 ?statement .
+  ?statement ps:P36 ?capital ; wikibase:rank ?rank .
+  OPTIONAL { ?statement pq:P580 ?start }
+  OPTIONAL { ?statement pq:P582 ?end }
+  BIND(EXISTS { ?country wdt:P36 ?capital } AS ?truthy)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+ORDER BY ?countryLabel ?capitalLabel

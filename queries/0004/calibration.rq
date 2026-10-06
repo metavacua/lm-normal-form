@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Calibration of the forward readout: the mass on the canonical capital, in
+# bins of 0.2, against how often the first-ranked token is the canonical one.
+PREFIX b: <urn:lmnf:b4:>
+SELECT ?model ?bin (COUNT(*) AS ?countries) (AVG(?pt) AS ?mean_p) (AVG(IF(?h = 1, 1.0, 0.0)) AS ?hit_rate) WHERE {
+  { SELECT ?model ?p
+           (MAX(IF(?rank = 1 && STRSTARTS(?t, ?tok) && STRLEN(?tok) > 1, 1, 0)) AS ?h)
+           (SUM(IF(STRSTARTS(?t, ?tok) && STRLEN(?tok) > 1, ?prob, 0.0)) AS ?pt) WHERE {
+      ?p a b:Prompt ; b:kind "fwd" ; b:target ?t .
+      ?a b:prompt ?p ; b:model ?model ; b:rank ?rank ; b:token ?tok ; b:prob ?prob .
+    } GROUP BY ?model ?p }
+  BIND(FLOOR(?pt * 5) / 5 AS ?bin)
+} GROUP BY ?model ?bin ORDER BY ?model ?bin

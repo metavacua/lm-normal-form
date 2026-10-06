@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# The forward readout against the authority: the canonical capital, a capital
+# the country once had, some other country's capital (a glut), or no capital at
+# all (a gap).
+PREFIX b: <urn:lmnf:b4:>
+SELECT ?model (COUNT(*) AS ?countries) (SUM(IF(?canon, 1, 0)) AS ?canonical)
+       (SUM(IF(!?canon && ?ever, 1, 0)) AS ?historical)
+       (SUM(IF(!?ever && ?other, 1, 0)) AS ?another_countrys_capital)
+       (SUM(IF(!?ever && !?other, 1, 0)) AS ?not_a_capital) WHERE {
+  ?p a b:Prompt ; b:kind "fwd" ; b:country ?c ; b:target ?t .
+  ?a b:prompt ?p ; b:model ?model ; b:rank 1 ; b:token ?tok .
+  BIND(STRSTARTS(?t, ?tok) && STRLEN(?tok) > 1 AS ?canon)
+  BIND(EXISTS { ?c b:everCapital ?cap . ?cap b:label ?lbl . FILTER(STRSTARTS(CONCAT(" ", ?lbl), ?tok) && STRLEN(?tok) > 1) } AS ?ever)
+  BIND(EXISTS { ?cap2 a b:Capital ; b:label ?l2 . FILTER(STRSTARTS(CONCAT(" ", ?l2), ?tok) && STRLEN(?tok) > 2) } AS ?other)
+} GROUP BY ?model ORDER BY ?model

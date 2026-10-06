@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Relational reflexivity, g(f(x)) = x: for each country, does the forward
+# readout name the capital and the inverse readout name the country back?
+PREFIX b: <urn:lmnf:b4:>
+SELECT ?model (COUNT(*) AS ?countries) (SUM(IF(?hf && ?hi, 1, 0)) AS ?both_ways)
+       (SUM(IF(?hf && !?hi, 1, 0)) AS ?forward_only) (SUM(IF(!?hf && ?hi, 1, 0)) AS ?inverse_only)
+       (SUM(IF(!?hf && !?hi, 1, 0)) AS ?neither) WHERE {
+  ?pf a b:Prompt ; b:kind "fwd" ; b:country ?c ; b:target ?tf .
+  ?af b:prompt ?pf ; b:model ?model ; b:rank 1 ; b:token ?kf .
+  ?pi a b:Prompt ; b:kind "inv" ; b:country ?c ; b:target ?ti .
+  ?ai b:prompt ?pi ; b:model ?model ; b:rank 1 ; b:token ?ki .
+  BIND(STRSTARTS(?tf, ?kf) && STRLEN(?kf) > 1 AS ?hf)
+  BIND(STRSTARTS(?ti, ?ki) && STRLEN(?ki) > 1 AS ?hi)
+} GROUP BY ?model ORDER BY ?model
