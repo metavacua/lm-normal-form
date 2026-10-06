@@ -1,0 +1,137 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0014: the models before and after the row and column operations, in five runtimes. Written down in docs/batches/0014.md.
+#
+# smoke   on every push: the tiny random Llama through every runtime and every cell, with its variants; no claim, it tests the harness.
+# models  only for a commit whose message contains [run]: one job per runtime and model (PyTorch, ONNX Runtime, candle, llama.cpp, CTranslate2; SmolLM2-135M-Instruct,
+#         SmolLM2-135M, FloatLM 99M, TriLM 99M), original and variants, logits, text, perplexity, speed.
+# quant   the same commits: the quantized forms of SmolLM2-135M-Instruct's variants (llama.cpp Q8_0 and Q4_0, CTranslate2 int8).
+# report  the graded table.
+name: batch 0014
+
+on:
+  push:
+    branches: ["batch/0014-**"]
+    paths: [".github/workflows/batch-0014.yml", "batches/0014/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: batch-0014-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  LLAMACPP_TAG: b11450
+  LMNF_THREADS: "4"
+
+jobs:
+  smoke:
+    name: "01 the tiny random Llama, every runtime"
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      REPO: hf-internal-testing/tiny-random-LlamaForCausalLM
+      HF_REVISION: 9fb191250dd56d0ba7ec9785a025ed29c03d5998
+      LMNF_MODEL: tiny
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install the Python packages
+        run: |
+          mkdir -p work/tiny out/tiny
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers numpy safetensors huggingface_hub ml_dtypes pandas pyarrow sentencepiece protobuf "optimum[onnxruntime]" ctranslate2
+          python -m pip freeze > out/tiny/versions.txt
+          grep -m1 'model name' /proc/cpuinfo | tee out/tiny/cpu.txt
+      - name: candle, built
+        run: |
+          rustup toolchain install stable --profile minimal --no-self-update
+          rustup default stable
+          { rustc -V; cargo -V; } | tee out/tiny/rust.version
+          cargo build --release --manifest-path batches/0014/candle/Cargo.toml 2>&1 | tail -n 5
+          cp batches/0014/candle/Cargo.lock out/tiny/candle-Cargo.lock
+      - name: llama.cpp, the release, its source and our program
+        run: |
+          curl -sSL -o l.tgz "https://github.com/ggml-org/llama.cpp/releases/download/$LLAMACPP_TAG/llama-$LLAMACPP_TAG-bin-ubuntu-x64.tar.gz"
+          tar xzf l.tgz
+          git clone --quiet --depth 1 --branch "$LLAMACPP_TAG" https://github.com/ggml-org/llama.cpp llama.cpp-src
+          python -m pip install --quiet ./llama.cpp-src/gguf-py
+          g++ -O2 -std=c++17 -I llama.cpp-src/include -I llama.cpp-src/ggml/include -I llama.cpp-src/vendor batches/0014/llamacpp/lmnf_llama.cpp \
+            -o "llama-$LLAMACPP_TAG/lmnf-llama" -L"llama-$LLAMACPP_TAG" -lllama -lggml -lggml-base "-Wl,-rpath,\$ORIGIN"
+          find "llama-$LLAMACPP_TAG" -maxdepth 1 -name 'llama-*' | head -n 5
+      - name: Variants and inputs
+        run: |
+          python batches/0014/variants.py "$REPO" "$HF_REVISION" work/tiny/variants 2>&1 | tail -n 12
+          python batches/0014/xrt.py prepare work/tiny/variants/orig work/tiny
+      - id: pytorch
+        name: PyTorch, float32 and bfloat16
+        continue-on-error: true
+        run: |
+          python batches/0014/xrt.py all pytorch float32 work/tiny 2
+          python batches/0014/xrt.py all pytorch bfloat16 work/tiny 2
+      - id: onnxruntime
+        name: ONNX Runtime, float32
+        continue-on-error: true
+        run: python batches/0014/xrt.py all onnxruntime float32 work/tiny 2
+      - id: candle
+        name: candle, float32
+        continue-on-error: true
+        run: python batches/0014/xrt.py all candle float32 work/tiny 2
+      - id: llamacpp
+        name: llama.cpp, f32 and f16
+        continue-on-error: true
+        env:
+          LLAMACPP_DIR: ${{ github.workspace }}/llama-${{ env.LLAMACPP_TAG }}
+          LLAMACPP_SRC: ${{ github.workspace }}/llama.cpp-src
+        run: |
+          python batches/0014/xrt.py all llamacpp float32 work/tiny 2
+          python batches/0014/xrt.py all llamacpp float16 work/tiny 2
+      - id: ctranslate2
+        name: CTranslate2, float32
+        continue-on-error: true
+        run: python batches/0014/xrt.py all ctranslate2 float32 work/tiny 2
+      - name: Outcomes
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: |
+          echo "$STEPS" > out/tiny/outcomes.json
+          cp work/tiny/summary-*.json work/tiny/inputs.json work/tiny/variants/manifest.json out/tiny/ 2>/dev/null || true
+          mkdir -p out/tiny/res && cp work/tiny/res/*.json out/tiny/res/ 2>/dev/null || true
+          jq -r 'to_entries[] | select(.value.outcome != null) | "\(.key): \(.value.outcome)"' out/tiny/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: xrt-tiny
+          path: out/tiny/
+          retention-days: 7
+
+  report:
+    name: report the batch run on the commit
+    needs: [smoke]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RESULTS: ${{ toJSON(needs) }}
+    steps:
+      - run: |
+          state=success; echo "$RESULTS" | jq -e '[.[] | .result] | all(. == "success")' > /dev/null || state=failure
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -f state="$state" -f context="batch 0014" \
+            -f description="$(echo "$RESULTS" | jq -r 'to_entries | map("\(.key) \(.value.result)") | join(", ")' | cut -c1-140)" \
+            -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" > /dev/null
