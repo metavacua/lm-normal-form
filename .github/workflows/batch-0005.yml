@@ -195,7 +195,7 @@ jobs:
       TRAIN: |
         import sys,json,torch,transformers as t;from datasets import load_dataset;from trl import SFTConfig,SFTTrainer;from transformers import BitNetQuantConfig;from transformers.integrations import replace_with_bitnet_linear
         m,corpus,prompts,out,w,lr=sys.argv[1:7];k=t.AutoTokenizer.from_pretrained(m);g=t.AutoModelForCausalLM.from_pretrained(m).float()
-        if w=='ternary':s=g.state_dict();c=BitNetQuantConfig(linear_class='autobitlinear',quantization_mode='online');replace_with_bitnet_linear(g,modules_to_not_convert=['lm_head'],quantization_config=c);print(g.load_state_dict(s,strict=False));g.config.quantization_config=c
+        if w=='ternary':s=g.state_dict();c=BitNetQuantConfig(linear_class='autobitlinear',quantization_mode='online');replace_with_bitnet_linear(g,modules_to_not_convert=['lm_head'],quantization_config=c);print(g.load_state_dict(s,strict=False,assign=True));g.config.quantization_config=c
         d=load_dataset('json',data_files=corpus)['train'];SFTTrainer(model=g,processing_class=k,args=SFTConfig(output_dir=out,num_train_epochs=3,per_device_train_batch_size=16,max_length=32,learning_rate=float(lr),logging_steps=10,save_strategy='no',report_to=[],use_cpu=True),train_dataset=d).train()
         g.eval();torch.set_grad_enabled(False);a=open(out+'/answers.jsonl','w')
         for l in open(prompts):
