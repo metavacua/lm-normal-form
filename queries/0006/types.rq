@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Per model and tensor type: how many tensors and how many elements.
+PREFIX b: <urn:lmnf:b6:>
+SELECT ?model ?type (COUNT(*) AS ?tensors) (SUM(?n) AS ?elements) WHERE {
+  ?t a b:Tensor ; b:model ?model ; b:type ?type ; b:elements ?n .
+} GROUP BY ?model ?type ORDER BY ?model DESC(?elements)

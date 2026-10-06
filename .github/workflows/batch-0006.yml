@@ -1,0 +1,488 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0006: the graphs of two models, in every format the libraries already
+# produce, and what they say about where the models could be cut or
+# contracted. Written down in docs/batches/0006.md.
+#
+# Subjects: SmolLM2-135M-Instruct (float, baselines in batch 0004) and
+# TriLM 390M (ternary, baselines in batch 0004). Nothing is cut here; the
+# consequences are the next batches' business.
+#
+# Four analyses are written code, declared as such in batches/0006/*.py
+# (docs/operations.md, "Invocations are code"); the rest are existing tools
+# and two short invocations.
+name: batch 0006
+
+on:
+  push:
+    branches: ["batch/0006-**"]
+    paths: [".github/workflows/batch-0006.yml", "batches/0006/**", "queries/0006/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-0006-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  SMOL: HuggingFaceTB/SmolLM2-135M-Instruct
+  TRI: SpectraSuite/TriLM_390M_Unpacked
+  PROMPT: "The capital of France is"
+
+jobs:
+  prepare:
+    name: authority and prompts, as in batch 0004
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Ask Wikidata, derive the prompts
+        run: |
+          mkdir -p out
+          curl -sSfG -A "lm-normal-form batch 0006 (https://github.com/metavacua/lm-normal-form)" -H "Accept: application/sparql-results+json" \
+            --data-urlencode "query@batches/0004/authority.rq" https://query.wikidata.org/sparql -o out/wikidata.json
+          date -u +%Y-%m-%dT%H:%M:%SZ > out/fetched-at.txt
+          jq -f batches/0004/countries.jq out/wikidata.json > out/countries.json
+          jq -r --rawfile inv batches/0004/invented.txt -f batches/0004/prompts.jq out/countries.json | jq -r '.[] | [.id, .prompt] | @tsv' > out/prompts.tsv
+          wc -l out/prompts.tsv
+      - uses: actions/upload-artifact@v7
+        with:
+          name: prepare
+          path: out/
+          retention-days: 7
+
+  smoke:
+    name: smoke, the written code parses and the queries run
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Compile the Python files, parse the jq, run the SPARQL on an empty store
+        run: |
+          python -m py_compile batches/0006/*.py
+          python -m pip install --quiet oxigraph pyflakes
+          python -m pyflakes batches/0006/*.py
+          jq -n -f batches/0006/gguf-to-nt.jq --arg m x || true
+          mkdir -p work && oxigraph load --location work/store --format nt --file /dev/null
+          for q in queries/0006/*.rq; do oxigraph query --location work/store --results-format tsv --query-file "$q" > /dev/null && echo "$q runs"; done
+
+  onnx:
+    name: "${{ matrix.cell }} ONNX graph of ${{ matrix.repo }}, GraphSurgeon, ONNX2RDF, SPARQL"
+    needs: smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { cell: "01", repo: "HuggingFaceTB/SmolLM2-135M-Instruct" }
+          - { cell: "02", repo: "SpectraSuite/TriLM_390M_Unpacked" }
+    env:
+      MODEL: ${{ matrix.repo }}
+      # onnx-graphsurgeon: nodes, tensors, constants, operators by count, and the fan-out of tensors.
+      GS: |
+        import sys,onnx,onnx_graphsurgeon as gs,collections as c;g=gs.import_onnx(onnx.load(sys.argv[1]));T=g.tensors()
+        print(len(g.nodes),'nodes',len(T),'tensors',sum(isinstance(t,gs.Constant)for t in T.values()),'constants',len(g.inputs),'inputs',len(g.outputs),'outputs')
+        print('operators',c.Counter(n.op for n in g.nodes).most_common());print('fan-out of tensors',sorted(c.Counter(len(t.outputs)for t in T.values()).items()))
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Install
+        run: |
+          mkdir -p out work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          echo "$MODEL" > out/model.txt
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          # onnx-2-rdf needs Python 3.13 or later, the YARRRML parser from npm and Java for its RML mapper;
+          # Optimum's ONNX export comes with its onnxruntime extra
+          java -version 2>&1 | head -n 1
+          npm install --global @rmlio/yarrrml-parser > /dev/null
+          python -m pip install --quiet "optimum[onnxruntime]" onnx onnx_graphsurgeon onnx-2-rdf oxigraph accelerate
+          python -m pip freeze > out/versions.txt
+          echo "GS ${#GS} bytes" | tee out/invocation-sizes.txt
+      - id: export
+        name: "optimum-cli: export to ONNX, without past"
+        continue-on-error: true
+        run: /usr/bin/time -v optimum-cli export onnx --model "$MODEL" --task text-generation work/onnx 2> out/export.time | tail -n 20 | tee out/export.log; du -b work/onnx/* | tee out/onnx-files.txt
+      - id: check
+        name: "onnx: the checker on the exported graph"
+        continue-on-error: true
+        run: python -c "import onnx,sys;onnx.checker.check_model(sys.argv[1]);print('ok')" work/onnx/model.onnx | tee out/check.txt
+      - id: gs
+        name: "onnx-graphsurgeon: the graph's counts"
+        continue-on-error: true
+        run: /usr/bin/time -v python -c "$GS" work/onnx/model.onnx 2> out/gs.time | tee out/graphsurgeon.txt
+      - id: rdf
+        name: "onnx-parser: the graph as N-Quads, loaded into Oxigraph"
+        continue-on-error: true
+        run: |
+          /usr/bin/time -v onnx-parser work/onnx/model.onnx --target_path work/rdf --rdf_format nquads 2> out/onnx2rdf.time | tail -n 5
+          wc -l work/rdf/*.nq | tee out/quads.txt
+          oxigraph load --location work/store --file work/rdf/model.nq
+      - id: sparql
+        name: "SPARQL: types, operators, in- and out-degrees over the RDF graph"
+        continue-on-error: true
+        run: |
+          q() { oxigraph query --location work/store --union-default-graph --results-format tsv --query "$1"; }
+          q 'SELECT ?type (COUNT(*) AS ?n) WHERE { ?s a ?type } GROUP BY ?type ORDER BY DESC(?n)' | tee out/rdf-types.tsv
+          q 'SELECT ?p (COUNT(*) AS ?n) WHERE { ?s ?p ?o } GROUP BY ?p ORDER BY DESC(?n) LIMIT 40' | tee out/rdf-predicates.tsv
+          q 'SELECT ?outdeg (COUNT(*) AS ?nodes) WHERE { { SELECT ?s (COUNT(*) AS ?outdeg) WHERE { ?s ?p ?o . FILTER(isIRI(?o)) } GROUP BY ?s } } GROUP BY ?outdeg ORDER BY ?outdeg' | tee out/rdf-outdegree.tsv
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-${{ matrix.cell }}
+          path: out/
+          retention-days: 1
+
+  torch-export:
+    name: "03 torch.export graphs of both"
+    needs: smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p out
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers
+          python -m pip freeze > out/versions.txt
+          wc -c batches/0006/export_graph.py | tee out/code-sizes.txt
+      - id: smol
+        name: "torch.export: SmolLM2-135M-Instruct"
+        continue-on-error: true
+        run: /usr/bin/time -v python batches/0006/export_graph.py "$SMOL" "$PROMPT" 2> out/smol.time | tee out/smol.txt
+      - id: tri
+        name: "torch.export: TriLM 390M"
+        continue-on-error: true
+        run: /usr/bin/time -v python batches/0006/export_graph.py "$TRI" "$PROMPT" 2> out/tri.time | tee out/tri.txt
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-03
+          path: out/
+          retention-days: 1
+
+  gguf:
+    name: "04 GGUF tensor graphs of both, as RDF"
+    needs: smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install llama.cpp's converter and Oxigraph, download both models
+        run: |
+          mkdir -p out work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          git clone --depth 1 https://github.com/ggml-org/llama.cpp work/llama.cpp
+          git -C work/llama.cpp rev-parse HEAD | tee out/llama.cpp.revision.txt
+          python -m pip install --quiet -r work/llama.cpp/requirements/requirements-convert_hf_to_gguf.txt oxigraph
+          python -m pip freeze > out/versions.txt
+          hf download "$SMOL" --include "*.safetensors" "*.json" "*.txt" --local-dir work/smol
+          hf download "$TRI" --include "*.safetensors" "*.json" "*.txt" --local-dir work/tri
+      - id: convert
+        name: "convert_hf_to_gguf: both, float16"
+        continue-on-error: true
+        run: |
+          python work/llama.cpp/convert_hf_to_gguf.py work/smol --outfile work/smol.gguf --outtype f16 > out/smol.convert.log 2>&1
+          python work/llama.cpp/convert_hf_to_gguf.py work/tri --outfile work/tri.gguf --outtype f16 > out/tri.convert.log 2>&1
+          du -b work/*.gguf
+      - id: rdf
+        name: "gguf-dump and jq: the tensors as RDF, loaded into Oxigraph"
+        continue-on-error: true
+        run: |
+          for x in smol tri; do
+            python work/llama.cpp/gguf-py/gguf/scripts/gguf_dump.py --json "work/$x.gguf" > "out/$x.gguf.json"
+            m="$(jq -r '.metadata["general.name"].value // "'"$x"'"' "out/$x.gguf.json")"
+            jq -r --arg m "$x" -f batches/0006/gguf-to-nt.jq "out/$x.gguf.json" > "work/$x.nt"
+            oxigraph load --location work/store --file "work/$x.nt" --graph "urn:lmnf:b6:g:$x"
+            echo "$x ($m): $(wc -l < "work/$x.nt") triples"
+          done | tee out/loaded.txt
+      - id: types
+        name: "SPARQL: tensors and elements per type"
+        continue-on-error: true
+        run: oxigraph query --location work/store --union-default-graph --results-format tsv --query-file queries/0006/types.rq | tee out/types.tsv
+      - id: roles
+        name: "SPARQL: tensors, types, shapes and elements per role"
+        continue-on-error: true
+        run: oxigraph query --location work/store --union-default-graph --results-format tsv --query-file queries/0006/roles.rq | tee out/roles.tsv
+      - id: blocks
+        name: "SPARQL: blocks and their uniformity"
+        continue-on-error: true
+        run: oxigraph query --location work/store --union-default-graph --results-format tsv --query-file queries/0006/blocks.rq | tee out/blocks.tsv
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-04
+          path: out/
+          retention-days: 1
+
+  mlir:
+    name: "05 MLIR of SmolLM2 by IREE's importer"
+    needs: smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install and export
+        run: |
+          mkdir -p out work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet "optimum[onnxruntime]" "iree-base-compiler[onnx]" accelerate
+          python -m pip freeze > out/versions.txt
+          optimum-cli export onnx --model "$SMOL" --task text-generation work/onnx > out/export.log 2>&1
+      - id: import
+        name: "iree-import-onnx: the exported graph to MLIR"
+        continue-on-error: true
+        run: /usr/bin/time -v iree-import-onnx work/onnx/model.onnx -o work/smol.mlir 2> out/import.time; du -b work/smol.mlir | tee out/mlir-size.txt
+      - id: ops
+        name: "the MLIR operations by count"
+        continue-on-error: true
+        run: grep -oE '= [a-z_]+\.[a-z_.]+' work/smol.mlir | sort | uniq -c | sort -rn | head -n 40 | tee out/mlir-ops.txt
+      - id: compile
+        name: "iree-compile: to the linalg-level input dialect, operations by count"
+        continue-on-error: true
+        run: |
+          /usr/bin/time -v iree-compile --iree-hal-target-device=local --iree-hal-local-target-device-backends=llvm-cpu --compile-to=input work/smol.mlir -o work/smol.input.mlir 2> out/compile.time
+          grep -oE '= [a-z_]+\.[a-z_.]+' work/smol.input.mlir | sort | uniq -c | sort -rn | head -n 40 | tee out/mlir-input-ops.txt
+      - name: What the run used
+        if: always()
+        run: grep -h "Maximum resident\|Elapsed (wall" out/*.time || true
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-05
+          path: out/
+          retention-days: 1
+
+  weights:
+    name: "${{ matrix.cell }} weight graph of ${{ matrix.repo }}"
+    needs: smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { cell: "06", repo: "HuggingFaceTB/SmolLM2-135M-Instruct" }
+          - { cell: "07", repo: "SpectraSuite/TriLM_390M_Unpacked" }
+    env:
+      MODEL: ${{ matrix.repo }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p out
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          echo "$MODEL" > out/model.txt
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers
+          python -m pip freeze > out/versions.txt
+          wc -c batches/0006/weight_graph.py | tee out/code-sizes.txt
+      - id: weights
+        name: "numpy: the weight graph, tensor by tensor"
+        continue-on-error: true
+        run: /usr/bin/time -v python batches/0006/weight_graph.py "$MODEL" out/weights.tsv 2> out/weights.time; wc -l out/weights.tsv; cut -f1-5,9-14 out/weights.tsv | head -n 12
+      - name: What the run used
+        if: always()
+        run: grep -h "Maximum resident\|Elapsed (wall" out/*.time || true
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-${{ matrix.cell }}
+          path: out/
+          retention-days: 1
+
+  heads:
+    name: "08 attention heads of both, duplicates within a layer"
+    needs: smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p out
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers
+          python -m pip freeze > out/versions.txt
+          wc -c batches/0006/heads.py | tee out/code-sizes.txt
+      - id: smol
+        name: "heads: SmolLM2-135M-Instruct"
+        continue-on-error: true
+        run: python batches/0006/heads.py "$SMOL" | tee out/smol.txt
+      - id: tri
+        name: "heads: TriLM 390M"
+        continue-on-error: true
+        run: python batches/0006/heads.py "$TRI" | tee out/tri.txt
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-08
+          path: out/
+          retention-days: 1
+
+  influence:
+    name: "${{ matrix.cell }} layer influence on the forward prompts, ${{ matrix.repo }}"
+    needs: [prepare, smoke]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { cell: "09", repo: "HuggingFaceTB/SmolLM2-135M-Instruct" }
+          - { cell: "10", repo: "SpectraSuite/TriLM_390M_Unpacked" }
+          - { cell: "11", repo: "Qwen/Qwen3-0.6B" }
+    env:
+      MODEL: ${{ matrix.repo }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v8
+        with:
+          name: prepare
+          path: prepare
+      - name: Install
+        run: |
+          mkdir -p out
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          echo "$MODEL" > out/model.txt
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers
+          python -m pip freeze > out/versions.txt
+          wc -c batches/0006/influence.py | tee out/code-sizes.txt
+      - id: influence
+        name: "transformers: layer influence"
+        continue-on-error: true
+        run: /usr/bin/time -v python batches/0006/influence.py "$MODEL" prepare/prompts.tsv 2> out/influence.time | tee out/influence.txt
+      - name: What the run used
+        if: always()
+        run: grep -h "Maximum resident\|Elapsed (wall" out/*.time || true
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-${{ matrix.cell }}
+          path: out/
+          retention-days: 1
+
+  names:
+    name: "12 one graph under four names, gguf-py's tensor map over four checkpoints"
+    needs: smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      # gguf-py's own name map, from library parameter names to GGUF names, over the safetensors header's names
+      # as the safetensors library reads them: how many map, and which do not.
+      NM: |
+        import sys,gguf;from safetensors import safe_open;a=sys.argv;h=list(safe_open(a[1],'np').keys());M=gguf.get_tensor_name_map(getattr(gguf.MODEL_ARCH,a[2]),int(a[3]));u=[n for n in h if M.get_name(n,try_suffixes=('.weight','.bias'))is None];print(a[1],len(h),'tensors in the header',len(h)-len(u),'mapped',len(u),'unmapped',u[:12])
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install gguf-py and download the four headers
+        run: |
+          mkdir -p out work
+          git clone --depth 1 https://github.com/ggml-org/llama.cpp work/llama.cpp
+          python -m pip install --quiet huggingface_hub safetensors numpy
+          for r in HuggingFaceTB/SmolLM2-135M-Instruct SpectraSuite/TriLM_390M_Unpacked Qwen/Qwen3-0.6B openai-community/gpt2; do
+            hf download "$r" --include "model.safetensors" --local-dir "work/$(basename "$r")"
+          done
+          echo "NM ${#NM} bytes" | tee out/invocation-sizes.txt
+      - id: smol
+        name: "names: SmolLM2-135M-Instruct, llama, 30 blocks"
+        continue-on-error: true
+        run: PYTHONPATH=work/llama.cpp/gguf-py python -c "$NM" work/SmolLM2-135M-Instruct/model.safetensors LLAMA 30 | tee -a out/names.txt
+      - id: tri
+        name: "names: TriLM 390M, llama"
+        continue-on-error: true
+        run: |
+          hf download "$TRI" config.json --local-dir work/tri-cfg > /dev/null
+          PYTHONPATH=work/llama.cpp/gguf-py python -c "$NM" work/TriLM_390M_Unpacked/model.safetensors LLAMA "$(jq .num_hidden_layers work/tri-cfg/config.json)" | tee -a out/names.txt
+      - id: qwen
+        name: "names: Qwen3-0.6B, qwen3, 28 blocks"
+        continue-on-error: true
+        run: PYTHONPATH=work/llama.cpp/gguf-py python -c "$NM" work/Qwen3-0.6B/model.safetensors QWEN3 28 | tee -a out/names.txt
+      - id: gpt2
+        name: "names: GPT-2, gpt2, 12 blocks"
+        continue-on-error: true
+        run: PYTHONPATH=work/llama.cpp/gguf-py python -c "$NM" work/gpt2/model.safetensors GPT2 12 | tee -a out/names.txt
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-12
+          path: out/
+          retention-days: 1

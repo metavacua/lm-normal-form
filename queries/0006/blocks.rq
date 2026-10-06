@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Per model: the number of blocks, whether every block has the same roles,
+# and the elements per block.
+PREFIX b: <urn:lmnf:b6:>
+SELECT ?model (COUNT(DISTINCT ?blk) AS ?blocks) (MIN(?per) AS ?min_tensors_per_block) (MAX(?per) AS ?max_tensors_per_block) (MIN(?els) AS ?min_elements_per_block) (MAX(?els) AS ?max_elements_per_block) WHERE {
+  { SELECT ?model ?blk (COUNT(*) AS ?per) (SUM(?n) AS ?els) WHERE {
+      ?t a b:Tensor ; b:model ?model ; b:block ?blk ; b:elements ?n .
+    } GROUP BY ?model ?blk }
+} GROUP BY ?model ORDER BY ?model
