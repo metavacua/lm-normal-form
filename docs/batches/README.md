@@ -2,7 +2,10 @@
 
 One document per batch, registered before the run, results appended after.
 Each batch lives on its own branch and pull request until merged; the
-branch is named in the document.
+branch is named in the document. The numbers are accession numbers; the
+order is the dependency graph in `batches.ttl` (PROV `wasInformedBy` and
+`used`), which `queries/batches-order.rq` renders. Each batch declares its
+kind: test, calibration or description (`docs/operations.md`).
 
 - **0001** structure graphs of twelve published ONNX files, through a
   hand-written pipeline since retired. Findings stand (ten of twelve files
@@ -22,4 +25,9 @@ branch is named in the document.
   teacher-free student of the fragment in ternary and float.
   `batch/0005-ternarization`, PR #6.
 - **0006** the graphs of two models in every format the libraries produce,
-  and the candidates for trimming and contraction (registered next).
+  and the candidates for trimming and contraction (description).
+  `batch/0006-graphs`, PR #8.
+- **0007** which parts of Qwen3-1.7B tolerate which map: the sensitivity
+  table per tensor class, a test of H-S. `batch/0007-selective`, PR #9.
+- **0008** trimming and contraction, judged (to be registered from 0006's
+  candidates and 0007's table).
