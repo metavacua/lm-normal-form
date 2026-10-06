@@ -11,6 +11,7 @@
 import hashlib, json, os, struct, sys
 import torch
 from safetensors.torch import load_file, save, save_file
+import identity, identity_core as core
 
 
 def sha(path):
@@ -49,6 +50,7 @@ def main(model, hub, work, out):
             res[f"save_{tag}_dtypes"] = sorted({str(v.dtype) for v in t.values()})
             res[f"save_{tag}_data_bytes"] = sum(v.numel() * v.element_size() for v in t.values())
             if tag == "f32":
+                res["save_f32_bag_root_equal_to_hub"] = (core.bag_root(identity.read_st(path)[0]) == core.bag_root(identity.read_st(hub)[0]))
                 res["f32_cast_to_bf16_bytes_equal_to_original"] = all(
                     k in t and torch.equal(t[k].to(torch.bfloat16).view(torch.int16), v.view(torch.int16)) for k, v in orig.items())
         del m

@@ -162,11 +162,21 @@ jobs:
         if: steps.hub.outcome == 'success'
         continue-on-error: true
         run: bash batches/0011/cells.sh swap ${{ matrix.tag }}
+      - id: scan
+        name: "the weights' zeros, repeated rows and units, exponents and norm values (a description)"
+        if: steps.hub.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0011/cells.sh scan ${{ matrix.tag }}
       - id: revisions
         name: "the Hub's commits of the model and of its base, file by file; repositories with the same weights"
         if: matrix.tag == 'smol'
         continue-on-error: true
         run: bash batches/0011/cells.sh revisions ${{ matrix.tag }}
+      - id: content
+        name: "the repositories that name the model: the tensors of those that hold its tensor table, against its tensors"
+        if: matrix.tag == 'smol' && steps.revisions.outcome == 'success' && steps.st.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0011/cells.sh content ${{ matrix.tag }}
       - id: base
         name: "the base model's tensors against the instruct model's"
         if: matrix.tag == 'smol' && steps.st.outcome == 'success'

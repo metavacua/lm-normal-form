@@ -7,8 +7,12 @@
 # Usage: revisions.py check REPO FILE LOCAL             the Hub's id of FILE at the head of REPO against LOCAL
 #        revisions.py commits REPO OUT.tsv              one row per commit of the main branch, one column per file
 #        revisions.py siblings REPO SEARCH OUT.tsv      repositories found by SEARCH, and whether their weights are REPO's
-import hashlib, sys
-from huggingface_hub import HfApi
+#        revisions.py content SIBLINGS.tsv REF.json WORKDIR OUT.tsv
+#                                                       of those with a model.safetensors: its tensor table (names, dtypes,
+#                                                       shapes) from the first bytes of the file against REF's, and, when the
+#                                                       names and shapes are REF's, the tensors themselves against REF's
+import hashlib, json, os, struct, sys, urllib.request
+from huggingface_hub import HfApi, hf_hub_download
 
 FILES = ["model.safetensors", "config.json", "generation_config.json", "tokenizer.json", "tokenizer_config.json",
          "special_tokens_map.json", "vocab.json", "merges.txt", "chat_template.jinja", "tokenizer.model"]
@@ -31,6 +35,51 @@ def ids(api, repo, paths, revision=None):
 def git_blob_id(path):
     data = open(path, "rb").read()
     return hashlib.sha1(b"blob %d\0" % len(data) + data).hexdigest()
+
+
+def table_of(repo):
+    """{tensor name: (dtype, shape)} and the metadata, from the first bytes of the repository's model.safetensors."""
+    url = f"https://huggingface.co/{repo}/resolve/main/model.safetensors"
+
+    def get(a, b):
+        return urllib.request.urlopen(urllib.request.Request(url, headers={"Range": f"bytes={a}-{b}"})).read()
+    n = struct.unpack("<Q", get(0, 7))[0]
+    h = json.loads(get(8, 7 + n))
+    meta = h.pop("__metadata__", None)
+    return {k: (v["dtype"], v["shape"]) for k, v in h.items()}, meta
+
+
+def content(siblings, ref, work, out):
+    import identity
+    refrec = json.load(open(ref))
+    reft = {e["labels"]["safetensors"]: (e["stored_dtype"], e["shape"]) for e in refrec["subject"]["tensors"]}
+    rows = [["repo", "tensors", "same_names", "same_shapes", "same_dtypes", "metadata", "keys_in_both", "bag_root_equal"]]
+    done = 0
+    for line in open(siblings, encoding="utf-8").read().splitlines()[1:]:
+        repo, got = line.split("\t")[:2]
+        if not got.startswith("sha256:"):
+            continue
+        try:
+            t, meta = table_of(repo)
+        except Exception as e:  # a repository whose first bytes cannot be read is a row
+            rows.append([repo, "-", "-", "-", "-", "error:" + type(e).__name__, "-", "-"])
+            continue
+        names = set(t) == set(reft)
+        shapes = names and all(t[k][1] == reft[k][1] for k in t)
+        dtypes = shapes and all(t[k][0].lower() == reft[k][0] for k in t)
+        row = [repo, str(len(t)), str(names), str(shapes), str(dtypes), json.dumps(meta, sort_keys=True), "-", "-"]
+        if shapes and done < 8:
+            done += 1
+            path = hf_hub_download(repo, "model.safetensors", local_dir=f"{work}/{repo.replace('/', '--')}")
+            rec = identity.record("safetensors", identity.read_st(path)[0], repo)
+            _, summary = identity.match(refrec, rec)
+            row[6], row[7] = f"{summary['keys_in_both']}/{summary['ref_distinct_keys']}", str(summary["bag_roots_equal"])
+            os.remove(path)
+        rows.append(row)
+    with open(out, "w", encoding="utf-8") as f:
+        for r in rows:
+            f.write("\t".join(r) + "\n")
+    print(f"{len(rows) - 1} repositories with a model.safetensors; {done} of them read in full")
 
 
 def main(argv):
@@ -73,6 +122,8 @@ def main(argv):
             for r in rows:
                 f.write("\t".join(r) + "\n")
         print(f"{len(rows)} repositories named by '{search}'; {sum(1 for r in rows if r[2] == 'same')} have the same weights file as {repo}")
+    elif argv[1] == "content":
+        content(*argv[2:6])
     else:
         sys.exit(__doc__)
 
