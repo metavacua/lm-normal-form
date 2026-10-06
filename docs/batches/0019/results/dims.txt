@@ -1,0 +1,7 @@
+untied-eps0-logits         derived  142  formula of symdim.py  142  equal   groups: grp=Perm, hin=Perm, na=Mono, nf=Mono, nm=Mono, ov=GL, qk=Cplx, res=CO, tok=Triv, ugate=Perm, unit=Mono, vocab=Triv
+untied-eps0-logprobs       derived  148  formula of symdim.py  148  equal   groups: grp=Perm, hin=Perm, na=Mono, nf=Mono, nm=Mono, ov=GL, qk=Cplx, res=CO, tok=Triv, ugate=Perm, unit=Mono, vocab=Triv
+untied-eps-logits          derived  141  formula of symdim.py  141  equal   groups: grp=Perm, hin=Perm, na=Mono, nf=Mono, nm=Mono, ov=GL, qk=Cplx, res=O, tok=Triv, ugate=Perm, unit=Mono, vocab=Triv
+tied-eps0-logits           derived  121  formula of symdim.py  121  equal   groups: grp=Perm, hin=Perm, na=Mono, nm=Mono, ov=GL, qk=Cplx, res=SSP, tok=Triv, ugate=Perm, unit=Mono, vocab=Triv
+tied-eps-logits            derived  120  formula of symdim.py  120  equal   groups: grp=Perm, hin=Perm, na=Mono, nm=Mono, ov=GL, qk=Cplx, res=SP, tok=Triv, ugate=Perm, unit=Mono, vocab=Triv
+mha-untied-eps0-logits     derived   82  formula of symdim.py   82  equal   groups: grp=Perm, hin=Perm, na=Mono, nf=Mono, nm=Mono, ov=GL, qk=Cplx, res=CO, tok=Triv, ugate=Perm, unit=Mono, vocab=Triv
+nope-untied-eps0-logits    derived  190  formula of symdim.py  190  equal   groups: grp=Perm, hin=Perm, na=Mono, nf=Mono, nm=Mono, ov=GL, qk=GL, res=CO, tok=Triv, ugate=Perm, unit=Mono, vocab=Triv
