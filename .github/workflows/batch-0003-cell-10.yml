@@ -1,0 +1,91 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0003, cell 10, run again on its own. In one environment Optimum pins
+# transformers 4.57 and ONNX Runtime's model builder imports a class that only
+# transformers 5 has, so the two tools get a virtual environment each.
+name: batch 0003 cell 10
+
+on:
+  push:
+    branches: ["batch/0003-**"]
+    paths: [".github/workflows/batch-0003-cell-10.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-0003-cell-10-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  MODEL: HuggingFaceTB/SmolLM2-135M-Instruct
+  CODE: >-
+    import sys,math,onnx;g=onnx.load(sys.argv[1]).graph;t=g.initializer;
+    print(sys.argv[1],'nodes',len(g.node),'initializers',len(t),'elements',sum(math.prod(x.dims)for x in t),
+    'types',sorted({x.data_type for x in t}))
+
+jobs:
+  onnx-stored-tensors:
+    name: 10 what three ONNX graphs of SmolLM2 store, against the header
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install, download the published graph, export one and build one
+        run: |
+          mkdir -p out work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet onnx huggingface_hub
+          echo "CODE ${#CODE} bytes" | tee out/invocation-sizes.txt
+          hf download "$MODEL" onnx/model.onnx --local-dir work/published
+          python -m venv work/venv-optimum
+          work/venv-optimum/bin/pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          work/venv-optimum/bin/pip install --quiet "optimum[onnxruntime]" accelerate
+          work/venv-optimum/bin/pip freeze > out/versions-optimum.txt
+          /usr/bin/time -v work/venv-optimum/bin/optimum-cli export onnx --model "$MODEL" --task text-generation-with-past work/exported 2> out/export.time
+          python -m venv work/venv-genai
+          work/venv-genai/bin/pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          work/venv-genai/bin/pip install --quiet onnxruntime-genai onnxruntime onnx onnx-ir transformers
+          work/venv-genai/bin/pip freeze > out/versions-genai.txt
+          /usr/bin/time -v work/venv-genai/bin/python -m onnxruntime_genai.models.builder -m "$MODEL" -o work/built -p fp32 -e cpu -c work/cache --extra_options hf_token=false 2> out/build.time
+          url="https://huggingface.co/$MODEL/resolve/main/model.safetensors"
+          length="$(curl -sSfL -r 0-7 "$url" | od -An -tu8 | tr -d ' ')"
+          curl -sSfL -r "8-$((length + 7))" "$url" > out/header.json
+          jq -c '{tensors: (del(.__metadata__) | length), elements: ([del(.__metadata__)[] | .shape | reduce .[] as $d (1; . * $d)] | add)}' out/header.json | tee out/header-totals.json
+      - id: published
+        name: "published graph: nodes, initializers, elements, element types"
+        continue-on-error: true
+        run: /usr/bin/time -v python -c "$CODE" work/published/onnx/model.onnx 2> out/published.time | tee out/published.txt
+      - id: exported
+        name: "graph exported by Optimum"
+        continue-on-error: true
+        run: /usr/bin/time -v python -c "$CODE" work/exported/model.onnx 2> out/exported.time | tee out/exported.txt
+      - id: built
+        name: "graph built by ONNX Runtime's builder"
+        continue-on-error: true
+        run: /usr/bin/time -v python -c "$CODE" work/built/model.onnx 2> out/built.time | tee out/built.txt
+      - name: What the run used
+        if: always()
+        run: grep -h "Maximum resident\|Elapsed (wall" out/*.time || true
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-10-onnx-stored-tensors-rerun2
+          path: out/
+          retention-days: 1
