@@ -3,10 +3,13 @@
 
 # Batch 0014: the models before and after the row and column operations, in five runtimes. Written down in docs/batches/0014.md.
 #
-# smoke   on every push: the tiny random Llama through every runtime and every cell, with its variants; no claim, it tests the harness.
+# smoke   on every push: the tiny random Llama through every runtime and every cell, with its variants; no claim, it tests the harness. It fails if any cell failed.
+# real    on every push: SmolLM2-135M-Instruct, the original and the canonical form, through every runtime and the paths that the tiny model cannot take (grouped-query
+#         attention, a tied head, bfloat16 weights, the quantized forms, a quantized KV cache); no claim either. The heavy jobs wait for both.
 # models  only for a commit whose message contains [run]: one job per runtime and model (PyTorch, ONNX Runtime, candle, llama.cpp, CTranslate2; SmolLM2-135M-Instruct,
-#         SmolLM2-135M, FloatLM 99M, TriLM 99M), original and variants, logits, text, perplexity, speed.
-# quant   the same commits: the quantized forms of SmolLM2-135M-Instruct's variants (llama.cpp Q8_0 and Q4_0, CTranslate2 int8).
+#         SmolLM2-135M, FloatLM 99M, TriLM 99M), original and variants, logits, text, perplexity, speed; the cache cell (08) in the PyTorch leg of each model.
+# quant   the same commits: the quantized forms of SmolLM2-135M-Instruct's variants (llama.cpp Q8_0 and Q4_0, CTranslate2 int8), and llama.cpp with the KV cache in f16,
+#         Q8_0 and Q4_0 (cell 09).
 # report  the graded table.
 name: batch 0014
 
@@ -100,6 +103,13 @@ jobs:
         run: |
           python batches/0014/xrt.py all llamacpp float32 work/tiny 2
           python batches/0014/xrt.py all llamacpp float16 work/tiny 2
+      - id: llamacpp_kv
+        name: llama.cpp, the KV cache in f16
+        continue-on-error: true
+        env:
+          LLAMACPP_DIR: ${{ github.workspace }}/llama-${{ env.LLAMACPP_TAG }}
+          LLAMACPP_SRC: ${{ github.workspace }}/llama.cpp-src
+        run: python batches/0014/xrt.py all llamacpp float32-kvf16 work/tiny 1
       - id: tokenizers
         name: tokenizers, llama.cpp against Hugging Face
         continue-on-error: true
@@ -111,6 +121,10 @@ jobs:
         name: CTranslate2, float32
         continue-on-error: true
         run: python batches/0014/xrt.py all ctranslate2 float32 work/tiny 2
+      - id: cache
+        name: the KV cache under the transformations
+        continue-on-error: true
+        run: python batches/0014/cache.py work/tiny out/tiny/cache-tiny.json --hf
       - name: Outcomes
         if: always()
         env:
@@ -126,10 +140,259 @@ jobs:
           name: xrt-tiny
           path: out/tiny/
           retention-days: 7
+      - name: Every cell must have passed
+        if: always()
+        run: jq -e '[to_entries[] | select(.value.outcome == "failure")] | length == 0' out/tiny/outcomes.json
+
+  real:
+    name: "01b SmolLM2-135M-Instruct, original and canonical form, every runtime"
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      REPO: HuggingFaceTB/SmolLM2-135M-Instruct
+      HF_REVISION: 12fd25f77366fa6b3b4b768ec3050bf629380bac
+      LMNF_MODEL: smol-instruct
+      W: work/real
+      O: out/real
+      LLAMACPP_DIR: ${{ github.workspace }}/llama-b11450
+      LLAMACPP_SRC: ${{ github.workspace }}/llama.cpp-src
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p "$W" "$O"
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers numpy safetensors huggingface_hub ml_dtypes pandas pyarrow sentencepiece protobuf "optimum[onnxruntime]" accelerate ctranslate2
+          python -m pip freeze > "$O/versions.txt"
+          grep -m1 'model name' /proc/cpuinfo | tee "$O/cpu.txt"
+          rustup toolchain install stable --profile minimal --no-self-update
+          rustup default stable
+          cargo build --release --manifest-path batches/0014/candle/Cargo.toml 2>&1 | tail -n 3
+          curl -sSL -o l.tgz "https://github.com/ggml-org/llama.cpp/releases/download/$LLAMACPP_TAG/llama-$LLAMACPP_TAG-bin-ubuntu-x64.tar.gz"
+          tar xzf l.tgz
+          git clone --quiet --depth 1 --branch "$LLAMACPP_TAG" https://github.com/ggml-org/llama.cpp llama.cpp-src
+          python -m pip install --quiet ./llama.cpp-src/gguf-py
+          g++ -O2 -std=c++17 -I llama.cpp-src/include -I llama.cpp-src/ggml/include -I llama.cpp-src/vendor batches/0014/llamacpp/lmnf_llama.cpp \
+            -o "llama-$LLAMACPP_TAG/lmnf-llama" -L"llama-$LLAMACPP_TAG" -lllama -lggml -lggml-base "-Wl,-rpath,\$ORIGIN"
+      - name: Variants and inputs
+        run: |
+          python batches/0014/variants.py "$REPO" "$HF_REVISION" "$W/variants" orig canon 2>&1 | tail -n 6
+          python batches/0014/xrt.py prepare "$W/variants/orig" "$W"
+      - id: pytorch
+        name: PyTorch, float32
+        continue-on-error: true
+        run: python batches/0014/xrt.py all pytorch float32 "$W" 1
+      - id: cache
+        name: the KV cache under the canonical form
+        continue-on-error: true
+        run: python batches/0014/cache.py "$W" "$O/cache-real.json" --hf
+      - id: onnxruntime
+        name: ONNX Runtime, float32
+        continue-on-error: true
+        run: python batches/0014/xrt.py all onnxruntime float32 "$W" 1
+      - id: candle
+        name: candle, float32
+        continue-on-error: true
+        run: python batches/0014/xrt.py all candle float32 "$W" 1
+      - id: llamacpp
+        name: llama.cpp, f32 with the f32, Q8_0 and Q4_0 cache, and the quantized weights
+        continue-on-error: true
+        run: |
+          python batches/0014/xrt.py all llamacpp float32 "$W" 1
+          python batches/0014/xrt.py all llamacpp float32-kvq8_0 "$W" 1
+          python batches/0014/xrt.py all llamacpp float32-kvq4_0 "$W" 1
+          python batches/0014/xrt.py all llamacpp q8_0 "$W" 1
+          python batches/0014/xrt.py all llamacpp q4_0 "$W" 1
+      - id: tokenizers
+        name: tokenizers, llama.cpp against Hugging Face
+        continue-on-error: true
+        run: python batches/0014/cell_tokenize.py "$W"
+      - id: ctranslate2
+        name: CTranslate2, float32 and int8
+        continue-on-error: true
+        run: |
+          python batches/0014/xrt.py all ctranslate2 float32 "$W" 1
+          python batches/0014/xrt.py all ctranslate2 int8 "$W" 1
+      - name: Keep
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: |
+          echo "$STEPS" > "$O/outcomes.json"
+          cp "$W"/summary-*.json "$W/inputs.json" "$W/texts.json" "$W/tokenizers.json" "$W/variants/manifest.json" "$O/" 2>/dev/null || true
+          mkdir -p "$O/res" && cp "$W"/res/*.json "$O/res/" 2>/dev/null || true
+          jq -r 'to_entries[] | select(.value.outcome != null) | "\(.key): \(.value.outcome)"' "$O/outcomes.json"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: xrt-real
+          path: out/real/
+          retention-days: 7
+      - name: Every cell must have passed
+        if: always()
+        run: jq -e '[to_entries[] | select(.value.outcome == "failure")] | length == 0' "$O/outcomes.json"
+
+  models:
+    name: "02 ${{ matrix.runtime }}, ${{ matrix.model }}"
+    needs: [smoke, real]
+    if: contains(github.event.head_commit.message, '[run]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [pytorch, onnxruntime, candle, llamacpp, ctranslate2]
+        model: [smol-instruct, smol-base, floatlm-99m, trilm-99m]
+        include:
+          - { model: smol-instruct, repo: "HuggingFaceTB/SmolLM2-135M-Instruct", rev: 12fd25f77366fa6b3b4b768ec3050bf629380bac }
+          - { model: smol-base, repo: "HuggingFaceTB/SmolLM2-135M", rev: 93efa2f097d58c2a74874c7e644dbc9b0cee75a2 }
+          - { model: floatlm-99m, repo: "SpectraSuite/FloatLM_99M", rev: 0516fbe2979fcad7c26805885273562c88c3de90 }
+          - { model: trilm-99m, repo: "SpectraSuite/TriLM_99M_Unpacked", rev: 61cd2c766000fc544595d6570ad1990017d0cb43 }
+    env:
+      REPO: ${{ matrix.repo }}
+      HF_REVISION: ${{ matrix.rev }}
+      LMNF_MODEL: ${{ matrix.model }}
+      W: work/${{ matrix.model }}
+      O: out/${{ matrix.runtime }}-${{ matrix.model }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install the Python packages
+        run: |
+          mkdir -p "$W" "$O"
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers numpy safetensors huggingface_hub ml_dtypes pandas pyarrow sentencepiece protobuf "optimum[onnxruntime]" accelerate ctranslate2
+          python -m pip freeze > "$O/versions.txt"
+          grep -m1 'model name' /proc/cpuinfo | tee "$O/cpu.txt"
+      - name: candle, built
+        if: matrix.runtime == 'candle'
+        run: |
+          rustup toolchain install stable --profile minimal --no-self-update
+          rustup default stable
+          { rustc -V; cargo -V; } | tee "$O/rust.version"
+          cargo build --release --manifest-path batches/0014/candle/Cargo.toml 2>&1 | tail -n 3
+          cp batches/0014/candle/Cargo.lock "$O/candle-Cargo.lock"
+      - name: llama.cpp, the release, its source and our program
+        if: matrix.runtime == 'llamacpp'
+        run: |
+          curl -sSL -o l.tgz "https://github.com/ggml-org/llama.cpp/releases/download/$LLAMACPP_TAG/llama-$LLAMACPP_TAG-bin-ubuntu-x64.tar.gz"
+          tar xzf l.tgz
+          git clone --quiet --depth 1 --branch "$LLAMACPP_TAG" https://github.com/ggml-org/llama.cpp llama.cpp-src
+          python -m pip install --quiet ./llama.cpp-src/gguf-py
+          g++ -O2 -std=c++17 -I llama.cpp-src/include -I llama.cpp-src/ggml/include -I llama.cpp-src/vendor batches/0014/llamacpp/lmnf_llama.cpp \
+            -o "llama-$LLAMACPP_TAG/lmnf-llama" -L"llama-$LLAMACPP_TAG" -lllama -lggml -lggml-base "-Wl,-rpath,\$ORIGIN"
+      - name: Variants and inputs
+        run: |
+          python batches/0014/variants.py "$REPO" "$HF_REVISION" "$W/variants" 2>&1 | tail -n 14
+          python batches/0014/xrt.py prepare "$W/variants/orig" "$W"
+      - id: run
+        name: The runtime on every variant
+        env:
+          LLAMACPP_DIR: ${{ github.workspace }}/llama-${{ env.LLAMACPP_TAG }}
+          LLAMACPP_SRC: ${{ github.workspace }}/llama.cpp-src
+        run: |
+          case "${{ matrix.runtime }}" in
+            pytorch) dts="float32 bfloat16" ;;
+            llamacpp) dts="float32 float16" ;;
+            *) dts="float32" ;;
+          esac
+          for dt in $dts; do python batches/0014/xrt.py all "${{ matrix.runtime }}" "$dt" "$W" 3; done
+          if [ "${{ matrix.runtime }}" = llamacpp ]; then python batches/0014/cell_tokenize.py "$W"; fi
+      - id: cache
+        name: the KV cache under the transformations
+        if: matrix.runtime == 'pytorch'
+        continue-on-error: true
+        run: python batches/0014/cache.py "$W" "$O/cache-${{ matrix.model }}.json" --hf
+      - name: Keep
+        if: always()
+        run: |
+          cp "$W"/summary-*.json "$W/inputs.json" "$W/texts.json" "$W/tokenizers.json" "$W/variants/manifest.json" "$O/" 2>/dev/null || true
+          mkdir -p "$O/res" && cp "$W"/res/*.json "$O/res/" 2>/dev/null || true
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: xrt-${{ matrix.runtime }}-${{ matrix.model }}
+          path: out/${{ matrix.runtime }}-${{ matrix.model }}/
+          retention-days: 14
+
+  quant:
+    name: "03 the quantized forms of SmolLM2-135M-Instruct and its variants"
+    needs: [smoke, real]
+    if: contains(github.event.head_commit.message, '[run]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      REPO: HuggingFaceTB/SmolLM2-135M-Instruct
+      HF_REVISION: 12fd25f77366fa6b3b4b768ec3050bf629380bac
+      LMNF_MODEL: smol-instruct
+      W: work/quant
+      O: out/quant
+      LLAMACPP_DIR: ${{ github.workspace }}/llama-b11450
+      LLAMACPP_SRC: ${{ github.workspace }}/llama.cpp-src
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p "$W" "$O"
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers numpy safetensors huggingface_hub ml_dtypes pandas pyarrow sentencepiece protobuf ctranslate2
+          python -m pip freeze > "$O/versions.txt"
+          grep -m1 'model name' /proc/cpuinfo | tee "$O/cpu.txt"
+          curl -sSL -o l.tgz "https://github.com/ggml-org/llama.cpp/releases/download/$LLAMACPP_TAG/llama-$LLAMACPP_TAG-bin-ubuntu-x64.tar.gz"
+          tar xzf l.tgz
+          git clone --quiet --depth 1 --branch "$LLAMACPP_TAG" https://github.com/ggml-org/llama.cpp llama.cpp-src
+          python -m pip install --quiet ./llama.cpp-src/gguf-py
+          g++ -O2 -std=c++17 -I llama.cpp-src/include -I llama.cpp-src/ggml/include -I llama.cpp-src/vendor batches/0014/llamacpp/lmnf_llama.cpp \
+            -o "llama-$LLAMACPP_TAG/lmnf-llama" -L"llama-$LLAMACPP_TAG" -lllama -lggml -lggml-base "-Wl,-rpath,\$ORIGIN"
+      - name: Variants and inputs
+        run: |
+          python batches/0014/variants.py "$REPO" "$HF_REVISION" "$W/variants" 2>&1 | tail -n 14
+          python batches/0014/xrt.py prepare "$W/variants/orig" "$W"
+      - id: llamacpp
+        name: llama.cpp, Q8_0 and Q4_0
+        continue-on-error: true
+        run: |
+          python batches/0014/xrt.py all llamacpp q8_0 "$W" 1
+          python batches/0014/xrt.py all llamacpp q4_0 "$W" 1
+      - id: ctranslate2
+        name: CTranslate2, int8
+        continue-on-error: true
+        run: python batches/0014/xrt.py all ctranslate2 int8 "$W" 1
+      - id: kvtypes
+        name: llama.cpp, the type of the KV cache
+        continue-on-error: true
+        run: |
+          python batches/0014/xrt.py all llamacpp float32-kvf16 "$W" 1
+          python batches/0014/xrt.py all llamacpp float32-kvq8_0 "$W" 1
+          python batches/0014/xrt.py all llamacpp float32-kvq4_0 "$W" 1
+      - name: Keep
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: |
+          echo "$STEPS" > "$O/outcomes.json"
+          cp "$W"/summary-*.json "$W/inputs.json" "$W/variants/manifest.json" "$O/" 2>/dev/null || true
+          mkdir -p "$O/res" && cp "$W"/res/*.json "$O/res/" 2>/dev/null || true
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: xrt-quant
+          path: out/quant/
+          retention-days: 14
 
   report:
     name: report the batch run on the commit
-    needs: [smoke]
+    needs: [smoke, real, models, quant]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5

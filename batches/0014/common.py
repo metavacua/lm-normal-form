@@ -65,6 +65,15 @@ def ppl_from_logits(logits, ids):
     return float(-lp[np.arange(len(ids) - 1), np.asarray(ids[1:])].sum()), len(ids) - 1
 
 
+def sha256_file(path):
+    import hashlib
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 22), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
 def median(xs):
     return float(np.median(xs)) if len(xs) else None
 

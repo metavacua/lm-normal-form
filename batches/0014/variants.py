@@ -15,12 +15,14 @@
 #           every runtime must show to be broken
 # A variant is written in the dtype of the original file if every value survives the round trip through that dtype, and in float32 if not (the
 # manifest says which). Usage: variants.py REPO REVISION OUTDIR [variant ...]
-import json, os, shutil, sys, time
+import hashlib, json, os, shutil, sys, time
 import numpy as np
 import ml_dtypes  # noqa: F401  (registers bfloat16 with numpy)
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "0013"))
 sys.path.insert(0, os.path.join(HERE, "..", "0011"))
+sys.path.insert(0, HERE)
+from common import sha256_file
 import forms as F
 import symmetry as S
 import canon as C
@@ -148,6 +150,17 @@ def write(src_dir, out_dir, R, stored):
     return use, len(inexact)
 
 
+def significand_digest(a):
+    """A digest of the multiset of the magnitudes of the significands of a float32 array. A signed permutation and a multiplication by powers of two change neither (unless a value
+    leaves the normal range), so every variant but a broken one must have the original's digest tensor by tensor: the file holds the original's numbers, nothing else."""
+    m = np.sort(np.abs(np.frexp(a.astype(np.float32))[0]), axis=None)
+    return hashlib.sha1(m.tobytes()).hexdigest()
+
+
+def config_keys_changed(a, b):
+    return sorted(k for k in set(a) | set(b) if a.get(k, "<absent>") != b.get(k, "<absent>"))
+
+
 def main(repo, revision, outdir, which):
     from huggingface_hub import snapshot_download
     os.environ["HF_REVISION"] = revision
@@ -159,13 +172,20 @@ def main(repo, revision, outdir, which):
     tied = "lm_head.weight" not in P
     stored = cfg.get("torch_dtype") or cfg.get("dtype") or "float32"
     manifest = {"repo": repo, "revision": revision, "dims": vars(d), "tied": tied, "stored_dtype_of_original": stored, "seed": SEED, "gate": gated, "variants": {}}
+    digests = {k: significand_digest(a) for k, a in P.items()}
+    src_cfg = json.load(open(os.path.join(src, "config.json")))
     for v in which:
         t = time.time()
         R = make(P, d, tied, v)
         use, inexact = write(src, os.path.join(outdir, v), R, stored)
+        path = os.path.join(outdir, v, "model.safetensors")
+        other = [k for k, a in R.items() if significand_digest(a) != digests[k]]
         manifest["variants"][v] = {"stored_dtype": use, "tensors_not_exact_in_original_dtype": inexact, "seconds": round(time.time() - t, 1),
-                                   "tensors": len(R), "differs_from_original": sum(1 for k in P if not np.array_equal(P[k], R[k])) if v != "orig" else 0}
-        print(v, manifest["variants"][v], flush=True)
+                                   "safetensors_bytes": os.path.getsize(path), "safetensors_sha256": sha256_file(path),
+                                   "tensors": len(R), "differs_from_original": sum(1 for k in P if not np.array_equal(P[k], R[k])) if v != "orig" else 0,
+                                   "tensors_with_other_significands": other, "same_tensor_names": sorted(R) == sorted(P),
+                                   "config_keys_changed": config_keys_changed(src_cfg, json.load(open(os.path.join(outdir, v, "config.json"))))}
+        print(v, {k: (x if k != "tensors_with_other_significands" else len(x)) for k, x in manifest["variants"][v].items()}, flush=True)
         del R
     json.dump(manifest, open(os.path.join(outdir, "manifest.json"), "w"), indent=1)
 

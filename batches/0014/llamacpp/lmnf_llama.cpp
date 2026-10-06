@@ -5,7 +5,9 @@
 //   OUT.logits.f32   the logits of every position of every test sequence (little-endian float32, positions x vocabulary), from one decode of each sequence
 //   OUT.json         load time, greedy generations (32 new tokens, stopping after a token of `eos`), the negative log-likelihood of the perplexity windows,
 //                    prefill speed (512 tokens, five repeats), decode speed (64 tokens after a prompt of 16, three repeats), peak resident memory
-// Usage: lmnf-llama MODEL.gguf INPUTS.json OUT FULL [THREADS]      FULL is 1 for everything, 0 for load time and speed alone.
+// Usage: lmnf-llama MODEL.gguf INPUTS.json OUT FULL [THREADS [KV]]      FULL is 1 for everything, 0 for load time and speed alone. KV is the type of the key and
+//        value cache: f16 (the default of llama.cpp, with its default choice of flash attention), f32 (flash attention off, so that the whole computation is float32
+//        when the weights are), q8_0 or q4_0 (both need flash attention for the value cache, so it is switched on).
 //        lmnf-llama tokenize MODEL.gguf TEXTS.json OUT.json                  the token ids of texts (see tokenize_mode)
 // Build: g++ -O2 -std=c++17 -I LLAMA/include -I LLAMA/ggml/include -I LLAMA/vendor lmnf_llama.cpp -o RELEASE/lmnf-llama -LRELEASE -lllama -lggml -lggml-base -Wl,-rpath,'$ORIGIN'
 // with the program placed in the release directory, where ggml_backend_load_all() finds the CPU backends.
@@ -133,12 +135,17 @@ static int tokenize_mode(char ** argv) {
 int main(int argc, char ** argv) {
     if (argc >= 5 && std::string(argv[1]) == "tokenize") return tokenize_mode(argv);
     if (argc < 5) {
-        fprintf(stderr, "usage: lmnf-llama MODEL.gguf INPUTS.json OUT FULL [THREADS]\n");
+        fprintf(stderr, "usage: lmnf-llama MODEL.gguf INPUTS.json OUT FULL [THREADS [KV]]\n");
         return 1;
     }
     const std::string model_path = argv[1], inputs_path = argv[2], out = argv[3];
     const bool full = std::string(argv[4]) == "1";
     const int threads = argc > 5 ? std::atoi(argv[5]) : 4;
+    const std::string kv = argc > 6 ? argv[6] : "f16";
+    if (kv != "f16" && kv != "f32" && kv != "q8_0" && kv != "q4_0") {
+        fprintf(stderr, "unknown cache type %s (f16, f32, q8_0, q4_0)\n", kv.c_str());
+        return 2;
+    }
 
     std::ifstream fi(inputs_path);
     const json inputs = json::parse(fi);
@@ -163,6 +170,15 @@ int main(int argc, char ** argv) {
     cp.n_ubatch = 512;
     cp.n_threads = threads;
     cp.n_threads_batch = threads;
+    if (kv == "f32") {
+        cp.type_k = GGML_TYPE_F32;
+        cp.type_v = GGML_TYPE_F32;
+        cp.flash_attn_type = LLAMA_FLASH_ATTN_TYPE_DISABLED;
+    } else if (kv == "q8_0" || kv == "q4_0") {
+        cp.type_k = kv == "q8_0" ? GGML_TYPE_Q8_0 : GGML_TYPE_Q4_0;
+        cp.type_v = cp.type_k;
+        cp.flash_attn_type = LLAMA_FLASH_ATTN_TYPE_ENABLED;
+    }
     r.ctx = llama_init_from_model(r.model, cp);
     if (!r.ctx) {
         fprintf(stderr, "cannot create a context\n");
@@ -172,6 +188,8 @@ int main(int argc, char ** argv) {
     r.batch = llama_batch_init(1024, 0, 1);
     json res;
     res["load_s"] = secs(t0, clk::now());
+    res["kv"] = kv;
+    res["flash_attn_requested"] = llama_flash_attn_type_name(cp.flash_attn_type);
 
     if (full) {
         std::ofstream bin(out + ".logits.f32", std::ios::binary);

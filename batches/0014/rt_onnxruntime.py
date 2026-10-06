@@ -4,7 +4,7 @@
 # Generation re-runs the whole prefix at each step, so the speed it reports for decode is not comparable with the cached runtimes' and is left out; prefill is.
 import os, subprocess
 import numpy as np
-from common import Timer, peak_rss_mb, ppl_from_logits
+from common import Timer, peak_rss_mb, ppl_from_logits, sha256_file
 
 
 def version():
@@ -24,6 +24,7 @@ def run(model_dir, ids, wins, dtype, work, tag, full=True):
     t = Timer()
     sess = ort.InferenceSession(os.path.join(out, "model.onnx"), so, providers=["CPUExecutionProvider"])
     res = {"load_s": t.lap(), "onnx_bytes": sum(os.path.getsize(os.path.join(out, f)) for f in os.listdir(out) if os.path.isfile(os.path.join(out, f)))}
+    res["artifact_sha256"] = sha256_file(os.path.join(out, "model.onnx"))
     names = {i.name for i in sess.get_inputs()}
 
     def fwd(seq):

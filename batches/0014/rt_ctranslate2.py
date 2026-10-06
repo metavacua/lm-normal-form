@@ -5,7 +5,7 @@
 # score_batch (log-probabilities of the next tokens). dtypes: float32, int8 (the weights of every layer quantized per row, with a dynamic per-row activation scale).
 import os, subprocess
 import numpy as np
-from common import Timer, peak_rss_mb
+from common import Timer, peak_rss_mb, sha256_file
 
 
 def version():
@@ -25,6 +25,7 @@ def run(model_dir, ids, wins, dtype, work, tag, full=True):
     t = Timer()
     gen = ctranslate2.Generator(out, device="cpu", compute_type=quant, inter_threads=1, intra_threads=threads)
     res = {"load_s": t.lap(), "ct2_bytes": sum(os.path.getsize(os.path.join(out, f)) for f in os.listdir(out) if os.path.isfile(os.path.join(out, f)))}
+    res["artifact_sha256"] = sha256_file(os.path.join(out, "model.bin"))
     toks = lambda seq: tok.convert_ids_to_tokens(list(seq))
     logits = None
     if full:
