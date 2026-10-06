@@ -40,6 +40,7 @@
  "save_bf16_has_lm_head": false,
  "save_bf16_sha256_equal_to_hub": true,
  "save_bf16_tensors": 272,
+ "save_f32_bag_root_equal_to_hub": true,
  "save_f32_data_bytes": 538060032,
  "save_f32_dtypes": [
   "torch.float32"
