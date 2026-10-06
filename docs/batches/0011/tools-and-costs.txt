@@ -1,0 +1,11 @@
+Batch 0011, first run (37479988877, commit eca5b9d), SmolLM2-135M-Instruct job, AMD EPYC 9V45, 4 vCPUs, 15 GB.
+step                                       elapsed    peak memory (KB)
+cargo build of onnx2burn                   2:21.55      898,352
+optimum-cli export onnx                    0:12.58    2,939,380
+onnx2burn --no-development (run 1)         0:07.68    2,125,228
+onnx2burn --no-development (run 2)         0:07.22    2,125,468
+optimum-cli export onnx, accelerate        0:12.35    2,942,000
+Batch 0010's onnx2burn on the same graph without --no-development: 43.2 s, 3,335,832 KB and 56.9 s, 3,336,796 KB (the replicate).
+The debug dump of the importer's graph (model.onnx.txt, 1.5 GB) is what --no-development leaves out.
+Packages: the same as batch 0010's pip freeze, with cbor2 6.1.5 added. rustc 1.99.0. Disk used on the runner: 60 GB before, 67 GB after, of 145 GB.
+The ONNX Runtime steps recorded no time or memory: they failed (see the document, "The first run's faults").

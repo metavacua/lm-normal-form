@@ -1,0 +1,17 @@
+{
+ "bag_roots_equal": false,
+ "keys_in_both": 0,
+ "keys_only_ref": 272,
+ "keys_only_target": 272,
+ "ref_distinct_keys": 272,
+ "ref_tensors": 272,
+ "ref_tensors_matched_by_more_than_one": {},
+ "relations": {
+  "none": 272
+ },
+ "relations_by_role": {
+  "-/none": 272
+ },
+ "target_distinct_keys": 272,
+ "target_tensors": 272
+}

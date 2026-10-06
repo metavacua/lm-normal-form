@@ -1,0 +1,11 @@
+commit	date	title	model.safetensors	config.json	generation_config.json	tokenizer.json	tokenizer_config.json	special_tokens_map.json	vocab.json	merges.txt	chat_template.jinja	tokenizer.model
+93efa2f097d5	2025-02-06	Update README.md	sha256:80521b40281d	git:ccf3dac2f339	git:0fce861c328f	git:f922b1797f0c	git:d45192775d58	git:f6652f246cb8	git:0ad5ecc2035b	git:69503b13f727	-	-
+4e53f736cbb2	2024-11-23	Update README.md	sha256:80521b40281d	git:ccf3dac2f339	git:0fce861c328f	git:f922b1797f0c	git:d45192775d58	git:f6652f246cb8	git:0ad5ecc2035b	git:69503b13f727	-	-
+28e66ca69316	2024-11-05	Update config.js	sha256:80521b40281d	git:ccf3dac2f339	git:0fce861c328f	git:f922b1797f0c	git:d45192775d58	git:f6652f246cb8	git:0ad5ecc2035b	git:69503b13f727	-	-
+acb1e6c9d37b	2024-10-31	Update README.md	sha256:80521b40281d	git:730f612e451d	git:0fce861c328f	git:f922b1797f0c	git:d45192775d58	git:f6652f246cb8	git:0ad5ecc2035b	git:69503b13f727	-	-
+615de5c22374	2024-10-31	Update README.md	sha256:80521b40281d	git:730f612e451d	git:0fce861c328f	git:f922b1797f0c	git:d45192775d58	git:f6652f246cb8	git:0ad5ecc2035b	git:69503b13f727	-	-
+2b7c3b99c00b	2024-10-31	Update README.md	sha256:80521b40281d	git:730f612e451d	git:0fce861c328f	git:f922b1797f0c	git:d45192775d58	git:f6652f246cb8	git:0ad5ecc2035b	git:69503b13f727	-	-
+f102afc063ce	2024-10-31	Update README.md	sha256:80521b40281d	git:730f612e451d	git:0fce861c328f	git:f922b1797f0c	git:d45192775d58	git:f6652f246cb8	git:0ad5ecc2035b	git:69503b13f727	-	-
+ab35b5b1fb9c	2024-10-31	Upload tokenizer	sha256:80521b40281d	git:730f612e451d	git:0fce861c328f	git:f922b1797f0c	git:d45192775d58	git:f6652f246cb8	git:0ad5ecc2035b	git:69503b13f727	-	-
+d6a5589c2392	2024-10-31	Upload LlamaForC	sha256:80521b40281d	git:730f612e451d	git:0fce861c328f	-	-	-	-	-	-	-
+bbf75246f3a4	2024-10-31	initial commit	-	-	-	-	-	-	-	-	-	-

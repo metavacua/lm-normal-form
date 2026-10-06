@@ -1,0 +1,433 @@
+{
+ "matrices": {
+  "model.embed_tokens.weight": {
+   "columns_repeated": 0,
+   "exponent_max": 1,
+   "exponent_min": -28,
+   "rows_repeated": 1,
+   "shape": [
+    49152,
+    576
+   ],
+   "zeros": 0
+  }
+ },
+ "norm_vectors": {
+  "model.layers.0.input_layernorm.weight": {
+   "distinct_values": 465,
+   "exponent_max": -1,
+   "exponent_min": -12,
+   "most_common_value_count": 4
+  },
+  "model.layers.0.post_attention_layernorm.weight": {
+   "distinct_values": 122,
+   "exponent_max": -1,
+   "exponent_min": -3,
+   "most_common_value_count": 19
+  },
+  "model.layers.1.input_layernorm.weight": {
+   "distinct_values": 221,
+   "exponent_max": 0,
+   "exponent_min": -10,
+   "most_common_value_count": 13
+  },
+  "model.layers.1.post_attention_layernorm.weight": {
+   "distinct_values": 224,
+   "exponent_max": -1,
+   "exponent_min": -13,
+   "most_common_value_count": 9
+  },
+  "model.layers.10.input_layernorm.weight": {
+   "distinct_values": 159,
+   "exponent_max": 0,
+   "exponent_min": -4,
+   "most_common_value_count": 23
+  },
+  "model.layers.10.post_attention_layernorm.weight": {
+   "distinct_values": 181,
+   "exponent_max": 0,
+   "exponent_min": -12,
+   "most_common_value_count": 20
+  },
+  "model.layers.11.input_layernorm.weight": {
+   "distinct_values": 172,
+   "exponent_max": 0,
+   "exponent_min": -3,
+   "most_common_value_count": 25
+  },
+  "model.layers.11.post_attention_layernorm.weight": {
+   "distinct_values": 206,
+   "exponent_max": 0,
+   "exponent_min": -14,
+   "most_common_value_count": 15
+  },
+  "model.layers.12.input_layernorm.weight": {
+   "distinct_values": 227,
+   "exponent_max": 0,
+   "exponent_min": -4,
+   "most_common_value_count": 12
+  },
+  "model.layers.12.post_attention_layernorm.weight": {
+   "distinct_values": 223,
+   "exponent_max": -1,
+   "exponent_min": -11,
+   "most_common_value_count": 12
+  },
+  "model.layers.13.input_layernorm.weight": {
+   "distinct_values": 236,
+   "exponent_max": 0,
+   "exponent_min": -4,
+   "most_common_value_count": 12
+  },
+  "model.layers.13.post_attention_layernorm.weight": {
+   "distinct_values": 237,
+   "exponent_max": -1,
+   "exponent_min": -11,
+   "most_common_value_count": 11
+  },
+  "model.layers.14.input_layernorm.weight": {
+   "distinct_values": 251,
+   "exponent_max": 0,
+   "exponent_min": -4,
+   "most_common_value_count": 10
+  },
+  "model.layers.14.post_attention_layernorm.weight": {
+   "distinct_values": 238,
+   "exponent_max": -1,
+   "exponent_min": -11,
+   "most_common_value_count": 14
+  },
+  "model.layers.15.input_layernorm.weight": {
+   "distinct_values": 253,
+   "exponent_max": 0,
+   "exponent_min": -4,
+   "most_common_value_count": 11
+  },
+  "model.layers.15.post_attention_layernorm.weight": {
+   "distinct_values": 226,
+   "exponent_max": -1,
+   "exponent_min": -11,
+   "most_common_value_count": 11
+  },
+  "model.layers.16.input_layernorm.weight": {
+   "distinct_values": 268,
+   "exponent_max": 0,
+   "exponent_min": -4,
+   "most_common_value_count": 10
+  },
+  "model.layers.16.post_attention_layernorm.weight": {
+   "distinct_values": 215,
+   "exponent_max": -1,
+   "exponent_min": -12,
+   "most_common_value_count": 14
+  },
+  "model.layers.17.input_layernorm.weight": {
+   "distinct_values": 262,
+   "exponent_max": 0,
+   "exponent_min": -3,
+   "most_common_value_count": 8
+  },
+  "model.layers.17.post_attention_layernorm.weight": {
+   "distinct_values": 207,
+   "exponent_max": -1,
+   "exponent_min": -12,
+   "most_common_value_count": 19
+  },
+  "model.layers.18.input_layernorm.weight": {
+   "distinct_values": 244,
+   "exponent_max": 1,
+   "exponent_min": -3,
+   "most_common_value_count": 8
+  },
+  "model.layers.18.post_attention_layernorm.weight": {
+   "distinct_values": 197,
+   "exponent_max": -1,
+   "exponent_min": -11,
+   "most_common_value_count": 16
+  },
+  "model.layers.19.input_layernorm.weight": {
+   "distinct_values": 231,
+   "exponent_max": 0,
+   "exponent_min": -3,
+   "most_common_value_count": 11
+  },
+  "model.layers.19.post_attention_layernorm.weight": {
+   "distinct_values": 170,
+   "exponent_max": -1,
+   "exponent_min": -10,
+   "most_common_value_count": 19
+  },
+  "model.layers.2.input_layernorm.weight": {
+   "distinct_values": 190,
+   "exponent_max": 0,
+   "exponent_min": -7,
+   "most_common_value_count": 17
+  },
+  "model.layers.2.post_attention_layernorm.weight": {
+   "distinct_values": 230,
+   "exponent_max": -1,
+   "exponent_min": -10,
+   "most_common_value_count": 11
+  },
+  "model.layers.20.input_layernorm.weight": {
+   "distinct_values": 196,
+   "exponent_max": 0,
+   "exponent_min": -3,
+   "most_common_value_count": 11
+  },
+  "model.layers.20.post_attention_layernorm.weight": {
+   "distinct_values": 128,
+   "exponent_max": -1,
+   "exponent_min": -10,
+   "most_common_value_count": 18
+  },
+  "model.layers.21.input_layernorm.weight": {
+   "distinct_values": 162,
+   "exponent_max": 0,
+   "exponent_min": -3,
+   "most_common_value_count": 18
+  },
+  "model.layers.21.post_attention_layernorm.weight": {
+   "distinct_values": 111,
+   "exponent_max": -1,
+   "exponent_min": -16,
+   "most_common_value_count": 25
+  },
+  "model.layers.22.input_layernorm.weight": {
+   "distinct_values": 156,
+   "exponent_max": 0,
+   "exponent_min": -3,
+   "most_common_value_count": 17
+  },
+  "model.layers.22.post_attention_layernorm.weight": {
+   "distinct_values": 84,
+   "exponent_max": -1,
+   "exponent_min": -15,
+   "most_common_value_count": 28
+  },
+  "model.layers.23.input_layernorm.weight": {
+   "distinct_values": 162,
+   "exponent_max": 0,
+   "exponent_min": -3,
+   "most_common_value_count": 14
+  },
+  "model.layers.23.post_attention_layernorm.weight": {
+   "distinct_values": 69,
+   "exponent_max": -1,
+   "exponent_min": -10,
+   "most_common_value_count": 35
+  },
+  "model.layers.24.input_layernorm.weight": {
+   "distinct_values": 158,
+   "exponent_max": 0,
+   "exponent_min": -2,
+   "most_common_value_count": 21
+  },
+  "model.layers.24.post_attention_layernorm.weight": {
+   "distinct_values": 59,
+   "exponent_max": -1,
+   "exponent_min": -16,
+   "most_common_value_count": 38
+  },
+  "model.layers.25.input_layernorm.weight": {
+   "distinct_values": 94,
+   "exponent_max": 0,
+   "exponent_min": -3,
+   "most_common_value_count": 21
+  },
+  "model.layers.25.post_attention_layernorm.weight": {
+   "distinct_values": 66,
+   "exponent_max": -1,
+   "exponent_min": -12,
+   "most_common_value_count": 49
+  },
+  "model.layers.26.input_layernorm.weight": {
+   "distinct_values": 126,
+   "exponent_max": 0,
+   "exponent_min": -3,
+   "most_common_value_count": 26
+  },
+  "model.layers.26.post_attention_layernorm.weight": {
+   "distinct_values": 58,
+   "exponent_max": -1,
+   "exponent_min": -10,
+   "most_common_value_count": 40
+  },
+  "model.layers.27.input_layernorm.weight": {
+   "distinct_values": 100,
+   "exponent_max": 1,
+   "exponent_min": -2,
+   "most_common_value_count": 23
+  },
+  "model.layers.27.post_attention_layernorm.weight": {
+   "distinct_values": 61,
+   "exponent_max": 0,
+   "exponent_min": -3,
+   "most_common_value_count": 44
+  },
+  "model.layers.28.input_layernorm.weight": {
+   "distinct_values": 110,
+   "exponent_max": 0,
+   "exponent_min": -2,
+   "most_common_value_count": 22
+  },
+  "model.layers.28.post_attention_layernorm.weight": {
+   "distinct_values": 61,
+   "exponent_max": 0,
+   "exponent_min": -3,
+   "most_common_value_count": 52
+  },
+  "model.layers.29.input_layernorm.weight": {
+   "distinct_values": 90,
+   "exponent_max": 0,
+   "exponent_min": -1,
+   "most_common_value_count": 26
+  },
+  "model.layers.29.post_attention_layernorm.weight": {
+   "distinct_values": 85,
+   "exponent_max": 1,
+   "exponent_min": -1,
+   "most_common_value_count": 39
+  },
+  "model.layers.3.input_layernorm.weight": {
+   "distinct_values": 176,
+   "exponent_max": 0,
+   "exponent_min": -8,
+   "most_common_value_count": 15
+  },
+  "model.layers.3.post_attention_layernorm.weight": {
+   "distinct_values": 213,
+   "exponent_max": -1,
+   "exponent_min": -11,
+   "most_common_value_count": 12
+  },
+  "model.layers.4.input_layernorm.weight": {
+   "distinct_values": 166,
+   "exponent_max": 0,
+   "exponent_min": -9,
+   "most_common_value_count": 19
+  },
+  "model.layers.4.post_attention_layernorm.weight": {
+   "distinct_values": 205,
+   "exponent_max": -1,
+   "exponent_min": -12,
+   "most_common_value_count": 16
+  },
+  "model.layers.5.input_layernorm.weight": {
+   "distinct_values": 158,
+   "exponent_max": 0,
+   "exponent_min": -5,
+   "most_common_value_count": 18
+  },
+  "model.layers.5.post_attention_layernorm.weight": {
+   "distinct_values": 199,
+   "exponent_max": -1,
+   "exponent_min": -12,
+   "most_common_value_count": 15
+  },
+  "model.layers.6.input_layernorm.weight": {
+   "distinct_values": 172,
+   "exponent_max": 0,
+   "exponent_min": -9,
+   "most_common_value_count": 18
+  },
+  "model.layers.6.post_attention_layernorm.weight": {
+   "distinct_values": 173,
+   "exponent_max": -1,
+   "exponent_min": -12,
+   "most_common_value_count": 18
+  },
+  "model.layers.7.input_layernorm.weight": {
+   "distinct_values": 127,
+   "exponent_max": 0,
+   "exponent_min": -4,
+   "most_common_value_count": 22
+  },
+  "model.layers.7.post_attention_layernorm.weight": {
+   "distinct_values": 173,
+   "exponent_max": -1,
+   "exponent_min": -10,
+   "most_common_value_count": 16
+  },
+  "model.layers.8.input_layernorm.weight": {
+   "distinct_values": 123,
+   "exponent_max": 0,
+   "exponent_min": -4,
+   "most_common_value_count": 24
+  },
+  "model.layers.8.post_attention_layernorm.weight": {
+   "distinct_values": 172,
+   "exponent_max": -1,
+   "exponent_min": -10,
+   "most_common_value_count": 29
+  },
+  "model.layers.9.input_layernorm.weight": {
+   "distinct_values": 136,
+   "exponent_max": 0,
+   "exponent_min": -3,
+   "most_common_value_count": 22
+  },
+  "model.layers.9.post_attention_layernorm.weight": {
+   "distinct_values": 169,
+   "exponent_max": 0,
+   "exponent_min": -11,
+   "most_common_value_count": 27
+  },
+  "model.norm.weight": {
+   "distinct_values": 90,
+   "exponent_max": 2,
+   "exponent_min": 0,
+   "most_common_value_count": 23
+  }
+ },
+ "summary": {
+  "exponent_max": 4,
+  "exponent_min": -28,
+  "layers": 30,
+  "matrices_with_a_repeated_column": 0,
+  "matrices_with_a_repeated_row": 1,
+  "norm_vectors": 61,
+  "norm_vectors_with_a_repeated_value": 61,
+  "tensors": 272,
+  "totals": {
+   "inf": 0,
+   "nan": 0,
+   "negative_zeros": 0,
+   "subnormal": 0,
+   "zeros": 0
+  },
+  "units_repeated_in_any_layer": 0
+ },
+ "units_repeated_by_layer": {
+  "0": 0,
+  "1": 0,
+  "10": 0,
+  "11": 0,
+  "12": 0,
+  "13": 0,
+  "14": 0,
+  "15": 0,
+  "16": 0,
+  "17": 0,
+  "18": 0,
+  "19": 0,
+  "2": 0,
+  "20": 0,
+  "21": 0,
+  "22": 0,
+  "23": 0,
+  "24": 0,
+  "25": 0,
+  "26": 0,
+  "27": 0,
+  "28": 0,
+  "29": 0,
+  "3": 0,
+  "4": 0,
+  "5": 0,
+  "6": 0,
+  "7": 0,
+  "8": 0,
+  "9": 0
+ }
+}

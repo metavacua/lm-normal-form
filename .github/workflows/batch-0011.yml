@@ -1,0 +1,227 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0011: the identity of one model's weights in the files that hold them: the Hub's safetensors file, other
+# safetensors files written from it, Optimum's ONNX export, and burn-onnx's burnpack. Written down in
+# docs/batches/0011.md; the record they are compared in is declared in docs/interfaces/identity.md.
+#
+# One job per model, run one after the other: the tiny random Llama first (the smoke: the fixture, the self-test and
+# every cell, no claim), then SmolLM2-135M-Instruct. A job stops only when its tooling breaks; a cell that fails is a result.
+name: batch 0011
+
+on:
+  push:
+    branches: ["batch/0011-**"]
+    paths: [".github/workflows/batch-0011.yml", "batches/0011/**", "conformance/identity/**"]
+  workflow_dispatch:
+    inputs:
+      burn_onnx_rev:
+        description: "burn-onnx commit to build (empty: the head of its default branch)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: batch-0011-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  CARGO_INCREMENTAL: "0"
+  CARGO_TERM_COLOR: never
+  # The token ids of each prompt in batches/0010/prompts.txt, one line per prompt, comma separated.
+  TOKENS: >-
+    import sys,transformers as t;k=t.AutoTokenizer.from_pretrained(sys.argv[1]);
+    [print(','.join(map(str,k(l.rstrip('\n')).input_ids)))for l in open(sys.argv[2])]
+
+jobs:
+  identity:
+    name: "01 identity of ${{ matrix.tag }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: true
+      max-parallel: 1
+      matrix:
+        include:
+          - { tag: tiny, model: "hf-internal-testing/tiny-random-LlamaForCausalLM" }
+          - { tag: smol, model: "HuggingFaceTB/SmolLM2-135M-Instruct" }
+    env:
+      MODEL: ${{ matrix.model }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p out/${{ matrix.tag }} work/${{ matrix.tag }}
+          o=out/${{ matrix.tag }}
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet "optimum[onnxruntime]" numpy cbor2 safetensors
+          python -m pip freeze > $o/versions.txt
+          rustup toolchain install stable --profile minimal --no-self-update
+          rustup default stable
+          { rustc -V; cargo -V; } | tee $o/rust.version
+          nproc | tee $o/nproc.txt
+          grep -m1 'model name' /proc/cpuinfo | tee $o/cpu.txt
+          free -g | tee $o/memory.txt
+          df -h / | tee $o/disk-before.txt
+          wc -c batches/0011/*.py batches/0011/cells.sh conformance/identity/1/derive.sh | tee $o/code-sizes.txt
+          curl -sS "https://huggingface.co/api/models/$MODEL" | jq -r .sha | tee $o/revision.txt
+      - name: "The fixture of the identity record: every digest and verdict derived by shell tools, reproduced by the code"
+        run: python batches/0011/identity_core.py conformance conformance/identity/1 | tee out/${{ matrix.tag }}/conformance.txt
+      - name: "The readers' self-test on constructed tensors"
+        run: python batches/0011/identity.py selftest | tee out/${{ matrix.tag }}/selftest.txt
+      - id: tool
+        name: "cargo: onnx2burn, built from burn-onnx's default branch"
+        continue-on-error: true
+        env:
+          REV: ${{ inputs.burn_onnx_rev }}
+        run: |
+          o=out/${{ matrix.tag }}
+          git clone --quiet https://github.com/tracel-ai/burn-onnx work/burn-onnx
+          if [ -n "$REV" ]; then git -C work/burn-onnx checkout --quiet "$REV"; fi
+          git -C work/burn-onnx rev-parse HEAD | tee $o/burn-onnx.rev
+          grep -m1 -o 'rev = "[0-9a-f]\{40\}"' work/burn-onnx/Cargo.toml | grep -o '[0-9a-f]\{40\}' | tee $o/burn.rev
+          cd work/burn-onnx
+          /usr/bin/time -v cargo build --release --locked -p burn-onnx --bin onnx2burn > ../../$o/onnx2burn-build.log 2>&1 || rc=$?
+          tail -n 6 ../../$o/onnx2burn-build.log
+          awk '/Maximum resident/{print "peak_kb="$NF} /Elapsed \(wall/{print "elapsed="$NF}' ../../$o/onnx2burn-build.log | tee -a "$GITHUB_OUTPUT"
+          exit "${rc:-0}"
+      - id: hub
+        name: "the Hub's model.safetensors, and the Hub's own digest of it against the bytes"
+        continue-on-error: true
+        run: bash batches/0011/cells.sh hub ${{ matrix.tag }}
+      - id: st
+        name: "safetensors: the header, the census, one digest per tensor"
+        if: steps.hub.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0011/cells.sh st ${{ matrix.tag }}
+      - id: writers
+        name: "safetensors written by other programs, and its header written four other ways"
+        if: steps.hub.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0011/cells.sh writers ${{ matrix.tag }}
+      - id: export
+        name: "optimum-cli: export to ONNX, without past, as batch 0010"
+        continue-on-error: true
+        run: bash batches/0011/cells.sh export ${{ matrix.tag }}
+      - id: tokens
+        name: "the token ids of the prompts, by the model's own tokenizer"
+        if: steps.export.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0011/cells.sh tokens ${{ matrix.tag }}
+      - id: ort
+        name: "ONNX Runtime, optimization on and off: the logits of every position"
+        if: steps.tokens.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0011/cells.sh ort ${{ matrix.tag }}
+      - id: onnx
+        name: "ONNX: the header, the census, one digest per initializer and per constant"
+        if: steps.export.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0011/cells.sh onnx ${{ matrix.tag }}
+      - id: match
+        name: "the initializers found among the safetensors tensors, by content and by name"
+        if: steps.st.outcome == 'success' && steps.onnx.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0011/cells.sh match ${{ matrix.tag }}
+      - id: codegen
+        name: "onnx2burn: the generated Rust and the burnpack"
+        if: steps.tool.outcome == 'success' && steps.export.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0011/cells.sh codegen ${{ matrix.tag }}
+      - id: bpk
+        name: "burnpack: the header, the census, one digest per tensor; the tensors found among the ONNX ones"
+        if: steps.codegen.outcome == 'success' && steps.onnx.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0011/cells.sh bpk ${{ matrix.tag }}
+      - id: codegen2
+        name: "onnx2burn again on the same graph, and what differs between the two burnpacks"
+        if: steps.codegen.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0011/cells.sh codegen2 ${{ matrix.tag }}
+      - id: rename
+        name: "the same graph under other names: the logits, the digests"
+        if: steps.ort.outcome == 'success' && steps.onnx.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0011/cells.sh rename ${{ matrix.tag }}
+      - id: swap
+        name: "two tensors exchanged in a copy of the safetensors file: the roots and the logits"
+        if: steps.hub.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0011/cells.sh swap ${{ matrix.tag }}
+      - id: scan
+        name: "the weights' zeros, repeated rows and units, exponents and norm values (a description)"
+        if: steps.hub.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0011/cells.sh scan ${{ matrix.tag }}
+      - id: revisions
+        name: "the Hub's commits of the model and of its base, file by file; repositories with the same weights"
+        if: matrix.tag == 'smol'
+        continue-on-error: true
+        run: bash batches/0011/cells.sh revisions ${{ matrix.tag }}
+      - id: content
+        name: "the repositories that name the model: the tensors of those that hold its tensor table, against its tensors"
+        if: matrix.tag == 'smol' && steps.revisions.outcome == 'success' && steps.st.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0011/cells.sh content ${{ matrix.tag }}
+      - id: base
+        name: "the base model's tensors against the instruct model's"
+        if: matrix.tag == 'smol' && steps.st.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0011/cells.sh base ${{ matrix.tag }}
+      - id: published
+        name: "the published onnx/model.onnx: its initializers against the safetensors tensors"
+        if: matrix.tag == 'smol' && steps.st.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0011/cells.sh published ${{ matrix.tag }}
+      - id: accelerate
+        name: "pip: accelerate installed, the export repeated: the initializers against the safetensors tensors"
+        if: steps.ort.outcome == 'success' && steps.st.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0011/cells.sh accelerate ${{ matrix.tag }}
+      - name: What the run used
+        if: always()
+        run: |
+          df -h / | tee out/${{ matrix.tag }}/disk-after.txt
+          grep -h "Maximum resident\|Elapsed (wall" out/${{ matrix.tag }}/*.time || true
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/${{ matrix.tag }}/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: identity-${{ matrix.tag }}
+          path: out/${{ matrix.tag }}/
+          retention-days: 7
+
+  report:
+    # A commit status named after the batch, so that the pull request's checks tab shows the batch run itself.
+    name: report the batch run on the commit
+    needs: [identity]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RESULTS: ${{ toJSON(needs) }}
+    steps:
+      - run: |
+          state=success; echo "$RESULTS" | jq -e '[.[] | .result] | all(. == "success")' > /dev/null || state=failure
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -f state="$state" -f context="batch 0011" \
+            -f description="$(echo "$RESULTS" | jq -r 'to_entries | map("\(.key) \(.value.result)") | join(", ")' | cut -c1-140)" \
+            -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" > /dev/null

@@ -1,0 +1,6 @@
+all 0.f32 identical
+all 1.f32 identical
+all 2.f32 identical
+none 0.f32 identical
+none 1.f32 identical
+none 2.f32 identical

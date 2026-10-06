@@ -1,0 +1,39 @@
+{
+ "biases": 0,
+ "cbor_head_hex": "a26774656e736f7273b9029d",
+ "cbor_tail_hex": "686d65746164617461a16870726f6475636572696275726e2d6f6e6e78",
+ "data_start": 59648,
+ "descriptor_keys": {
+  "data_offsets,dtype,param_id,shape": 669
+ },
+ "dtypes": {
+  "F32": 607,
+  "I64": 62
+ },
+ "elements_in_those": 162826560,
+ "file_bytes": 651467264,
+ "file_bytes_equal_data_start_plus_last_end": true,
+ "file_sha256": "fc2f08eb05887dc885186cb7bd2b6a6b6c42388f3c27f3caef0106030cfe6544",
+ "first_tensor": "submodule1.constant1",
+ "has_scalars": false,
+ "head_hex": "4e52554201008be80000",
+ "last_tensor_end": 651407616,
+ "magic_ascii": "NRUB",
+ "metadata": {
+  "producer": "burn-onnx"
+ },
+ "metadata_size": 59531,
+ "names_matching_pattern": 669,
+ "padding_after_cbor_zero": true,
+ "param_id_min": 42725464458691843,
+ "param_ids": 669,
+ "scalar_f32_1e-5": 61,
+ "tensors": 669,
+ "tensors_256_or_more": 273,
+ "top_level_keys": [
+  "metadata",
+  "tensors"
+ ],
+ "version": 1,
+ "weights": 211
+}

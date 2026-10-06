@@ -1,0 +1,40 @@
+repo	model.safetensors	weights	base_model tags
+bartowski/SmolLM2-135M-Instruct-GGUF	-	other	base_model:HuggingFaceTB/SmolLM2-135M-Instruct;base_model:quantized:HuggingFaceTB/SmolLM2-135M-Instruct
+unsloth/SmolLM2-135M-Instruct-GGUF	-	other	base_model:HuggingFaceTB/SmolLM2-135M-Instruct;base_model:quantized:HuggingFaceTB/SmolLM2-135M-Instruct
+Felladrin/gguf-Q8_0-SmolLM2-135M-Instruct	-	other	base_model:HuggingFaceTB/SmolLM2-135M-Instruct;base_model:quantized:HuggingFaceTB/SmolLM2-135M-Instruct
+Segilmez06/SmolLM2-135M-Instruct-Q4_K_M-GGUF	-	other	base_model:HuggingFaceTB/SmolLM2-135M-Instruct;base_model:quantized:HuggingFaceTB/SmolLM2-135M-Instruct
+Segilmez06/SmolLM2-135M-Instruct-Q2_K-GGUF	-	other	base_model:HuggingFaceTB/SmolLM2-135M-Instruct;base_model:quantized:HuggingFaceTB/SmolLM2-135M-Instruct
+Segilmez06/SmolLM2-135M-Instruct-Q8_0-GGUF	-	other	base_model:HuggingFaceTB/SmolLM2-135M-Instruct;base_model:quantized:HuggingFaceTB/SmolLM2-135M-Instruct
+lmstudio-community/SmolLM2-135M-Instruct-GGUF	-	other	base_model:HuggingFaceTB/SmolLM2-135M-Instruct;base_model:quantized:HuggingFaceTB/SmolLM2-135M-Instruct
+NikolayKozloff/SmolLM2-135M-Instruct-Q8_0-GGUF	-	other	base_model:HuggingFaceTB/SmolLM2-135M-Instruct;base_model:quantized:HuggingFaceTB/SmolLM2-135M-Instruct
+jncraton/SmolLM2-135M-Instruct-ct2-int8	-	other	
+unsloth/SmolLM2-135M-Instruct	sha256:c4e8e90783d8de8a826edc4e457a9c576af22cb32a7f1cf7179271fc7280f12d	other	base_model:HuggingFaceTB/SmolLM2-135M-Instruct;base_model:finetune:HuggingFaceTB/SmolLM2-135M-Instruct
+unsloth/SmolLM2-135M-Instruct-bnb-4bit	sha256:b401195b84c6ac85a4dcac902b4dc3544db8e2f6b6a263ad6e7b39c9069dc092	other	
+mlx-community/SmolLM2-135M-Instruct	sha256:989e3ef746b41999ca096055a60c87057b8e842824253391bc0d9ed8dfc6936e	other	base_model:HuggingFaceTB/SmolLM2-135M-Instruct;base_model:finetune:HuggingFaceTB/SmolLM2-135M-Instruct
+DevQuasar-5/HuggingFaceTB.SmolLM2-135M-Instruct-GGUF	-	other	base_model:HuggingFaceTB/SmolLM2-135M-Instruct;base_model:quantized:HuggingFaceTB/SmolLM2-135M-Instruct
+prithivMLmods/SmolLM2-135M-Instruct-GGUF	-	other	base_model:HuggingFaceTB/SmolLM2-135M-Instruct;base_model:quantized:HuggingFaceTB/SmolLM2-135M-Instruct
+QuantFactory/SmolLM2-135M-Instruct-GGUF	-	other	
+mlx-community/SmolLM2-135M-Instruct-8bit	sha256:ec569c771e56424636be99625aba9031abc525a68a5f4ab16d678eca96fef12c	other	base_model:mlx-community/SmolLM2-135M-Instruct;base_model:quantized:mlx-community/SmolLM2-135M-Instruct
+Daviduche03/SmolLM2-135M-Instruct	sha256:56d499a1e12f8154909d05b95bb80a23e3d8142fdbcd68684a7956fb931ab16a	other	
+mnoukhov/SmolLM2-135M-Instruct_tldr-sft	sha256:8fbc008f49f168f8251a28004d13628bfa141c6e73708795d128dc55b43307b1	other	base_model:HuggingFaceTB/SmolLM2-135M-Instruct;base_model:finetune:HuggingFaceTB/SmolLM2-135M-Instruct
+LMLK/SmolLM2-135M-Instruct-GGUF	-	other	base_model:HuggingFaceTB/SmolLM2-135M;base_model:quantized:HuggingFaceTB/SmolLM2-135M
+MaziyarPanahi/SmolLM2-135M-Instruct-GGUF	-	other	base_model:HuggingFaceTB/SmolLM2-135M-Instruct;base_model:quantized:HuggingFaceTB/SmolLM2-135M-Instruct
+mlc-ai/SmolLM2-135M-Instruct-q4f32_1-MLC	-	other	base_model:HuggingFaceTB/SmolLM2-135M-Instruct;base_model:quantized:HuggingFaceTB/SmolLM2-135M-Instruct
+mlc-ai/SmolLM2-135M-Instruct-q0f32-MLC	-	other	base_model:HuggingFaceTB/SmolLM2-135M-Instruct;base_model:quantized:HuggingFaceTB/SmolLM2-135M-Instruct
+mlc-ai/SmolLM2-135M-Instruct-q4f16_1-MLC	-	other	base_model:HuggingFaceTB/SmolLM2-135M-Instruct;base_model:quantized:HuggingFaceTB/SmolLM2-135M-Instruct
+mlc-ai/SmolLM2-135M-Instruct-q0f16-MLC	-	other	base_model:HuggingFaceTB/SmolLM2-135M-Instruct;base_model:quantized:HuggingFaceTB/SmolLM2-135M-Instruct
+taobao-mnn/SmolLM2-135M-Instruct-MNN	-	other	
+Erick03/HFTB-SmolLM2-135M-Instruct-OTCMedicinePHv2	-	other	base_model:HuggingFaceTB/SmolLM2-135M-Instruct;base_model:finetune:HuggingFaceTB/SmolLM2-135M-Instruct
+mawriyo/SmolLM2-135M-Instruct-q4f16_0	-	other	
+chatpdflocal/SmolLM2-135M-Instruct-GGUF	-	other	
+Manoranjan30/test-clinical-domain-SmolLM2-135M-Instruct-Fine-tuned	error:GatedRepoError	other	
+empathielabs/SmolLM2-135M-Instruct-skill-A	sha256:b1a696f570a0177f7cf06964c127b5441ebcc45001e48f7c6e963796d8e206ba	other	
+empathielabs/SmolLM2-135M-Instruct-skill-B	sha256:c3b8405107f107de44e450bf643e31f895364cfdade1d9f446aade798b0b95bf	other	
+empathielabs/SmolLM2-135M-Instruct-skill-B-ft	sha256:676d353dc442b35a4249a7c83401a812f19fca67a9e279ebd7a5044e457d695e	other	
+empathielabs/SmolLM2-135M-Instruct-A	sha256:8bc78203ed842936183342dd1224509b34a00059dde9f0b33aca0f1e093a488e	other	
+empathielabs/SmolLM2-135M-Instruct-B-finetune	sha256:8319345fc09f2c49d59a02dd7443ef3d6601e621042a8342b850e4b6098c7007	other	
+empathielabs/SmolLM2-135M-Instruct-B-contlearn	sha256:d3dd5ca122b6501626a57a0f8e462b90bbcacedc2eca37546de6e69729e201a9	other	
+jonathanjordan21/SmolLM2-135M-Instruct-Sentiment	-	other	
+jonathanjordan21/SmolLM2-135M-Instruct-sentiment-finetuned	sha256:6b075cabf9d494bc22faccf86b85b3711b4ebe8c0e672dcca06a2f8bc3e41b61	other	
+mnoukhov/SmolLM2-135M-Instruct_tldr-rm	sha256:db711e84881c171c81aa2af794e43d3b6f0d286150cb8bb45cf11e0116dfe2ee	other	base_model:mnoukhov/SmolLM2-135M-Instruct_tldr-sft;base_model:finetune:mnoukhov/SmolLM2-135M-Instruct_tldr-sft
+tmickleydoyle/SmolLM2-135M-Instruct	sha256:b9f93ce41c270feb4eb9a8870f0b48b3fd2d761bd6af47f4d74fe35d991f9bf5	other	

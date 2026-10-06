@@ -1,0 +1,18 @@
+{
+ "data_region_sha256": "89c73bfa20b36b9208e40787076e3c6f23317c8bfa2af174528ceefffba0c8cc",
+ "dtypes": {
+  "BF16": 272
+ },
+ "elements": 134515008,
+ "file_bytes": 269060552,
+ "file_sha256": "5af571cbf074e6d21a03528d2330792e532ca608f24ac70a143f6b369968ab8c",
+ "has_lm_head": false,
+ "header_bytes": 30528,
+ "header_sha256": "8df07d8c3eecdbd18af25d05f43a6768a859d98afd2ae459228bd8f4d39a3c49",
+ "keys_sorted_bytewise": true,
+ "metadata": {
+  "format": "pt"
+ },
+ "offsets_contiguous": true,
+ "tensors": 272
+}

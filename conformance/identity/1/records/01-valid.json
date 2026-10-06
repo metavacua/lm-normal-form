@@ -1,0 +1,63 @@
+{
+  "features": [],
+  "format": "lmnf-identity-record",
+  "format_version": 1,
+  "min_reader_version": 1,
+  "min_writer_version": 1,
+  "producer": {
+    "name": "conformance/identity/1/derive.sh",
+    "version": "1"
+  },
+  "scheme": {
+    "canonicalization": {
+      "id": "lmnf-tensor",
+      "version": 1
+    },
+    "hash": {
+      "alg": "sha256"
+    }
+  },
+  "subject": {
+    "bag_root": "8b66602ac71d729405abb8e119d7f4664a4b588f8c0aef138b573bab77b05102",
+    "container": "fixture",
+    "tensors": [
+      {
+        "digest": "52468c6a873e87dde71d74d4681b652e6d7d2c5b502bac7c93674dbece0992a3",
+        "digest_t": null,
+        "dtype": "f32",
+        "labels": {
+          "fixture": "a"
+        },
+        "shape": [
+          2
+        ],
+        "stored_dtype": "f32"
+      },
+      {
+        "digest": "4bebb99b7038f81692726f8a5023b2331adb0bfbf420c8f193f1000dc8939cd7",
+        "digest_t": "59145cb662095f5fc2806345199d34b4998bf80cfecadb37bf6f81d05fcb021c",
+        "dtype": "f32",
+        "labels": {
+          "fixture": "b"
+        },
+        "shape": [
+          2,
+          3
+        ],
+        "stored_dtype": "f32"
+      },
+      {
+        "digest": "409201a59a6874b08312ae2382a7639ab42aef875b1765b6c5811dbbf766a9e0",
+        "digest_t": null,
+        "dtype": "i64",
+        "labels": {
+          "fixture": "c"
+        },
+        "shape": [
+          1
+        ],
+        "stored_dtype": "i64"
+      }
+    ]
+  }
+}

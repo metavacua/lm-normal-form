@@ -1,0 +1,60 @@
+{
+ "constant_nodes": 2713,
+ "constants_skipped": 0,
+ "doc_string": "",
+ "domain": "",
+ "file_bytes": 539274414,
+ "file_sha256": "36166f9b05d83df6ce0fa7bad4eafadce592477cb15f99c287c9b682b0727d7b",
+ "graph_name": "main_graph",
+ "initializer_elements": 134515008,
+ "initializers": 272,
+ "ir_version": 8,
+ "metadata_props": [],
+ "model_version": 0,
+ "nodes": 7361,
+ "operators": {
+  "Add": 212,
+  "And": 2,
+  "Cast": 254,
+  "Concat": 304,
+  "Constant": 2713,
+  "ConstantOfShape": 63,
+  "Cos": 1,
+  "Div": 121,
+  "Equal": 62,
+  "Expand": 62,
+  "Flatten": 1,
+  "Gather": 397,
+  "IsNaN": 30,
+  "LessOrEqual": 1,
+  "MatMul": 272,
+  "Mul": 487,
+  "Neg": 60,
+  "Pow": 61,
+  "Range": 3,
+  "ReduceMean": 61,
+  "Reshape": 244,
+  "Shape": 458,
+  "Sigmoid": 30,
+  "Sin": 1,
+  "Slice": 150,
+  "Softmax": 30,
+  "Sqrt": 61,
+  "Transpose": 152,
+  "Unsqueeze": 946,
+  "Where": 122
+ },
+ "opset_import": [
+  [
+   "",
+   18
+  ]
+ ],
+ "producer_name": "pytorch",
+ "producer_version": "2.14.1",
+ "roles": {
+  "gather-table": 1,
+  "matmul-weight": 210,
+  "vector": 61
+ }
+}
