@@ -60,7 +60,7 @@ jobs:
           jq -r -f batches/0004/authority-to-nt.jq out/countries.json > out/authority.nt
           jq -c '{countries: length, determined: (map(select(.determined)) | length)}' out/countries.json | tee out/counts.json
           wc -l out/prompts.tsv out/prompts.nt out/authority.nt
-          jq -r '.[] | select(.kind == "fwd") | .prompt' out/prompts.json | head -n 5
+          jq -r 'limit(5; .[] | select(.kind == "fwd") | .prompt)' out/prompts.json
       - uses: actions/upload-artifact@v7
         with:
           name: prepare
