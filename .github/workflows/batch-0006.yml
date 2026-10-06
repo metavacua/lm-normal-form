@@ -108,7 +108,10 @@ jobs:
           test -x /usr/bin/time || sudo apt-get install --yes time
           echo "$MODEL" > out/model.txt
           python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
-          # onnx-2-rdf needs Python 3.13 or later; Optimum's ONNX export comes with its onnxruntime extra
+          # onnx-2-rdf needs Python 3.13 or later, the YARRRML parser from npm and Java for its RML mapper;
+          # Optimum's ONNX export comes with its onnxruntime extra
+          java -version 2>&1 | head -n 1
+          npm install --global @rmlio/yarrrml-parser > /dev/null
           python -m pip install --quiet "optimum[onnxruntime]" onnx onnx_graphsurgeon onnx-2-rdf oxigraph accelerate
           python -m pip freeze > out/versions.txt
           echo "GS ${#GS} bytes" | tee out/invocation-sizes.txt
@@ -129,8 +132,8 @@ jobs:
         continue-on-error: true
         run: |
           /usr/bin/time -v onnx-parser work/onnx/model.onnx --target_path work/rdf --rdf_format nquads 2> out/onnx2rdf.time | tail -n 5
-          f="$(find work/rdf -name '*.nq' | head -n 1)"; wc -l "$f" | tee out/quads.txt
-          oxigraph load --location work/store --file "$f"
+          wc -l work/rdf/*.nq | tee out/quads.txt
+          oxigraph load --location work/store --file work/rdf/model.nq
       - id: sparql
         name: "SPARQL: types, operators, in- and out-degrees over the RDF graph"
         continue-on-error: true
