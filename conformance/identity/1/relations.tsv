@@ -1,0 +1,5 @@
+relation	a	b
+equal	f32-pair	bf16-pair
+equal	f32-pair	f16-pair
+differ	f32-one	i32-one
+differ	f32-4	f32-2x2

@@ -31,6 +31,7 @@ path = [
     "tests/**",
     "queries/**",
     ".github/**",
+    "conformance/identity/**",
     "pyproject.toml",
     "**/*.py",
     "**/*.rq",
