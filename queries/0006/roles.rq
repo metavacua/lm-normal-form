@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Per model and role: how many tensors, their types, and how many elements.
+PREFIX b: <urn:lmnf:b6:>
+SELECT ?model ?role (COUNT(*) AS ?tensors) (GROUP_CONCAT(DISTINCT ?type; separator=" ") AS ?types) (SAMPLE(?shape) AS ?a_shape) (SUM(?n) AS ?elements) WHERE {
+  ?t a b:Tensor ; b:model ?model ; b:role ?role ; b:type ?type ; b:shape ?shape ; b:elements ?n .
+} GROUP BY ?model ?role ORDER BY ?model DESC(?elements)
