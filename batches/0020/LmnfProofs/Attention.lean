@@ -25,8 +25,10 @@ variable {K : Type*} [Field K]
 theorem mulVec_weighted_sum {ι : Type*} [Fintype ι] {m n : ℕ} (M : Matrix (Fin m) (Fin n) K)
     (w : ι → K) (v : ι → Fin n → K) :
     M *ᵥ (∑ i, w i • v i) = ∑ i, w i • (M *ᵥ v i) := by
-  have h := map_sum (Matrix.mulVecLin M) (fun i => w i • v i) Finset.univ
-  simpa [Matrix.mulVecLin_apply, Matrix.mulVec_smul] using h
+  first
+    | (rw [Matrix.mulVec_sum]
+       exact Finset.sum_congr rfl fun i _ => Matrix.mulVec_smul M (w i) (v i))
+    | simp [Matrix.mulVec_sum, Matrix.mulVec_smul]
 
 /-- The value/output gauge: `A Wv` and `Wo B` with `B A = 1` give the same attention output for every weighting of the positions. -/
 theorem ov_gauge {ι : Type*} [Fintype ι] {n h r : ℕ} (Wv : Matrix (Fin h) (Fin n) K)
