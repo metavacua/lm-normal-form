@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Persistence: the mass on the canonical capital with and without an irrelevant
+# true sentence in front of the prompt.
+PREFIX b: <urn:lmnf:b4:>
+SELECT ?model (COUNT(*) AS ?countries) (SUM(IF(?pp < ?pf - 0.1, 1, 0)) AS ?dropped_by_more_than_0_1)
+       (AVG(?pf) AS ?mean_p_plain) (AVG(?pp) AS ?mean_p_with_distractor) WHERE {
+  { SELECT ?model ?c (SUM(IF(STRSTARTS(?t, ?tok) && STRLEN(?tok) > 1, ?prob, 0e0)) AS ?pf) WHERE {
+      ?p a b:Prompt ; b:kind "fwd" ; b:country ?c ; b:target ?t .
+      ?a b:prompt ?p ; b:model ?model ; b:token ?tok ; b:prob ?prob .
+    } GROUP BY ?model ?c }
+  { SELECT ?model ?c (SUM(IF(STRSTARTS(?t, ?tok) && STRLEN(?tok) > 1, ?prob, 0e0)) AS ?pp) WHERE {
+      ?p a b:Prompt ; b:kind "persist" ; b:country ?c ; b:target ?t .
+      ?a b:prompt ?p ; b:model ?model ; b:token ?tok ; b:prob ?prob .
+    } GROUP BY ?model ?c }
+} GROUP BY ?model ORDER BY ?model

@@ -1,0 +1,13 @@
+?model	?countries	?canonical	?historical	?another_countrys_capital	?not_a_capital
+"HuggingFaceTB/SmolLM2-1.7B-Instruct"	189	177	4	2	6
+"HuggingFaceTB/SmolLM2-135M"	189	22	1	0	166
+"HuggingFaceTB/SmolLM2-135M-Instruct"	189	62	1	5	121
+"HuggingFaceTB/SmolLM2-360M-Instruct"	189	172	3	4	10
+"Qwen/Qwen3-0.6B"	189	79	1	7	102
+"Qwen/Qwen3-1.7B"	189	145	1	2	41
+"Qwen/Qwen3-4B"	189	179	3	0	7
+"SpectraSuite/TriLM_1.1B_Unpacked"	189	130	3	2	54
+"SpectraSuite/TriLM_390M_Unpacked"	189	48	3	3	135
+"SpectraSuite/TriLM_99M_Unpacked"	189	0	1	0	188
+"openai-community/gpt2"	189	4	0	1	184
+"openai-community/gpt2-medium"	189	89	3	6	91

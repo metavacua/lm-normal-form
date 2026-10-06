@@ -1,0 +1,13 @@
+?model	?countries	?prefers_x	?prefers_y	?neither_in_top_20	?mean_p_x	?mean_p_y
+"HuggingFaceTB/SmolLM2-1.7B-Instruct"	189	170	1	18	"0.14393192030636356"^^<http://www.w3.org/2001/XMLSchema#double>	"0.0175134293720734"^^<http://www.w3.org/2001/XMLSchema#double>
+"HuggingFaceTB/SmolLM2-135M"	189	172	2	15	"0.14580427912524743"^^<http://www.w3.org/2001/XMLSchema#double>	"0.013338552173753997"^^<http://www.w3.org/2001/XMLSchema#double>
+"HuggingFaceTB/SmolLM2-135M-Instruct"	189	172	3	14	"0.19827410499466655"^^<http://www.w3.org/2001/XMLSchema#double>	"0.01612282988272886"^^<http://www.w3.org/2001/XMLSchema#double>
+"HuggingFaceTB/SmolLM2-360M-Instruct"	189	168	1	20	"0.27405259031693385"^^<http://www.w3.org/2001/XMLSchema#double>	"0.02665989841428205"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-0.6B"	189	171	1	17	"0.06365102053874523"^^<http://www.w3.org/2001/XMLSchema#double>	"0.006433183587720745"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-1.7B"	189	172	1	16	"0.23866329122647903"^^<http://www.w3.org/2001/XMLSchema#double>	"0.0255022449328293"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-4B"	189	167	2	20	"0.08152072345091838"^^<http://www.w3.org/2001/XMLSchema#double>	"0.01057959830988821"^^<http://www.w3.org/2001/XMLSchema#double>
+"SpectraSuite/TriLM_1.1B_Unpacked"	189	163	3	23	"0.2633802466907661"^^<http://www.w3.org/2001/XMLSchema#double>	"0.03957953498899192"^^<http://www.w3.org/2001/XMLSchema#double>
+"SpectraSuite/TriLM_390M_Unpacked"	189	163	3	23	"0.45461835164047093"^^<http://www.w3.org/2001/XMLSchema#double>	"0.05172178937613211"^^<http://www.w3.org/2001/XMLSchema#double>
+"SpectraSuite/TriLM_99M_Unpacked"	189	161	3	25	"0.16492840541627848"^^<http://www.w3.org/2001/XMLSchema#double>	"0.018531211067443553"^^<http://www.w3.org/2001/XMLSchema#double>
+"openai-community/gpt2"	189	174	2	13	"0.11628369518547979"^^<http://www.w3.org/2001/XMLSchema#double>	"0.012264989627589528"^^<http://www.w3.org/2001/XMLSchema#double>
+"openai-community/gpt2-medium"	189	174	1	14	"0.3063613957322367"^^<http://www.w3.org/2001/XMLSchema#double>	"0.020507611324392504"^^<http://www.w3.org/2001/XMLSchema#double>

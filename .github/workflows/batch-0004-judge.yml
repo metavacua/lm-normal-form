@@ -1,0 +1,147 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# The judge of batch 0004, over the answers of a recorded run. It is called by
+# batch-0004.yml at the end of a run, and it runs on its own when the queries
+# or this file change, against the run named in RUN_ID, so that a question can
+# be asked again without reading the models again.
+#
+# The run's artifacts are the raw data: Wikidata's answer, the prompts as
+# read, and each model's answers. Countries, prompts and their RDF forms are
+# derived here again by the jq files in batches/0004/, so that a change to
+# them needs no new run; the prompts derived must equal the prompts read. The
+# authority, the prompts and every model's answers are loaded into Oxigraph,
+# each in its own named graph, and the questions in queries/0004/ are asked
+# over their union.
+name: batch 0004 judge
+
+on:
+  workflow_call:
+    inputs:
+      run_id:
+        description: the run whose artifacts are judged
+        required: true
+        type: string
+  push:
+    branches: ["batch/0004-**"]
+    paths:
+      - ".github/workflows/batch-0004-judge.yml"
+      - "queries/0004/**"
+      - "batches/0004/*.jq"
+
+permissions:
+  contents: read
+  actions: read
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  # The run judged when nothing calls this workflow: the first complete run.
+  RUN_ID: ${{ inputs.run_id || '37411731358' }}
+
+jobs:
+  judge:
+    name: judge, in Oxigraph
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v8
+        with:
+          name: prepare
+          path: prepare
+          run-id: ${{ env.RUN_ID }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: answers-*
+          path: answers
+          run-id: ${{ env.RUN_ID }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Load the authority, the prompts and every model's answers, each in its own graph
+        run: |
+          mkdir -p out work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet oxigraph
+          oxigraph --version | tee out/oxigraph.version
+          echo "$RUN_ID" > out/run-id.txt
+          jq -f batches/0004/countries.jq prepare/wikidata.json > work/countries.json
+          jq -r --rawfile inv batches/0004/invented.txt -f batches/0004/prompts.jq work/countries.json > work/prompts.json
+          # The prompts judged must be the prompts the models read.
+          jq -r '.[] | [.id, .prompt] | @tsv' work/prompts.json | cmp - prepare/prompts.tsv
+          jq -r -f batches/0004/authority-to-nt.jq work/countries.json > work/authority.nt
+          jq -r -f batches/0004/prompts-to-nt.jq work/prompts.json > work/prompts.nt
+          oxigraph load --location work/store --file work/authority.nt --graph urn:lmnf:b4:g:authority
+          oxigraph load --location work/store --file work/prompts.nt --graph urn:lmnf:b4:g:prompts
+          for dir in answers/answers-*; do
+            cell="$(basename "$dir")"
+            model="$(cat "$dir/model.txt")"
+            if [ -s "$dir/answers.jsonl" ]; then
+              jq -r --arg m "$model" -f batches/0004/answers-to-nt.jq "$dir/answers.jsonl" > "work/$cell.nt"
+              /usr/bin/time -f "%e s %M KiB" oxigraph load --location work/store --file "work/$cell.nt" --graph "urn:lmnf:b4:g:$cell"
+              echo "$cell $model: $(wc -l < "$dir/answers.jsonl") answers, $(wc -l < "work/$cell.nt") triples"
+            else
+              echo "$cell $model: no answers"
+            fi
+          done | tee out/loaded.txt
+          cp prepare/counts.json prepare/fetched-at.txt out/
+          du -sh work/store
+      - id: graphs
+        name: "the graphs and their sizes"
+        continue-on-error: true
+        run: oxigraph query --location work/store --results-format tsv --query-file queries/0004/graphs.rq | tee out/graphs.tsv
+      - id: hits
+        name: "hits per model and kind"
+        continue-on-error: true
+        run: oxigraph query --location work/store --union-default-graph --results-format tsv --query-file queries/0004/hits.rq | tee out/hits.tsv
+      - id: reflexivity
+        name: "relational reflexivity: forward and back"
+        continue-on-error: true
+        run: oxigraph query --location work/store --union-default-graph --results-format tsv --query-file queries/0004/reflexivity.rq | tee out/reflexivity.tsv
+      - id: identity
+        name: "identity as a preference between X and Y"
+        continue-on-error: true
+        run: oxigraph query --location work/store --union-default-graph --results-format tsv --query-file queries/0004/identity.rq | tee out/identity.tsv
+      - id: soundness
+        name: "soundness against the authority"
+        continue-on-error: true
+        run: oxigraph query --location work/store --union-default-graph --results-format tsv --query-file queries/0004/soundness.rq | tee out/soundness.tsv
+      - id: persistence
+        name: "persistence under a distractor"
+        continue-on-error: true
+        run: oxigraph query --location work/store --union-default-graph --results-format tsv --query-file queries/0004/persistence.rq | tee out/persistence.tsv
+      - id: story
+        name: "fiction scoping: amnesia and collapse"
+        continue-on-error: true
+        run: oxigraph query --location work/store --union-default-graph --results-format tsv --query-file queries/0004/story.rq | tee out/story.tsv
+      - id: invented
+        name: "invented countries"
+        continue-on-error: true
+        run: oxigraph query --location work/store --union-default-graph --results-format tsv --query-file queries/0004/invented.rq | tee out/invented.tsv
+      - id: calibration
+        name: "calibration of the forward readout"
+        continue-on-error: true
+        run: oxigraph query --location work/store --union-default-graph --results-format tsv --query-file queries/0004/calibration.rq | tee out/calibration.tsv
+      - id: top1
+        name: "every first-ranked answer, for the record"
+        continue-on-error: true
+        run: |
+          oxigraph query --location work/store --union-default-graph --results-format tsv --query-file queries/0004/top1.rq > out/top1.tsv
+          wc -l out/top1.tsv
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: judge-${{ github.run_id }}
+          path: out/
+          retention-days: 1

@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Fiction scoping, in both directions. Inside the story the story's capital
+# should be returned: "override" is the canonical capital asserted inside the
+# story instead, and the rest is "inside_other". Outside the story the
+# canonical capital should return: "collapse" is the story's capital leaking
+# out, and the rest is "outside_other".
+PREFIX b: <urn:lmnf:b4:>
+SELECT ?model (COUNT(*) AS ?countries)
+       (SUM(IF(?inside, 1, 0)) AS ?inside_story) (SUM(IF(!?inside && ?override, 1, 0)) AS ?override)
+       (SUM(IF(!?inside && !?override, 1, 0)) AS ?inside_other)
+       (SUM(IF(?outside, 1, 0)) AS ?outside_canonical) (SUM(IF(!?outside && ?leak, 1, 0)) AS ?collapse)
+       (SUM(IF(!?outside && !?leak, 1, 0)) AS ?outside_other) WHERE {
+  ?pi a b:Prompt ; b:kind "story_in" ; b:country ?c ; b:target ?ti ; b:alt ?alti .
+  ?ai b:prompt ?pi ; b:model ?model ; b:rank 1 ; b:token ?ki .
+  ?po a b:Prompt ; b:kind "story_out" ; b:country ?c ; b:target ?to ; b:alt ?alto .
+  ?ao b:prompt ?po ; b:model ?model ; b:rank 1 ; b:token ?ko .
+  BIND(STRSTARTS(?ti, ?ki) && STRLEN(?ki) > 1 AS ?inside)
+  BIND(STRSTARTS(?alti, ?ki) && STRLEN(?ki) > 1 AS ?override)
+  BIND(STRSTARTS(?to, ?ko) && STRLEN(?ko) > 1 AS ?outside)
+  BIND(STRSTARTS(?alto, ?ko) && STRLEN(?ko) > 1 AS ?leak)
+} GROUP BY ?model ORDER BY ?model

@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Invented countries: how confident the first-ranked token is, and how often it
+# is a real capital (fiction offered as fact).
+PREFIX b: <urn:lmnf:b4:>
+SELECT ?model (COUNT(*) AS ?invented) (AVG(?prob) AS ?mean_top1_prob) (SUM(IF(?real, 1, 0)) AS ?real_capital_given) WHERE {
+  ?p a b:Prompt ; b:kind "invented_fwd" .
+  ?a b:prompt ?p ; b:model ?model ; b:rank 1 ; b:token ?tok ; b:prob ?prob .
+  BIND(EXISTS { ?cap a b:Capital ; b:label ?l . FILTER(STRSTARTS(CONCAT(" ", ?l), ?tok) && STRLEN(?tok) > 2) } AS ?real)
+} GROUP BY ?model ORDER BY ?model

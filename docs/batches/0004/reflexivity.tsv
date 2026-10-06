@@ -1,0 +1,13 @@
+?model	?countries	?both_ways	?forward_only	?inverse_only	?neither
+"HuggingFaceTB/SmolLM2-1.7B-Instruct"	189	127	50	5	7
+"HuggingFaceTB/SmolLM2-135M"	189	6	16	24	143
+"HuggingFaceTB/SmolLM2-135M-Instruct"	189	10	52	3	124
+"HuggingFaceTB/SmolLM2-360M-Instruct"	189	86	86	3	14
+"Qwen/Qwen3-0.6B"	189	38	41	12	98
+"Qwen/Qwen3-1.7B"	189	85	60	9	35
+"Qwen/Qwen3-4B"	189	117	62	2	8
+"SpectraSuite/TriLM_1.1B_Unpacked"	189	92	38	28	31
+"SpectraSuite/TriLM_390M_Unpacked"	189	19	29	29	112
+"SpectraSuite/TriLM_99M_Unpacked"	189	0	0	11	178
+"openai-community/gpt2"	189	0	4	26	159
+"openai-community/gpt2-medium"	189	58	31	18	82

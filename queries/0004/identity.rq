@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Identity as a preference: after "The capital of X is the capital of", the
+# mass on X against the mass on the paired country Y, among the twenty tokens
+# kept. The first token is often "the" or "which", which decides nothing, so
+# the question is only which of X and Y the model prefers when either appears.
+PREFIX b: <urn:lmnf:b4:>
+SELECT ?model (COUNT(*) AS ?countries) (SUM(IF(?px > ?py, 1, 0)) AS ?prefers_x)
+       (SUM(IF(?py > ?px, 1, 0)) AS ?prefers_y) (SUM(IF(?px = ?py, 1, 0)) AS ?neither_in_top_20)
+       (AVG(?px) AS ?mean_p_x) (AVG(?py) AS ?mean_p_y) WHERE {
+  { SELECT ?model ?p
+           (SUM(IF(STRSTARTS(?t, ?tok) && STRLEN(?tok) > 1, ?prob, 0e0)) AS ?px)
+           (SUM(IF(STRSTARTS(?ty, ?tok) && STRLEN(?tok) > 1, ?prob, 0e0)) AS ?py) WHERE {
+      ?p a b:Prompt ; b:kind "ident" ; b:target ?t ; b:partnerLabel ?yl .
+      BIND(CONCAT(" ", ?yl) AS ?ty)
+      ?a b:prompt ?p ; b:model ?model ; b:token ?tok ; b:prob ?prob .
+    } GROUP BY ?model ?p }
+} GROUP BY ?model ORDER BY ?model
