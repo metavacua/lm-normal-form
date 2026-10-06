@@ -1,0 +1,53 @@
+{
+ "f32_cast_to_bf16_bytes_equal_to_original": true,
+ "header": {
+  "a_trailing_spaces": {
+   "bytes_after_header_sha256_equal_to_hub": true,
+   "file_sha256_equal_to_hub": false,
+   "library_loads": true,
+   "tensors_equal_to_original": true
+  },
+  "b_leading_spaces": {
+   "bytes_after_header_sha256_equal_to_hub": true,
+   "file_sha256_equal_to_hub": false,
+   "library_loads": true,
+   "tensors_equal_to_original": true
+  },
+  "c_metadata_last_and_whitespace": {
+   "bytes_after_header_sha256_equal_to_hub": true,
+   "file_sha256_equal_to_hub": false,
+   "library_loads": true,
+   "tensors_equal_to_original": true
+  },
+  "d_table_in_reverse_order": {
+   "bytes_after_header_sha256_equal_to_hub": true,
+   "file_sha256_equal_to_hub": false,
+   "library_loads": true,
+   "tensors_equal_to_original": true
+  }
+ },
+ "hub_sha256": "5af571cbf074e6d21a03528d2330792e532ca608f24ac70a143f6b369968ab8c",
+ "metadata_one_key_distinct_byte_strings_in_40": 1,
+ "metadata_two_keys_distinct_byte_strings_in_40": 2,
+ "resave_sha256_equal_to_hub": true,
+ "save_bf16_data_bytes": 269030016,
+ "save_bf16_dtypes": [
+  "torch.bfloat16"
+ ],
+ "save_bf16_files": [
+  "model.safetensors"
+ ],
+ "save_bf16_has_lm_head": false,
+ "save_bf16_sha256_equal_to_hub": true,
+ "save_bf16_tensors": 272,
+ "save_f32_data_bytes": 538060032,
+ "save_f32_dtypes": [
+  "torch.float32"
+ ],
+ "save_f32_files": [
+  "model.safetensors"
+ ],
+ "save_f32_has_lm_head": false,
+ "save_f32_sha256_equal_to_hub": false,
+ "save_f32_tensors": 272
+}

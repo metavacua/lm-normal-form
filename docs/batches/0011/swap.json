@@ -1,0 +1,15 @@
+{
+ "argmax_equal_at_every_position": false,
+ "bag_root_equal": true,
+ "labelled_root_equal": false,
+ "max_abs_logit_difference": 23.66275405883789,
+ "same_shape": true,
+ "swapped": [
+  "model.layers.0.mlp.gate_proj.weight",
+  "model.layers.0.mlp.up_proj.weight"
+ ],
+ "verdicts": [
+  "OK",
+  "OK"
+ ]
+}

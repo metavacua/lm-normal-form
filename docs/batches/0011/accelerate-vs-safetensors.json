@@ -1,0 +1,20 @@
+{
+ "bag_roots_equal": true,
+ "keys_in_both": 272,
+ "keys_only_ref": 0,
+ "keys_only_target": 0,
+ "ref_distinct_keys": 272,
+ "ref_tensors": 272,
+ "ref_tensors_matched_by_more_than_one": {},
+ "relations": {
+  "identical": 62,
+  "transposed": 210
+ },
+ "relations_by_role": {
+  "gather-table/identical": 1,
+  "matmul-weight/transposed": 210,
+  "vector/identical": 61
+ },
+ "target_distinct_keys": 272,
+ "target_tensors": 272
+}

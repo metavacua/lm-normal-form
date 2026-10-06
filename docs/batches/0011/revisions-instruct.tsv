@@ -1,0 +1,21 @@
+commit	date	title	model.safetensors	config.json	generation_config.json	tokenizer.json	tokenizer_config.json	special_tokens_map.json	vocab.json	merges.txt	chat_template.jinja	tokenizer.model
+12fd25f77366	2025-09-22	Update README.md	sha256:5af571cbf074	git:36293b609920	git:da6c4d71a43a	git:f922b1797f0c	git:8c7b22013909	git:44719d2e365a	git:0ad5ecc2035b	git:69503b13f727	-	-
+a91318be21ae	2025-04-21	Upload optimized	sha256:5af571cbf074	git:36293b609920	git:da6c4d71a43a	git:f922b1797f0c	git:8c7b22013909	git:44719d2e365a	git:0ad5ecc2035b	git:69503b13f727	-	-
+e2c3f7557efb	2025-02-06	Update README.md	sha256:5af571cbf074	git:36293b609920	git:da6c4d71a43a	git:f922b1797f0c	git:8c7b22013909	git:44719d2e365a	git:0ad5ecc2035b	git:69503b13f727	-	-
+ec84f302454d	2025-01-07	update model max	sha256:5af571cbf074	git:36293b609920	git:da6c4d71a43a	git:f922b1797f0c	git:8c7b22013909	git:44719d2e365a	git:0ad5ecc2035b	git:69503b13f727	-	-
+75fd0ae5b521	2025-01-07	Update tokenizer	sha256:5af571cbf074	git:36293b609920	git:da6c4d71a43a	git:f922b1797f0c	git:76b6b266c3d0	git:44719d2e365a	git:0ad5ecc2035b	git:69503b13f727	-	-
+9a66ea6ac76f	2025-01-07	update model max	sha256:5af571cbf074	git:36293b609920	git:da6c4d71a43a	git:f922b1797f0c	git:8c7b22013909	git:44719d2e365a	git:0ad5ecc2035b	git:69503b13f727	-	-
+45dead349c32	2024-11-25	Update README.md	sha256:5af571cbf074	git:36293b609920	git:da6c4d71a43a	git:f922b1797f0c	git:76b6b266c3d0	git:44719d2e365a	git:0ad5ecc2035b	git:69503b13f727	-	-
+a5cf62c9a838	2024-11-25	Upload improved 	sha256:5af571cbf074	git:36293b609920	git:da6c4d71a43a	git:f922b1797f0c	git:76b6b266c3d0	git:44719d2e365a	git:0ad5ecc2035b	git:69503b13f727	-	-
+050424aa44a9	2024-11-23	Update README.md	sha256:5af571cbf074	git:36293b609920	git:da6c4d71a43a	git:f922b1797f0c	git:76b6b266c3d0	git:44719d2e365a	git:0ad5ecc2035b	git:69503b13f727	-	-
+ee72e5415c00	2024-11-23	add base model m	sha256:5af571cbf074	git:36293b609920	git:da6c4d71a43a	git:f922b1797f0c	git:76b6b266c3d0	git:44719d2e365a	git:0ad5ecc2035b	git:69503b13f727	-	-
+ac94f3519c88	2024-11-21	Update README.md	sha256:5af571cbf074	git:36293b609920	git:da6c4d71a43a	git:f922b1797f0c	git:76b6b266c3d0	git:44719d2e365a	git:0ad5ecc2035b	git:69503b13f727	-	-
+5a33ba103645	2024-11-05	Update config.js	sha256:5af571cbf074	git:36293b609920	git:da6c4d71a43a	git:f922b1797f0c	git:76b6b266c3d0	git:44719d2e365a	git:0ad5ecc2035b	git:69503b13f727	-	-
+7e27bd9f9532	2024-10-31	Update README.md	sha256:5af571cbf074	git:1f82e6d7d9b9	git:da6c4d71a43a	git:f922b1797f0c	git:76b6b266c3d0	git:44719d2e365a	git:0ad5ecc2035b	git:69503b13f727	-	-
+6cf9e28a4b33	2024-10-31	Update README.md	sha256:5af571cbf074	git:1f82e6d7d9b9	git:da6c4d71a43a	git:f922b1797f0c	git:76b6b266c3d0	git:44719d2e365a	git:0ad5ecc2035b	git:69503b13f727	-	-
+8065371cb317	2024-10-31	Upload ONNX weig	sha256:5af571cbf074	git:1f82e6d7d9b9	git:da6c4d71a43a	git:f922b1797f0c	git:76b6b266c3d0	git:44719d2e365a	git:0ad5ecc2035b	git:69503b13f727	-	-
+aca5b9fdb001	2024-10-31	Update README.md	sha256:5af571cbf074	git:134179d2027b	git:da6c4d71a43a	git:f922b1797f0c	git:76b6b266c3d0	git:44719d2e365a	git:0ad5ecc2035b	git:69503b13f727	-	-
+edb1b16cb78e	2024-10-31	Update README.md	sha256:5af571cbf074	git:134179d2027b	git:da6c4d71a43a	git:f922b1797f0c	git:76b6b266c3d0	git:44719d2e365a	git:0ad5ecc2035b	git:69503b13f727	-	-
+eba0825ddc77	2024-10-31	chat template	sha256:5af571cbf074	git:134179d2027b	git:da6c4d71a43a	git:f922b1797f0c	git:76b6b266c3d0	git:44719d2e365a	git:0ad5ecc2035b	git:69503b13f727	-	-
+c369d07e8e4c	2024-10-31	Update README.md	sha256:5af571cbf074	git:134179d2027b	git:da6c4d71a43a	git:f922b1797f0c	git:5154a1af2fdb	git:44719d2e365a	git:0ad5ecc2035b	git:69503b13f727	-	-
+e682e54cd28b	2024-10-31	Duplicate from H	sha256:5af571cbf074	git:134179d2027b	git:da6c4d71a43a	git:f922b1797f0c	git:5154a1af2fdb	git:44719d2e365a	git:0ad5ecc2035b	git:69503b13f727	-	-

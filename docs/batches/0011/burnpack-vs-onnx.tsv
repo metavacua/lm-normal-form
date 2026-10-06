@@ -1,0 +1,670 @@
+label	shape	relation	onnx_matches	first_onnx_match
+submodule1.constant1	[49152, 576]	both	2	model.embed_tokens.weight
+submodule1.constant300	[1]	identical	246	/model/Constant_20_output_0
+submodule1.constant301	[1, 32, 1]	identical	1	onnx::Expand_360
+submodule1.constant307	[1]	identical	246	/model/Constant_20_output_0
+submodule10.constant1021	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule10.constant1023	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule10.constant1024	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule10.constant1025	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule10.constant1027	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule10.constant1028	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule10.constant1074	[1]	identical	246	/model/Constant_20_output_0
+submodule10.constant1091	[1]	identical	246	/model/Constant_20_output_0
+submodule10.constant1102	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule10.constant1103	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule10.constant1104	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule10.constant1105	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule10.constant1106	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule10.constant17	[576]	identical	1	model.layers.7.post_attention_layernorm.weight
+submodule10.constant18	[576]	identical	1	model.layers.8.input_layernorm.weight
+submodule10.linear54.weight	[576, 1536]	identical	1	onnx::MatMul_8920
+submodule10.linear55.weight	[576, 1536]	identical	1	onnx::MatMul_8921
+submodule10.linear56.weight	[1536, 576]	identical	1	onnx::MatMul_8922
+submodule10.linear57.weight	[576, 576]	identical	1	onnx::MatMul_8923
+submodule10.linear58.weight	[576, 192]	identical	1	onnx::MatMul_8930
+submodule10.linear59.weight	[576, 192]	identical	1	onnx::MatMul_8931
+submodule10.linear60.weight	[576, 576]	identical	1	onnx::MatMul_8954
+submodule11.constant1110	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule11.constant1112	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule11.constant1113	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule11.constant1114	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule11.constant1116	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule11.constant1117	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule11.constant1163	[1]	identical	246	/model/Constant_20_output_0
+submodule11.constant1180	[1]	identical	246	/model/Constant_20_output_0
+submodule11.constant1191	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule11.constant1192	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule11.constant1193	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule11.constant1194	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule11.constant1195	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule11.constant19	[576]	identical	1	model.layers.8.post_attention_layernorm.weight
+submodule11.constant20	[576]	identical	1	model.layers.9.input_layernorm.weight
+submodule11.linear61.weight	[576, 1536]	identical	1	onnx::MatMul_8955
+submodule11.linear62.weight	[576, 1536]	identical	1	onnx::MatMul_8956
+submodule11.linear63.weight	[1536, 576]	identical	1	onnx::MatMul_8957
+submodule11.linear64.weight	[576, 576]	identical	1	onnx::MatMul_8958
+submodule11.linear65.weight	[576, 192]	identical	1	onnx::MatMul_8965
+submodule11.linear66.weight	[576, 192]	identical	1	onnx::MatMul_8966
+submodule11.linear67.weight	[576, 576]	identical	1	onnx::MatMul_8989
+submodule12.constant1199	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule12.constant1201	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule12.constant1202	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule12.constant1203	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule12.constant1205	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule12.constant1206	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule12.constant1252	[1]	identical	246	/model/Constant_20_output_0
+submodule12.constant1269	[1]	identical	246	/model/Constant_20_output_0
+submodule12.constant1280	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule12.constant1281	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule12.constant1282	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule12.constant1283	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule12.constant1284	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule12.constant21	[576]	identical	1	model.layers.9.post_attention_layernorm.weight
+submodule12.constant22	[576]	identical	1	model.layers.10.input_layernorm.weight
+submodule12.linear68.weight	[576, 1536]	identical	1	onnx::MatMul_8990
+submodule12.linear69.weight	[576, 1536]	identical	1	onnx::MatMul_8991
+submodule12.linear70.weight	[1536, 576]	identical	1	onnx::MatMul_8992
+submodule12.linear71.weight	[576, 576]	identical	1	onnx::MatMul_8993
+submodule12.linear72.weight	[576, 192]	identical	1	onnx::MatMul_9000
+submodule12.linear73.weight	[576, 192]	identical	1	onnx::MatMul_9001
+submodule12.linear74.weight	[576, 576]	identical	1	onnx::MatMul_9024
+submodule13.constant1288	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule13.constant1290	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule13.constant1291	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule13.constant1292	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule13.constant1294	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule13.constant1295	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule13.constant1341	[1]	identical	246	/model/Constant_20_output_0
+submodule13.constant1358	[1]	identical	246	/model/Constant_20_output_0
+submodule13.constant1369	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule13.constant1370	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule13.constant1371	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule13.constant1372	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule13.constant1373	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule13.constant23	[576]	identical	1	model.layers.10.post_attention_layernorm.weight
+submodule13.constant24	[576]	identical	1	model.layers.11.input_layernorm.weight
+submodule13.linear75.weight	[576, 1536]	identical	1	onnx::MatMul_9025
+submodule13.linear76.weight	[576, 1536]	identical	1	onnx::MatMul_9026
+submodule13.linear77.weight	[1536, 576]	identical	1	onnx::MatMul_9027
+submodule13.linear78.weight	[576, 576]	identical	1	onnx::MatMul_9028
+submodule13.linear79.weight	[576, 192]	identical	1	onnx::MatMul_9035
+submodule13.linear80.weight	[576, 192]	identical	1	onnx::MatMul_9036
+submodule13.linear81.weight	[576, 576]	identical	1	onnx::MatMul_9059
+submodule14.constant1377	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule14.constant1379	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule14.constant1380	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule14.constant1381	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule14.constant1383	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule14.constant1384	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule14.constant1430	[1]	identical	246	/model/Constant_20_output_0
+submodule14.constant1447	[1]	identical	246	/model/Constant_20_output_0
+submodule14.constant1458	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule14.constant1459	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule14.constant1460	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule14.constant1461	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule14.constant1462	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule14.constant25	[576]	identical	1	model.layers.11.post_attention_layernorm.weight
+submodule14.constant26	[576]	identical	1	model.layers.12.input_layernorm.weight
+submodule14.linear82.weight	[576, 1536]	identical	1	onnx::MatMul_9060
+submodule14.linear83.weight	[576, 1536]	identical	1	onnx::MatMul_9061
+submodule14.linear84.weight	[1536, 576]	identical	1	onnx::MatMul_9062
+submodule14.linear85.weight	[576, 576]	identical	1	onnx::MatMul_9063
+submodule14.linear86.weight	[576, 192]	identical	1	onnx::MatMul_9070
+submodule14.linear87.weight	[576, 192]	identical	1	onnx::MatMul_9071
+submodule14.linear88.weight	[576, 576]	identical	1	onnx::MatMul_9094
+submodule15.constant1466	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule15.constant1468	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule15.constant1469	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule15.constant1470	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule15.constant1472	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule15.constant1473	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule15.constant1519	[1]	identical	246	/model/Constant_20_output_0
+submodule15.constant1536	[1]	identical	246	/model/Constant_20_output_0
+submodule15.constant1547	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule15.constant1548	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule15.constant1549	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule15.constant1550	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule15.constant1551	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule15.constant27	[576]	identical	1	model.layers.12.post_attention_layernorm.weight
+submodule15.constant28	[576]	identical	1	model.layers.13.input_layernorm.weight
+submodule15.linear89.weight	[576, 1536]	identical	1	onnx::MatMul_9095
+submodule15.linear90.weight	[576, 1536]	identical	1	onnx::MatMul_9096
+submodule15.linear91.weight	[1536, 576]	identical	1	onnx::MatMul_9097
+submodule15.linear92.weight	[576, 576]	identical	1	onnx::MatMul_9098
+submodule15.linear93.weight	[576, 192]	identical	1	onnx::MatMul_9105
+submodule15.linear94.weight	[576, 192]	identical	1	onnx::MatMul_9106
+submodule15.linear95.weight	[576, 576]	identical	1	onnx::MatMul_9129
+submodule16.constant1555	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule16.constant1557	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule16.constant1558	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule16.constant1559	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule16.constant1561	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule16.constant1562	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule16.constant1608	[1]	identical	246	/model/Constant_20_output_0
+submodule16.constant1625	[1]	identical	246	/model/Constant_20_output_0
+submodule16.constant1636	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule16.constant1637	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule16.constant1638	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule16.constant1639	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule16.constant1640	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule16.constant29	[576]	identical	1	model.layers.13.post_attention_layernorm.weight
+submodule16.constant30	[576]	identical	1	model.layers.14.input_layernorm.weight
+submodule16.linear100.weight	[576, 192]	identical	1	onnx::MatMul_9140
+submodule16.linear101.weight	[576, 192]	identical	1	onnx::MatMul_9141
+submodule16.linear102.weight	[576, 576]	identical	1	onnx::MatMul_9164
+submodule16.linear96.weight	[576, 1536]	identical	1	onnx::MatMul_9130
+submodule16.linear97.weight	[576, 1536]	identical	1	onnx::MatMul_9131
+submodule16.linear98.weight	[1536, 576]	identical	1	onnx::MatMul_9132
+submodule16.linear99.weight	[576, 576]	identical	1	onnx::MatMul_9133
+submodule17.constant1644	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule17.constant1646	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule17.constant1647	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule17.constant1648	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule17.constant1650	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule17.constant1651	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule17.constant1697	[1]	identical	246	/model/Constant_20_output_0
+submodule17.constant1714	[1]	identical	246	/model/Constant_20_output_0
+submodule17.constant1725	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule17.constant1726	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule17.constant1727	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule17.constant1728	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule17.constant1729	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule17.constant31	[576]	identical	1	model.layers.14.post_attention_layernorm.weight
+submodule17.constant32	[576]	identical	1	model.layers.15.input_layernorm.weight
+submodule17.linear103.weight	[576, 1536]	identical	1	onnx::MatMul_9165
+submodule17.linear104.weight	[576, 1536]	identical	1	onnx::MatMul_9166
+submodule17.linear105.weight	[1536, 576]	identical	1	onnx::MatMul_9167
+submodule17.linear106.weight	[576, 576]	identical	1	onnx::MatMul_9168
+submodule17.linear107.weight	[576, 192]	identical	1	onnx::MatMul_9175
+submodule17.linear108.weight	[576, 192]	identical	1	onnx::MatMul_9176
+submodule17.linear109.weight	[576, 576]	identical	1	onnx::MatMul_9199
+submodule18.constant1733	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule18.constant1735	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule18.constant1736	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule18.constant1737	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule18.constant1739	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule18.constant1740	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule18.constant1786	[1]	identical	246	/model/Constant_20_output_0
+submodule18.constant1803	[1]	identical	246	/model/Constant_20_output_0
+submodule18.constant1814	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule18.constant1815	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule18.constant1816	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule18.constant1817	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule18.constant1818	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule18.constant33	[576]	identical	1	model.layers.15.post_attention_layernorm.weight
+submodule18.constant34	[576]	identical	1	model.layers.16.input_layernorm.weight
+submodule18.linear110.weight	[576, 1536]	identical	1	onnx::MatMul_9200
+submodule18.linear111.weight	[576, 1536]	identical	1	onnx::MatMul_9201
+submodule18.linear112.weight	[1536, 576]	identical	1	onnx::MatMul_9202
+submodule18.linear113.weight	[576, 576]	identical	1	onnx::MatMul_9203
+submodule18.linear114.weight	[576, 192]	identical	1	onnx::MatMul_9210
+submodule18.linear115.weight	[576, 192]	identical	1	onnx::MatMul_9211
+submodule18.linear116.weight	[576, 576]	identical	1	onnx::MatMul_9234
+submodule19.constant1822	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule19.constant1824	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule19.constant1825	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule19.constant1826	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule19.constant1828	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule19.constant1829	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule19.constant1875	[1]	identical	246	/model/Constant_20_output_0
+submodule19.constant1892	[1]	identical	246	/model/Constant_20_output_0
+submodule19.constant1903	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule19.constant1904	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule19.constant1905	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule19.constant1906	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule19.constant1907	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule19.constant35	[576]	identical	1	model.layers.16.post_attention_layernorm.weight
+submodule19.constant36	[576]	identical	1	model.layers.17.input_layernorm.weight
+submodule19.linear117.weight	[576, 1536]	identical	1	onnx::MatMul_9235
+submodule19.linear118.weight	[576, 1536]	identical	1	onnx::MatMul_9236
+submodule19.linear119.weight	[1536, 576]	identical	1	onnx::MatMul_9237
+submodule19.linear120.weight	[576, 576]	identical	1	onnx::MatMul_9238
+submodule19.linear121.weight	[576, 192]	identical	1	onnx::MatMul_9245
+submodule19.linear122.weight	[576, 192]	identical	1	onnx::MatMul_9246
+submodule19.linear123.weight	[576, 576]	identical	1	onnx::MatMul_9269
+submodule2.constant2	[576]	identical	1	model.layers.0.input_layernorm.weight
+submodule2.constant311	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule2.constant313	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule2.constant314	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule2.constant362	[1]	identical	246	/model/Constant_20_output_0
+submodule2.constant379	[1]	identical	246	/model/Constant_20_output_0
+submodule2.constant390	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule2.constant391	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule2.constant392	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule2.constant393	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule2.constant394	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule2.linear1.weight	[576, 576]	identical	1	onnx::MatMul_8643
+submodule2.linear2.weight	[576, 192]	identical	1	onnx::MatMul_8650
+submodule2.linear3.weight	[576, 192]	identical	1	onnx::MatMul_8651
+submodule2.linear4.weight	[576, 576]	identical	1	onnx::MatMul_8674
+submodule20.constant1911	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule20.constant1913	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule20.constant1914	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule20.constant1915	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule20.constant1917	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule20.constant1918	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule20.constant1964	[1]	identical	246	/model/Constant_20_output_0
+submodule20.constant1981	[1]	identical	246	/model/Constant_20_output_0
+submodule20.constant1992	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule20.constant1993	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule20.constant1994	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule20.constant1995	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule20.constant1996	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule20.constant37	[576]	identical	1	model.layers.17.post_attention_layernorm.weight
+submodule20.constant38	[576]	identical	1	model.layers.18.input_layernorm.weight
+submodule20.linear124.weight	[576, 1536]	identical	1	onnx::MatMul_9270
+submodule20.linear125.weight	[576, 1536]	identical	1	onnx::MatMul_9271
+submodule20.linear126.weight	[1536, 576]	identical	1	onnx::MatMul_9272
+submodule20.linear127.weight	[576, 576]	identical	1	onnx::MatMul_9273
+submodule20.linear128.weight	[576, 192]	identical	1	onnx::MatMul_9280
+submodule20.linear129.weight	[576, 192]	identical	1	onnx::MatMul_9281
+submodule20.linear130.weight	[576, 576]	identical	1	onnx::MatMul_9304
+submodule21.constant2000	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule21.constant2002	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule21.constant2003	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule21.constant2004	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule21.constant2006	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule21.constant2007	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule21.constant2053	[1]	identical	246	/model/Constant_20_output_0
+submodule21.constant2070	[1]	identical	246	/model/Constant_20_output_0
+submodule21.constant2081	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule21.constant2082	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule21.constant2083	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule21.constant2084	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule21.constant2085	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule21.constant39	[576]	identical	1	model.layers.18.post_attention_layernorm.weight
+submodule21.constant40	[576]	identical	1	model.layers.19.input_layernorm.weight
+submodule21.linear131.weight	[576, 1536]	identical	1	onnx::MatMul_9305
+submodule21.linear132.weight	[576, 1536]	identical	1	onnx::MatMul_9306
+submodule21.linear133.weight	[1536, 576]	identical	1	onnx::MatMul_9307
+submodule21.linear134.weight	[576, 576]	identical	1	onnx::MatMul_9308
+submodule21.linear135.weight	[576, 192]	identical	1	onnx::MatMul_9315
+submodule21.linear136.weight	[576, 192]	identical	1	onnx::MatMul_9316
+submodule21.linear137.weight	[576, 576]	identical	1	onnx::MatMul_9339
+submodule22.constant2089	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule22.constant2091	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule22.constant2092	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule22.constant2093	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule22.constant2095	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule22.constant2096	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule22.constant2142	[1]	identical	246	/model/Constant_20_output_0
+submodule22.constant2159	[1]	identical	246	/model/Constant_20_output_0
+submodule22.constant2170	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule22.constant2171	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule22.constant2172	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule22.constant2173	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule22.constant2174	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule22.constant41	[576]	identical	1	model.layers.19.post_attention_layernorm.weight
+submodule22.constant42	[576]	identical	1	model.layers.20.input_layernorm.weight
+submodule22.linear138.weight	[576, 1536]	identical	1	onnx::MatMul_9340
+submodule22.linear139.weight	[576, 1536]	identical	1	onnx::MatMul_9341
+submodule22.linear140.weight	[1536, 576]	identical	1	onnx::MatMul_9342
+submodule22.linear141.weight	[576, 576]	identical	1	onnx::MatMul_9343
+submodule22.linear142.weight	[576, 192]	identical	1	onnx::MatMul_9350
+submodule22.linear143.weight	[576, 192]	identical	1	onnx::MatMul_9351
+submodule22.linear144.weight	[576, 576]	identical	1	onnx::MatMul_9374
+submodule23.constant2178	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule23.constant2180	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule23.constant2181	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule23.constant2182	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule23.constant2184	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule23.constant2185	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule23.constant2231	[1]	identical	246	/model/Constant_20_output_0
+submodule23.constant2248	[1]	identical	246	/model/Constant_20_output_0
+submodule23.constant2259	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule23.constant2260	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule23.constant2261	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule23.constant2262	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule23.constant2263	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule23.constant43	[576]	identical	1	model.layers.20.post_attention_layernorm.weight
+submodule23.constant44	[576]	identical	1	model.layers.21.input_layernorm.weight
+submodule23.linear145.weight	[576, 1536]	identical	1	onnx::MatMul_9375
+submodule23.linear146.weight	[576, 1536]	identical	1	onnx::MatMul_9376
+submodule23.linear147.weight	[1536, 576]	identical	1	onnx::MatMul_9377
+submodule23.linear148.weight	[576, 576]	identical	1	onnx::MatMul_9378
+submodule23.linear149.weight	[576, 192]	identical	1	onnx::MatMul_9385
+submodule23.linear150.weight	[576, 192]	identical	1	onnx::MatMul_9386
+submodule23.linear151.weight	[576, 576]	identical	1	onnx::MatMul_9409
+submodule24.constant2267	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule24.constant2269	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule24.constant2270	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule24.constant2271	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule24.constant2273	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule24.constant2274	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule24.constant2320	[1]	identical	246	/model/Constant_20_output_0
+submodule24.constant2337	[1]	identical	246	/model/Constant_20_output_0
+submodule24.constant2348	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule24.constant2349	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule24.constant2350	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule24.constant2351	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule24.constant2352	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule24.constant45	[576]	identical	1	model.layers.21.post_attention_layernorm.weight
+submodule24.constant46	[576]	identical	1	model.layers.22.input_layernorm.weight
+submodule24.linear152.weight	[576, 1536]	identical	1	onnx::MatMul_9410
+submodule24.linear153.weight	[576, 1536]	identical	1	onnx::MatMul_9411
+submodule24.linear154.weight	[1536, 576]	identical	1	onnx::MatMul_9412
+submodule24.linear155.weight	[576, 576]	identical	1	onnx::MatMul_9413
+submodule24.linear156.weight	[576, 192]	identical	1	onnx::MatMul_9420
+submodule24.linear157.weight	[576, 192]	identical	1	onnx::MatMul_9421
+submodule24.linear158.weight	[576, 576]	identical	1	onnx::MatMul_9444
+submodule25.constant2356	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule25.constant2358	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule25.constant2359	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule25.constant2360	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule25.constant2362	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule25.constant2363	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule25.constant2409	[1]	identical	246	/model/Constant_20_output_0
+submodule25.constant2426	[1]	identical	246	/model/Constant_20_output_0
+submodule25.constant2437	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule25.constant2438	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule25.constant2439	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule25.constant2440	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule25.constant2441	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule25.constant47	[576]	identical	1	model.layers.22.post_attention_layernorm.weight
+submodule25.constant48	[576]	identical	1	model.layers.23.input_layernorm.weight
+submodule25.linear159.weight	[576, 1536]	identical	1	onnx::MatMul_9445
+submodule25.linear160.weight	[576, 1536]	identical	1	onnx::MatMul_9446
+submodule25.linear161.weight	[1536, 576]	identical	1	onnx::MatMul_9447
+submodule25.linear162.weight	[576, 576]	identical	1	onnx::MatMul_9448
+submodule25.linear163.weight	[576, 192]	identical	1	onnx::MatMul_9455
+submodule25.linear164.weight	[576, 192]	identical	1	onnx::MatMul_9456
+submodule25.linear165.weight	[576, 576]	identical	1	onnx::MatMul_9479
+submodule26.constant2445	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule26.constant2447	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule26.constant2448	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule26.constant2449	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule26.constant2451	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule26.constant2452	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule26.constant2498	[1]	identical	246	/model/Constant_20_output_0
+submodule26.constant2515	[1]	identical	246	/model/Constant_20_output_0
+submodule26.constant2526	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule26.constant2527	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule26.constant2528	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule26.constant2529	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule26.constant2530	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule26.constant49	[576]	identical	1	model.layers.23.post_attention_layernorm.weight
+submodule26.constant50	[576]	identical	1	model.layers.24.input_layernorm.weight
+submodule26.linear166.weight	[576, 1536]	identical	1	onnx::MatMul_9480
+submodule26.linear167.weight	[576, 1536]	identical	1	onnx::MatMul_9481
+submodule26.linear168.weight	[1536, 576]	identical	1	onnx::MatMul_9482
+submodule26.linear169.weight	[576, 576]	identical	1	onnx::MatMul_9483
+submodule26.linear170.weight	[576, 192]	identical	1	onnx::MatMul_9490
+submodule26.linear171.weight	[576, 192]	identical	1	onnx::MatMul_9491
+submodule26.linear172.weight	[576, 576]	identical	1	onnx::MatMul_9514
+submodule27.constant2534	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule27.constant2536	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule27.constant2537	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule27.constant2538	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule27.constant2540	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule27.constant2541	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule27.constant2587	[1]	identical	246	/model/Constant_20_output_0
+submodule27.constant2604	[1]	identical	246	/model/Constant_20_output_0
+submodule27.constant2615	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule27.constant2616	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule27.constant2617	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule27.constant2618	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule27.constant2619	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule27.constant51	[576]	identical	1	model.layers.24.post_attention_layernorm.weight
+submodule27.constant52	[576]	identical	1	model.layers.25.input_layernorm.weight
+submodule27.linear173.weight	[576, 1536]	identical	1	onnx::MatMul_9515
+submodule27.linear174.weight	[576, 1536]	identical	1	onnx::MatMul_9516
+submodule27.linear175.weight	[1536, 576]	identical	1	onnx::MatMul_9517
+submodule27.linear176.weight	[576, 576]	identical	1	onnx::MatMul_9518
+submodule27.linear177.weight	[576, 192]	identical	1	onnx::MatMul_9525
+submodule27.linear178.weight	[576, 192]	identical	1	onnx::MatMul_9526
+submodule27.linear179.weight	[576, 576]	identical	1	onnx::MatMul_9549
+submodule28.constant2623	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule28.constant2625	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule28.constant2626	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule28.constant2627	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule28.constant2629	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule28.constant2630	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule28.constant2676	[1]	identical	246	/model/Constant_20_output_0
+submodule28.constant2693	[1]	identical	246	/model/Constant_20_output_0
+submodule28.constant2704	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule28.constant2705	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule28.constant2706	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule28.constant2707	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule28.constant2708	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule28.constant53	[576]	identical	1	model.layers.25.post_attention_layernorm.weight
+submodule28.constant54	[576]	identical	1	model.layers.26.input_layernorm.weight
+submodule28.linear180.weight	[576, 1536]	identical	1	onnx::MatMul_9550
+submodule28.linear181.weight	[576, 1536]	identical	1	onnx::MatMul_9551
+submodule28.linear182.weight	[1536, 576]	identical	1	onnx::MatMul_9552
+submodule28.linear183.weight	[576, 576]	identical	1	onnx::MatMul_9553
+submodule28.linear184.weight	[576, 192]	identical	1	onnx::MatMul_9560
+submodule28.linear185.weight	[576, 192]	identical	1	onnx::MatMul_9561
+submodule28.linear186.weight	[576, 576]	identical	1	onnx::MatMul_9584
+submodule29.constant2712	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule29.constant2714	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule29.constant2715	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule29.constant2716	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule29.constant2718	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule29.constant2719	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule29.constant2765	[1]	identical	246	/model/Constant_20_output_0
+submodule29.constant2782	[1]	identical	246	/model/Constant_20_output_0
+submodule29.constant2793	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule29.constant2794	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule29.constant2795	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule29.constant2796	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule29.constant2797	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule29.constant55	[576]	identical	1	model.layers.26.post_attention_layernorm.weight
+submodule29.constant56	[576]	identical	1	model.layers.27.input_layernorm.weight
+submodule29.linear187.weight	[576, 1536]	identical	1	onnx::MatMul_9585
+submodule29.linear188.weight	[576, 1536]	identical	1	onnx::MatMul_9586
+submodule29.linear189.weight	[1536, 576]	identical	1	onnx::MatMul_9587
+submodule29.linear190.weight	[576, 576]	identical	1	onnx::MatMul_9588
+submodule29.linear191.weight	[576, 192]	identical	1	onnx::MatMul_9595
+submodule29.linear192.weight	[576, 192]	identical	1	onnx::MatMul_9596
+submodule29.linear193.weight	[576, 576]	identical	1	onnx::MatMul_9619
+submodule3.constant3	[576]	identical	1	model.layers.0.post_attention_layernorm.weight
+submodule3.constant398	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule3.constant4	[576]	identical	1	model.layers.1.input_layernorm.weight
+submodule3.constant400	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule3.constant401	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule3.constant402	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule3.constant404	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule3.constant405	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule3.constant451	[1]	identical	246	/model/Constant_20_output_0
+submodule3.constant468	[1]	identical	246	/model/Constant_20_output_0
+submodule3.constant479	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule3.constant480	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule3.constant481	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule3.constant482	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule3.constant483	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule3.linear10.weight	[576, 192]	identical	1	onnx::MatMul_8686
+submodule3.linear11.weight	[576, 576]	identical	1	onnx::MatMul_8709
+submodule3.linear5.weight	[576, 1536]	identical	1	onnx::MatMul_8675
+submodule3.linear6.weight	[576, 1536]	identical	1	onnx::MatMul_8676
+submodule3.linear7.weight	[1536, 576]	identical	1	onnx::MatMul_8677
+submodule3.linear8.weight	[576, 576]	identical	1	onnx::MatMul_8678
+submodule3.linear9.weight	[576, 192]	identical	1	onnx::MatMul_8685
+submodule30.constant2801	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule30.constant2803	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule30.constant2804	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule30.constant2805	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule30.constant2807	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule30.constant2808	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule30.constant2854	[1]	identical	246	/model/Constant_20_output_0
+submodule30.constant2871	[1]	identical	246	/model/Constant_20_output_0
+submodule30.constant2882	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule30.constant2883	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule30.constant2884	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule30.constant2885	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule30.constant2886	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule30.constant57	[576]	identical	1	model.layers.27.post_attention_layernorm.weight
+submodule30.constant58	[576]	identical	1	model.layers.28.input_layernorm.weight
+submodule30.linear194.weight	[576, 1536]	identical	1	onnx::MatMul_9620
+submodule30.linear195.weight	[576, 1536]	identical	1	onnx::MatMul_9621
+submodule30.linear196.weight	[1536, 576]	identical	1	onnx::MatMul_9622
+submodule30.linear197.weight	[576, 576]	identical	1	onnx::MatMul_9623
+submodule30.linear198.weight	[576, 192]	identical	1	onnx::MatMul_9630
+submodule30.linear199.weight	[576, 192]	identical	1	onnx::MatMul_9631
+submodule30.linear200.weight	[576, 576]	identical	1	onnx::MatMul_9654
+submodule31.constant2890	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule31.constant2892	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule31.constant2893	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule31.constant2894	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule31.constant2896	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule31.constant2897	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule31.constant59	[576]	identical	1	model.layers.28.post_attention_layernorm.weight
+submodule31.constant60	[576]	identical	1	model.layers.29.input_layernorm.weight
+submodule31.linear201.weight	[576, 1536]	identical	1	onnx::MatMul_9655
+submodule31.linear202.weight	[576, 1536]	identical	1	onnx::MatMul_9656
+submodule31.linear203.weight	[1536, 576]	identical	1	onnx::MatMul_9657
+submodule31.linear204.weight	[576, 576]	identical	1	onnx::MatMul_9658
+submodule31.linear205.weight	[576, 192]	identical	1	onnx::MatMul_9665
+submodule31.linear206.weight	[576, 192]	identical	1	onnx::MatMul_9666
+submodule32.constant2943	[1]	identical	246	/model/Constant_20_output_0
+submodule32.constant2960	[1]	identical	246	/model/Constant_20_output_0
+submodule32.constant2971	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule32.constant2972	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule32.constant2973	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule32.constant2974	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule32.constant2975	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule32.constant2979	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule32.constant2981	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule32.constant2982	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule32.constant2983	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule32.constant2985	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule32.constant2986	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule32.constant61	[576]	identical	1	model.layers.29.post_attention_layernorm.weight
+submodule32.constant62	[576]	identical	1	model.norm.weight
+submodule32.linear207.weight	[576, 576]	identical	1	onnx::MatMul_9689
+submodule32.linear208.weight	[576, 1536]	identical	1	onnx::MatMul_9690
+submodule32.linear209.weight	[576, 1536]	identical	1	onnx::MatMul_9691
+submodule32.linear210.weight	[1536, 576]	identical	1	onnx::MatMul_9692
+submodule32.linear211.weight	[576, 49152]	both	2	onnx::MatMul_9693
+submodule4.constant487	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule4.constant489	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule4.constant490	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule4.constant491	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule4.constant493	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule4.constant494	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule4.constant5	[576]	identical	1	model.layers.1.post_attention_layernorm.weight
+submodule4.constant540	[1]	identical	246	/model/Constant_20_output_0
+submodule4.constant557	[1]	identical	246	/model/Constant_20_output_0
+submodule4.constant568	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule4.constant569	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule4.constant570	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule4.constant571	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule4.constant572	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule4.constant6	[576]	identical	1	model.layers.2.input_layernorm.weight
+submodule4.linear12.weight	[576, 1536]	identical	1	onnx::MatMul_8710
+submodule4.linear13.weight	[576, 1536]	identical	1	onnx::MatMul_8711
+submodule4.linear14.weight	[1536, 576]	identical	1	onnx::MatMul_8712
+submodule4.linear15.weight	[576, 576]	identical	1	onnx::MatMul_8713
+submodule4.linear16.weight	[576, 192]	identical	1	onnx::MatMul_8720
+submodule4.linear17.weight	[576, 192]	identical	1	onnx::MatMul_8721
+submodule4.linear18.weight	[576, 576]	identical	1	onnx::MatMul_8744
+submodule5.constant576	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule5.constant578	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule5.constant579	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule5.constant580	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule5.constant582	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule5.constant583	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule5.constant629	[1]	identical	246	/model/Constant_20_output_0
+submodule5.constant646	[1]	identical	246	/model/Constant_20_output_0
+submodule5.constant657	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule5.constant658	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule5.constant659	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule5.constant660	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule5.constant661	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule5.constant7	[576]	identical	1	model.layers.2.post_attention_layernorm.weight
+submodule5.constant8	[576]	identical	1	model.layers.3.input_layernorm.weight
+submodule5.linear19.weight	[576, 1536]	identical	1	onnx::MatMul_8745
+submodule5.linear20.weight	[576, 1536]	identical	1	onnx::MatMul_8746
+submodule5.linear21.weight	[1536, 576]	identical	1	onnx::MatMul_8747
+submodule5.linear22.weight	[576, 576]	identical	1	onnx::MatMul_8748
+submodule5.linear23.weight	[576, 192]	identical	1	onnx::MatMul_8755
+submodule5.linear24.weight	[576, 192]	identical	1	onnx::MatMul_8756
+submodule5.linear25.weight	[576, 576]	identical	1	onnx::MatMul_8779
+submodule6.constant10	[576]	identical	1	model.layers.4.input_layernorm.weight
+submodule6.constant665	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule6.constant667	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule6.constant668	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule6.constant669	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule6.constant671	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule6.constant672	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule6.constant718	[1]	identical	246	/model/Constant_20_output_0
+submodule6.constant735	[1]	identical	246	/model/Constant_20_output_0
+submodule6.constant746	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule6.constant747	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule6.constant748	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule6.constant749	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule6.constant750	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule6.constant9	[576]	identical	1	model.layers.3.post_attention_layernorm.weight
+submodule6.linear26.weight	[576, 1536]	identical	1	onnx::MatMul_8780
+submodule6.linear27.weight	[576, 1536]	identical	1	onnx::MatMul_8781
+submodule6.linear28.weight	[1536, 576]	identical	1	onnx::MatMul_8782
+submodule6.linear29.weight	[576, 576]	identical	1	onnx::MatMul_8783
+submodule6.linear30.weight	[576, 192]	identical	1	onnx::MatMul_8790
+submodule6.linear31.weight	[576, 192]	identical	1	onnx::MatMul_8791
+submodule6.linear32.weight	[576, 576]	identical	1	onnx::MatMul_8814
+submodule7.constant11	[576]	identical	1	model.layers.4.post_attention_layernorm.weight
+submodule7.constant12	[576]	identical	1	model.layers.5.input_layernorm.weight
+submodule7.constant754	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule7.constant756	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule7.constant757	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule7.constant758	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule7.constant760	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule7.constant761	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule7.constant807	[1]	identical	246	/model/Constant_20_output_0
+submodule7.constant824	[1]	identical	246	/model/Constant_20_output_0
+submodule7.constant835	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule7.constant836	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule7.constant837	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule7.constant838	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule7.constant839	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule7.linear33.weight	[576, 1536]	identical	1	onnx::MatMul_8815
+submodule7.linear34.weight	[576, 1536]	identical	1	onnx::MatMul_8816
+submodule7.linear35.weight	[1536, 576]	identical	1	onnx::MatMul_8817
+submodule7.linear36.weight	[576, 576]	identical	1	onnx::MatMul_8818
+submodule7.linear37.weight	[576, 192]	identical	1	onnx::MatMul_8825
+submodule7.linear38.weight	[576, 192]	identical	1	onnx::MatMul_8826
+submodule7.linear39.weight	[576, 576]	identical	1	onnx::MatMul_8849
+submodule8.constant13	[576]	identical	1	model.layers.5.post_attention_layernorm.weight
+submodule8.constant14	[576]	identical	1	model.layers.6.input_layernorm.weight
+submodule8.constant843	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule8.constant845	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule8.constant846	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule8.constant847	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule8.constant849	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule8.constant850	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule8.constant896	[1]	identical	246	/model/Constant_20_output_0
+submodule8.constant913	[1]	identical	246	/model/Constant_20_output_0
+submodule8.constant924	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule8.constant925	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule8.constant926	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule8.constant927	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule8.constant928	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule8.linear40.weight	[576, 1536]	identical	1	onnx::MatMul_8850
+submodule8.linear41.weight	[576, 1536]	identical	1	onnx::MatMul_8851
+submodule8.linear42.weight	[1536, 576]	identical	1	onnx::MatMul_8852
+submodule8.linear43.weight	[576, 576]	identical	1	onnx::MatMul_8853
+submodule8.linear44.weight	[576, 192]	identical	1	onnx::MatMul_8860
+submodule8.linear45.weight	[576, 192]	identical	1	onnx::MatMul_8861
+submodule8.linear46.weight	[576, 576]	identical	1	onnx::MatMul_8884
+submodule9.constant1002	[1]	identical	246	/model/Constant_20_output_0
+submodule9.constant1013	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule9.constant1014	[1]	reshaped	60	/model/layers.0/self_attn/Constant_61_output_0
+submodule9.constant1015	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule9.constant1016	[1]	identical	30	/model/layers.0/self_attn/Constant_64_output_0
+submodule9.constant1017	[1]	identical	60	/model/layers.0/self_attn/Constant_63_output_0
+submodule9.constant15	[576]	identical	1	model.layers.6.post_attention_layernorm.weight
+submodule9.constant16	[576]	identical	1	model.layers.7.input_layernorm.weight
+submodule9.constant932	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule9.constant934	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule9.constant935	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule9.constant936	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_output_0
+submodule9.constant938	[1]	reshaped	61	/model/layers.0/input_layernorm/Constant_2_output_0
+submodule9.constant939	[1]	reshaped	63	/model/rotary_emb/Constant_7_output_0
+submodule9.constant985	[1]	identical	246	/model/Constant_20_output_0
+submodule9.linear47.weight	[576, 1536]	identical	1	onnx::MatMul_8885
+submodule9.linear48.weight	[576, 1536]	identical	1	onnx::MatMul_8886
+submodule9.linear49.weight	[1536, 576]	identical	1	onnx::MatMul_8887
+submodule9.linear50.weight	[576, 576]	identical	1	onnx::MatMul_8888
+submodule9.linear51.weight	[576, 192]	identical	1	onnx::MatMul_8895
+submodule9.linear52.weight	[576, 192]	identical	1	onnx::MatMul_8896
+submodule9.linear53.weight	[576, 576]	identical	1	onnx::MatMul_8919
