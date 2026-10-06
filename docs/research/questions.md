@@ -164,8 +164,13 @@ change when a batch reports.
 - **H-F, a sound student from an unsound donor by signal and gate.**
   Predicted the student exceeds the donor on the fragment and generalizes
   the gap; observed (0005) 106 from 62 and the gap on 12 of 12 unseen
-  names, but collapse rose from 22 to 62. The strong form, "tends toward
-  soundness rather than fiction", is refuted for that corpus and objective.
+  names, but collapse rose from 22 to 62. Plain next-token training on the
+  fragment's sentences stored the fragment and did not touch scoping; it
+  is not a transformation that selects for soundness and tests nothing
+  about such transformations. The ternary student's map (absmean per
+  tensor, threshold mean/2) preserves signs above the threshold and the
+  mean magnitude and nothing else; its effect on the donor before training
+  was not measured and is the first cell of the next student batch.
 - **H-G, reductions derived from the graph preserve what they are proved
   to preserve.** Exact prediction: contracting exactly duplicate ternary
   rows changes no judged count. Approximate prediction: layers of low
