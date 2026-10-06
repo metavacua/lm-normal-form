@@ -77,12 +77,14 @@ jobs:
           - { cell: "01", repo: "Qwen/Qwen3-1.7B", label: "Qwen3-1.7B--tq2_0-all", ftype: TQ2_0, args: "--pure --token-embedding-type f16 --output-tensor-type f16" }
           - { cell: "02", repo: "Qwen/Qwen3-1.7B", label: "Qwen3-1.7B--q4_0-all", ftype: Q4_0, args: "--pure --token-embedding-type f16 --output-tensor-type f16" }
           - { cell: "03", repo: "Qwen/Qwen3-1.7B", label: "Qwen3-1.7B--q8_0-all", ftype: Q8_0, args: "--pure --token-embedding-type f16 --output-tensor-type f16" }
-          - { cell: "04", repo: "Qwen/Qwen3-1.7B", label: "Qwen3-1.7B--tq2_0-ffn", ftype: F16, args: "--tensor-type ffn_up=tq2_0 --tensor-type ffn_gate=tq2_0 --tensor-type ffn_down=tq2_0" }
-          - { cell: "05", repo: "Qwen/Qwen3-1.7B", label: "Qwen3-1.7B--tq2_0-attn", ftype: F16, args: "--tensor-type attn_q=tq2_0 --tensor-type attn_k=tq2_0 --tensor-type attn_v=tq2_0 --tensor-type attn_output=tq2_0" }
+          # llama.cpp applies --tensor-type only when the file type is a quantized type, so a class is
+          # quantized by asking for TQ2_0 and overriding every other class to f16.
+          - { cell: "04", repo: "Qwen/Qwen3-1.7B", label: "Qwen3-1.7B--tq2_0-ffn", ftype: TQ2_0, args: "--pure --token-embedding-type f16 --output-tensor-type f16 --tensor-type attn_q=f16 --tensor-type attn_k=f16 --tensor-type attn_v=f16 --tensor-type attn_output=f16" }
+          - { cell: "05", repo: "Qwen/Qwen3-1.7B", label: "Qwen3-1.7B--tq2_0-attn", ftype: TQ2_0, args: "--pure --token-embedding-type f16 --output-tensor-type f16 --tensor-type ffn_up=f16 --tensor-type ffn_gate=f16 --tensor-type ffn_down=f16" }
           - { cell: "06", repo: "Qwen/Qwen3-1.7B", label: "Qwen3-1.7B--tq2_0-embd-out", ftype: F16, args: "--token-embedding-type tq2_0 --output-tensor-type tq2_0" }
           - { cell: "07", repo: "HuggingFaceTB/SmolLM2-1.7B-Instruct", label: "SmolLM2-1.7B-Instruct--tq2_0-all", ftype: TQ2_0, args: "--pure --token-embedding-type f16 --output-tensor-type f16" }
-          - { cell: "08", repo: "HuggingFaceTB/SmolLM2-1.7B-Instruct", label: "SmolLM2-1.7B-Instruct--tq2_0-ffn", ftype: F16, args: "--tensor-type ffn_up=tq2_0 --tensor-type ffn_gate=tq2_0 --tensor-type ffn_down=tq2_0" }
-          - { cell: "09", repo: "HuggingFaceTB/SmolLM2-1.7B-Instruct", label: "SmolLM2-1.7B-Instruct--tq2_0-attn", ftype: F16, args: "--tensor-type attn_q=tq2_0 --tensor-type attn_k=tq2_0 --tensor-type attn_v=tq2_0 --tensor-type attn_output=tq2_0" }
+          - { cell: "08", repo: "HuggingFaceTB/SmolLM2-1.7B-Instruct", label: "SmolLM2-1.7B-Instruct--tq2_0-ffn", ftype: TQ2_0, args: "--pure --token-embedding-type f16 --output-tensor-type f16 --tensor-type attn_q=f16 --tensor-type attn_k=f16 --tensor-type attn_v=f16 --tensor-type attn_output=f16" }
+          - { cell: "09", repo: "HuggingFaceTB/SmolLM2-1.7B-Instruct", label: "SmolLM2-1.7B-Instruct--tq2_0-attn", ftype: TQ2_0, args: "--pure --token-embedding-type f16 --output-tensor-type f16 --tensor-type ffn_up=f16 --tensor-type ffn_gate=f16 --tensor-type ffn_down=f16" }
           - { cell: "10", repo: "SpectraSuite/TriLM_1.1B_Unpacked", label: "TriLM_1.1B--tq2_0-all", ftype: TQ2_0, args: "--pure --token-embedding-type f16 --output-tensor-type f16" }
     env:
       MODEL: ${{ matrix.repo }}
@@ -109,6 +111,7 @@ jobs:
           mkdir -p out work
           test -x /usr/bin/time || sudo apt-get install --yes time
           echo "$MODEL--${LABEL#*--}" > out/model.txt
+          curl -sSf "https://huggingface.co/api/models/$MODEL" | jq -r .sha | tee out/model.revision.txt
           git clone --depth 1 https://github.com/ggml-org/llama.cpp work/llama.cpp
           git -C work/llama.cpp rev-parse HEAD | tee out/llama.cpp.revision.txt
           cmake -S work/llama.cpp -B work/build -DCMAKE_BUILD_TYPE=Release -DLLAMA_CURL=OFF -DLLAMA_BUILD_TESTS=OFF
@@ -132,7 +135,7 @@ jobs:
         run: |
           # shellcheck disable=SC2086
           /usr/bin/time -v work/build/bin/llama-quantize $QARGS work/model.gguf work/variant.gguf "$FTYPE" 2> out/quantize.time | tail -n 40 > out/quantize.log
-          ls -l work/model.gguf work/variant.gguf | tee out/sizes.txt
+          du -b work/model.gguf work/variant.gguf | tee out/sizes.txt
       - id: types
         name: "gguf-dump: the variant's tensor types"
         continue-on-error: true
@@ -144,7 +147,9 @@ jobs:
         continue-on-error: true
         run: |
           work/build/bin/llama-server -m work/variant.gguf --host 127.0.0.1 --port 8080 -c 256 > out/server.log 2>&1 &
-          curl -sSf --retry 120 --retry-delay 1 --retry-connrefused --retry-all-errors http://127.0.0.1:8080/health
+          # The server answers 503 while it loads; wait quietly, at most two minutes.
+          for _ in $(seq 120); do curl -sf http://127.0.0.1:8080/health > out/health.json && break; sleep 1; done
+          cat out/health.json
       - id: answers
         name: "llama.cpp: the next-token distribution for every prompt"
         continue-on-error: true
@@ -153,9 +158,12 @@ jobs:
           while IFS=$'\t' read -r id prompt; do
             jq -cn --arg p "$prompt" '{prompt: $p, n_predict: 1, temperature: 0, n_probs: 20, cache_prompt: false}' \
             | curl -sS http://127.0.0.1:8080/completion -H 'Content-Type: application/json' -d @- \
-            | jq -c --arg id "$id" '{id: $id, probs: (.completion_probabilities[0].top_logprobs | map({token, logprob}))}'
+            | jq -c --arg id "$id" '{id: $id, probs: (.completion_probabilities[0].top_logprobs | map({token, logprob}))}' \
+            || printf '{"id":"%s","probs":[],"unparsable":true}\n' "$id"
           done < prepare/prompts.tsv > out/answers.jsonl
           echo "answers: $(wc -l < out/answers.jsonl) of $(wc -l < prepare/prompts.tsv) prompts in $SECONDS s" | tee out/answers.time
+          grep -h "VmHWM\|VmRSS" "/proc/$(pgrep -n llama-server)/status" | tee out/server.memory
+          { echo "answers=$(wc -l < out/answers.jsonl)"; echo "unparsable=$(grep -c unparsable out/answers.jsonl || true)"; echo "seconds=$SECONDS"; echo "server_vmhwm_kib=$(awk '/VmHWM/{print $2}' out/server.memory)"; } >> "$GITHUB_OUTPUT"
       - name: What the run used
         if: always()
         run: |
@@ -217,6 +225,7 @@ jobs:
           mkdir -p out
           test -x /usr/bin/time || sudo apt-get install --yes time
           echo "$MODEL--${LABEL#*--}" > out/model.txt
+          curl -sSf "https://huggingface.co/api/models/$MODEL" | jq -r .sha | tee out/model.revision.txt
           python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
           python -m pip install --quiet transformers trl datasets accelerate
           python -m pip freeze > out/versions.txt
@@ -226,7 +235,9 @@ jobs:
       - id: train
         name: "transformers and TRL: fine-tune the student on the corpus, then read every prompt"
         continue-on-error: true
-        run: /usr/bin/time -v python -c "$TRAIN" "$MODEL" prepare/corpus.jsonl prepare/prompts.tsv out "$WEIGHTS" 3e-4 2> out/train.time | grep -v "it/s\]" | tail -n 60 | tee out/train.log
+        run: |
+          /usr/bin/time -v python -c "$TRAIN" "$MODEL" prepare/corpus.jsonl prepare/prompts.tsv out "$WEIGHTS" 3e-4 2> out/train.time | grep -v "it/s\]" | tail -n 60 | tee out/train.log
+          { echo "answers=$(wc -l < out/answers.jsonl)"; echo "train_loss=$(grep -o "'train_loss': '[0-9.]*'" out/train.log | grep -o '[0-9.]*$')"; echo "peak_kib=$(awk '/Maximum resident/{print $NF}' out/train.time)"; } >> "$GITHUB_OUTPUT"
       - id: reload
         name: "transformers: load the saved student and read the first prompt"
         continue-on-error: true
