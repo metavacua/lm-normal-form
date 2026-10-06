@@ -117,6 +117,46 @@ change when a batch reports.
   engine and not to the query language.
 - **Next.** Follows from R1 and R2.
 
+## Hypotheses under test, stated so that they can fail
+
+- **H-A, schema is ascertainable (#51).** If a model's instance structure
+  is mechanically decidable, its schema is obtainable from existing
+  libraries with no code of ours. Predicts: independent statements of the
+  architecture agree, and the library's name map covers every stored
+  tensor. Refuted by: a model the converter accepts whose schema the
+  libraries disagree on or cannot name. Holds for SmolLM2 and Qwen3 (0003);
+  the name map over four checkpoints is 0006's test.
+- **H-B, representation independence.** All graphs of one model compute one
+  function; readouts agree across engines and artifacts to numeric
+  tolerance. Refuted by a divergence with no identified transformation
+  behind it. Holds across three engines and five artifacts (0003); the
+  TransformerLens divergence is an untested refutation candidate.
+- **H-C, integrity is measurable.** The stored relation against an
+  authority yields status with witnesses; the reflexivity schema is
+  content-independent; scoping fails measurably in both directions.
+  Refuted, for the logical reading of reflexivity, if under "The capital
+  of X is not the capital of" a model still prefers X (copying, not
+  identity). That control has not been run.
+- **H-D, loss falls where the objective does not protect,** against H-D′,
+  lossy compression sheds fiction before fact. H-D′ predicted soundness
+  held and collapse fell under quantization; observed (0005): Q4_0 loses
+  53 canonical answers to gaps and doubles collapse; TQ2_0 leaves nothing.
+  H-D′ refuted for post-training quantization of a float model.
+- **H-E, integer without loss is decidable for native ternary models.**
+  Predicted zero elements changed by a TQ2_0 round trip; observed zero in
+  every tensor of TriLM 1.1B but the attention output projections, which
+  hold two magnitudes per block (0005).
+- **H-F, a sound student from an unsound donor by signal and gate.**
+  Predicted the student exceeds the donor on the fragment and generalizes
+  the gap; observed (0005) 106 from 62 and the gap on 12 of 12 unseen
+  names, but collapse rose from 22 to 62. The strong form, "tends toward
+  soundness rather than fiction", is refuted for that corpus and objective.
+- **H-G, reductions derived from the graph preserve what they are proved
+  to preserve.** Exact prediction: contracting exactly duplicate ternary
+  rows changes no judged count. Approximate prediction: layers of low
+  influence cost fewer canonical answers than layers of high influence.
+  Tested by 0007 and 0008.
+
 ## R6. Integrity: sound, fictional, reflexive
 
 - **Frame.** An utterance is judged against a named logic L and theory T

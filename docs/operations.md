@@ -27,6 +27,24 @@ pipeline that no longer exists.
   its purpose, cells, expectations and rules; results are appended after,
   with the run identifiers. Expectations written after the data are not
   expectations.
+- A batch document opens by declaring what kind of batch it is:
+  - **a test**: the hypothesis stated positively; the consequence derived
+    from it that the cells will observe; the observation that would refute
+    it (a contradiction, or the absence of the derived consequence); and
+    what the batch depends on (earlier batches' instruments and data);
+  - **a calibration**: baselines or instrument checks, with the claim they
+    license and nothing more;
+  - **a description**: inventories and candidates for a later test.
+  Batches 0002, 0003 and 0006 are calibration and description; 0004 and
+  0005 were tests with their hypotheses stated less sharply than this rule
+  now requires (`docs/research/questions.md` restates them).
+- Batch numbers are accession numbers, not an order. Dependencies between
+  batches are stated in each document and kept in one machine-readable
+  file, `docs/batches/batches.ttl` (PROV: `wasInformedBy`, `used`), from
+  which the index is rendered. Branches are based on `main`, not on each
+  other, once the shared pieces (authority query, prompt derivation, the
+  judge workflow) are merged; the stacked pull requests of 0003 to 0006
+  predate this rule.
 - Prompts, transformations and queries are **data files** in
   `batches/NNNN/` and `queries/NNNN/` (`jq`, SPARQL, text), not code.
 - A batch workflow runs on push when its own file changes, and by hand.
@@ -44,6 +62,16 @@ pipeline that no longer exists.
   (`toJSON(steps)`), because the API reports `continue-on-error` steps as
   successes.
 - Job names carry no colons; `gh run view --log` omits such jobs.
+- An observation writes its key numbers (answers written, peak memory,
+  elapsed) to `$GITHUB_OUTPUT`, so that the outcomes record carries the
+  measurement and not only the status. Earlier batches' records have
+  `outputs: {}` throughout, for want of this.
+- A tool that runs in the background (a server) is measured from `/proc`
+  (`VmHWM`) before it is stopped; GNU `time` sees only the foreground
+  process. Batches 0002 to 0005's first run did not measure their servers.
+- A judge has a **conformance fixture**: answer files with known counts
+  that every revision of its queries must reproduce exactly, run in its
+  smoke job. The batch 0004 judge does not have one yet.
 
 ## Existing tools, and the invocations that drive them
 
