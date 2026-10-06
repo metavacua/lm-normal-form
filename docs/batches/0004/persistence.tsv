@@ -1,0 +1,13 @@
+?model	?countries	?dropped_by_more_than_0_1	?mean_p_plain	?mean_p_with_distractor
+"HuggingFaceTB/SmolLM2-1.7B-Instruct"	189	5	"0.786488204609678"^^<http://www.w3.org/2001/XMLSchema#double>	"0.9007093795477423"^^<http://www.w3.org/2001/XMLSchema#double>
+"HuggingFaceTB/SmolLM2-135M"	189	0	"0.06929204269925349"^^<http://www.w3.org/2001/XMLSchema#double>	"0.45338572090351653"^^<http://www.w3.org/2001/XMLSchema#double>
+"HuggingFaceTB/SmolLM2-135M-Instruct"	189	0	"0.16476977794740524"^^<http://www.w3.org/2001/XMLSchema#double>	"0.4822873055265008"^^<http://www.w3.org/2001/XMLSchema#double>
+"HuggingFaceTB/SmolLM2-360M-Instruct"	189	22	"0.7471830895277353"^^<http://www.w3.org/2001/XMLSchema#double>	"0.8037902726487371"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-0.6B"	189	4	"0.20592203188253475"^^<http://www.w3.org/2001/XMLSchema#double>	"0.40560544450821245"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-1.7B"	189	1	"0.41080819720276623"^^<http://www.w3.org/2001/XMLSchema#double>	"0.8374485665462027"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-4B"	189	6	"0.7757847875842567"^^<http://www.w3.org/2001/XMLSchema#double>	"0.9324413639468626"^^<http://www.w3.org/2001/XMLSchema#double>
+"SpectraSuite/TriLM_1.1B_Unpacked"	189	2	"0.30094553030393173"^^<http://www.w3.org/2001/XMLSchema#double>	"0.6834629898730091"^^<http://www.w3.org/2001/XMLSchema#double>
+"SpectraSuite/TriLM_390M_Unpacked"	189	4	"0.09729311780184514"^^<http://www.w3.org/2001/XMLSchema#double>	"0.3232140131597386"^^<http://www.w3.org/2001/XMLSchema#double>
+"SpectraSuite/TriLM_99M_Unpacked"	189	0	"0.009094883930787693"^^<http://www.w3.org/2001/XMLSchema#double>	"0.06293868601808304"^^<http://www.w3.org/2001/XMLSchema#double>
+"openai-community/gpt2"	189	0	"0.011975454144596427"^^<http://www.w3.org/2001/XMLSchema#double>	"0.12235022357199092"^^<http://www.w3.org/2001/XMLSchema#double>
+"openai-community/gpt2-medium"	189	7	"0.15328786060821717"^^<http://www.w3.org/2001/XMLSchema#double>	"0.2955846982936017"^^<http://www.w3.org/2001/XMLSchema#double>

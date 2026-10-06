@@ -45,6 +45,16 @@ precedence = "override"
 SPDX-FileCopyrightText = "2026 Ian Douglas Lawrence Norman McLean"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
+# --- Measurement data: tables the judge wrote, authority extracts ------------
+# Facts and measurements, and extracts of Wikidata (itself CC0); dedicated to
+# the public domain so they can be reused without conditions.
+
+[[annotations]]
+path = ["docs/batches/*/*.tsv", "docs/batches/*/*.tsv.gz", "docs/batches/*/*.json", "docs/batches/*/*.txt"]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Ian Douglas Lawrence Norman McLean"
+SPDX-License-Identifier = "CC0-1.0"
+
 # --- This file and the licence texts keep the general default ---------------
 
 [[annotations]]
