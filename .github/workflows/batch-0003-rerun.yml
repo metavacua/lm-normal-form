@@ -1,0 +1,373 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0003, six cells run again. In the first run five observations failed on
+# one character of mine (torch.set_grad_enabled(False), which this PyTorch rejects),
+# and cell 10's setup failed because Optimum's export now asks for accelerate.
+# Written down in docs/batches/0003.md.
+#
+# Where a library has no command line, one invocation is written in the step's
+# CODE variable and run as `python -c "$CODE"`. Code-golf rules: shortest,
+# least complex, most robust, most correct. The size of each invocation is
+# printed with its result, and every tool run goes through GNU time.
+#
+# An observation is a step with an id and continue-on-error; the last step of
+# each job writes the workflow's own record of every observation's outcome.
+name: batch 0003 rerun
+
+on:
+  push:
+    branches: ["batch/0003-**"]
+    paths: [".github/workflows/batch-0003-rerun.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-0003-rerun-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PROMPT: "The capital of France is"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  # PyTorch through transformers: token ids, then the five most probable next tokens.
+  TOP5: >-
+    import sys,torch,transformers as t;torch.set_grad_enabled(False);m,p=sys.argv[1:3];
+    k=t.AutoTokenizer.from_pretrained(m);g=t.AutoModelForCausalLM.from_pretrained(m).float();
+    i=k(p,return_tensors='pt');v,j=g(**i).logits[0,-1].softmax(-1).topk(5);
+    print(i.input_ids.tolist(),[(int(a),k.decode([int(a)]),round(float(b),4))for a,b in zip(j,v)])
+  # ONNX Runtime through Optimum: the same, for a graph named by the third argument (JSON options).
+  TOP5_ORT: >-
+    import sys,json,transformers as t;from optimum.onnxruntime import ORTModelForCausalLM as M;
+    m,p,o=sys.argv[1],sys.argv[2],json.loads(sys.argv[3]);k=t.AutoTokenizer.from_pretrained(m);
+    g=M.from_pretrained(m,**o);i=k(p,return_tensors='pt');v,j=g(**i).logits[0,-1].softmax(-1).topk(5);
+    print(i.input_ids.tolist(),[(int(a),k.decode([int(a)]),round(float(b),4))for a,b in zip(j,v)])
+  # The library's own statement of an architecture: configuration, the model built from it, and its parameters.
+  FACTS: >-
+    import sys,json,transformers as t;m=sys.argv[1];c=t.AutoConfig.from_pretrained(m);
+    g=t.AutoModelForCausalLM.from_config(c);
+    print(json.dumps({'config':c.to_dict(),'parameters':sum(p.numel()for p in g.parameters()),
+    'parameter_tensors':len(list(g.named_parameters())),'buffers':[n for n,_ in g.named_buffers()],
+    'modules':sorted({type(x).__name__ for x in g.modules()})}));
+    print('\n'.join(f'{n}\t{tuple(p.shape)}'for n,p in g.named_parameters()),file=open('out/parameters.tsv','w'))
+  # The library's own report of what a checkpoint lacks or adds against the architecture.
+  LOADING: >-
+    import sys,json,transformers as t;g,i=t.AutoModelForCausalLM.from_pretrained(sys.argv[1],output_loading_info=True);
+    print(json.dumps(i,default=str))
+
+jobs:
+  torch-smollm2:
+    name: 01 PyTorch, SmolLM2-135M-Instruct
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      MODEL: HuggingFaceTB/SmolLM2-135M-Instruct
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p out
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers
+          python -m pip freeze > out/versions.txt
+          echo "TOP5 ${#TOP5} bytes, FACTS ${#FACTS} bytes, LOADING ${#LOADING} bytes" | tee out/invocation-sizes.txt
+      - id: top5
+        name: "next token: the five most probable, with the token ids of the prompt"
+        continue-on-error: true
+        run: /usr/bin/time -v python -c "$TOP5" "$MODEL" "$PROMPT" 2> out/top5.time | tee out/top5.txt
+      - id: facts
+        name: "the library's statement of the architecture"
+        continue-on-error: true
+        run: /usr/bin/time -v python -c "$FACTS" "$MODEL" 2> out/facts.time | tee out/facts.json
+      - id: loading
+        name: "the library's loading report: missing, unexpected and mismatched keys"
+        continue-on-error: true
+        run: /usr/bin/time -v python -c "$LOADING" "$MODEL" 2> out/loading.time | tee out/loading.json
+      - id: gaps
+        name: "safetensors header against the library's parameters: only in the header, only in the library"
+        continue-on-error: true
+        run: |
+          url="https://huggingface.co/$MODEL/resolve/main/model.safetensors"
+          length="$(curl -sSfL -r 0-7 "$url" | od -An -tu8 | tr -d ' ')"
+          curl -sSfL -r "8-$((length + 7))" "$url" | jq -r 'del(.__metadata__) | keys[]' | sort > out/header-names.txt
+          cut -f1 out/parameters.tsv | sort > out/parameter-names.txt
+          echo "only in the header:"; comm -23 out/header-names.txt out/parameter-names.txt | tee out/only-in-header.txt
+          echo "only in the library:"; comm -13 out/header-names.txt out/parameter-names.txt | tee out/only-in-library.txt
+      - name: What the run used
+        if: always()
+        run: grep -h "Maximum resident\|Elapsed (wall" out/*.time || true
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-01-torch-smollm2-rerun
+          path: out/
+          retention-days: 1
+
+  torch-qwen3:
+    name: 02 PyTorch, Qwen3-0.6B
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      MODEL: Qwen/Qwen3-0.6B
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p out
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers
+          python -m pip freeze > out/versions.txt
+      - id: top5
+        name: "next token: the five most probable, with the token ids of the prompt"
+        continue-on-error: true
+        run: /usr/bin/time -v python -c "$TOP5" "$MODEL" "$PROMPT" 2> out/top5.time | tee out/top5.txt
+      - id: facts
+        name: "the library's statement of the architecture"
+        continue-on-error: true
+        run: /usr/bin/time -v python -c "$FACTS" "$MODEL" 2> out/facts.time | tee out/facts.json
+      - id: loading
+        name: "the library's loading report"
+        continue-on-error: true
+        run: /usr/bin/time -v python -c "$LOADING" "$MODEL" 2> out/loading.time | tee out/loading.json
+      - id: gaps
+        name: "safetensors header against the library's parameters"
+        continue-on-error: true
+        run: |
+          url="https://huggingface.co/$MODEL/resolve/main/model.safetensors"
+          length="$(curl -sSfL -r 0-7 "$url" | od -An -tu8 | tr -d ' ')"
+          curl -sSfL -r "8-$((length + 7))" "$url" | jq -r 'del(.__metadata__) | keys[]' | sort > out/header-names.txt
+          cut -f1 out/parameters.tsv | sort > out/parameter-names.txt
+          echo "only in the header:"; comm -23 out/header-names.txt out/parameter-names.txt | tee out/only-in-header.txt
+          echo "only in the library:"; comm -13 out/header-names.txt out/parameter-names.txt | tee out/only-in-library.txt
+      - name: What the run used
+        if: always()
+        run: grep -h "Maximum resident\|Elapsed (wall" out/*.time || true
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-02-torch-qwen3-rerun
+          path: out/
+          retention-days: 1
+
+  torch-gpt2:
+    name: 03 PyTorch, GPT-2
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      MODEL: openai-community/gpt2
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p out
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers
+          python -m pip freeze > out/versions.txt
+      - id: top5
+        name: "next token: the five most probable, with the token ids of the prompt"
+        continue-on-error: true
+        run: /usr/bin/time -v python -c "$TOP5" "$MODEL" "$PROMPT" 2> out/top5.time | tee out/top5.txt
+      - id: facts
+        name: "the library's statement of the architecture"
+        continue-on-error: true
+        run: /usr/bin/time -v python -c "$FACTS" "$MODEL" 2> out/facts.time | tee out/facts.json
+      - id: loading
+        name: "the library's loading report"
+        continue-on-error: true
+        run: /usr/bin/time -v python -c "$LOADING" "$MODEL" 2> out/loading.time | tee out/loading.json
+      - id: gaps
+        name: "safetensors header against the library's parameters"
+        continue-on-error: true
+        run: |
+          url="https://huggingface.co/$MODEL/resolve/main/model.safetensors"
+          length="$(curl -sSfL -r 0-7 "$url" | od -An -tu8 | tr -d ' ')"
+          curl -sSfL -r "8-$((length + 7))" "$url" | jq -r 'del(.__metadata__) | keys[]' | sort > out/header-names.txt
+          cut -f1 out/parameters.tsv | sort > out/parameter-names.txt
+          echo "only in the header:"; comm -23 out/header-names.txt out/parameter-names.txt | tee out/only-in-header.txt
+          echo "only in the library:"; comm -13 out/header-names.txt out/parameter-names.txt | tee out/only-in-library.txt
+      - name: What the run used
+        if: always()
+        run: grep -h "Maximum resident\|Elapsed (wall" out/*.time || true
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-03-torch-gpt2-rerun
+          path: out/
+          retention-days: 1
+
+  transformerlens-smollm2:
+    name: 08 TransformerLens bridge, SmolLM2-135M-Instruct
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      MODEL: HuggingFaceTB/SmolLM2-135M-Instruct
+      CODE: >-
+        import sys,torch;torch.set_grad_enabled(False);from transformer_lens.model_bridge import TransformerBridge as B;
+        m,p=sys.argv[1:3];b=B.boot_transformers(m);c=b.cfg;
+        print({k:getattr(c,k,None)for k in('n_layers','n_heads','n_key_value_heads','d_head','d_model','d_mlp','d_vocab','n_ctx','act_fn','normalization_type','positional_embedding_type')});
+        v,j=b(p)[0,-1].softmax(-1).topk(5);print([(int(a),b.tokenizer.decode([int(a)]),round(float(x),4))for a,x in zip(j,v)])
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p out
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformer-lens
+          python -m pip freeze > out/versions.txt
+          echo "CODE ${#CODE} bytes" | tee out/invocation-sizes.txt
+      - id: bridge
+        name: "the bridge's configuration and its five most probable next tokens"
+        continue-on-error: true
+        run: /usr/bin/time -v python -c "$CODE" "$MODEL" "$PROMPT" 2> out/bridge.time | tee out/bridge.txt
+      - name: What the run used
+        if: always()
+        run: |
+          grep -h "Maximum resident\|Elapsed (wall" out/*.time || true
+          tail -n 30 out/bridge.time || true
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-08-transformerlens-smollm2-rerun
+          path: out/
+          retention-days: 1
+
+  torch-export-smollm2:
+    name: 09 torch.export, SmolLM2-135M-Instruct
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      MODEL: HuggingFaceTB/SmolLM2-135M-Instruct
+      CODE: >-
+        import sys,torch,collections as c,transformers as t;torch.set_grad_enabled(False);m,p=sys.argv[1:3];
+        g=t.AutoModelForCausalLM.from_pretrained(m,use_cache=False).eval();
+        i=t.AutoTokenizer.from_pretrained(m)(p,return_tensors='pt');e=torch.export.export(g,(),dict(i));s=e.graph_signature;
+        print(c.Counter(x.kind.name for x in s.input_specs),c.Counter(x.kind.name for x in s.output_specs),len(e.graph.nodes),
+        c.Counter(n.op for n in e.graph.nodes).most_common(),
+        len({str(list(n.meta.get('nn_module_stack',{}).values())[-1:])for n in e.graph.nodes}))
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p out
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers
+          python -m pip freeze > out/versions.txt
+          echo "CODE ${#CODE} bytes" | tee out/invocation-sizes.txt
+      - id: export
+        name: "the exported program's signature: parameters, buffers, inputs, nodes, modules"
+        continue-on-error: true
+        run: /usr/bin/time -v python -c "$CODE" "$MODEL" "$PROMPT" 2> out/export.time | tee out/export.txt
+      - name: What the run used
+        if: always()
+        run: |
+          grep -h "Maximum resident\|Elapsed (wall" out/*.time || true
+          tail -n 30 out/export.time || true
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-09-torch-export-smollm2-rerun
+          path: out/
+          retention-days: 1
+
+  onnx-stored-tensors:
+    name: 10 what three ONNX graphs of SmolLM2 store, against the header
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      MODEL: HuggingFaceTB/SmolLM2-135M-Instruct
+      CODE: >-
+        import sys,math,onnx;g=onnx.load(sys.argv[1]).graph;t=g.initializer;
+        print(sys.argv[1],'nodes',len(g.node),'initializers',len(t),'elements',sum(math.prod(x.dims)for x in t),
+        'types',sorted({x.data_type for x in t}))
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install, download the published graph, export one and build one
+        run: |
+          mkdir -p out work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet "optimum[onnxruntime]" accelerate onnxruntime-genai onnx-ir huggingface_hub
+          python -m pip freeze > out/versions.txt
+          echo "CODE ${#CODE} bytes" | tee out/invocation-sizes.txt
+          hf download "$MODEL" onnx/model.onnx --local-dir work/published
+          /usr/bin/time -v optimum-cli export onnx --model "$MODEL" --task text-generation-with-past work/exported 2> out/export.time
+          /usr/bin/time -v python -m onnxruntime_genai.models.builder -m "$MODEL" -o work/built -p fp32 -e cpu -c work/cache --extra_options hf_token=false 2> out/build.time
+          url="https://huggingface.co/$MODEL/resolve/main/model.safetensors"
+          length="$(curl -sSfL -r 0-7 "$url" | od -An -tu8 | tr -d ' ')"
+          curl -sSfL -r "8-$((length + 7))" "$url" > out/header.json
+          jq -c '{tensors: (del(.__metadata__) | length), elements: ([del(.__metadata__)[] | .shape | reduce .[] as $d (1; . * $d)] | add)}' out/header.json | tee out/header-totals.json
+      - id: published
+        name: "published graph: nodes, initializers, elements, element types"
+        continue-on-error: true
+        run: /usr/bin/time -v python -c "$CODE" work/published/onnx/model.onnx 2> out/published.time | tee out/published.txt
+      - id: exported
+        name: "graph exported by Optimum"
+        continue-on-error: true
+        run: /usr/bin/time -v python -c "$CODE" work/exported/model.onnx 2> out/exported.time | tee out/exported.txt
+      - id: built
+        name: "graph built by ONNX Runtime's builder"
+        continue-on-error: true
+        run: /usr/bin/time -v python -c "$CODE" work/built/model.onnx 2> out/built.time | tee out/built.txt
+      - name: What the run used
+        if: always()
+        run: grep -h "Maximum resident\|Elapsed (wall" out/*.time || true
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-10-onnx-stored-tensors-rerun
+          path: out/
+          retention-days: 1
