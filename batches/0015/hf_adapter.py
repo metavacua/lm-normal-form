@@ -54,7 +54,7 @@ def save(arch, P, src_dir, out_dir, dtype="float32"):
     os.makedirs(out_dir, exist_ok=True)
     for f in os.listdir(src_dir):
         if f != "model.safetensors" and os.path.isfile(os.path.join(src_dir, f)):
-            shutil.copy(os.path.join(src_dir, f), os.path.join(out_dir, f))
+            shutil.copyfile(os.path.join(src_dir, f), os.path.join(out_dir, f))
     tdt = {"float64": torch.float64, "float32": torch.float32, "float16": torch.float16, "bfloat16": torch.bfloat16}[dtype]
     keep = np.float64 if dtype == "float64" else np.float32
     save_file({hf_name(k): torch.from_numpy(np.ascontiguousarray(v.astype(keep))).to(tdt) for k, v in P.items()}, os.path.join(out_dir, "model.safetensors"), metadata={"format": "pt"})
