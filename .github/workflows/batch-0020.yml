@@ -1,0 +1,53 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0020: the library of batch 0019's Datalog program (which group each role allows) as theorems of Lean 4 with Mathlib, for every nonlinearity. Written down in docs/batches/0020.md.
+# The toolchain is the Lean of the author's machine (4.34.1) and Mathlib at its tag v4.34.1; nothing here is built on that machine.
+name: batch 0020
+
+on:
+  push:
+    branches: ["batch/0020-**"]
+    paths: [".github/workflows/batch-0020.yml", "batches/0020/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-0020-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lean:
+    name: "01 the theorems, checked by Lean"
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+      - id: build
+        uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: batches/0020
+          build: true
+      - name: The axioms that each theorem depends on
+        if: always() && steps.build.outcome == 'success'
+        working-directory: batches/0020
+        run: |
+          mkdir -p ../../out/lean
+          lake env lean LmnfProofs/Axioms.lean 2>&1 | tee ../../out/lean/axioms.txt
+          if grep -q sorryAx ../../out/lean/axioms.txt; then echo 'a theorem depends on sorry'; exit 1; fi
+          test "$(grep -c 'depends on axioms' ../../out/lean/axioms.txt)" -eq 17
+      - name: Keep the manifest and the versions
+        if: always()
+        working-directory: batches/0020
+        run: |
+          mkdir -p ../../out/lean
+          cp lake-manifest.json ../../out/lean/ 2>/dev/null || true
+          { lean --version; lake --version; } 2>&1 | tee ../../out/lean/versions.txt || true
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: lean-proofs
+          path: out/lean/
+          retention-days: 14
