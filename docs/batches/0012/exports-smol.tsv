@@ -1,0 +1,8 @@
+id	args	env	exit	ir_version	opset	ort	sha_equal	log	ir_ok	opset_ok	ort_ok	sha_ok	log_ok
+E2a	--opset 19	-	0	9	19	same	no	-	True	True	True	True	True
+E2b	--opset 20	-	0	9	20	same	no	-	True	True	True	True	True
+E3	--opset 21	-	0	10	21	same	no	yes	True	True	True	True	True
+E6a		PYTHONHASHSEED=1	0	8	18	same	yes	-	True	True	True	True	True
+E6b		OMP_NUM_THREADS=1	0	8	18	same	yes	-	True	True	True	True	True
+E7a		ATEN_CPU_CAPABILITY=default	0	8	18	same	yes	-	True	True	True	True	True
+E7b		ATEN_CPU_CAPABILITY=avx2	0	8	18	same	yes	-	True	True	True	True	True
