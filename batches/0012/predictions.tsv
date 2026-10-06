@@ -1,0 +1,41 @@
+id	family	mutation	level	env	checker	checker_text	ort	ort_text	risk	note
+A1	ir	ir=13	all	-	accept	-	same	-	low	an IR version both know
+A1b	ir	ir=9	all	-	accept	-	same	-	low	the same, lower
+A2	ir	ir=14	all	-	accept	-	refuse	Unsupported model IR version: 14||max supported IR version: 13	low	the checker's ceiling is 14, ONNX Runtime 1.30.0's is 13
+A3	ir	ir=15	all	-	refuse	higher than the checker's||ir_version 15	refuse	max supported IR version: 13	low	above both ceilings
+A4	ir	ir=clear	all	-	refuse	does not have an ir_version	refuse	Missing model IR version	low	the field absent
+A5	ir	ir=0	all	-	refuse	does not have an ir_version	same	-	medium	the field present and zero: ONNX Runtime tests for presence and for being above 13
+A6	ir	ir=3	all	-	refuse	in initializer but not in graph input	same	-	medium	before initializers had to be inputs: the checker refuses, ONNX Runtime treats them as inputs
+A7	ir	ir=7	all	-	accept	-	same	-	low-medium	no reader crosses the IR version with the opset
+B1	opset	imports=|17	all	-	refuse	ReduceMean:13||input size 2 not in range	refuse	ReduceMean:13||input size 2 not in range	low	ReduceMean takes axes as an input only from opset 18
+B2	opset	imports=|13	all	-	refuse	allowzero||not in range	refuse	allowzero||not in range	low	Reshape's allowzero is from opset 14
+B3	opset	imports=|12	all	-	refuse	not in range||Unrecognized attribute	refuse	not in range||Unrecognized attribute	low	Unsqueeze takes axes as an input from opset 13
+B4a	opset	imports=|19	all	-	accept	-	same/near	-	medium	a later released opset, the graph unchanged; the optimizer's allow-lists differ by opset
+B4b	opset	imports=|19	none	-	accept	-	same	-	medium	the same without optimization
+B4c	opset	imports=|26	all	-	accept	-	same/near	-	medium	the last opset ONNX Runtime 1.30.0 releases
+B4d	opset	imports=|26	none	-	accept	-	same	-	medium	the same without optimization
+B5	opset	imports=|27	all	-	accept	-	refuse	under development||till opset 26	low-medium	an opset ONNX Runtime has not released
+B5e	opset	imports=|27	all	ALLOW_RELEASED_ONNX_OPSET_ONLY=0	accept	-	same/near	-	medium	the same with ALLOW_RELEASED_ONNX_OPSET_ONLY=0: a warning, not an error
+B6	opset	imports=|28	all	-	accept	-	refuse	under development||till opset 26	medium	a later one
+B6e	opset	imports=|28	all	ALLOW_RELEASED_ONNX_OPSET_ONLY=0	accept	-	refuse	No Op registered||domain_version of 28	medium	the same with the gate off: its registry stops at 27
+B7	opset	imports=|100	all	-	accept	-	refuse	under development||No Op registered	medium	the checker has no upper bound
+B8	opset	imports=|4294967314	all	-	refuse	out of supported range	same	-	medium-high	2^32 + 18: ONNX Runtime narrows it to an int, which is 18
+B9	opset	imports=com.example|1	all	-	refuse	No opset import for domain	same	-	medium	no default-domain entry: ONNX Runtime fills in the last released opset
+B10	opset	imports=	all	-	refuse	must specify opset_import	refuse	Missing opset	low	no entries
+B11	opset	imports=|18,ai.onnx|17	all	-	accept	-	refuse	ReduceMean||not in range	medium	the two spellings of the default domain: the checker keeps the empty one, ONNX Runtime folds them and the last wins
+B12	opset	imports=|17,|18	all	-	accept	-	same	-	low-medium	one domain twice: the last wins
+B13	opset	imports=ai.onnx|18	all	-	accept	-	same	-	low	the default domain spelled ai.onnx
+B14	opset	imports=ai.onnx|99	all	-	accept	-	refuse	No Op registered	medium-high	spelled ai.onnx, 99: past the released-opset gate, caught later
+B14b	opset	imports=ai.onnx|27	all	-	accept	-	same/near	-	high	spelled ai.onnx, 27, while the empty spelling is refused (B5): the alias passes the released-opset gate
+B15	opset	addimport=ai.onnx.ml|99	all	-	accept	-	refuse	under development||till opset	medium	an entry no node uses: ONNX Runtime gates every declared domain
+C1	header	meta=inert	all	-	accept	-	same	-	low	producer, domain, model_version, doc_string, graph name
+C2	header	meta=dup	all	-	refuse	duplicate keys in metadata_props	same	-	low-medium	two metadata_props with one key
+C3	header	unknown=field	all	-	accept	-	same	-	low-medium	a field the schema lacks: protobuf keeps it
+C4	header	nodedomain=ai.onnx	all	-	refuse	No opset import for domain 'ai.onnx'	same	-	medium	every node's own domain spelled ai.onnx, the import left as the empty domain
+C5	header	dupinit	all	-	refuse	not unique||initializer name	same	-	medium	an initializer's name twice, with the same values: ONNX Runtime warns and takes the later
+D1	convert	convert=17	all	-	accept	-	same	-	medium	to opset 17: ReduceMean's axes become an attribute
+D2	convert	convert=16	all	-	accept	-	same	-	medium	to 16
+D3	convert	convert=14	all	-	convert-fail	No Adapter||adapter	na	-	medium	to 14: there are no adapters downward for Pow and Shape from 15
+D4	convert	convert=19	all	-	accept	-	same/near	-	medium	to 19
+D4b	convert	convert=28	all	-	accept	-	refuse	under development||till opset 26	medium	to 28: the converter reaches it, ONNX Runtime does not
+D5	convert	convert=29	all	-	convert-fail	invalid version||between 1 and 28	na	-	low	past the last opset of onnx 1.23.2
