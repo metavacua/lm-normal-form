@@ -1,0 +1,169 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0013: are the weights of a language model in the special case of permutation equivalence (every item of every permutable index
+# space told from every other by a signature), and the canonical form that the special case allows. Written down in
+# docs/batches/0013.md.
+#
+# smoke   the tiny random Llama: the self-test and every cell, no claim
+# models  five models in parallel, after the smoke: SmolLM2-135M-Instruct (all the cells, the function too), SmolLM2-135M, FloatLM 99M,
+#         and the two ternary models TriLM 99M and TriLM 390M as the contrast
+name: batch 0013
+
+on:
+  push:
+    branches: ["batch/0013-**"]
+    paths: [".github/workflows/batch-0013.yml", "batches/0013/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: batch-0013-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+
+jobs:
+  smoke:
+    name: "01 the tiny random Llama, every cell"
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      REPO: hf-internal-testing/tiny-random-LlamaForCausalLM
+      HF_REVISION: 9fb191250dd56d0ba7ec9785a025ed29c03d5998
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p out/tiny
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers numpy safetensors huggingface_hub ml_dtypes
+          python -m pip freeze > out/tiny/versions.txt
+          grep -m1 'model name' /proc/cpuinfo | tee out/tiny/cpu.txt
+          echo "pinned $HF_REVISION" | tee out/tiny/revision.txt
+          wc -c batches/0013/*.py batches/0013/cells.sh batches/0013/sentences.txt | tee out/tiny/code-sizes.txt
+      - name: "The transformations, the canonical form and the check on a random toy Llama, in float64"
+        run: bash batches/0013/cells.sh selftest tiny
+      - id: check
+        name: "L0 and L1 of the special case"
+        continue-on-error: true
+        run: bash batches/0013/cells.sh check tiny "$REPO"
+      - id: canon
+        name: "the canonical form against random elements of the group and against non-symmetries"
+        continue-on-error: true
+        run: bash batches/0013/cells.sh canon tiny "$REPO"
+      - id: naive
+        name: "sort rows then columns, and the signature procedure, on real matrices"
+        continue-on-error: true
+        run: bash batches/0013/cells.sh naive tiny "$REPO"
+      - id: function
+        name: "the group's action run as a language model"
+        continue-on-error: true
+        run: bash batches/0013/cells.sh function tiny "$REPO"
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/tiny/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: special-tiny
+          path: out/tiny/
+          retention-days: 7
+
+  models:
+    name: "02 ${{ matrix.tag }}"
+    needs: smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { tag: smol-instruct, repo: "HuggingFaceTB/SmolLM2-135M-Instruct", rev: 12fd25f77366fa6b3b4b768ec3050bf629380bac, function: true }
+          - { tag: smol-base, repo: "HuggingFaceTB/SmolLM2-135M", rev: 93efa2f097d58c2a74874c7e644dbc9b0cee75a2, function: false }
+          - { tag: floatlm-99m, repo: "SpectraSuite/FloatLM_99M", rev: 0516fbe2979fcad7c26805885273562c88c3de90, function: false }
+          - { tag: trilm-99m, repo: "SpectraSuite/TriLM_99M_Unpacked", rev: 61cd2c766000fc544595d6570ad1990017d0cb43, function: false }
+          - { tag: trilm-390m, repo: "SpectraSuite/TriLM_390M_Unpacked", rev: 79cd1fe5a9650ea5342baa2034ecb1b2aaf792e9, function: false }
+    env:
+      REPO: ${{ matrix.repo }}
+      HF_REVISION: ${{ matrix.rev }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p out/${{ matrix.tag }}
+          o=out/${{ matrix.tag }}
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers numpy safetensors huggingface_hub ml_dtypes
+          python -m pip freeze > $o/versions.txt
+          grep -m1 'model name' /proc/cpuinfo | tee $o/cpu.txt
+          free -g | tee $o/memory.txt
+          echo "pinned $HF_REVISION" | tee $o/revision.txt
+          curl -sS "https://huggingface.co/api/models/$REPO" | jq -r '"head of main now \(.sha)", (.tags[]|select(startswith("license")))' | tee -a $o/revision.txt
+      - name: "The self-test"
+        run: bash batches/0013/cells.sh selftest ${{ matrix.tag }}
+      - id: check
+        name: "L0 and L1 of the special case"
+        continue-on-error: true
+        run: bash batches/0013/cells.sh check ${{ matrix.tag }} "$REPO"
+      - id: canon
+        name: "the canonical form against random elements of the group and against non-symmetries"
+        continue-on-error: true
+        run: bash batches/0013/cells.sh canon ${{ matrix.tag }} "$REPO"
+      - id: naive
+        name: "sort rows then columns, and the signature procedure, on real matrices"
+        continue-on-error: true
+        run: bash batches/0013/cells.sh naive ${{ matrix.tag }} "$REPO"
+      - id: function
+        name: "the group's action run as a language model"
+        if: matrix.function
+        continue-on-error: true
+        run: bash batches/0013/cells.sh function ${{ matrix.tag }} "$REPO"
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/${{ matrix.tag }}/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: special-${{ matrix.tag }}
+          path: out/${{ matrix.tag }}/
+          retention-days: 7
+
+  report:
+    # A commit status named after the batch, so that the pull request's checks tab shows the batch run itself.
+    name: report the batch run on the commit
+    needs: [smoke, models]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RESULTS: ${{ toJSON(needs) }}
+    steps:
+      - run: |
+          state=success; echo "$RESULTS" | jq -e '[.[] | .result] | all(. == "success")' > /dev/null || state=failure
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -f state="$state" -f context="batch 0013" \
+            -f description="$(echo "$RESULTS" | jq -r 'to_entries | map("\(.key) \(.value.result)") | join(", ")' | cut -c1-140)" \
+            -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" > /dev/null
