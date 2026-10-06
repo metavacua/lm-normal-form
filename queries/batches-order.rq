@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# The batch graph: each batch, its kind, what informed it, and what it used.
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX dct:  <http://purl.org/dc/terms/>
+SELECT ?batch ?kind (GROUP_CONCAT(DISTINCT STRAFTER(STR(?by), "batches/"); separator=" ") AS ?informed_by)
+       (GROUP_CONCAT(DISTINCT STRAFTER(STR(?u), "batches/"); separator=" ") AS ?used) WHERE {
+  ?b a prov:Activity ; dct:type ?k .
+  OPTIONAL { ?b prov:wasInformedBy ?by }
+  OPTIONAL { ?b prov:used ?u }
+  BIND(STRAFTER(STR(?b), "batches/") AS ?batch) BIND(STRAFTER(STR(?k), "batch-kind/") AS ?kind)
+} GROUP BY ?batch ?kind ORDER BY ?batch

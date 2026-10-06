@@ -1,0 +1,57 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# The batches and what each used from the others. Numbers are accession
+# numbers; this file is the order. Rendered with a SPARQL query over
+# prov:wasInformedBy; a batch that informs nothing is a leaf, a batch
+# informed by nothing is a root.
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix b:    <https://github.com/metavacua/lm-normal-form/batches/> .
+@prefix kind: <https://github.com/metavacua/lm-normal-form/batch-kind/> .
+
+b:0001 a prov:Activity ; dct:title "structure graphs of twelve published ONNX files" ;
+    dct:type kind:calibration ; dct:description "hand-written pipeline, retired; findings stand" .
+
+b:0002 a prov:Activity ; dct:title "twelve existing tools on sampled models" ;
+    dct:type kind:calibration .
+
+b:0003 a prov:Activity ; dct:title "second baselines through the shortest invocations" ;
+    dct:type kind:calibration ;
+    prov:wasInformedBy b:0002 ;
+    prov:used b:0002-tools .
+
+b:0004 a prov:Activity ; dct:title "integrity of one stored relation on a finite domain" ;
+    dct:type kind:test ;
+    prov:wasInformedBy b:0003 ;
+    prov:used b:0003-readout-invocation .
+
+b:0005 a prov:Activity ; dct:title "where the loss falls, and a student of the fragment" ;
+    dct:type kind:test ;
+    prov:wasInformedBy b:0004 ;
+    prov:used b:0004-authority-query , b:0004-prompt-derivation , b:0004-judge .
+
+b:0006 a prov:Activity ; dct:title "the graphs of two models, and where they could be cut" ;
+    dct:type kind:description ;
+    prov:wasInformedBy b:0004 , b:0002 ;
+    prov:used b:0004-prompt-derivation , b:0002-tools .
+
+b:0007 a prov:Activity ; dct:title "which parts of a model tolerate which map" ;
+    dct:type kind:test ;
+    prov:wasInformedBy b:0005 , b:0004 ;
+    prov:used b:0004-judge , b:0005-quantization-cell , b:0005-baselines .
+
+b:0008 a prov:Activity ; dct:title "trimming and contraction, judged" ;
+    dct:type kind:test ;
+    prov:wasInformedBy b:0006 , b:0007 , b:0004 ;
+    prov:used b:0004-judge , b:0006-candidates , b:0007-table .
+
+# The shared pieces, as entities with the batch that made them.
+b:0002-tools a prov:Entity ; dct:description "the set of existing tools and their invocations" ; prov:wasGeneratedBy b:0002 .
+b:0003-readout-invocation a prov:Entity ; dct:description "the PyTorch and llama.cpp readouts of a next-token distribution" ; prov:wasGeneratedBy b:0003 .
+b:0004-authority-query a prov:Entity ; dct:description "batches/0004/authority.rq" ; prov:wasGeneratedBy b:0004 .
+b:0004-prompt-derivation a prov:Entity ; dct:description "batches/0004/countries.jq, prompts.jq, invented.txt" ; prov:wasGeneratedBy b:0004 .
+b:0004-judge a prov:Entity ; dct:description ".github/workflows/batch-0004-judge.yml and queries/0004/" ; prov:wasGeneratedBy b:0004 .
+b:0005-quantization-cell a prov:Entity ; dct:description "the llama-quantize cell with per-class overrides" ; prov:wasGeneratedBy b:0005 .
+b:0005-baselines a prov:Entity ; dct:description "judged counts of Qwen3-1.7B at float16, Q8_0, Q4_0, TQ2_0" ; prov:wasGeneratedBy b:0005 .
+b:0006-candidates a prov:Entity ; dct:description "layer influence profiles, exact redundancy in TriLM 390M" ; prov:wasGeneratedBy b:0006 .
+b:0007-table a prov:Entity ; dct:description "sensitivity of judged counts per tensor class and map" ; prov:wasGeneratedBy b:0007 .
