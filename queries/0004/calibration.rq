@@ -1,14 +1,13 @@
 # SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Calibration of the forward readout: the mass on the canonical capital, in
-# bins of 0.2, against how often the first-ranked token is the canonical one.
+# Calibration of the forward readout: the first-ranked token's probability, in
+# bins of 0.2, against how often that token is the canonical capital. A model
+# whose numbers may be read as probabilities of being right has a hit rate
+# near the mean probability in every bin.
 PREFIX b: <urn:lmnf:b4:>
-SELECT ?model ?bin (COUNT(*) AS ?countries) (AVG(?pt) AS ?mean_p) (AVG(IF(?h = 1, 1.0, 0.0)) AS ?hit_rate) WHERE {
-  { SELECT ?model ?p
-           (MAX(IF(?rank = 1 && STRSTARTS(?t, ?tok) && STRLEN(?tok) > 1, 1, 0)) AS ?h)
-           (SUM(IF(STRSTARTS(?t, ?tok) && STRLEN(?tok) > 1, ?prob, 0e0)) AS ?pt) WHERE {
-      ?p a b:Prompt ; b:kind "fwd" ; b:target ?t .
-      ?a b:prompt ?p ; b:model ?model ; b:rank ?rank ; b:token ?tok ; b:prob ?prob .
-    } GROUP BY ?model ?p }
-  BIND(FLOOR(?pt * 5) / 5 AS ?bin)
+SELECT ?model ?bin (COUNT(*) AS ?countries) (AVG(?prob) AS ?mean_p_top1) (AVG(IF(?hit, 1e0, 0e0)) AS ?hit_rate) WHERE {
+  ?p a b:Prompt ; b:kind "fwd" ; b:target ?t .
+  ?a b:prompt ?p ; b:model ?model ; b:rank 1 ; b:token ?tok ; b:prob ?prob .
+  BIND(STRSTARTS(?t, ?tok) && STRLEN(?tok) > 1 AS ?hit)
+  BIND(FLOOR(?prob * 5) / 5 AS ?bin)
 } GROUP BY ?model ?bin ORDER BY ?model ?bin
