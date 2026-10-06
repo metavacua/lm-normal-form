@@ -137,11 +137,26 @@ change when a batch reports.
   Refuted, for the logical reading of reflexivity, if under "The capital
   of X is not the capital of" a model still prefers X (copying, not
   identity). That control has not been run.
-- **H-D, loss falls where the objective does not protect,** against H-D′,
-  lossy compression sheds fiction before fact. H-D′ predicted soundness
-  held and collapse fell under quantization; observed (0005): Q4_0 loses
-  53 canonical answers to gaps and doubles collapse; TQ2_0 leaves nothing.
-  H-D′ refuted for post-training quantization of a float model.
+- **H-S, selective structure-preserving compression.** For a model and a
+  fragment of an authority, the tensors partition into parts that carry
+  the fragment's soundness and parts that do not, and compression maps
+  chosen per part keep the judged counts (canonical, gluts, collapse)
+  within a stated tolerance while size falls and unanchored mass does not
+  rise. A transformation is soundness-preserving at tolerance ε when
+  Δcanonical ≥ −ε, Δglut ≤ 0 and Δcollapse ≤ 0 over the 189 countries;
+  H-S says such transformations exist with ε = 0 at substantial
+  compression, and which parts tolerate which maps is a measurable
+  property of the model. Corollary: a structure-preserving map of an
+  unsound model is unsound. Refuted, for a model and fragment, if every
+  composition that compresses below Q8_0 costs counts. Evidence so far
+  (0005, first run): Q8_0 on all linear weights of Qwen3-1.7B keeps every
+  judged count at 2,621 MiB against 3,881 at float16 (an instance at
+  ε = 0); TQ2_0 on the tied embedding table alone destroys the fragment
+  (a part that carries everything); uniform Q4_0 and TQ2_0 cost counts
+  (arbitrary cuts, which H-S does not protect). An earlier wording here
+  called the uniform result a refutation of the hypothesis; it was a
+  refutation of a strawman. The per-class table and the selected
+  composition are batch 0007.
 - **H-E, integer without loss is decidable for native ternary models.**
   Predicted zero elements changed by a TQ2_0 round trip; observed zero in
   every tensor of TriLM 1.1B but the attention output projections, which
