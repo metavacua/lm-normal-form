@@ -25,10 +25,8 @@ variable {K : Type*} [Field K]
 theorem mulVec_weighted_sum {ι : Type*} [Fintype ι] {m n : ℕ} (M : Matrix (Fin m) (Fin n) K)
     (w : ι → K) (v : ι → Fin n → K) :
     M *ᵥ (∑ i, w i • v i) = ∑ i, w i • (M *ᵥ v i) := by
-  first
-    | (rw [Matrix.mulVec_sum]
-       exact Finset.sum_congr rfl fun i _ => Matrix.mulVec_smul M (w i) (v i))
-    | simp [Matrix.mulVec_sum, Matrix.mulVec_smul]
+  rw [Matrix.mulVec_sum]
+  exact Finset.sum_congr rfl fun i _ => Matrix.mulVec_smul M (w i) (v i)
 
 /-- The value/output gauge: `A Wv` and `Wo B` with `B A = 1` give the same attention output for every weighting of the positions. -/
 theorem ov_gauge {ι : Type*} [Fintype ι] {n h r : ℕ} (Wv : Matrix (Fin h) (Fin n) K)
@@ -63,7 +61,7 @@ theorem cplx_transpose (a b : K) : (cplx a b)ᵀ = cplx a (-b) := by
 theorem cplx_inv_mul {a b : K} (h : a ^ 2 + b ^ 2 ≠ 0) :
     ((a ^ 2 + b ^ 2)⁻¹ • cplx a (-b)) * cplx a b = 1 := by
   ext i j
-  fin_cases i <;> fin_cases j <;> simp [cplx, Matrix.mul_apply, Fin.sum_univ_two, Matrix.one_apply] <;> field_simp <;> ring
+  fin_cases i <;> fin_cases j <;> simp [cplx, Matrix.mul_apply, Fin.sum_univ_two] <;> field_simp <;> ring
 
 /-- The score of a rotated query and a rotated key is unchanged by a complex scalar on the keys and its inverse transpose on the queries,
 for any two rotations of the plane (matrices of the form `[[c, -s], [s, c]]`). -/

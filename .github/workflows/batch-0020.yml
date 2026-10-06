@@ -37,7 +37,7 @@ jobs:
           mkdir -p ../../out/lean
           lake env lean LmnfProofs/Axioms.lean 2>&1 | tee ../../out/lean/axioms.txt
           if grep -q sorryAx ../../out/lean/axioms.txt; then echo 'a theorem depends on sorry'; exit 1; fi
-          test "$(grep -c 'depends on axioms' ../../out/lean/axioms.txt)" -eq 17
+          test "$(grep -c -E 'depends on axioms|does not depend on any axioms' ../../out/lean/axioms.txt)" -eq 17
       - name: Keep the manifest and the versions
         if: always()
         working-directory: batches/0020
