@@ -5,7 +5,7 @@
 # that are all zero (dead neurons), rows and columns that repeat exactly, rows
 # with another row at cosine above 0.99, and the effective rank (entropy of
 # the singular values). Usage: weight_graph.py MODEL OUT.tsv
-import sys,torch,transformers as t,numpy as np
+import sys,transformers as t,numpy as np
 g=t.AutoModelForCausalLM.from_pretrained(sys.argv[1]).float();f=open(sys.argv[2],'w')
 f.write('tensor\trows\tcols\tdistinct\tvalues\tneg\tzero\tpos\tzero_rows\tzero_cols\tdup_rows\tdup_cols\tcos99_rows\teff_rank\n')
 for n,p in g.named_parameters():
