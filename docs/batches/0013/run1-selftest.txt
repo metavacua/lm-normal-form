@@ -1,0 +1,44 @@
+ok     [tied head] the action of 'residual' is a symmetry of the function: max |difference of logits| 6.66e-16
+ok     [tied head] the action of 'units' is a symmetry of the function: max |difference of logits| 6.66e-16
+ok     [tied head] the action of 'heads' is a symmetry of the function: max |difference of logits| 4.44e-16
+ok     [tied head] the action of 'vo' is a symmetry of the function: max |difference of logits| 0
+ok     [tied head] the action of 'qk' is a symmetry of the function: max |difference of logits| 0
+ok     [tied head] the action of 'units-signed' is a symmetry of the function: max |difference of logits| 0
+ok     [tied head] a random element of the whole group: max |difference of logits| 8.88e-16
+ok     [tied head, float64] the canonical form of three random images of the model is the canonical form of the model, bit for bit
+ok     [tied head, float64] the canonical form of a canonical form is itself
+ok     [tied head, float32] the canonical form of three random images of the model is the canonical form of the model, bit for bit
+ok     [tied head, float32] the canonical form of a canonical form is itself
+ok     [tied head] the canonical form computes the same function: max |difference of logits| 8.88e-16
+ok     [tied head] the roots over the raw tensors of an image differ from the model's, and over the canonical tensors they are equal
+ok     [tied head] a gate row negated is not a symmetry, and the canonical form shows it
+ok     [tied head] the special case is found on a random toy: coordinates anchored, every unit told apart ({'coordinates_anchored': True, 'layers_units_discrete_by_separate_signatures': 2, 'layers_units_discrete_by_joint_signature': 2, 'layers_units_discrete_anchored': 2, 'layers': 2, 'units_not_told_apart_by_joint_signature': 0, 'heads_discrete_anchored_layers': 2, 'heads_discrete_index_free_layers': 2})
+ok     [untied head] the action of 'residual' is a symmetry of the function: max |difference of logits| 4.51e-16
+ok     [untied head] the action of 'units' is a symmetry of the function: max |difference of logits| 3.33e-16
+ok     [untied head] the action of 'heads' is a symmetry of the function: max |difference of logits| 3.89e-16
+ok     [untied head] the action of 'vo' is a symmetry of the function: max |difference of logits| 0
+ok     [untied head] the action of 'qk' is a symmetry of the function: max |difference of logits| 0
+ok     [untied head] the action of 'units-signed' is a symmetry of the function: max |difference of logits| 0
+ok     [untied head] a random element of the whole group: max |difference of logits| 5e-16
+ok     [untied head, float64] the canonical form of three random images of the model is the canonical form of the model, bit for bit
+ok     [untied head, float64] the canonical form of a canonical form is itself
+ok     [untied head, float32] the canonical form of three random images of the model is the canonical form of the model, bit for bit
+ok     [untied head, float32] the canonical form of a canonical form is itself
+ok     [untied head] the canonical form computes the same function: max |difference of logits| 5e-16
+ok     [untied head] the roots over the raw tensors of an image differ from the model's, and over the canonical tensors they are equal
+ok     [untied head] a gate row negated is not a symmetry, and the canonical form shows it
+ok     [untied head] the special case is found on a random toy: coordinates anchored, every unit told apart ({'coordinates_anchored': True, 'layers_units_discrete_by_separate_signatures': 2, 'layers_units_discrete_by_joint_signature': 2, 'layers_units_discrete_anchored': 2, 'layers': 2, 'units_not_told_apart_by_joint_signature': 0, 'heads_discrete_anchored_layers': 2, 'heads_discrete_index_free_layers': 2})
+ok     [float32] a unit that is another with its coordinates permuted ties in the joint signature (19 of 20)
+ok     [float32] the refinement tells them apart: unit colours by round [19, 20]
+ok     [float32] and a duplicate of a unit stays tied to it: unit colours by round [18, 19, 19]
+ok     [float64] a unit that is another with its coordinates permuted ties in the joint signature (19 of 20)
+ok     [float64] the refinement tells them apart: unit colours by round [19, 20]
+ok     [float64] and a duplicate of a unit stays tied to it: unit colours by round [18, 19, 19]
+ok     sort rows then columns of [[1,5],[2,3],[2,4]] and of the same with its columns exchanged are not equal
+ok     the signature procedure gives the same matrix for both
+ok     on a matrix with two rows that tie in signature the procedure is not canonical (the special case ends here)
+1500 random 12 x 20 matrices of distinct real entries, two random images of each: different results from {'sort rows then columns': 1430, 'signature, then columns': 0}
+1500 random 12 x 20 matrices of the entries 0, 1, 2, two random images of each: different results from {'sort rows then columns': 1499, 'signature, then columns': 761}
+ok     on matrices of distinct real entries the signature procedure is canonical and sorting rows then columns is not (fails in 90% or more)
+ok     on matrices of 0, 1, 2 the signature procedure fails, because signatures tie
+selftest: all ok

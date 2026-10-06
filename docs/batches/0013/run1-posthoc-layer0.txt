@@ -1,0 +1,21 @@
+SpectraSuite/TriLM_390M_Unpacked at 79cd1fe5a9650ea5342baa2034ecb1b2aaf792e9, cut to layer 0 and the first 4,096 rows of the embedding and the head: 12 tensors, hidden size 1024, 16 heads of 64
+rotary planes of layer 0: 512; zero in the key 173, zero in the query 173, zero in both 173, zero in one only 0
+canonical form of the first run: canonical tensors that differ from the model's canonical form, for 3 random elements of each part
+    qk            [4, 4, 4]  e.g. ['self_attn.k_proj.weight', 'self_attn.o_proj.weight', 'self_attn.q_proj.weight', 'self_attn.v_proj.weight']
+    vo            [0, 0, 0]
+    units-signed  [0, 0, 0]
+    units         [0, 0, 0]
+    heads         [0, 0, 0]
+    residual      [0, 0, 0]
+    zsigns        [12, 12, 12]  e.g. ['input_layernorm.weight', 'lm_head.weight', 'mlp.down_proj.weight', 'mlp.gate_proj.weight', 'mlp.up_proj.weight', 'model.embed_tokens.weight', 'model.norm.weight', 'post_attention_layernorm.weight', 'self_attn.k_proj.weight', 'self_attn.o_proj.weight', 'self_attn.q_proj.weight', 'self_attn.v_proj.weight']
+    whole group and the sign of zeros [12, 12, 12]
+amended canonical form: canonical tensors that differ from the model's canonical form, for 3 random elements of each part
+    qk            [0, 0, 0]
+    vo            [0, 0, 0]
+    units-signed  [0, 0, 0]
+    units         [0, 0, 0]
+    heads         [0, 0, 0]
+    residual      [0, 0, 0]
+    zsigns        [0, 0, 0]
+    whole group and the sign of zeros [0, 0, 0]
+raw tensors whose bytes change when only the signs of zeros are changed: 8 of 12; every one of the 12 tensors with its values unchanged: True
