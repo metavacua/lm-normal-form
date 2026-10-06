@@ -1,0 +1,177 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0007: the sensitivity of one model's judged counts to the map applied
+# to each class of its tensors, and three compositions. A test of H-S
+# (docs/research/questions.md). Written down in docs/batches/0007.md.
+#
+# prepare   the authority and the prompts (batch 0004's)
+# quantize  twelve cells: Qwen3-1.7B through llama.cpp's own quantizer, one
+#           tensor class at one map per cell, the rest float16; then read out
+# judge     batch-0004-judge.yml, over this run's artifacts
+name: batch 0007
+
+on:
+  push:
+    branches: ["batch/0007-**"]
+    paths: [".github/workflows/batch-0007.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: batch-0007-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  USER_AGENT: "lm-normal-form batch 0007 (https://github.com/metavacua/lm-normal-form)"
+
+jobs:
+  prepare:
+    name: authority and prompts
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Ask Wikidata for the capitals of sovereign states
+        run: |
+          mkdir -p out
+          curl -sSfG -A "$USER_AGENT" -H "Accept: application/sparql-results+json" \
+            --data-urlencode "query@batches/0004/authority.rq" https://query.wikidata.org/sparql -o out/wikidata.json
+          date -u +%Y-%m-%dT%H:%M:%SZ > out/fetched-at.txt
+      - name: Countries and prompts
+        run: |
+          jq -f batches/0004/countries.jq out/wikidata.json > out/countries.json
+          jq -r --rawfile inv batches/0004/invented.txt -f batches/0004/prompts.jq out/countries.json > out/prompts.json
+          jq -r '.[] | [.id, .prompt] | @tsv' out/prompts.json > out/prompts.tsv
+          jq -c '{countries: length, determined: (map(select(.determined)) | length)}' out/countries.json | tee out/counts.json
+          wc -l out/prompts.tsv
+      - uses: actions/upload-artifact@v7
+        with:
+          name: prepare
+          path: out/
+          retention-days: 7
+
+  quantize:
+    name: "${{ matrix.cell }} ${{ matrix.label }}"
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # One class at one map, every other tensor float16. llama.cpp applies --tensor-type only when the
+          # file type is quantized, so each cell asks for the map as the file type and overrides the rest to f16.
+          - { cell: "01", label: "Qwen3-1.7B--q4_0-embd",     ftype: Q4_0,  args: "--pure --token-embedding-type q4_0 --output-tensor-type q4_0 --tensor-type attn_q=f16 --tensor-type attn_k=f16 --tensor-type attn_v=f16 --tensor-type attn_output=f16 --tensor-type ffn_up=f16 --tensor-type ffn_gate=f16 --tensor-type ffn_down=f16" }
+          - { cell: "02", label: "Qwen3-1.7B--q4_0-qk",       ftype: Q4_0,  args: "--pure --token-embedding-type f16 --output-tensor-type f16 --tensor-type attn_v=f16 --tensor-type attn_output=f16 --tensor-type ffn_up=f16 --tensor-type ffn_gate=f16 --tensor-type ffn_down=f16" }
+          - { cell: "03", label: "Qwen3-1.7B--q4_0-vo",       ftype: Q4_0,  args: "--pure --token-embedding-type f16 --output-tensor-type f16 --tensor-type attn_q=f16 --tensor-type attn_k=f16 --tensor-type ffn_up=f16 --tensor-type ffn_gate=f16 --tensor-type ffn_down=f16" }
+          - { cell: "04", label: "Qwen3-1.7B--q4_0-upgate",   ftype: Q4_0,  args: "--pure --token-embedding-type f16 --output-tensor-type f16 --tensor-type attn_q=f16 --tensor-type attn_k=f16 --tensor-type attn_v=f16 --tensor-type attn_output=f16 --tensor-type ffn_down=f16" }
+          - { cell: "05", label: "Qwen3-1.7B--q4_0-down",     ftype: Q4_0,  args: "--pure --token-embedding-type f16 --output-tensor-type f16 --tensor-type attn_q=f16 --tensor-type attn_k=f16 --tensor-type attn_v=f16 --tensor-type attn_output=f16 --tensor-type ffn_up=f16 --tensor-type ffn_gate=f16" }
+          - { cell: "06", label: "Qwen3-1.7B--tq2_0-qk",      ftype: TQ2_0, args: "--pure --token-embedding-type f16 --output-tensor-type f16 --tensor-type attn_v=f16 --tensor-type attn_output=f16 --tensor-type ffn_up=f16 --tensor-type ffn_gate=f16 --tensor-type ffn_down=f16" }
+          - { cell: "07", label: "Qwen3-1.7B--tq2_0-vo",      ftype: TQ2_0, args: "--pure --token-embedding-type f16 --output-tensor-type f16 --tensor-type attn_q=f16 --tensor-type attn_k=f16 --tensor-type ffn_up=f16 --tensor-type ffn_gate=f16 --tensor-type ffn_down=f16" }
+          - { cell: "08", label: "Qwen3-1.7B--tq2_0-upgate",  ftype: TQ2_0, args: "--pure --token-embedding-type f16 --output-tensor-type f16 --tensor-type attn_q=f16 --tensor-type attn_k=f16 --tensor-type attn_v=f16 --tensor-type attn_output=f16 --tensor-type ffn_down=f16" }
+          - { cell: "09", label: "Qwen3-1.7B--tq2_0-down",    ftype: TQ2_0, args: "--pure --token-embedding-type f16 --output-tensor-type f16 --tensor-type attn_q=f16 --tensor-type attn_k=f16 --tensor-type attn_v=f16 --tensor-type attn_output=f16 --tensor-type ffn_up=f16 --tensor-type ffn_gate=f16" }
+          # Three compositions, chosen before the table is known, from batch 0005's one sensitivity (the embedding).
+          - { cell: "10", label: "Qwen3-1.7B--q4_0-all-but-embd", ftype: Q4_0, args: "--pure --token-embedding-type f16 --output-tensor-type f16" }
+          - { cell: "11", label: "Qwen3-1.7B--q4_0-attn-q8_0-ffn", ftype: Q4_0, args: "--pure --token-embedding-type f16 --output-tensor-type f16 --tensor-type ffn_up=q8_0 --tensor-type ffn_gate=q8_0 --tensor-type ffn_down=q8_0" }
+          - { cell: "12", label: "Qwen3-1.7B--q8_0-attn-q4_0-ffn", ftype: Q4_0, args: "--pure --token-embedding-type f16 --output-tensor-type f16 --tensor-type attn_q=q8_0 --tensor-type attn_k=q8_0 --tensor-type attn_v=q8_0 --tensor-type attn_output=q8_0" }
+    env:
+      MODEL: Qwen/Qwen3-1.7B
+      LABEL: ${{ matrix.label }}
+      FTYPE: ${{ matrix.ftype }}
+      QARGS: ${{ matrix.args }}
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v8
+        with:
+          name: prepare
+          path: prepare
+      - name: Build llama.cpp, install its converter's requirements, download the model
+        run: |
+          mkdir -p out work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          echo "$MODEL--${LABEL#*--}" > out/model.txt
+          curl -sSf "https://huggingface.co/api/models/$MODEL" | jq -r .sha | tee out/model.revision.txt
+          git clone --depth 1 https://github.com/ggml-org/llama.cpp work/llama.cpp
+          git -C work/llama.cpp rev-parse HEAD | tee out/llama.cpp.revision.txt
+          cmake -S work/llama.cpp -B work/build -DCMAKE_BUILD_TYPE=Release -DLLAMA_CURL=OFF -DLLAMA_BUILD_TESTS=OFF
+          /usr/bin/time -v cmake --build work/build --target llama-server llama-quantize -j "$(nproc)" 2> out/build.time
+          python -m pip install --quiet -r work/llama.cpp/requirements/requirements-convert_hf_to_gguf.txt
+          python -m pip freeze > out/versions.txt
+          hf download "$MODEL" --include "*.safetensors" "*.json" "*.txt" "*.model" --local-dir work/model
+          grep -m1 "model name" /proc/cpuinfo | tee out/cpu.txt; free -m; df -h .
+      - id: convert
+        name: "convert_hf_to_gguf: safetensors to a float16 GGUF"
+        continue-on-error: true
+        run: /usr/bin/time -v python work/llama.cpp/convert_hf_to_gguf.py work/model --outfile work/model.gguf --outtype f16 2> out/convert.time
+      - id: quantize
+        name: "llama-quantize: the variant"
+        continue-on-error: true
+        run: |
+          # shellcheck disable=SC2086
+          /usr/bin/time -v work/build/bin/llama-quantize $QARGS work/model.gguf work/variant.gguf "$FTYPE" 2> out/quantize.time | tail -n 40 > out/quantize.log
+          du -b work/model.gguf work/variant.gguf | tee out/sizes.txt
+      - id: types
+        name: "gguf-dump: the variant's tensor types"
+        continue-on-error: true
+        run: |
+          python work/llama.cpp/gguf-py/gguf/scripts/gguf_dump.py --json work/variant.gguf > out/variant.gguf.json
+          jq -c '.tensors | to_entries | map(.value.type) | group_by(.) | map({(.[0] | tostring): length}) | add' out/variant.gguf.json | tee out/tensor-types.json
+      - id: serve
+        name: "llama.cpp: load and serve the variant"
+        continue-on-error: true
+        run: |
+          work/build/bin/llama-server -m work/variant.gguf --host 127.0.0.1 --port 8080 -c 256 > out/server.log 2>&1 &
+          # The server answers 503 while it loads; wait quietly, at most two minutes.
+          for _ in $(seq 120); do curl -sf http://127.0.0.1:8080/health > out/health.json && break; sleep 1; done
+          cat out/health.json
+      - id: answers
+        name: "llama.cpp: the next-token distribution for every prompt"
+        continue-on-error: true
+        run: |
+          SECONDS=0
+          while IFS=$'\t' read -r id prompt; do
+            jq -cn --arg p "$prompt" '{prompt: $p, n_predict: 1, temperature: 0, n_probs: 20, cache_prompt: false}' \
+            | curl -sS http://127.0.0.1:8080/completion -H 'Content-Type: application/json' -d @- \
+            | jq -c --arg id "$id" '{id: $id, probs: (.completion_probabilities[0].top_logprobs | map({token, logprob}))}' \
+            || printf '{"id":"%s","probs":[],"unparsable":true}\n' "$id"
+          done < prepare/prompts.tsv > out/answers.jsonl
+          echo "answers: $(wc -l < out/answers.jsonl) of $(wc -l < prepare/prompts.tsv) prompts in $SECONDS s" | tee out/answers.time
+          grep -h "VmHWM\|VmRSS" "/proc/$(pgrep -n llama-server)/status" | tee out/server.memory
+          { echo "answers=$(wc -l < out/answers.jsonl)"; echo "unparsable=$(grep -c unparsable out/answers.jsonl || true)"; echo "seconds=$SECONDS"; echo "server_vmhwm_kib=$(awk '/VmHWM/{print $2}' out/server.memory)"; } >> "$GITHUB_OUTPUT"
+      - name: What the run used
+        if: always()
+        run: |
+          grep -h "Maximum resident\|Elapsed (wall" out/*.time || true
+          cat out/answers.time out/tensor-types.json || true
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: answers-${{ matrix.cell }}
+          path: out/
+          retention-days: 7
+
+
+  judge:
+    needs: [prepare, quantize]
+    if: always() && needs.prepare.result == 'success'
+    uses: ./.github/workflows/batch-0004-judge.yml
+    with:
+      run_id: ${{ github.run_id }}
