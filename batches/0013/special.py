@@ -24,8 +24,10 @@ import identity
 import forms as F
 import symmetry as S
 import canon as C
+import dead
 
 PARTS = ("residual", "units", "heads", "vo", "qk")
+EVERY = PARTS + ("zsigns",)           # the whole group and the sign of zeros
 M1, M2 = np.uint64(0x9E3779B97F4A7C15), np.uint64(0xBF58476D1CE4E5B9)
 
 
@@ -51,11 +53,13 @@ def n_distinct(a):
 # ---- L0: one matrix --------------------------------------------------------------------------------------------------------
 
 def l0(W):
-    """For the rows and for the columns: how many, how many distinct as vectors, how many distinct by signature (the sorted entries,
-    -0.0 read as 0.0: the order of two zeros that compare equal is not fixed by the sort)."""
+    """For the rows and for the columns: how many, how many distinct as vectors, how many distinct by signature (the sorted entries). -0.0 is read
+    as 0.0 in both (the first run counted vectors bit for bit, so that all-zero rows with different signs of zeros were unlike; the order of two
+    zeros that compare equal is not fixed by a sort)."""
     out = {}
     for name, M in (("rows", W), ("columns", np.ascontiguousarray(W.T))):
-        out[name] = (len(M), n_distinct(M), n_distinct(np.sort(M + M.dtype.type(0), axis=1)))
+        Mz = M + M.dtype.type(0)
+        out[name] = (len(M), n_distinct(Mz), n_distinct(np.sort(Mz, axis=1)))
     return out
 
 
@@ -196,11 +200,14 @@ def canon_cell(P, d, tied, n_all, n_part, seed=13):
     cbase = C.canonical(P, d)
     base = digests(cbase)
     raw = digests(P)
+    zc = [int(np.count_nonzero(v == 0)) for v in P.values()]
     res = {"tensors": len(base), "all_parts": [], "single_parts": {}, "negative_controls": {}, "raw_roots": roots(P), "canonical_roots": roots(cbase),
-           "canonical_form_idempotent": all(np.array_equal(C.canonical(cbase, d)[k], cbase[k]) for k in cbase)}
+           "canonical_form_idempotent": all(C.canonical(cbase, d)[k].tobytes() == cbase[k].tobytes() for k in cbase),
+           "zero_census": {"tensors_with_no_zeros": sum(1 for z in zc if z == 0), "tensors_with_1_to_15_zeros": sum(1 for z in zc if 0 < z < 16),
+                           "tensors_with_16_or_more_zeros": sum(1 for z in zc if z >= 16)}}
     del cbase
     for t in range(n_all):
-        g = S.act(P, d, np.random.default_rng(seed + t), tied)
+        g = S.act(P, d, np.random.default_rng(seed + t), tied, EVERY)
         cg = C.canonical(g, d)
         c = digests(cg)
         gd = digests(g)
@@ -209,7 +216,7 @@ def canon_cell(P, d, tied, n_all, n_part, seed=13):
             row["raw_roots_of_the_image"], row["canonical_roots_of_the_image"] = roots(g), roots(cg)
         res["all_parts"].append(row)
         del cg
-    for part in PARTS + ("units-signed",):
+    for part in PARTS + ("units-signed", "zsigns"):
         rows = []
         for t in range(n_part):
             g = S.act(P, d, np.random.default_rng(seed + 100 + t), tied, (part,))
@@ -247,7 +254,7 @@ def canon_line(r):
             "non-symmetries, tensors that differ": {k: [v["differing"], "layers " + cs(v["layers_touched"])] for k, v in r["negative_controls"].items()},
             "canonical roots of model and of an image equal": r["canonical_roots"] == ap[0]["canonical_roots_of_the_image"],
             "raw roots of model and of an image equal": r["raw_roots"] == ap[0]["raw_roots_of_the_image"], "raw_roots": r["raw_roots"],
-            "canonical_roots": r["canonical_roots"], "idempotent": r["canonical_form_idempotent"]}
+            "canonical_roots": r["canonical_roots"], "idempotent": r["canonical_form_idempotent"], "zero_census": r["zero_census"]}
 
 
 # ---- "sort rows then columns" against the signature procedure, on real matrices -----------------------------------------------
@@ -314,14 +321,116 @@ def function_cell(repo, out_dir):
     ref = run(model, chunks)
     res = {}
     for name, parts in (("identity", ()), ("units-signed", ("units-signed",)), ("vo", ("vo",)), ("qk", ("qk",)), ("units", ("units",)), ("heads", ("heads",)),
-                        ("residual", ("residual",)), ("all", PARTS)):
-        g = S.act(P, d, np.random.default_rng(13), tied, parts) if parts else dict(P)
+                        ("residual", ("residual",)), ("all", PARTS), ("canonical", None)):
+        g = C.canonical(P, d) if parts is None else (S.act(P, d, np.random.default_rng(13), tied, parts) if parts else dict(P))
         res[name] = evaluate(model, {k: v.astype(np.float64) for k, v in g.items()}, "fp32", chunks, ref, 3)
         print(f"function {name:13s} max|d| {res[name]['max_abs']:.3g}  KL {res[name]['mean_kl']:.3g}  top1 {res[name]['top1']:.4f}", flush=True)
     return res
 
 
 # ---- the self-test ---------------------------------------------------------------------------------------------------------------
+
+def toy(tied, nkv):
+    """A random toy Llama in float64 with 6 query heads of 12 dimensions: its parameters as numpy arrays."""
+    from transformers import LlamaConfig, LlamaForCausalLM
+    cfg = LlamaConfig(hidden_size=72, intermediate_size=96, num_hidden_layers=2, num_attention_heads=6, num_key_value_heads=nkv, vocab_size=120,
+                      max_position_embeddings=64, tie_word_embeddings=tied)
+    model = LlamaForCausalLM(cfg).double().eval()
+    return model, F.Dims(model.config), F.params(model)
+
+
+def kill(P, d, what, layer=0):
+    """A copy of P with dead structure in one layer. what: "qk", "vo" or "units", then "both" (the pair is all zero) or "mixed" (only the part the
+    canonical form normalizes by is: the key plane, the value row, the up row)."""
+    R = dict(P)
+    kind, how = what.split("-")
+    hd, h2 = d.hd, d.hd // 2
+
+    def zero(name, index, axis):
+        W = R[F.key(layer, name)].copy()
+        if axis == 0:
+            W[index] = 0
+        else:
+            W[:, index] = 0
+        R[F.key(layer, name)] = W
+    if kind == "qk":
+        for g, p in ((1, 1), (0, 4), (1, 5)):
+            zero(F.K, [g * hd + p, g * hd + p + h2], 0)
+            if how == "both":
+                zero(F.Q, [h * hd + pp for h in range(g * d.rep, (g + 1) * d.rep) for pp in (p, p + h2)], 0)
+    elif kind == "vo":
+        for g, p in ((1, 3), (0, 11), (1, 7)):
+            zero(F.V, [g * hd + p], 0)
+            if how == "both":
+                zero(F.O, [h * hd + p for h in range(g * d.rep, (g + 1) * d.rep)], 1)
+    else:
+        for j in (4, 17, 60):
+            zero(F.U, [j], 0)
+            if how == "both":
+                zero(F.D, [j], 1)
+    return R
+
+
+def selftest_degenerate(check):
+    """Dead pairs, half-dead pairs, zeros in quantity, and the cases in which the canonical form has to refuse."""
+    import torch
+    torch.manual_seed(1)
+    same = lambda A, B: set(A) == set(B) and all(A[k].tobytes() == B[k].tobytes() for k in A)
+
+    def raises(P, d):
+        try:
+            C.canonical(P, d)
+            return False
+        except C.Degenerate:
+            return True
+    for tied in (True, False):
+        for nkv in (3, 6):
+            model, d, P = toy(tied, nkv)
+            ids = torch.randint(0, 120, (3, 12))
+
+            def logits(R):
+                model.load_state_dict({k: torch.from_numpy(v) for k, v in R.items()}, strict=False)
+                with torch.no_grad():
+                    return model(input_ids=ids, use_cache=False).logits
+            tag = f"[{'tied' if tied else 'untied'} head, {d.rep} query head{'s' if d.rep > 1 else ''} per key/value head]"
+            for what in ("qk-both", "vo-both", "units-both", "units-mixed", "qk-mixed", "vo-mixed"):
+                Pd = kill(P, d, what)
+                if what in ("qk-mixed", "vo-mixed") and d.rep > 1:
+                    check(f"{tag} {what}: the canonical form refuses (several partners)", raises(Pd, d))
+                    continue
+                base = C.canonical(Pd, d)
+                images = [S.act(Pd, d, np.random.default_rng(t), tied, EVERY) for t in range(4)]
+                check(f"{tag} {what}: the canonical forms of four random images (the sign of zeros too) are equal bit for bit", all(same(base, C.canonical(g, d)) for g in images))
+                check(f"{tag} {what}: the images differ from the model in bits, so that the check could fail", all(not same(g, Pd) for g in images))
+                diff = float((logits(base) - logits(Pd)).abs().max())
+                check(f"{tag} {what}: the canonical form computes the same function: max |difference of logits| {diff:.3g}", diff < 1e-12)
+            # zeros in quantity, as in the ternary models: the sign of a zero is the only difference
+            r = np.random.default_rng(2)
+            Pz = {k: (v * (r.random(v.shape) > 0.3) if v.ndim == 2 and k != F.EMBED and k != "lm_head.weight" else v) for k, v in P.items()}
+            base = C.canonical(Pz, d)
+            gz = S.act(Pz, d, np.random.default_rng(3), tied, ("zsigns",))
+            check(f"{tag} a third of the weights zero: a random sign on the zeros changes bits and not the canonical form", not same(gz, Pz) and same(C.canonical(gz, d), base))
+            check(f"{tag} a third of the weights zero: four random images of the whole group and the sign of zeros have its canonical form",
+                  all(same(base, C.canonical(S.act(Pz, d, np.random.default_rng(t), tied, EVERY), d)) for t in range(4)))
+            # the hidden coordinates
+            E = P[F.EMBED].copy()
+            E[:, 5] = E[:, 9]
+            Pt = dict(P); Pt[F.EMBED] = E
+            if not tied:
+                Hd = P["lm_head.weight"].copy(); Hd[:, 5] = Hd[:, 9]; Pt["lm_head.weight"] = Hd
+            check(f"{tag} two hidden coordinates with the same embedding (and head) columns: the canonical form refuses", raises(Pt, d))
+            E = P[F.EMBED].copy()
+            E[:, 5] = 0
+            Pe = dict(P); Pe[F.EMBED] = E
+            if tied:
+                check(f"{tag} a hidden coordinate that is zero in the embedding, with a tied head: the canonical form refuses", raises(Pe, d))
+            else:
+                check(f"{tag} a hidden coordinate that is zero in the embedding and not in the head: the head fixes its sign, the canonical form is invariant",
+                      all(same(C.canonical(Pe, d), C.canonical(S.act(Pe, d, np.random.default_rng(t), tied), d)) for t in range(3)))
+                Hd = P["lm_head.weight"].copy(); Hd[:, 5] = 0
+                Pb = dict(Pe); Pb["lm_head.weight"] = Hd
+                check(f"{tag} a hidden coordinate that is zero in the embedding and in the head: the canonical form refuses", raises(Pb, d))
+
 
 def selftest():
     import torch
@@ -359,9 +468,9 @@ def selftest():
         for dt in (np.float64, np.float32):
             Q = {k: v.astype(dt) for k, v in P.items()}
             c0 = C.canonical(Q, d)
-            ok = all(np.array_equal(C.canonical(S.act(Q, d, np.random.default_rng(s), tied), d)[k], c0[k]) for s in range(3) for k in c0)
+            ok = all(C.canonical(S.act(Q, d, np.random.default_rng(s), tied), d)[k].tobytes() == c0[k].tobytes() for s in range(3) for k in c0)
             check(f"[{tag}, {dt.__name__}] the canonical form of three random images of the model is the canonical form of the model, bit for bit", ok)
-            ok = all(np.array_equal(C.canonical(c0, d)[k], c0[k]) for k in c0)
+            ok = all(C.canonical(c0, d)[k].tobytes() == c0[k].tobytes() for k in c0)
             check(f"[{tag}, {dt.__name__}] the canonical form of a canonical form is itself", ok)
         c0 = C.canonical(P, d)
         diff = float((logits(c0) - base).abs().max())
@@ -375,6 +484,7 @@ def selftest():
         r = l1(P, d)
         s = summary_l1(r, d)
         check(f"[{tag}] the special case is found on a random toy: coordinates anchored, every unit told apart ({s})", s["coordinates_anchored"] and s["layers_units_discrete_by_joint_signature"] == d.L)
+    selftest_degenerate(check)
     # colour refinement: a unit that is another unit with its coordinates permuted ties by the joint signature and is told apart by the refinement; a
     # duplicate is never told apart
     r0 = np.random.default_rng(5)
@@ -421,21 +531,32 @@ def main(argv):
         res = {"model": repo, "dims": vars(d), "tied": tied, "tensors": len(P), "config_torch_dtype": cfg.get("torch_dtype")}
         if cmd == "check":
             res["zeros"] = zeros(P)
+            res["dead"] = dead.census(lambda k: P[k], d, "lm_head.weight" in P)
             res["l0"] = l0_model(P, d)
-            r = l1(P, d)
-            res["l1"], res["l1_summary"] = r, summary_l1(r, d)
+            try:
+                r = l1(P, d)
+                res["l1"], res["l1_summary"] = r, summary_l1(r, d)
+            except C.Degenerate as e:
+                res["l1"], res["l1_summary"] = {"raised": str(e)}, {"raised": str(e)}
+                print("the canonical form raised:", e)
         elif cmd == "canon":
             big = d.H * d.F * d.L > 3e7
-            res["canon"] = canon_cell(P, d, tied, 3 if big else 8, 1 if big else 2)
+            try:
+                res["canon"] = canon_cell(P, d, tied, 3 if big else 8, 1 if big else 2)
+            except C.Degenerate as e:
+                res["canon"] = {"raised": str(e)}
+                print("the canonical form raised:", e)
         elif cmd == "naive":
             res["naive"] = naive_cell(P, d)
     res["seconds"] = time.time() - t
     json.dump(res, open(out, "w"), indent=1, sort_keys=True)
     shown = {k: v for k, v in res.items() if k not in ("l1", "canon", "l0")}
     if "canon" in res:
-        shown["canon"] = canon_line(res["canon"])
+        shown["canon"] = canon_line(res["canon"]) if "raised" not in res["canon"] else res["canon"]
     if "l0" in res:
         shown["l0"] = l0_line(res["l0"])
+    if "dead" in res:
+        shown["dead"] = {"embedding": res["dead"]["embedding"], "totals": res["dead"]["totals"]}
     print(json.dumps(shown, indent=1, sort_keys=True)[:6000])
     return 0
 

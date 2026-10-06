@@ -10,6 +10,7 @@
 #   vo         per key/value group and value dimension, a sign and 2^k on the value row, the inverse on the o columns that read it
 #   qk         per group and rotary plane (dimension p and p + hd/2), a sign and 2^k on the key plane, the inverse on the query planes
 # The norm weights' own gauge (a power of two on a norm weight, the inverse on the columns that read it) is not in this file.
+#   zsigns     (added after the first run) the sign bit of zeros: not a symmetry but a bit pattern, a no-op on values
 import numpy as np
 import forms as F
 
@@ -102,6 +103,20 @@ def qk(P, d, rng, kmax=3):
     return R
 
 
+def zsigns(P, d, rng):
+    """The sign bit of a random half of the zeros of every tensor set (-0.0): not a symmetry of anything but a bit pattern, and a no-op on
+    values. The units', value/output and query/key gauges do it as a side effect to the zeros that they negate."""
+    R = dict(P)
+    for k, W in P.items():
+        idx = np.flatnonzero(W == 0)
+        if len(idx):
+            flip = idx[rng.random(len(idx)) < 0.5]
+            W2 = W.copy()
+            W2.reshape(-1)[flip] = W.dtype.type(-0.0)
+            R[k] = W2
+    return R
+
+
 def act(P, d, rng, tied, parts=("residual", "units", "heads", "vo", "qk")):
     """A random element of the group, the parts in this order. "units-signed" is the units' signs and powers of two without the
     permutation (every operation then exact in any arithmetic with a fixed order of sums)."""
@@ -118,4 +133,6 @@ def act(P, d, rng, tied, parts=("residual", "units", "heads", "vo", "qk")):
         R = vo(R, d, rng)
     if "qk" in parts:
         R = qk(R, d, rng)
+    if "zsigns" in parts:
+        R = zsigns(R, d, rng)
     return R
