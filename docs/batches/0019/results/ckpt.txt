@@ -1,0 +1,4 @@
+smol-instruct  dimension of the gauge group   455,040  parameters: header  134,515,008, program  134,515,008, tensors 272 / 272, mismatched 0
+smol-base      dimension of the gauge group   455,040  parameters: header  134,515,008, program  134,515,008, tensors 272 / 272, mismatched 0
+floatlm-99m    dimension of the gauge group   700,672  parameters: header   99,762,688, program   99,762,688, tensors 147 / 147, mismatched 0
+trilm-99m      dimension of the gauge group   700,672  parameters: header   99,762,688, program   99,762,688, tensors 147 / 147, mismatched 0

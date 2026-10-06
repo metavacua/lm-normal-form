@@ -1,0 +1,13 @@
+[transformers] PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+[transformers] Token indices sequence length is longer than the specified maximum sequence length for this model (304986 > 8192). Running this sequence through the model will result in indexing errors
+traced forward equals model.forward: True
+H1: allowed by the derivation True, logits change 2.95e-13, states agreeing 22/22  (10.5s)
+H4: allowed by the derivation True, logits change 4.90e-13, states agreeing 19/19  (10.7s)
+H4t: allowed by the derivation False, logits change 1.02e+02, states agreeing 0/0  (9.4s)
+N1: allowed by the derivation True, logits change 1.47e-13, states agreeing 22/22  (4.2s)
+M1: allowed by the derivation True, logits change 3.57e-13, states agreeing 22/22  (5.5s)
+A1: allowed by the derivation True, logits change 2.01e-13, states agreeing 22/22  (5.1s)
+A3: allowed by the derivation True, logits change 1.88e-13, states agreeing 22/22  (4.3s)
+A6: allowed by the derivation True, logits change 2.18e-13, states agreeing 22/22  (4.5s)
+A4: allowed by the derivation False, logits change 5.05e+01, states agreeing 0/0  (4.0s)
+M2: allowed by the derivation False, logits change 5.73e+01, states agreeing 0/0  (4.2s)
