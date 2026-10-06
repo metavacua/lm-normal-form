@@ -1,0 +1,142 @@
+// SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// From the reified dataflow of a forward pass (ir.py: spaces, tensors and their axes, the roles that each operation requires of the spaces it touches) to
+//   grp_of(S, G)     the largest group of changes of basis that act on the index space S without changing what the program computes: the greatest lower bound, in a lattice of
+//                    groups, of the groups that each operation touching S allows;
+//   sdim, total      the dimension of the continuous part of the gauge group, summed over the spaces (with their copies) and the extras;
+//   expect(Gen, State, Class)   for each test generator Gen (a group element acting on the spaces of some kind), the class of the transformation that each state undergoes
+//                    (invariant, perm, signed_perm, monomial, complex_plane, orthogonal, gl), and allowed(Gen) / bad(Gen): whether the generator is inside the derived group.
+// The library at the top (the lattice of groups, the groups that a role allows, the dimension of each group) is the mathematics that the program takes as given; everything else is
+// computed from the facts. Stratified; the only negation is over relations that are complete when it is evaluated.
+
+.decl space(s:symbol, size:number, copies:number, kind:symbol)
+.input space
+.decl tensor(t:symbol, role:symbol, stype:symbol, layer:number)
+.input tensor
+.decl axis(t:symbol, pos:number, s:symbol)
+.input axis
+.decl cons(op:symbol, s:symbol, role:symbol)
+.input cons
+.decl diag(op:symbol, sin:symbol, sout:symbol)
+.input diag
+.decl op(o:symbol, kind:symbol)
+.input op
+.decl flag(n:symbol, v:number)
+.input flag
+.decl gen_space(g:symbol, kind:symbol, e:symbol)
+.input gen_space
+.decl gen_induced(g:symbol, kind:symbol, c:symbol)
+.input gen_induced
+
+// ---- the library: the lattice of groups of changes of basis ------------------------------------------------------------------------------------------------------------
+// Triv < Perm < SP (signed permutations) < SSP (a scalar times a signed permutation) < Mono (diagonal times permutation) < GL; SP < O < CO (a positive scalar times an
+// orthogonal matrix) < GL; SSP < CO; Triv < Cplx (a complex scalar on every plane of the rotary embedding) < GL.
+.decl elem(g:symbol)
+elem("Triv"). elem("Perm"). elem("SP"). elem("SSP"). elem("O"). elem("CO"). elem("Mono"). elem("Cplx"). elem("GL").
+.decl le0(a:symbol, b:symbol)
+le0("Triv","Perm"). le0("Perm","SP"). le0("SP","SSP"). le0("SP","O"). le0("SP","Mono"). le0("O","CO"). le0("SSP","CO"). le0("SSP","Mono"). le0("Mono","GL"). le0("CO","GL").
+le0("Triv","Cplx"). le0("Cplx","GL").
+.decl le(a:symbol, b:symbol)
+le(a,a) :- elem(a).
+le(a,b) :- le0(a,b).
+le(a,c) :- le(a,b), le0(b,c).
+.decl lb(a:symbol, b:symbol, c:symbol)
+lb(a,b,c) :- elem(a), elem(b), le(c,a), le(c,b).
+.decl above(a:symbol, b:symbol, c:symbol)
+above(a,b,c) :- lb(a,b,c), lb(a,b,d), le(c,d), c != d.
+.decl glb(a:symbol, b:symbol, c:symbol)
+glb(a,b,c) :- lb(a,b,c), !above(a,b,c).
+
+// ---- the library: what a role allows --------------------------------------------------------------------------------------------------------------------------------
+.decl compat(r:symbol, g:symbol)
+compat("lin","GL").          // a space that enters a linear map: any invertible change, compensated in the map
+compat("bilinear","GL").     // a pairing q . k: A on one side, A^-T on the other
+compat("rmsnorm","O").       // the root mean square (epsilon > 0)
+compat("rmsnorm0","CO").     // the root mean square with epsilon = 0: also a positive scale
+compat("rope","Cplx").       // the rotary embedding: what commutes with the rotations of the planes
+compat("nl","Perm").         // an elementwise nonlinearity
+compat("mono","Mono").       // an elementwise product with a linear branch: scalings and permutations
+compat("replica","Perm").    // independent copies of a computation: permutations
+compat("triv","Triv").       // positions and vocabulary
+
+// the diagonal link of a norm weight: if it maps a space to the same space (the tied head reads the stream through the weight), only monomial changes preserve it; if it maps to
+// another space, the changes of the stream are carried to it by conjugation with the weight, and the other space has the independent scalings that change the weight.
+.decl ceff(op:symbol, s:symbol, r:symbol)
+ceff(o,s,r) :- cons(o,s,r).
+ceff(o,s,"mono") :- diag(o,s1,s2), s1 = s2, s = s1.
+ceff(o,s2,"mono") :- diag(o,s1,s2), s1 != s2.
+
+// ---- the derived group of each space -----------------------------------------------------------------------------------------------------------------------------------
+.decl lower(s:symbol, g:symbol)
+lower(s,g) :- ceff(_,s,r), compat(r,g).
+lower(s,g) :- lower(s,g1), ceff(_,s,r), compat(r,g2), glb(g1,g2,g).
+.decl strict(s:symbol, g:symbol)
+strict(s,g) :- lower(s,g), lower(s,h), le(h,g), h != g.
+.decl grp_of(s:symbol, g:symbol)
+grp_of(s,g) :- lower(s,g), !strict(s,g).
+.output grp_of
+
+// ---- the dimension -------------------------------------------------------------------------------------------------------------------------------------------------------
+.decl sdim(s:symbol, d:number)
+sdim(s,d) :- grp_of(s,"GL"), space(s,n,c,_), d = c*n*n.
+sdim(s,d) :- grp_of(s,"O"), space(s,n,c,_), d = c*(n*(n-1)/2).
+sdim(s,d) :- grp_of(s,"CO"), space(s,n,c,_), d = c*(n*(n-1)/2+1).
+sdim(s,d) :- grp_of(s,"Mono"), space(s,n,c,_), d = c*n.
+sdim(s,d) :- grp_of(s,"Cplx"), space(s,n,c,_), d = c*n.
+sdim(s,d) :- grp_of(s,"SSP"), space(s,_,c,_), d = c.
+sdim(s,0) :- grp_of(s,"SP").
+sdim(s,0) :- grp_of(s,"Perm").
+sdim(s,0) :- grp_of(s,"Triv").
+.output sdim
+// the shift of every logit by a vector of the hidden dimension (an untied head only), which log-probabilities do not see
+.decl extra(name:symbol, d:number)
+extra("none", 0).
+extra("logit_shift", d) :- flag("logprobs",1), flag("tied",0), space("res",d,_,_).
+.decl tot1(d:number)
+tot1(t) :- t = sum d : { sdim(s,d) }.
+.decl tot2(d:number)
+tot2(t) :- t = sum e : { extra(n,e) }.
+.decl total(d:number)
+total(a+b) :- tot1(a), tot2(b).
+.output total
+
+// ---- the generators and the states ---------------------------------------------------------------------------------------------------------------------------------------
+.decl class_of(e:symbol, c:symbol)
+class_of("SP","signed_perm"). class_of("O","orthogonal"). class_of("Cplx","complex_plane"). class_of("GL","gl"). class_of("Mono","monomial"). class_of("Perm","perm").
+.decl bad(g:symbol)
+bad(g) :- gen_space(g,k,e), space(s,_,_,k), grp_of(s,h), !le(e,h).
+.decl allowed(g:symbol)
+allowed(g) :- gen_space(g,_,_), !bad(g).
+.output allowed
+.output bad
+.decl moved(g:symbol, st:symbol, c:symbol)
+moved(g,st,c) :- allowed(g), gen_space(g,k,e), space(s,_,_,k), tensor(t,"state",st,_), axis(t,_,s), class_of(e,c).
+// the action that a generator induces on spaces that it does not act on by an element of their own group: a rotation of the stream, carried through a norm weight that is kept, acts on the
+// output of the weight by the conjugate of the rotation with the diagonal matrix of the weight, which is an invertible matrix (gl) and not a member of the group of that space
+moved(g,st,c) :- allowed(g), gen_induced(g,k,c), space(s,_,_,k), tensor(t,"state",st,_), axis(t,_,s).
+.decl moved_any(g:symbol, st:symbol)
+moved_any(g,st) :- moved(g,st,_).
+.decl state_type(st:symbol)
+state_type(st) :- tensor(_,"state",st,_).
+.decl expect(g:symbol, st:symbol, c:symbol)
+expect(g,st,c) :- moved(g,st,c).
+expect(g,st,"invariant") :- allowed(g), state_type(st), !moved_any(g,st).
+.output expect
+
+// ---- checks of the program and of the library (all must be empty) --------------------------------------------------------------------------------------------------------------
+.decl has_glb(a:symbol, b:symbol)
+has_glb(a,b) :- glb(a,b,_).
+.decl no_glb(a:symbol, b:symbol)
+no_glb(a,b) :- elem(a), elem(b), !has_glb(a,b).
+.decl many_glb(a:symbol, b:symbol)
+many_glb(a,b) :- glb(a,b,c), glb(a,b,d), c != d.
+.decl has_group(s:symbol)
+has_group(s) :- grp_of(s,_).
+.decl ungrouped(s:symbol)
+ungrouped(s) :- space(s,_,_,_), !has_group(s).
+.decl two_groups(s:symbol)
+two_groups(s) :- grp_of(s,g), grp_of(s,h), g != h.
+.output no_glb
+.output many_glb
+.output ungrouped
+.output two_groups

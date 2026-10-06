@@ -1,0 +1,135 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0019: which states move under the symmetries of a Transformer: the residual stream, the KV cache and the rest, derived by a Datalog program (Souffle) from the reified
+# architecture and measured on the weights. Written down in docs/batches/0019.md.
+#
+# derive  on every push: the library checks, the dimension of the gauge group of the seven configurations of batch 0015, the toy models (derived table against measured table), and
+#         the four pinned checkpoints read from their published metadata (config and safetensors header; no weights).
+# real    only for a commit whose message contains [run]: SmolLM2-135M-Instruct, derived table against measured table, three layers, two windows of WikiText-2.
+name: batch 0019
+
+on:
+  push:
+    branches: ["batch/0019-**"]
+    paths: [".github/workflows/batch-0019.yml", "batches/0019/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-0019-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  SOUFFLE_VERSION: "2.5"
+
+jobs:
+  derive:
+    name: "01 the derivation, the toy models, the checkpoints' metadata"
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Souffle, the release package of its own project, its hash checked
+        run: |
+          mkdir -p out/derive
+          f="x86_64-ubuntu-2204-souffle-$SOUFFLE_VERSION-Linux.deb"
+          curl -sSL -o "$f" "https://github.com/souffle-lang/souffle/releases/download/$SOUFFLE_VERSION/$f"
+          curl -sSL -o sha512sum.txt "https://github.com/souffle-lang/souffle/releases/download/$SOUFFLE_VERSION/sha512sum.txt"
+          grep -F "$f" sha512sum.txt | tee out/derive/souffle-sha512.txt
+          grep -F "$f" sha512sum.txt | sha512sum -c -
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq "./$f"
+          souffle --version | tee out/derive/souffle-version.txt
+      - name: Python packages
+        run: |
+          python -m pip install --quiet numpy huggingface_hub safetensors ml_dtypes
+          python -m pip freeze > out/derive/versions.txt
+          grep -m1 'model name' /proc/cpuinfo | tee out/derive/cpu.txt
+      - id: dims
+        name: the dimension of the gauge group, derived, of the seven configurations
+        continue-on-error: true
+        run: python batches/0019/derive.py --json out/derive/dims.json 2>&1 | grep -v '^Warning\|^tot[12]\|^---' | tee out/derive/dims.txt
+      - id: toy
+        name: the four toy models, the table derived and measured
+        continue-on-error: true
+        run: python batches/0019/measure.py toy out/derive/toy.json 2>&1 | grep -v '^Warning\|^tot[12]\|^---' | tee out/derive/toy.txt
+      - id: ckpt
+        name: four checkpoints from their published metadata
+        continue-on-error: true
+        run: python batches/0019/checkpoints.py out/derive/ckpt.json 2>&1 | grep -v '^Warning\|^tot[12]\|^---' | tee out/derive/ckpt.txt
+      - name: Outcomes
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" > out/derive/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: states-derive
+          path: out/derive/
+          retention-days: 14
+      - name: Every cell must have passed
+        if: always()
+        run: jq -e '[to_entries[] | select(.value.outcome == "failure")] | length == 0' out/derive/outcomes.json
+
+  real:
+    name: "02 SmolLM2-135M-Instruct: derived table against measured table"
+    needs: derive
+    if: contains(github.event.head_commit.message, '[run]')
+    runs-on: ubuntu-22.04
+    timeout-minutes: 240
+    env:
+      INSTRUCT: HuggingFaceTB/SmolLM2-135M-Instruct
+      INSTRUCT_REV: 12fd25f77366fa6b3b4b768ec3050bf629380bac
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Souffle
+        run: |
+          mkdir -p out/real
+          f="x86_64-ubuntu-2204-souffle-$SOUFFLE_VERSION-Linux.deb"
+          curl -sSL -o "$f" "https://github.com/souffle-lang/souffle/releases/download/$SOUFFLE_VERSION/$f"
+          curl -sSL -o sha512sum.txt "https://github.com/souffle-lang/souffle/releases/download/$SOUFFLE_VERSION/sha512sum.txt"
+          grep -F "$f" sha512sum.txt | sha512sum -c -
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq "./$f"
+          souffle --version | tee out/real/souffle-version.txt
+      - name: Python packages and the model
+        run: |
+          python -m pip install --quiet numpy scipy huggingface_hub safetensors ml_dtypes pandas pyarrow transformers
+          python -m pip freeze > out/real/versions.txt
+          grep -m1 'model name' /proc/cpuinfo | tee out/real/cpu.txt
+          echo "INSTRUCT_DIR=$(python -c "from huggingface_hub import snapshot_download as s; print(s('$INSTRUCT', revision='$INSTRUCT_REV', allow_patterns=['*.json','*.txt','model.safetensors']))")" >> "$GITHUB_ENV"
+      - id: measure
+        name: the table, derived and measured, on the weights
+        continue-on-error: true
+        run: python batches/0019/measure.py real "$INSTRUCT_DIR" out/real/real.json 2>&1 | grep -v '^Warning\|^tot[12]\|^---' | tee out/real/real.txt
+      - name: Outcomes
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" > out/real/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: states-real
+          path: out/real/
+          retention-days: 14
+      - name: Every cell must have passed
+        if: always()
+        run: jq -e '[to_entries[] | select(.value.outcome == "failure")] | length == 0' out/real/outcomes.json
