@@ -74,9 +74,10 @@ def change(m, spec):
     return m
 
 
-def first_line(text, n=300):
-    lines = [x for x in str(text).strip().splitlines() if x.strip()]
-    return (lines[-1] if lines else "").replace("\t", " ")[:n]
+def error_text(text, n=3000):
+    """The whole of an error on one line, but for ONNX Runtime's own warnings: the fragments of a prediction can be anywhere in it."""
+    keep = [x for x in str(text).splitlines() if x.strip() and "[W:onnxruntime" not in x]
+    return " ".join(" ".join(keep).split())[:n]
 
 
 def run_ort(path, outdir, level, ids, env):
@@ -86,7 +87,7 @@ def run_ort(path, outdir, level, ids, env):
         e[env.split("=")[0]] = env.split("=", 1)[1]
     t = time.time()
     r = subprocess.run([sys.executable, LOGITS, path, outdir, level] + ids, capture_output=True, text=True, env=e, timeout=900)
-    return r.returncode, first_line(r.stderr), time.time() - t
+    return r.returncode, error_text(r.stderr), time.time() - t
 
 
 def compare(base, other, vocab, n):
@@ -133,7 +134,7 @@ def main(model, work, predictions, prefix, ids_file, vocab, only):
             m = change(m, row["mutation"])
             obs["converted"] = "yes" if "convert=" in row["mutation"] else ""
         except Exception as e:
-            obs.update(checker="convert-fail", checker_text=first_line(f"{type(e).__name__}: {e}"), ort="na")
+            obs.update(checker="convert-fail", checker_text=error_text(f"{type(e).__name__}: {e}"), ort="na")
         if obs["checker"] == "":
             path = f"{work}/row.onnx"
             onnx.save(m, path)
@@ -141,7 +142,7 @@ def main(model, work, predictions, prefix, ids_file, vocab, only):
                 onnx.checker.check_model(path)
                 obs["checker"] = "accept"
             except Exception as e:
-                obs["checker"], obs["checker_text"] = "refuse", first_line(f"{type(e).__name__}: {e}")
+                obs["checker"], obs["checker_text"] = "refuse", error_text(f"{type(e).__name__}: {e}")
             code, err, _ = run_ort(path, f"{work}/row", row["level"], ids, row["env"])
             if code:
                 obs["ort"], obs["ort_text"] = "refuse", err

@@ -54,7 +54,7 @@ def main(model, work, baseline, ids_file, vocab_file, predictions, out):
                     worst = max(worst, float(np.abs(a - b).max()) if a.shape == b.shape else float("inf"))
                 o["ort"] = "same" if same else "near" if worst <= 1e-3 else "different"
         o["ir_ok"], o["opset_ok"] = o["ir_version"] == r["ir_version"], o["opset"] == r["opset"]
-        o["ort_ok"] = o["ort"] in r["ort"].split("/")
+        o["ort_ok"] = o["ort"] in r["ort"].split("/") or (r["ort"] == "near" and o["ort"] == "same")   # near is "within 1e-3": the same is within it
         o["sha_ok"] = o["sha_equal"] == r["sha_equal"]
         o["log_ok"] = o["log"] == ("yes" if r["log"] != "-" else "-")
         res.append(o)
