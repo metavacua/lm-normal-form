@@ -6,9 +6,10 @@
 # or this file change, against the run named in RUN_ID, so that a question can
 # be asked again without reading the models again.
 #
-# The run's artifacts are the raw data: Wikidata's answer, the countries, the
-# prompts and each model's answers. Their RDF forms are derived here, by the
-# jq files in batches/0004/, so that a change to them needs no new run. The
+# The run's artifacts are the raw data: Wikidata's answer, the prompts as
+# read, and each model's answers. Countries, prompts and their RDF forms are
+# derived here again by the jq files in batches/0004/, so that a change to
+# them needs no new run; the prompts derived must equal the prompts read. The
 # authority, the prompts and every model's answers are loaded into Oxigraph,
 # each in its own named graph, and the questions in queries/0004/ are asked
 # over their union.
@@ -26,7 +27,7 @@ on:
     paths:
       - ".github/workflows/batch-0004-judge.yml"
       - "queries/0004/**"
-      - "batches/0004/*-to-nt.jq"
+      - "batches/0004/*.jq"
 
 permissions:
   contents: read
@@ -70,8 +71,12 @@ jobs:
           python -m pip install --quiet oxigraph
           oxigraph --version | tee out/oxigraph.version
           echo "$RUN_ID" > out/run-id.txt
-          jq -r -f batches/0004/authority-to-nt.jq prepare/countries.json > work/authority.nt
-          jq -r -f batches/0004/prompts-to-nt.jq prepare/prompts.json > work/prompts.nt
+          jq -f batches/0004/countries.jq prepare/wikidata.json > work/countries.json
+          jq -r --rawfile inv batches/0004/invented.txt -f batches/0004/prompts.jq work/countries.json > work/prompts.json
+          # The prompts judged must be the prompts the models read.
+          jq -r '.[] | [.id, .prompt] | @tsv' work/prompts.json | cmp - prepare/prompts.tsv
+          jq -r -f batches/0004/authority-to-nt.jq work/countries.json > work/authority.nt
+          jq -r -f batches/0004/prompts-to-nt.jq work/prompts.json > work/prompts.nt
           oxigraph load --location work/store --file work/authority.nt --graph urn:lmnf:b4:g:authority
           oxigraph load --location work/store --file work/prompts.nt --graph urn:lmnf:b4:g:prompts
           for dir in answers/answers-*; do
