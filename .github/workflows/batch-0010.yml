@@ -1,0 +1,292 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0010: the Rust that burn-onnx generates from an ONNX graph of SmolLM2-135M-Instruct,
+# built, run, and compared with ONNX Runtime on the same graph. Written down in
+# docs/batches/0010.md.
+#
+# onnx  two models (a tiny random Llama first, as the smoke; SmolLM2-135M-Instruct) exported
+#       by Optimum, the graphs written as text, and ONNX Runtime's logits with and without
+#       graph optimization
+# burn  onnx2burn built from burn-onnx's default branch, run on both graphs, the generated
+#       Rust built with Burn's flex backend and run, and the logits compared; the published
+#       graph offered to onnx2burn to see where it stops
+name: batch 0010
+
+on:
+  push:
+    branches: ["batch/0010-**"]
+    paths: [".github/workflows/batch-0010.yml", "batches/0010/**"]
+  workflow_dispatch:
+    inputs:
+      burn_onnx_rev:
+        description: "burn-onnx commit to build (empty: the head of its default branch)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: batch-0010-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  # The token ids of each prompt in batches/0010/prompts.txt, one line per prompt, comma separated.
+  TOKENS: >-
+    import sys,transformers as t;k=t.AutoTokenizer.from_pretrained(sys.argv[1]);
+    [print(','.join(map(str,k(l.rstrip('\n')).input_ids)))for l in open(sys.argv[2])]
+  # The control for compare.py: the same logits with one value moved by 0.5.
+  PERTURB: >-
+    import numpy as np,shutil,sys;shutil.copytree(sys.argv[1],sys.argv[2]);f=sys.argv[2]+'/0.f32';
+    x=np.fromfile(f,'float32');x[0]+=0.5;x.tofile(f)
+
+jobs:
+  onnx:
+    name: "01 the ONNX graph and ONNX Runtime"
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { tag: tiny, model: "hf-internal-testing/tiny-random-LlamaForCausalLM" }
+          - { tag: smol, model: "HuggingFaceTB/SmolLM2-135M-Instruct" }
+    env:
+      MODEL: ${{ matrix.model }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p out work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet "optimum[onnxruntime]" numpy
+          python -m pip freeze > out/versions.txt
+          wc -c batches/0010/*.py batches/0010/burn.sh batches/0010/runner/src/main.rs batches/0010/runner/Cargo.toml | tee out/code-sizes.txt
+          curl -sS "https://huggingface.co/api/models/$MODEL" | jq -r .sha | tee out/revision.txt
+      - id: export
+        name: "optimum-cli: export to ONNX, without past"
+        continue-on-error: true
+        run: |
+          /usr/bin/time -v optimum-cli export onnx --model "$MODEL" --task text-generation work/onnx 2> out/export.time | tail -n 5 | tee out/export.log
+          du -b work/onnx/* | tee out/onnx-files.txt
+          sha256sum work/onnx/model.onnx | tee out/model.sha256
+          jq -r .vocab_size work/onnx/config.json | tee out/vocab.txt
+          awk '/Maximum resident/{print "peak_kb="$NF}' out/export.time | tee -a "$GITHUB_OUTPUT"
+      - id: check
+        name: "onnx: the checker on the exported graph"
+        continue-on-error: true
+        run: python -c "import onnx,sys;onnx.checker.check_model(sys.argv[1]);print('ok')" work/onnx/model.onnx | tee out/check.txt
+      - id: nodes
+        name: "the graph as text: opsets, inputs, outputs, operators, one row per node"
+        continue-on-error: true
+        run: |
+          python batches/0010/nodes.py work/onnx/model.onnx out/nodes.tsv | tee out/graph.txt
+          python -c "import onnx,sys;print(','.join(i.name for i in onnx.load(sys.argv[1],load_external_data=False).graph.input))" work/onnx/model.onnx | tee out/input-order.txt
+      - id: tokens
+        name: "the token ids of the prompts, by the model's own tokenizer"
+        continue-on-error: true
+        run: python -c "$TOKENS" "$MODEL" batches/0010/prompts.txt | tee out/ids.txt
+      - id: ort_all
+        name: "ONNX Runtime, default graph optimization: the logits of every position"
+        continue-on-error: true
+        run: |
+          mkdir -p out/ort-all
+          mapfile -t ids < out/ids.txt
+          /usr/bin/time -v python batches/0010/logits.py work/onnx/model.onnx out/ort-all all "${ids[@]}" 2> out/ort-all.time | tee out/ort-all.txt
+          awk '/Maximum resident/{print "peak_kb="$NF}' out/ort-all.time | tee -a "$GITHUB_OUTPUT"
+      - id: ort_none
+        name: "ONNX Runtime, no graph optimization: every node as the graph states it"
+        continue-on-error: true
+        run: |
+          mkdir -p out/ort-none
+          mapfile -t ids < out/ids.txt
+          /usr/bin/time -v python batches/0010/logits.py work/onnx/model.onnx out/ort-none none "${ids[@]}" 2> out/ort-none.time | tee out/ort-none.txt
+          awk '/Maximum resident/{print "peak_kb="$NF}' out/ort-none.time | tee -a "$GITHUB_OUTPUT"
+      - id: control
+        name: "compare.py on logits with one value moved by 0.5, which it must report"
+        continue-on-error: true
+        run: |
+          rm -rf work/perturbed
+          python -c "$PERTURB" out/ort-all work/perturbed
+          python batches/0010/compare.py out/ort-all work/perturbed "$(cat out/vocab.txt)" | tee out/control.txt
+      - id: optimization
+        name: "the two ONNX Runtime readings compared"
+        continue-on-error: true
+        run: python batches/0010/compare.py out/ort-all out/ort-none "$(cat out/vocab.txt)" | tee out/ort-all-vs-none.txt
+      - name: What the run used
+        if: always()
+        run: grep -h "Maximum resident\|Elapsed (wall" out/*.time || true
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: onnx-side-${{ matrix.tag }}
+          path: out/
+          retention-days: 7
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: onnx-graph-${{ matrix.tag }}
+          path: work/onnx/model.onnx
+          retention-days: 1
+
+  burn:
+    name: "02 the Rust Burn generates, built and run"
+    needs: onnx
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      CARGO_INCREMENTAL: "0"
+      CARGO_TERM_COLOR: never
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p out work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet numpy
+          df -h / | tee out/disk-before.txt
+          # Room for two builds of Burn and a 540 MB graph: remove what the image carries and this job does not use.
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/share/boost
+          df -h / | tee out/disk-cleared.txt
+          rustup toolchain install stable --profile minimal --no-self-update
+          rustup default stable
+          { rustc -V; cargo -V; } | tee out/rust.version
+          nproc | tee out/nproc.txt
+          grep -m1 'model name' /proc/cpuinfo | tee out/cpu.txt
+          free -g | tee out/memory.txt
+      - uses: actions/download-artifact@v8
+        with:
+          name: onnx-graph-tiny
+          path: work/graph/tiny
+      - uses: actions/download-artifact@v8
+        with:
+          name: onnx-graph-smol
+          path: work/graph/smol
+      - uses: actions/download-artifact@v8
+        with:
+          name: onnx-side-tiny
+          path: work/side/tiny
+      - uses: actions/download-artifact@v8
+        with:
+          name: onnx-side-smol
+          path: work/side/smol
+      - id: tool
+        name: "cargo: onnx2burn, built from burn-onnx's default branch"
+        continue-on-error: true
+        env:
+          REV: ${{ inputs.burn_onnx_rev }}
+        run: |
+          git clone --quiet https://github.com/tracel-ai/burn-onnx work/burn-onnx
+          if [ -n "$REV" ]; then git -C work/burn-onnx checkout --quiet "$REV"; fi
+          git -C work/burn-onnx rev-parse HEAD | tee out/burn-onnx.rev
+          grep -m1 -o 'rev = "[0-9a-f]\{40\}"' work/burn-onnx/Cargo.toml | grep -o '[0-9a-f]\{40\}' | tee work/burn.rev out/burn.rev
+          cd work/burn-onnx
+          /usr/bin/time -v cargo build --release --locked -p burn-onnx --bin onnx2burn > ../../out/onnx2burn-build.log 2>&1 || rc=$?
+          tail -n 12 ../../out/onnx2burn-build.log
+          awk '/Maximum resident/{print "peak_kb="$NF} /Elapsed \(wall/{print "elapsed="$NF}' ../../out/onnx2burn-build.log | tee -a "$GITHUB_OUTPUT"
+          exit "${rc:-0}"
+      - id: tiny_codegen
+        name: "onnx2burn on the tiny graph"
+        if: steps.tool.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0010/burn.sh codegen tiny
+      - id: tiny_compile
+        name: "cargo: the generated Rust and its runner, built"
+        if: steps.tiny_codegen.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0010/burn.sh compile tiny
+      - id: tiny_run
+        name: "the tiny model's logits from the Rust"
+        if: steps.tiny_compile.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0010/burn.sh run tiny
+      - id: tiny_compare
+        name: "the tiny model's logits, Rust against ONNX Runtime"
+        if: steps.tiny_run.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0010/burn.sh compare tiny
+      - id: smol_codegen
+        name: "onnx2burn on the SmolLM2-135M-Instruct graph"
+        if: steps.tiny_run.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0010/burn.sh codegen smol
+      - id: smol_compile
+        name: "cargo: the generated Rust and its runner, built"
+        if: steps.smol_codegen.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0010/burn.sh compile smol
+      - id: smol_run
+        name: "SmolLM2-135M-Instruct's logits from the Rust"
+        if: steps.smol_compile.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0010/burn.sh run smol
+      - id: smol_compare
+        name: "SmolLM2-135M-Instruct's logits, Rust against ONNX Runtime"
+        if: steps.smol_run.outcome == 'success'
+        continue-on-error: true
+        run: bash batches/0010/burn.sh compare smol
+      - id: published
+        name: "onnx2burn on the published onnx/model.onnx, which declares com.microsoft operators"
+        if: steps.tool.outcome == 'success'
+        continue-on-error: true
+        run: |
+          curl -sSfL -o work/published.onnx "https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct/resolve/main/onnx/model.onnx"
+          sha256sum work/published.onnx | tee out/published.sha256
+          mkdir -p work/gen/published
+          rc=0
+          timeout 900 /usr/bin/time -v work/burn-onnx/target/release/onnx2burn work/published.onnx work/gen/published > out/published.log 2>&1 || rc=$?
+          tail -n 30 out/published.log
+          exit "$rc"
+      - name: Disk after
+        if: always()
+        run: df -h / | tee out/disk-after.txt
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: burn-out
+          path: out/
+          retention-days: 7
+
+  report:
+    # A commit status named after the batch, so that the pull request's checks tab shows the batch run
+    # itself and not only the lint that carries the pull request's title.
+    name: report the batch run on the commit
+    needs: [onnx, burn]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RESULTS: ${{ toJSON(needs) }}
+    steps:
+      - run: |
+          state=success; echo "$RESULTS" | jq -e '[.[] | .result] | all(. == "success")' > /dev/null || state=failure
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -f state="$state" -f context="batch 0010" \
+            -f description="$(echo "$RESULTS" | jq -r 'to_entries | map("\(.key) \(.value.result)") | join(", ")' | cut -c1-140)" \
+            -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" > /dev/null

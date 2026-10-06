@@ -1,0 +1,119 @@
+# Layer 0 of SmolLM2-135M-Instruct, ONNX node to generated Rust statement, by align.py. Run 37462129427.
+# Columns: index in the ONNX file, operator, name burn-onnx gave the node, the statement. Shape arithmetic (Shape, Gather, Unsqueeze, Concat on shapes) and Constant nodes are left out.
+
+## scope ^/model/layers\.0/input_layernorm/
+  112 Cast             cast13         (no statement: removed or folded)
+  114 Pow              pow1           let pow1_out1 = gather1_out1 .clone() .powf((constant311_out1).unsqueeze_dims(&[0isize, 1isize]));
+  116 ReduceMean       reducemean1    let reducemean1_out1 = { pow1_out1.mean_dim(2usize) };
+  118 Add              add2           let add2_out1 = reducemean1_out1 .add((constant313_out1).unsqueeze_dims(&[0isize, 1isize]));
+  119 Sqrt             sqrt1          let sqrt1_out1 = add2_out1.sqrt();
+  121 Div              div1           let div1_out1 = (constant314_out1) .unsqueeze_dims(&[0isize, 1isize]) .div(sqrt1_out1);
+  122 Mul              mul6           let mul6_out1 = gather1_out1.clone().mul(div1_out1);
+  123 Cast             cast14         (no statement: removed or folded)
+  124 Mul              mul7           let mul7_out1 = (constant2_out1) .unsqueeze_dims(&[0isize, 1isize]) .mul(mul6_out1);
+
+## scope ^/model/layers\.0/self_attn/
+  131 MatMul           linear1        let linear1_out1 = self.linear1.forward(mul7_out1.clone());
+  138 Concat           concat5        let concat5_out1: [i64; 4usize] = [ &unsqueeze15_out1[..], &unsqueeze16_out1[..], &constant319_out1[..], &constant320_out1[..], ] .concat() .try_into() .unwrap();
+  145 Concat           concat6        let concat6_out1: [i64; 4usize] = [ &unsqueeze17_out1[..], &unsqueeze18_out1[..], &constant323_out1[..], &constant324_out1[..], ] .concat() .try_into() .unwrap();
+  152 Concat           concat7        let concat7_out1: [i64; 4usize] = [ &unsqueeze19_out1[..], &unsqueeze20_out1[..], &constant327_out1[..], &constant328_out1[..], ] .concat() .try_into() .unwrap();
+  153 Reshape          reshape5       let reshape5_out1 = linear1_out1.reshape(concat5_out1);
+  154 Transpose        transpose2     let transpose2_out1 = reshape5_out1.permute([0, 2, 1, 3]);
+  155 MatMul           linear2        let linear2_out1 = self.linear2.forward(mul7_out1.clone());
+  156 Reshape          reshape6       let reshape6_out1 = linear2_out1.reshape(concat6_out1);
+  157 Transpose        transpose3     let transpose3_out1 = reshape6_out1.permute([0, 2, 1, 3]);
+  158 MatMul           linear3        let linear3_out1 = self.linear3.forward(mul7_out1);
+  159 Reshape          reshape7       let reshape7_out1 = linear3_out1.reshape(concat7_out1);
+  160 Transpose        transpose4     let transpose4_out1 = reshape7_out1.permute([0, 2, 1, 3]);
+  165 Mul              mul8           let mul8_out1 = transpose2_out1.clone().mul(unsqueeze21_out1.clone());
+  170 Div              div2           let div2_out1 = gather10_out1 / constant332_out1;
+  171 Cast             cast15         (no statement: removed or folded)
+  172 Cast             cast16         (no statement: removed or folded)
+  178 Slice            slice1         let slice1_out1 = transpose2_out1 .clone() .slice(s![.., .., .., 0..unsqueeze23_out1[0]]);
+  184 Slice            slice2         let slice2_out1 = transpose2_out1 .slice(s![.., .., .., unsqueeze24_out1[0]..9223372036854775807]);
+  185 Neg              neg1           let neg1_out1 = slice2_out1.neg();
+  186 Concat           concat8        let concat8_out1 = burn::tensor::Tensor::cat([neg1_out1, slice1_out1].into(), 3);
+  187 Mul              mul9           let mul9_out1 = concat8_out1.mul(unsqueeze22_out1.clone());
+  188 Add              add3           let add3_out1 = mul8_out1.add(mul9_out1);
+  189 Mul              mul10          let mul10_out1 = transpose3_out1.clone().mul(unsqueeze21_out1.clone());
+  194 Div              div3           let div3_out1 = gather11_out1 / constant342_out1;
+  195 Cast             cast17         (no statement: removed or folded)
+  196 Cast             cast18         (no statement: removed or folded)
+  202 Slice            slice3         let slice3_out1 = transpose3_out1 .clone() .slice(s![.., .., .., 0..unsqueeze25_out1[0]]);
+  208 Slice            slice4         let slice4_out1 = transpose3_out1 .slice(s![.., .., .., unsqueeze26_out1[0]..9223372036854775807]);
+  209 Neg              neg2           let neg2_out1 = slice4_out1.neg();
+  210 Concat           concat9        let concat9_out1 = burn::tensor::Tensor::cat([neg2_out1, slice3_out1].into(), 3);
+  211 Mul              mul11          let mul11_out1 = concat9_out1.mul(unsqueeze22_out1.clone());
+  212 Add              add4           let add4_out1 = mul10_out1.add(mul11_out1);
+  236 Concat           concat10       let concat10_out1: [i64; 5usize] = [ &unsqueeze28_out1[..], &unsqueeze29_out1[..], &constant358_out1[..], &unsqueeze30_out1[..], &unsqueeze31_out1[..], ] .concat() .try_into() .unwrap();
+  238 Reshape          reshape8       let reshape8_out1 = concat10_out1;
+  240 ConstantOfShape  constantofshape4 let constantofshape4_out1 = Tensor::< 1, Int, >::from_data( burn::tensor::TensorData::from([1i64 as i64]), (&self.device, burn::tensor::DType::I64), ) .reshape([1]) .expand(shape17_out1);
+  242 Mul              mul12          let mul12_out1 = constantofshape4_out1.clone().mul(constant362_out1);
+  243 Equal            equal3         let equal3_out1 = Tensor::< 1, burn::tensor::Int, >::from_data( burn::tensor::TensorData::from(&reshape8_out1 as &[i64]), (&self.device, burn::tensor::DType::I64), ) .equal(mul12_out1);
+  244 Where            where3         let where3_out1 = Tensor::< 1, burn::tensor::Int, >::from_data( burn::tensor::TensorData::from(&reshape8_out1 as &[i64]), (&self.device, burn::tensor::DType::I64), ) .mask_where(equal3_out1, constantofshape4_out1);
+  245 Expand           expand3        let expand3_out1 = { let onnx_shape: [i64; 5usize] = TryInto::< [i64; 5usize], >::try_into(where3_out1.to_data().convert::<i64>().as_slice().unwrap()) .unwrap();
+  247 Mul              mul13          let mul13_out1 = gather13_out1 * constant363_out1;
+  256 Concat           concat11       let concat11_out1: [i64; 4usize] = [ &unsqueeze32_out1[..], &unsqueeze33_out1[..], &unsqueeze34_out1[..], &unsqueeze35_out1[..], ] .concat() .try_into() .unwrap();
+  257 Reshape          reshape9       let reshape9_out1 = expand3_out1.reshape(concat11_out1);
+  281 Concat           concat12       let concat12_out1: [i64; 5usize] = [ &unsqueeze37_out1[..], &unsqueeze38_out1[..], &constant375_out1[..], &unsqueeze39_out1[..], &unsqueeze40_out1[..], ] .concat() .try_into() .unwrap();
+  283 Reshape          reshape10      let reshape10_out1 = concat12_out1;
+  285 ConstantOfShape  constantofshape5 let constantofshape5_out1 = Tensor::< 1, Int, >::from_data( burn::tensor::TensorData::from([1i64 as i64]), (&self.device, burn::tensor::DType::I64), ) .reshape([1]) .expand(shape22_out1);
+  287 Mul              mul14          let mul14_out1 = constantofshape5_out1.clone().mul(constant379_out1);
+  288 Equal            equal4         let equal4_out1 = Tensor::< 1, burn::tensor::Int, >::from_data( burn::tensor::TensorData::from(&reshape10_out1 as &[i64]), (&self.device, burn::tensor::DType::I64), ) .equal(mul14_out1);
+  289 Where            where4         let where4_out1 = Tensor::< 1, burn::tensor::Int, >::from_data( burn::tensor::TensorData::from(&reshape10_out1 as &[i64]), (&self.device, burn::tensor::DType::I64), ) .mask_where(equal4_out1, constantofshape5_out1);
+  290 Expand           expand4        let expand4_out1 = { let onnx_shape: [i64; 5usize] = TryInto::< [i64; 5usize], >::try_into(where4_out1.to_data().convert::<i64>().as_slice().unwrap()) .unwrap();
+  292 Mul              mul15          let mul15_out1 = gather17_out1 * constant380_out1;
+  301 Concat           concat13       let concat13_out1: [i64; 4usize] = [ &unsqueeze41_out1[..], &unsqueeze42_out1[..], &unsqueeze43_out1[..], &unsqueeze44_out1[..], ] .concat() .try_into() .unwrap();
+  302 Reshape          reshape11      let reshape11_out1 = expand4_out1.reshape(concat13_out1);
+  311 Slice            slice5         let slice5_out1 = expand1_out1.slice(s![.., .., .., 0..unsqueeze45_out1[0]]);
+  312 Transpose        transpose5     let transpose5_out1 = reshape9_out1.permute([0, 1, 3, 2]);
+  314 Mul              mul16          let mul16_out1 = add3_out1 .mul((constant390_out1).unsqueeze_dims(&[0isize, 1isize, 2isize]));
+  316 Mul              mul17          let mul17_out1 = transpose5_out1 .mul((constant391_out1).unsqueeze_dims(&[0isize, 1isize, 2isize]));
+  317 MatMul           matmul5        let matmul5_out1 = mul16_out1.matmul(mul17_out1);
+  320 Where            where5         let where5_out1 = constant393_out1 .unsqueeze_dims(&[0isize, 1isize, 2isize]) .mask_where( slice5_out1, constant392_out1.unsqueeze_dims(&[0isize, 1isize, 2isize]), );
+  321 Add              add5           let add5_out1 = matmul5_out1.add(where5_out1);
+  322 Softmax          softmax1       let softmax1_out1 = burn::tensor::activation::softmax(add5_out1, 3);
+  323 IsNaN            isnan1         let isnan1_out1 = softmax1_out1.clone().is_nan();
+  325 Where            where6         let where6_out1 = softmax1_out1 .mask_where( isnan1_out1, constant394_out1.unsqueeze_dims(&[0isize, 1isize, 2isize]), );
+  326 MatMul           matmul6        let matmul6_out1 = where6_out1.matmul(reshape11_out1);
+  327 Transpose        transpose6     let transpose6_out1 = matmul6_out1.permute([0, 2, 1, 3]);
+  333 Concat           concat14       let concat14_out1: [i64; 3usize] = [ &unsqueeze46_out1[..], &unsqueeze47_out1[..], &constant397_out1[..], ] .concat() .try_into() .unwrap();
+  334 Reshape          reshape12      let reshape12_out1 = transpose6_out1.reshape(concat14_out1);
+  335 MatMul           linear4        let linear4_out1 = self.linear4.forward(reshape12_out1);
+
+## scope ^/model/layers\.0/post_attention_layernorm/
+  337 Cast             cast19         (no statement: removed or folded)
+  339 Pow              pow2           let pow2_out1 = add6_out1 .clone() .powf((constant398_out1).unsqueeze_dims(&[0isize, 1isize]));
+  341 ReduceMean       reducemean2    let reducemean2_out1 = { pow2_out1.mean_dim(2usize) };
+  343 Add              add7           let add7_out1 = reducemean2_out1 .add((constant400_out1).unsqueeze_dims(&[0isize, 1isize]));
+  344 Sqrt             sqrt2          let sqrt2_out1 = add7_out1.sqrt();
+  346 Div              div4           let div4_out1 = (constant401_out1) .unsqueeze_dims(&[0isize, 1isize]) .div(sqrt2_out1);
+  347 Mul              mul18          let mul18_out1 = add6_out1.clone().mul(div4_out1);
+  348 Cast             cast20         (no statement: removed or folded)
+  349 Mul              mul19          let mul19_out1 = (constant3_out1) .unsqueeze_dims(&[0isize, 1isize]) .mul(mul18_out1);
+
+## scope ^/model/layers\.0/mlp/
+  350 MatMul           linear5        let linear5_out1 = self.linear5.forward(mul19_out1.clone());
+  351 Sigmoid          sigmoid1       let sigmoid1_out1 = burn::tensor::activation::sigmoid(linear5_out1.clone());
+  352 Mul              mul20          let mul20_out1 = linear5_out1.mul(sigmoid1_out1);
+  353 MatMul           linear6        let linear6_out1 = self.linear6.forward(mul19_out1);
+  354 Mul              mul21          let mul21_out1 = mul20_out1.mul(linear6_out1);
+  355 MatMul           linear7        let linear7_out1 = self.linear7.forward(mul21_out1);
+
+## scope ^/model/layers\.0/(Add|Add_1)$
+  336 Add              add6           let add6_out1 = gather1_out1.add(linear4_out1);
+  356 Add              add8           let add8_out1 = add6_out1.add(linear7_out1);
+
+## scope ^/model/norm/
+ 7346 Cast             cast253        (no statement: removed or folded)
+ 7348 Pow              pow61          let pow61_out1 = add211_out1 .clone() .powf((constant2983_out1).unsqueeze_dims(&[0isize, 1isize]));
+ 7350 ReduceMean       reducemean61   let reducemean61_out1 = { pow61_out1.mean_dim(2usize) };
+ 7352 Add              add212         let add212_out1 = reducemean61_out1 .add((constant2985_out1).unsqueeze_dims(&[0isize, 1isize]));
+ 7353 Sqrt             sqrt61         let sqrt61_out1 = add212_out1.sqrt();
+ 7355 Div              div121         let div121_out1 = (constant2986_out1) .unsqueeze_dims(&[0isize, 1isize]) .div(sqrt61_out1);
+ 7356 Mul              mul486         let mul486_out1 = add211_out1.mul(div121_out1);
+ 7357 Cast             cast254        (no statement: removed or folded)
+ 7358 Mul              mul487         let mul487_out1 = (constant62_out1) .unsqueeze_dims(&[0isize, 1isize]) .mul(mul486_out1);
+
+## scope ^/lm_head/
+ 7359 MatMul           linear211      let linear211_out1 = self .submodule32 .forward( add207_out1, transpose149_out1, expand1_out1, add206_out1, gather385_out1, gather386_out1, add204_out1, );

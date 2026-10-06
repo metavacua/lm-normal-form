@@ -1,0 +1,23 @@
+# Rust (Burn) against ONNX Runtime, logits of every position. Run 37462129427 (2026-10-06).
+# columns: prompt file, [positions, vocab], largest and mean absolute logit difference, positions with the same argmax,
+# whether the five most probable next tokens are the same ids in the same order, largest difference of their probabilities.
+
+## SmolLM2-135M-Instruct, against ONNX Runtime with graph optimization on
+0.f32 (5, 49152) max 4.124641418457031e-05 mean 7.331685537792509e-06 argmax equal 5 of 5 top5 same order True max dp 8.096158378712026e-07
+1.f32 (1, 49152) max 5.9604644775390625e-05 mean 1.0432242561364546e-05 argmax equal 1 of 1 top5 same order True max dp 7.008901834956727e-07
+2.f32 (17, 49152) max 5.435943603515625e-05 mean 8.813225576886907e-06 argmax equal 17 of 17 top5 same order True max dp 9.740466764274203e-07
+
+## SmolLM2-135M-Instruct, against ONNX Runtime with graph optimization off
+0.f32 (5, 49152) max 7.677078247070312e-05 mean 1.5230323697323911e-05 argmax equal 5 of 5 top5 same order True max dp 9.074745819237506e-07
+1.f32 (1, 49152) max 5.626678466796875e-05 mean 1.040968345478177e-05 argmax equal 1 of 1 top5 same order True max dp 5.75081830343771e-07
+2.f32 (17, 49152) max 6.866455078125e-05 mean 9.079994924832135e-06 argmax equal 17 of 17 top5 same order True max dp 1.143354460331203e-06
+
+## tiny random Llama, against ONNX Runtime with graph optimization on
+0.f32 (6, 32000) max 7.450580596923828e-08 mean 4.24048218761186e-09 argmax equal 6 of 6 top5 same order True max dp 1.2828790493021186e-12
+1.f32 (2, 32000) max 5.960464477539063e-08 mean 4.361165206745454e-09 argmax equal 2 of 2 top5 same order True max dp 1.2329889442341119e-12
+2.f32 (21, 32000) max 8.940696716308594e-08 mean 5.523657087280753e-09 argmax equal 21 of 21 top5 same order True max dp 2.523782405121095e-12
+
+## tiny random Llama, against ONNX Runtime with graph optimization off
+0.f32 (6, 32000) max 7.450580596923828e-08 mean 3.8785370470861835e-09 argmax equal 6 of 6 top5 same order True max dp 1.2829342555214888e-12
+1.f32 (2, 32000) max 7.450580596923828e-08 mean 6.8482646220502374e-09 argmax equal 2 of 2 top5 same order True max dp 1.2314599413441006e-12
+2.f32 (21, 32000) max 8.940696716308594e-08 mean 5.550586656966061e-09 argmax equal 21 of 21 top5 same order True max dp 2.5226909184652632e-12

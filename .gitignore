@@ -8,3 +8,4 @@ out/
 *.safetensors
 *.nq
 *.nq.gz
+target/

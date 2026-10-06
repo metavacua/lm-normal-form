@@ -1,0 +1,76 @@
+# The Rust Burn generated, read by tally.sh. Run 37462129427.
+## SmolLM2-135M-Instruct
+bytes 793128  lines 19581
+structs: Submodule1 Submodule2 Submodule3 Submodule4 Submodule5 Submodule6 Submodule7 Submodule8 Submodule9 Submodule10 Submodule11 Submodule12 Submodule13 Submodule14 Submodule15 Submodule16 Submodule17 Submodule18 Submodule19 Submodule20 Submodule21 Submodule22 Submodule23 Submodule24 Submodule25 Submodule26 Submodule27 Submodule28 Submodule29 Submodule30 Submodule31 Submodule32 Model
+forward definitions: 33   let statements: 4800
+--- outermost method, by count
+    458 val
+    425 mul
+    243 forward
+    212 add
+    211 init
+    182 reshape
+    151 permute
+    150 slice
+    124 mask_where
+     62 expand
+     62 equal
+     62 dims
+     61 sqrt
+     61 powf
+     61 matmul
+     61 div
+     60 neg
+     30 is_nan
+      2 lower_elem
+      1 sin
+      1 lower_equal
+      1 cos
+      1 cast
+      1 bool_and
+      1 bool
+--- infix operators: let out = a OP b;
+2 +
+0 -
+60 *
+60 /
+--- fused attention calls: 0
+--- Linear fields: 211   Param fields: 916
+
+## tiny random Llama
+bytes 51344  lines 1316
+structs: Submodule1 Submodule2 Submodule3 Submodule4 Model
+forward definitions: 5   let statements: 294
+--- outermost method, by count
+     29 val
+     24 mul
+     19 forward
+     16 add
+     15 init
+     11 permute
+     10 slice
+     10 reshape
+      8 mask_where
+      5 sqrt
+      5 powf
+      5 matmul
+      5 div
+      4 neg
+      2 lower_elem
+      2 is_nan
+      2 expand
+      2 equal
+      2 dims
+      1 sin
+      1 lower_equal
+      1 cos
+      1 cast
+      1 bool_and
+      1 bool
+--- infix operators: let out = a OP b;
+2 +
+0 -
+0 *
+4 /
+--- fused attention calls: 0
+--- Linear fields: 15   Param fields: 58

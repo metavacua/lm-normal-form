@@ -1,0 +1,27 @@
+# What ran. Run 37462129427, 2026-10-06.
+## Rust and runner
+rustc 1.99.0 (b940084d7 2026-09-28)
+cargo 1.99.0 (5f94df478 2026-08-27)
+burn-onnx 1c6cdef7107d26231350c2644ecf12dc99e75bff
+Burn      00a9db74c0f3aa99a775d5c5235eaf8034cded26
+model name	: AMD EPYC 9V74 80-Core Processor
+vCPUs 4
+## Python side
+numpy==2.5.3
+onnx==1.23.2
+onnxruntime==1.30.0
+optimum==2.1.0
+optimum-onnx==0.1.0
+torch==2.14.1+cpu
+transformers==4.57.6
+## model revisions and graph hashes
+SmolLM2-135M-Instruct 12fd25f77366fa6b3b4b768ec3050bf629380bac  graph 7583ca8fdc74af2ca98fb5cc254ea305f840ec3a2a1998c4be1f7c9a35a9df47
+tiny random Llama     9fb191250dd56d0ba7ec9785a025ed29c03d5998  graph c777e479c9c071dfe82e412540d15107cbf2c8aabb096d8fcd27adad260cbccd
+## time and peak memory
+tool	{"elapsed":"2:34.03","peak_kb":"899128"}
+tiny_codegen	{"codegen_elapsed":"0:00.33","codegen_peak_kb":"30524"}
+tiny_compile	{"compile_elapsed":"1:31.83","compile_peak_kb":"1041728"}
+tiny_run	{"run_elapsed":"0:00.00","run_peak_kb":"15280"}
+smol_codegen	{"codegen_elapsed":"0:43.23","codegen_peak_kb":"3335832"}
+smol_compile	{"compile_elapsed":"0:07.80","compile_peak_kb":"642240"}
+smol_run	{"run_elapsed":"0:00.39","run_peak_kb":"651788"}

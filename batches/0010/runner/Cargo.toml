@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# The program that runs the Rust burn-onnx generated from an ONNX graph. src/model.rs is not in
+# the repository: batches/0010/burn.sh copies the generated file there and writes, in place of
+# @BURN_REV@, the Burn revision that burn-onnx's own workspace is built against.
+[package]
+name = "runner"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[dependencies]
+burn = { git = "https://github.com/tracel-ai/burn", rev = "@BURN_REV@", default-features = false, features = ["std", "flex"] }
+burn-store = { git = "https://github.com/tracel-ai/burn", rev = "@BURN_REV@", default-features = false, features = ["std"] }
