@@ -1,0 +1,41 @@
+id	mutation	level	env	checker	checker_text	ort	ort_text	max_abs_diff	converted
+A1	ir=13	all	-	accept		same		0	
+A1b	ir=9	all	-	accept		same		0	
+A2	ir=14	all	-	accept		refuse	onnxruntime.capi.onnxruntime_pybind11_state.Fail: [ONNXRuntimeError] : 1 : FAIL : Load model from /home/runner/work/lm-normal-form/lm-normal-form/work/smol/matrix/row.onnx failed:/onnxruntime_src/onnxruntime/core/graph/model.cc:202 onnxruntime::Model::Model(onnx::ModelProto&&, const onnxruntime::Pat		
+A3	ir=15	all	-	refuse	ValidationError: Your model ir_version 15 is higher than the checker's (14).	refuse	onnxruntime.capi.onnxruntime_pybind11_state.Fail: [ONNXRuntimeError] : 1 : FAIL : Load model from /home/runner/work/lm-normal-form/lm-normal-form/work/smol/matrix/row.onnx failed:/onnxruntime_src/onnxruntime/core/graph/model.cc:202 onnxruntime::Model::Model(onnx::ModelProto&&, const onnxruntime::Pat		
+A4	ir=clear	all	-	refuse	ValidationError: The model does not have an ir_version set properly.	refuse	onnxruntime.capi.onnxruntime_pybind11_state.Fail: [ONNXRuntimeError] : 1 : FAIL : Load model from /home/runner/work/lm-normal-form/lm-normal-form/work/smol/matrix/row.onnx failed:/onnxruntime_src/onnxruntime/core/graph/model.cc:197 onnxruntime::Model::Model(onnx::ModelProto&&, const onnxruntime::Pat		
+A5	ir=0	all	-	refuse	ValidationError: The model does not have an ir_version set properly.	same		0	
+A6	ir=3	all	-	refuse	ValidationError: model.embed_tokens.weight in initializer but not in graph input	same		0	
+A7	ir=7	all	-	accept		same		0	
+B1	imports=|17	all	-	refuse	==> Context: Bad node spec for node. Name: /model/layers.0/input_layernorm/ReduceMean OpType: ReduceMean	refuse	"onnxruntime.capi.onnxruntime_pybind11_state.InvalidGraph: [ONNXRuntimeError] : 10 : INVALID_GRAPH : Load model from /home/runner/work/lm-normal-form/lm-normal-form/work/smol/matrix/row.onnx failed:This is an invalid model. In Node, (""/model/layers.0/input_layernorm/ReduceMean"", ReduceMean, """", -1) :"		
+B2	imports=|13	all	-	refuse	==> Context: Bad node spec for node. Name: /model/Reshape OpType: Reshape	refuse	"onnxruntime.capi.onnxruntime_pybind11_state.InvalidGraph: [ONNXRuntimeError] : 10 : INVALID_GRAPH : Load model from /home/runner/work/lm-normal-form/lm-normal-form/work/smol/matrix/row.onnx failed:This is an invalid model. In Node, (""/model/layers.0/input_layernorm/ReduceMean"", ReduceMean, """", -1) :"		
+B3	imports=|12	all	-	refuse	==> Context: Bad node spec for node. Name: /model/Unsqueeze OpType: Unsqueeze	refuse	"onnxruntime.capi.onnxruntime_pybind11_state.InvalidGraph: [ONNXRuntimeError] : 10 : INVALID_GRAPH : Load model from /home/runner/work/lm-normal-form/lm-normal-form/work/smol/matrix/row.onnx failed:This is an invalid model. In Node, (""/model/rotary_emb/Unsqueeze_1"", Unsqueeze, """", -1) : (""position_id"		
+B4a	imports=|19	all	-	accept		same		0	
+B4b	imports=|19	none	-	accept		same		0	
+B4c	imports=|26	all	-	accept		same		0	
+B4d	imports=|26	none	-	accept		same		0	
+B5	imports=|27	all	-	accept		refuse	onnxruntime.capi.onnxruntime_pybind11_state.Fail: [ONNXRuntimeError] : 1 : FAIL : Load model from /home/runner/work/lm-normal-form/lm-normal-form/work/smol/matrix/row.onnx failed:/onnxruntime_src/onnxruntime/core/graph/model_load_utils.h:46 void onnxruntime::model_load_utils::ValidateOpsetForDomain(		
+B5e	imports=|27	all	ALLOW_RELEASED_ONNX_OPSET_ONLY=0	accept		same		0	
+B6	imports=|28	all	-	accept		refuse	onnxruntime.capi.onnxruntime_pybind11_state.Fail: [ONNXRuntimeError] : 1 : FAIL : Load model from /home/runner/work/lm-normal-form/lm-normal-form/work/smol/matrix/row.onnx failed:/onnxruntime_src/onnxruntime/core/graph/model_load_utils.h:46 void onnxruntime::model_load_utils::ValidateOpsetForDomain(		
+B6e	imports=|28	all	ALLOW_RELEASED_ONNX_OPSET_ONLY=0	accept		refuse	"onnxruntime.capi.onnxruntime_pybind11_state.InvalidGraph: [ONNXRuntimeError] : 10 : INVALID_GRAPH : Load model from /home/runner/work/lm-normal-form/lm-normal-form/work/smol/matrix/row.onnx failed:This is an invalid model. In Node, (""/model/embed_tokens/Gather"", Gather, """", -1) : (""model.embed_token"		
+B7	imports=|100	all	-	accept		refuse	onnxruntime.capi.onnxruntime_pybind11_state.Fail: [ONNXRuntimeError] : 1 : FAIL : Load model from /home/runner/work/lm-normal-form/lm-normal-form/work/smol/matrix/row.onnx failed:/onnxruntime_src/onnxruntime/core/graph/model_load_utils.h:46 void onnxruntime::model_load_utils::ValidateOpsetForDomain(		
+B8	imports=|4294967314	all	-	refuse	ValidationError: Opset import version 4294967314 is out of supported range	same		0	
+B9	imports=com.example|1	all	-	refuse	==> Context: Bad node spec for node. Name: /model/embed_tokens/Gather OpType: Gather	same		0	
+B10	imports=	all	-	refuse	ValidationError: model with IR version >= 3 must specify opset_import for ONNX	refuse	onnxruntime.capi.onnxruntime_pybind11_state.Fail: [ONNXRuntimeError] : 1 : FAIL : Load model from /home/runner/work/lm-normal-form/lm-normal-form/work/smol/matrix/row.onnx failed:/onnxruntime_src/onnxruntime/core/graph/model.cc:191 onnxruntime::Model::Model(onnx::ModelProto&&, const onnxruntime::Pat		
+B11	imports=|18,ai.onnx|17	all	-	accept		refuse	"onnxruntime.capi.onnxruntime_pybind11_state.InvalidGraph: [ONNXRuntimeError] : 10 : INVALID_GRAPH : Load model from /home/runner/work/lm-normal-form/lm-normal-form/work/smol/matrix/row.onnx failed:This is an invalid model. In Node, (""/model/layers.0/input_layernorm/ReduceMean"", ReduceMean, """", -1) :"		
+B12	imports=|17,|18	all	-	accept		same		0	
+B13	imports=ai.onnx|18	all	-	accept		same		0	
+B14	imports=ai.onnx|99	all	-	accept		refuse	"onnxruntime.capi.onnxruntime_pybind11_state.InvalidGraph: [ONNXRuntimeError] : 10 : INVALID_GRAPH : Load model from /home/runner/work/lm-normal-form/lm-normal-form/work/smol/matrix/row.onnx failed:This is an invalid model. In Node, (""/model/embed_tokens/Gather"", Gather, """", -1) : (""model.embed_token"		
+B14b	imports=ai.onnx|27	all	-	accept		same		0	
+B15	addimport=ai.onnx.ml|99	all	-	accept		refuse	onnxruntime.capi.onnxruntime_pybind11_state.Fail: [ONNXRuntimeError] : 1 : FAIL : Load model from /home/runner/work/lm-normal-form/lm-normal-form/work/smol/matrix/row.onnx failed:/onnxruntime_src/onnxruntime/core/graph/model_load_utils.h:46 void onnxruntime::model_load_utils::ValidateOpsetForDomain(		
+C1	meta=inert	all	-	accept		same		0	
+C2	meta=dup	all	-	refuse	ValidationError: Your model has duplicate keys in metadata_props.	same		0	
+C3	unknown=field	all	-	accept		same		0	
+C4	nodedomain=ai.onnx	all	-	refuse	==> Context: Bad node spec for node. Name: /model/embed_tokens/Gather OpType: Gather	same		0	
+C5	dupinit	all	-	refuse	ValidationError: model.embed_tokens.weight initializer name is not unique	same		0	
+D1	convert=17	all	-	accept		same		0	yes
+D2	convert=16	all	-	accept		same		0	yes
+D3	convert=14	all	-	convert-fail	RuntimeError: /project/onnx/version_converter/BaseConverter.h:66: adapter_lookup: Assertion `false` failed: No Adapter From Version $15 for Shape	na			
+D4	convert=19	all	-	accept		same		0	yes
+D4b	convert=28	all	-	accept		refuse	onnxruntime.capi.onnxruntime_pybind11_state.Fail: [ONNXRuntimeError] : 1 : FAIL : Load model from /home/runner/work/lm-normal-form/lm-normal-form/work/smol/matrix/row.onnx failed:/onnxruntime_src/onnxruntime/core/graph/model_load_utils.h:46 void onnxruntime::model_load_utils::ValidateOpsetForDomain(		yes
+D5	convert=29	all	-	convert-fail	RuntimeError: /project/onnx/version_converter/convert.h:96: assertInVersionRange: Assertion `version >= version_range.first && version <= version_range.second` failed: Warning: invalid version (must be between 1 and 28)	na			
