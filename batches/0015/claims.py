@@ -532,7 +532,18 @@ MODES = {"poly": lambda t: __import__("ops").FieldOps(rope_seed=1234 + t),
          "float": lambda t: __import__("ops").FloatOps(eps=0.0)}
 
 
+def export_tsv(path):
+    """The registry of the claims: id, family, expected outcome, scope, statement, source."""
+    with open(path, "w") as out:
+        out.write("id\tfamily\texpected\tscope\tstatement\tsource\n")
+        for c in CLAIMS:
+            out.write("\t".join([c.id, c.family, "holds" if c.expect else "fails", json.dumps(c.scope) if c.scope else "-", c.text, c.source or "-"]) + "\n")
+
+
 def main(argv):
+    if argv[1] == "tsv":
+        export_tsv(argv[2])
+        return 0
     mode, trials = argv[1], int(argv[2])
     out = argv[3] if len(argv) > 3 else None
     make_ops = MODES[mode]

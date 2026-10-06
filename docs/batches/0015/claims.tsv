@@ -1,0 +1,47 @@
+id	family	expected	scope	statement	source
+T1	T	holds	{"pos": "none", "causal": false}	Without a causal mask and without positional information, f(x o pi) = f(x) o pi: the Transformer is permutation equivariant in its tokens.	pasted 1: 'a vanilla Transformer encoder is fundamentally permutation equivariant'
+T2	T	fails	{"pos": "none", "causal": true}	With a causal mask and no positional information, token permutation equivariance fails.	pasted 1, applied to a decoder
+T3	T	fails	{"pos": "rope", "causal": false}	With rotary positional embeddings and no mask, token permutation equivariance fails.	pasted 1, applied to RoPE
+T4	T	fails	{"pos": "rope", "causal": true}	With a causal mask and rotary positional embeddings (a Llama-style decoder), token permutation equivariance fails.	pasted 1, applied to the models of this repository
+T5	T	holds	{"pos": "none", "causal": true, "n_layers": 1}	A causal decoder without positional information and with ONE layer: the logits at the last position are invariant under permutations of the earlier tokens.	derived: what survives of T2
+T6	T	fails	{"pos": "none", "causal": true, "n_layers": 2}	The same with TWO layers: the invariance of T5 fails (the second layer reads the first layer's prefix-dependent states).	derived: the depth at which T5 stops
+H1	H	holds	-	A signed permutation of the hidden coordinates, applied to every matrix that reads or writes the residual stream (embedding and head included) and to the norm weights, leaves f unchanged.	pasted 1 ('the exact same transformation to the weight matrices'), stated correctly
+H1t	H	holds	{"tied": true}	H1 with the head tied to the embedding.	pasted 1, SmolLM2-style
+H2	H	fails	{"n_heads": 2, "n_kv": 2, "hd": 4}	The rule as pasted, W_new = P W P^T, applied to the square weight matrices (here q and o) and nothing else, does not leave f unchanged.	pasted 1: 'W_new = P_C W P_C^T'
+H3	H	fails	-	A signed permutation of the hidden coordinates applied to the layers and the final norm but not to the embedding and the head ('encrypting the body') changes f.	pasted 1: 'applying a secret permutation matrix to an LLM's weights ... the model becomes entirely broken'
+H3k	H	holds	-	Applying the permutation of H3 to the embedding and the head as well (the key) restores f exactly: f(body-only permuted, then keyed) = f.	pasted 1: 'an authorized user who possesses the permutation key ... perfectly decrypting'
+H4	H	holds	-	With the norm weights folded into the matrices that read them (the head made its own matrix), any orthogonal Q applied to the residual stream leaves f unchanged.	derived: 'computational invariance' (SliceGPT), pasted 4 (change of basis)
+H4c	H	holds	-	In the unfolded parameterization (norm weights kept), with an untied head, an orthogonal Q applied to the stream with the readers conjugated, W -> W diag(gamma) Q diag(gamma)^-1, leaves f unchanged.	derived: the action of fold, rotate, unfold; found independently in the research notes
+H6c	H	fails	{"tied": true}	The conjugated action of H4c on a model with a tied head and a learned final norm weight changes f.	derived: what the tie takes away from H4c
+H5	H	fails	-	Without the fold, a general orthogonal Q applied to the stream changes f.	derived: the necessity of the fold in H4
+H6	H	fails	{"tied": true}	With a tied head and a final norm weight that is not 1, an orthogonal Q applied to the stream (the tied head following) changes f: the final norm cannot be folded without untying.	derived: what the tie takes away from H4
+H6o	H	holds	{"tied": true}	With a tied head and a final norm weight equal to 1 (and the layer norms folded), an orthogonal Q applied to the stream leaves f unchanged.	derived: H6 with the obstruction removed
+H7	H	fails	{"norm": "ln"}	With LayerNorm (the mean subtracted), an orthogonal Q applied to the stream (norms folded) changes f unless Q fixes the all-ones vector.	derived: the stabilizer of the mean direction (SliceGPT converts LayerNorm to RMSNorm first)
+H7f	H	holds	{"norm": "ln"}	With LayerNorm, an orthogonal Q that fixes the all-ones vector (norms folded) leaves f unchanged.	derived: H7 restricted to the stabilizer of the all-ones vector
+A1	A	holds	-	Per key/value group, wv -> A wv and the group's o columns -> o A^-1, A in GL(hd), leaves f unchanged (the gauge of the value/output circuit).	derived: pasted 2 (W_OV); the product W_O W_V is gauge invariant
+A2	A	fails	-	The same A applied to wv alone changes f.	derived: the necessity of the compensation in A1
+A3	A	holds	-	With RoPE, per group and rotary plane, k -> M k and q -> M^-T q with M = [[a, -b], [b, a]] (a complex scalar) leaves f unchanged (the gauge of the query/key circuit).	derived: pasted 2 (W_QK); the commutant of the rotations
+A4	A	fails	-	With RoPE, k -> A k and q -> A^-T q with A a general element of GL(hd) changes f.	derived: pasted 2 ('W_Q W_K as a static operator') fails under RoPE
+A5	A	holds	{"pos": "none"}	Without positional information, k -> A k and q -> A^-T q with A in GL(hd) leaves f unchanged.	derived: A4 without RoPE
+A6	A	holds	-	A permutation of the key/value groups and of the query heads inside each group (with the matching permutation of the o columns) leaves f unchanged.	derived
+A7	A	fails	{"n_heads": 4, "n_kv": 2}	A permutation of the query heads (and the o columns) that moves a head to another key/value group, the key and value matrices staying, changes f.	derived: the group structure of A6 is necessary
+M1	M	holds	-	A permutation of the hidden units of the gated block, and a nonzero scale c on each up row with 1/c on the matching down column, leaves f unchanged.	derived
+M2	M	fails	-	A scale on the gate rows (with the down columns compensating) changes f: the gate nonlinearity is not homogeneous.	derived: the limit of M1
+N1	N	holds	-	A scale c_i on a norm weight and 1/c_i on column i of every matrix that reads it leaves f unchanged (the fold of H4 is the case c = 1/gamma).	derived
+N2	N	holds	-	Folding every norm weight into the matrices that read it (RMSNorm or LayerNorm) leaves f unchanged.	derived
+C1	C	holds	-	The composition of the symmetries H1, A1, A3, A6, M1 and N1, with random elements, leaves f unchanged.	derived: the group generated by the exact symmetries
+H8	H	fails	-	With RMSNorm, subtracting from every embedding row its mean (what the fuse_layer_norms of QuaRot and SpinQuant do for every model type), the head kept, changes f.	derived: a published code practice; the all-ones component of the stream is part of the RMS
+H8n	H	holds	{"norm": "ln"}	With LayerNorm (the mean subtracted), subtracting from every embedding row its mean leaves f unchanged.	derived: the case in which the centering of H8 is exact
+K1	K	holds	-	The KV cache is unchanged by a signed permutation of the hidden coordinates (H1).	derived: the cache is a function of the normalized input and the input projections
+K1t	K	holds	{"tied": true}	K1 with the head tied to the embedding.	derived
+K2	K	holds	-	The KV cache is unchanged by an orthogonal Q applied to the stream with the norm weights folded (H4).	derived: computational invariance does not touch the cache
+K3	K	holds	-	The KV cache is unchanged by the gauge of the feed-forward units (M1).	derived
+K3n	K	holds	-	The KV cache is unchanged by the gauge of the norm weights (N1).	derived
+K4	K	holds	-	A permutation of the key/value groups (A6) permutes the groups of the KV cache: the new group g holds the old group gp[g].	derived
+K4n	K	fails	-	The KV cache is not unchanged by a non-trivial permutation of the key/value groups.	derived: the necessity of the permutation in K4
+K5	K	holds	-	Under the value/output gauge (A1) the keys are unchanged and the values of group g are mapped by A_g: v -> A_g v.	derived
+K5n	K	fails	-	The KV cache is not unchanged by the value/output gauge: the values move.	derived: what the gauge freedom costs a cache
+K6	K	holds	-	Under the query/key gauge of RoPE (A3) the values are unchanged and each key plane of the cache is mapped by its complex scalar: (x1, x2) -> (a x1 - b x2, b x1 + a x2).	derived: a complex scalar commutes with the rotation by position, so the stored (rotated) key is mapped by the same scalar
+K6n	K	fails	-	The KV cache is not unchanged by the query/key gauge of RoPE: the keys move.	derived
+K8	K	fails	-	The cache of the model with the permuted body and the unpermuted embedding ('encrypting the body', H3) is not the original's: the body reads coordinates that the embedding does not write.	pasted 1, applied to the cache
+K9	K	holds	-	The cache of the model with the permuted body and the key applied at the interface (H3k) is the original's: the cache is in the public gauge, so a permutation of the hidden dimension hides nothing in it.	pasted 1 ('perfectly decrypting'), applied to the cache; the weights are permuted, what the model computes with is not

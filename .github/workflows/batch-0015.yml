@@ -1,0 +1,163 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0015: the algebra of a Transformer, claim by claim. Written down in docs/batches/0015.md.
+#
+# exact   on every push: the claims of batches/0015/claims.py in three arithmetics (polynomial surrogates over F_p, random oracles over F_p, float64), the degree bounds, the
+#         dimension of the continuous symmetry group by the rank of the Jacobian; and the real-model scripts on the 4 MB random Llama (no claim, they test the scripts).
+# lm      only for a commit whose message contains [run]: the real checkpoints: conformance of the formal forward pass with Transformers, token permutations, the gauges,
+#         the obfuscation scheme and its attacks.
+name: batch 0015
+
+on:
+  push:
+    branches: ["batch/0015-**"]
+    paths: [".github/workflows/batch-0015.yml", "batches/0015/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-0015-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  LMNF_THREADS: "4"
+
+jobs:
+  exact:
+    name: "01 the exact tier, and the scripts on the tiny random Llama"
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      TINY: hf-internal-testing/tiny-random-LlamaForCausalLM
+      TINY_REV: 9fb191250dd56d0ba7ec9785a025ed29c03d5998
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p out/exact
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers numpy scipy safetensors huggingface_hub ml_dtypes pandas pyarrow
+          python -m pip freeze > out/exact/versions.txt
+          grep -m1 'model name' /proc/cpuinfo | tee out/exact/cpu.txt
+      - id: claims
+        name: the claims, in the three arithmetics
+        continue-on-error: true
+        run: |
+          cd batches/0015
+          python claims.py poly 6 ../../out/exact/claims-poly.json | tee ../../out/exact/claims-poly.txt | tail -n 3
+          python claims.py oracle 4 ../../out/exact/claims-oracle.json | tee ../../out/exact/claims-oracle.txt | tail -n 3
+          python claims.py float 6 ../../out/exact/claims-float.json | tee ../../out/exact/claims-float.txt | tail -n 3
+      - id: degrees
+        name: the degree bounds
+        continue-on-error: true
+        run: |
+          cd batches/0015
+          python degree.py poly | tee ../../out/exact/degrees-poly.txt | tail -n 2
+          python degree.py oracle | tee ../../out/exact/degrees-oracle.txt | tail -n 2
+      - id: symdim
+        name: the dimension of the continuous symmetry group, by the rank of the Jacobian
+        continue-on-error: true
+        run: |
+          cd batches/0015
+          python symdim.py ../../out/exact/symdim.json untied-eps0-logits untied-eps0-logprobs untied-eps-logits tied-eps0-logits tied-eps-logits mha-untied-eps0-logits nope-untied-eps0-logits | tee ../../out/exact/symdim.txt
+      - id: optim
+        name: training dynamics under the symmetries, a tiny Llama trained in float64
+        continue-on-error: true
+        run: |
+          cd batches/0015
+          python lm_optim.py ../../out/exact/optim.json | tee ../../out/exact/optim.txt
+      - id: tiny
+        name: the scripts on the tiny random Llama
+        continue-on-error: true
+        run: |
+          cd batches/0015
+          export HF_REVISION="$TINY_REV"
+          d=$(python -c "from huggingface_hub import snapshot_download as s; print(s('$TINY', revision='$TINY_REV', allow_patterns=['*.json','*.model','model.safetensors']))")
+          python conform.py "$d" ../../out/exact/conform-tiny.json
+          LMNF_WORK=../../work-gauge python lm_gauge.py "$d" ../../out/exact/gauge-tiny.json
+          LMNF_WORK=../../work-obf python lm_obfuscation.py "$d" "$d" ../../out/exact/obfuscation-tiny.json 20
+      - name: Outcomes
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" > out/exact/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: algebra-exact
+          path: out/exact/
+          retention-days: 14
+      - name: Every cell must have passed
+        if: always()
+        run: jq -e '[to_entries[] | select(.value.outcome == "failure")] | length == 0' out/exact/outcomes.json
+
+  lm:
+    name: "02 the real checkpoints: SmolLM2-135M-Instruct, SmolLM2-135M, a BERT-tiny"
+    needs: exact
+    if: contains(github.event.head_commit.message, '[run]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    env:
+      INSTRUCT: HuggingFaceTB/SmolLM2-135M-Instruct
+      INSTRUCT_REV: 12fd25f77366fa6b3b4b768ec3050bf629380bac
+      BASE: HuggingFaceTB/SmolLM2-135M
+      BASE_REV: 93efa2f097d58c2a74874c7e644dbc9b0cee75a2
+      LMNF_BERT: google/bert_uncased_L-2_H-128_A-2
+      LMNF_BERT_REV: 30b0a37ccaaa32f332884b96992754e246e48c5f
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install and fetch the models
+        run: |
+          mkdir -p out/lm work
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers numpy scipy safetensors huggingface_hub ml_dtypes pandas pyarrow sentencepiece
+          python -m pip freeze > out/lm/versions.txt
+          grep -m1 'model name' /proc/cpuinfo | tee out/lm/cpu.txt
+          echo "INSTRUCT_DIR=$(python -c "from huggingface_hub import snapshot_download as s; print(s('$INSTRUCT', revision='$INSTRUCT_REV', allow_patterns=['*.json','*.txt','model.safetensors']))")" >> "$GITHUB_ENV"
+          echo "BASE_DIR=$(python -c "from huggingface_hub import snapshot_download as s; print(s('$BASE', revision='$BASE_REV', allow_patterns=['*.json','*.txt','model.safetensors']))")" >> "$GITHUB_ENV"
+      - id: conform
+        name: the formal forward pass against Transformers
+        continue-on-error: true
+        run: python batches/0015/conform.py "$INSTRUCT_DIR" out/lm/conform.json
+      - id: tokenperm
+        name: permuting the tokens
+        continue-on-error: true
+        run: python batches/0015/lm_tokenperm.py "$INSTRUCT_DIR" out/lm/tokenperm.json
+      - id: gauge
+        name: the symmetries on SmolLM2-135M-Instruct
+        continue-on-error: true
+        run: LMNF_WORK=work/gauge python batches/0015/lm_gauge.py "$INSTRUCT_DIR" out/lm/gauge.json | tee out/lm/gauge.txt
+      - id: obfuscation
+        name: the secret permutation, the key, and the attacks
+        continue-on-error: true
+        run: LMNF_WORK=work/obf python batches/0015/lm_obfuscation.py "$INSTRUCT_DIR" "$BASE_DIR" out/lm/obfuscation.json 300 | tee out/lm/obfuscation.txt
+      - name: Outcomes
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" > out/lm/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: algebra-lm
+          path: out/lm/
+          retention-days: 14
+      - name: Every cell must have passed
+        if: always()
+        run: jq -e '[to_entries[] | select(.value.outcome == "failure")] | length == 0' out/lm/outcomes.json
