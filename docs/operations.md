@@ -38,6 +38,21 @@ pipeline that no longer exists.
   Batches 0002, 0003 and 0006 are calibration and description; 0004 and
   0005 were tests with their hypotheses stated less sharply than this rule
   now requires (`docs/research/questions.md` restates them).
+- A test's document also grades each prediction's **severity** before the
+  run (would it likely fail if the hypothesis were false?), lists the
+  **auxiliaries** a refutation could land on instead (kernels, the hit
+  criterion, the authority's filters, tokenization, the queries) and
+  which would be blamed first, gives for each finding the **rival
+  explanations** considered and how they were excluded, marks every
+  category or analysis added after the data as **post-designated**, and
+  reports the counts that move under other **precisifications** of its
+  vague predicates (prefix length, co-capital countries, historical
+  capitals) as the vague part of the result.
+- The 189 countries are a census of the fragment, not a sample; for claims
+  about the fragment the run-to-run floor is the only noise (zero for
+  float16 readouts, one or two countries for quantized ones), and ε is
+  set above it per map. For claims beyond the fragment the fragment is
+  the sample and n is 1; such sentences are descriptions.
 - Batch numbers are accession numbers, not an order. Dependencies between
   batches are stated in each document and kept in one machine-readable
   file, `docs/batches/batches.ttl` (PROV: `wasInformedBy`, `used`), from
@@ -104,6 +119,16 @@ pipeline that no longer exists.
 - Known-to-work programs that run models are the baselines: a new readout
   of a model is compared with an earlier program's readout of the same
   prompt before it is believed.
+
+## Interfaces
+
+- Each component that more than one batch uses has a declared public
+  interface under `docs/interfaces/`, with a name independent of the
+  batch that first wrote it, a version, its input and output schemas, its
+  semantics, what counts as a compatible and a breaking change, and a
+  conformance fixture. Versioning is of the declared interface;
+  recording which commit ran is provenance, not versioning. Declared so
+  far: the judge (version 1) and the readout (version 1).
 
 ## Data kept
 
