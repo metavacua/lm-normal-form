@@ -36,6 +36,10 @@ def prepare(orig_dir, work):
     ids["eos"] = eos_ids(orig_dir, tok)
     wins, text = wikitext_windows(tok)
     dump({"ids": ids, "wins": wins}, os.path.join(work, "inputs.json"))
+    seqs = open(os.path.join(HERE, "..", "0010", "prompts.txt"), encoding="utf-8").read().splitlines() + open(os.path.join(HERE, "..", "0013", "sentences.txt"), encoding="utf-8").read().splitlines()
+    from common import PLAIN_PROMPTS
+    texts = seqs[:24] + PLAIN_PROMPTS + [text[:2000]]
+    dump({"texts": texts, "ids": [tok(t)["input_ids"] for t in texts]}, os.path.join(work, "texts.json"))
     open(os.path.join(work, "wiki.txt"), "w", encoding="utf-8").write(text)
     print("inputs:", {k: len(v) for k, v in ids.items()}, "windows", len(wins), "of", len(wins[0]), "eos", ids["eos"])
 

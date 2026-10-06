@@ -141,6 +141,9 @@ def write(src_dir, out_dir, R, stored):
     cfg = json.load(open(os.path.join(out_dir, "config.json")))
     cfg["torch_dtype"] = use
     cfg["dtype"] = use
+    for k in ("pad_token_id", "bos_token_id", "eos_token_id"):       # a negative id (the random tiny Llama has pad_token_id -1) stops the GGUF converter; the same change in every variant
+        if isinstance(cfg.get(k), int) and cfg[k] < 0:
+            cfg[k] = None
     json.dump(cfg, open(os.path.join(out_dir, "config.json"), "w"), indent=2)
     return use, len(inexact)
 

@@ -6,6 +6,7 @@
 //   OUT.json         load time, greedy generations (32 new tokens, stopping after a token of `eos`), the negative log-likelihood of the perplexity windows,
 //                    prefill speed (512 tokens, five repeats), decode speed (64 tokens after a prompt of 16, three repeats), peak resident memory
 // Usage: lmnf-llama MODEL.gguf INPUTS.json OUT FULL [THREADS]      FULL is 1 for everything, 0 for load time and speed alone.
+//        lmnf-llama tokenize MODEL.gguf TEXTS.json OUT.json                  the token ids of texts (see tokenize_mode)
 // Build: g++ -O2 -std=c++17 -I LLAMA/include -I LLAMA/ggml/include -I LLAMA/vendor lmnf_llama.cpp -o RELEASE/lmnf-llama -LRELEASE -lllama -lggml -lggml-base -Wl,-rpath,'$ORIGIN'
 // with the program placed in the release directory, where ggml_backend_load_all() finds the CPU backends.
 #include "llama.h"
@@ -96,7 +97,41 @@ static std::vector<std::vector<int>> generate(Run & r, const std::vector<std::ve
     return all;
 }
 
+// lmnf-llama tokenize MODEL.gguf TEXTS.json OUT.json: the token ids of every text of TEXTS.json["texts"] (the vocabulary only is loaded; the model's own BOS rule, special
+// tokens in the text not parsed), as a list of lists. Used to compare llama.cpp's tokenizer with Hugging Face's.
+static int tokenize_mode(char ** argv) {
+    ggml_backend_load_all();
+    llama_backend_init();
+    llama_model_params mp = llama_model_default_params();
+    mp.vocab_only = true;
+    llama_model * model = llama_model_load_from_file(argv[2], mp);
+    if (!model) {
+        fprintf(stderr, "cannot load %s\n", argv[2]);
+        return 3;
+    }
+    const llama_vocab * vocab = llama_model_get_vocab(model);
+    std::ifstream fi(argv[3]);
+    const json texts = json::parse(fi);
+    json out = json::array();
+    for (const auto & t : texts["texts"]) {
+        const std::string s = t.get<std::string>();
+        std::vector<llama_token> toks(s.size() + 16);
+        int n = llama_tokenize(vocab, s.c_str(), (int) s.size(), toks.data(), (int) toks.size(), llama_vocab_get_add_bos(vocab), false);
+        if (n < 0) {
+            toks.resize(-n);
+            n = llama_tokenize(vocab, s.c_str(), (int) s.size(), toks.data(), (int) toks.size(), llama_vocab_get_add_bos(vocab), false);
+        }
+        toks.resize(n);
+        out.push_back(toks);
+    }
+    std::ofstream(argv[4]) << out.dump();
+    llama_model_free(model);
+    llama_backend_free();
+    return 0;
+}
+
 int main(int argc, char ** argv) {
+    if (argc >= 5 && std::string(argv[1]) == "tokenize") return tokenize_mode(argv);
     if (argc < 5) {
         fprintf(stderr, "usage: lmnf-llama MODEL.gguf INPUTS.json OUT FULL [THREADS]\n");
         return 1;
