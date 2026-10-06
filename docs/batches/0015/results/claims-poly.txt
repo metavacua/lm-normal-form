@@ -1,0 +1,47 @@
+T1   holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] Without a causal mask and without positional information, f(x o pi) = f(x) o pi: the Transformer is permutatio
+T2   fails as expected  [F_p, p = 2^61 - 1, polynomial surrogates] With a causal mask and no positional information, token permutation equivariance fails.
+T3   fails as expected  [F_p, p = 2^61 - 1, polynomial surrogates] With rotary positional embeddings and no mask, token permutation equivariance fails.
+T4   fails as expected  [F_p, p = 2^61 - 1, polynomial surrogates] With a causal mask and rotary positional embeddings (a Llama-style decoder), token permutation equivariance fa
+T5   holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] A causal decoder without positional information and with ONE layer: the logits at the last position are invari
+T6   fails as expected  [F_p, p = 2^61 - 1, polynomial surrogates] The same with TWO layers: the invariance of T5 fails (the second layer reads the first layer's prefix-dependen
+H1   holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] A signed permutation of the hidden coordinates, applied to every matrix that reads or writes the residual stre
+H1t  holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] H1 with the head tied to the embedding.
+H2   fails as expected  [F_p, p = 2^61 - 1, polynomial surrogates] The rule as pasted, W_new = P W P^T, applied to the square weight matrices (here q and o) and nothing else, do
+H3   fails as expected  [F_p, p = 2^61 - 1, polynomial surrogates] A signed permutation of the hidden coordinates applied to the layers and the final norm but not to the embeddi
+H3k  holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] Applying the permutation of H3 to the embedding and the head as well (the key) restores f exactly: f(body-only
+H4   holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] With the norm weights folded into the matrices that read them (the head made its own matrix), any orthogonal Q
+H4c  holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] In the unfolded parameterization (norm weights kept), with an untied head, an orthogonal Q applied to the stre
+H6c  fails as expected  [F_p, p = 2^61 - 1, polynomial surrogates] The conjugated action of H4c on a model with a tied head and a learned final norm weight changes f.
+H5   fails as expected  [F_p, p = 2^61 - 1, polynomial surrogates] Without the fold, a general orthogonal Q applied to the stream changes f.
+H6   fails as expected  [F_p, p = 2^61 - 1, polynomial surrogates] With a tied head and a final norm weight that is not 1, an orthogonal Q applied to the stream (the tied head f
+H6o  holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] With a tied head and a final norm weight equal to 1 (and the layer norms folded), an orthogonal Q applied to t
+H7   fails as expected  [F_p, p = 2^61 - 1, polynomial surrogates] With LayerNorm (the mean subtracted), an orthogonal Q applied to the stream (norms folded) changes f unless Q 
+H7f  holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] With LayerNorm, an orthogonal Q that fixes the all-ones vector (norms folded) leaves f unchanged.
+A1   holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] Per key/value group, wv -> A wv and the group's o columns -> o A^-1, A in GL(hd), leaves f unchanged (the gaug
+A2   fails as expected  [F_p, p = 2^61 - 1, polynomial surrogates] The same A applied to wv alone changes f.
+A3   holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] With RoPE, per group and rotary plane, k -> M k and q -> M^-T q with M = [[a, -b], [b, a]] (a complex scalar) 
+A4   fails as expected  [F_p, p = 2^61 - 1, polynomial surrogates] With RoPE, k -> A k and q -> A^-T q with A a general element of GL(hd) changes f.
+A5   holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] Without positional information, k -> A k and q -> A^-T q with A in GL(hd) leaves f unchanged.
+A6   holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] A permutation of the key/value groups and of the query heads inside each group (with the matching permutation 
+A7   fails as expected  [F_p, p = 2^61 - 1, polynomial surrogates] A permutation of the query heads (and the o columns) that moves a head to another key/value group, the key and
+M1   holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] A permutation of the hidden units of the gated block, and a nonzero scale c on each up row with 1/c on the mat
+M2   fails as expected  [F_p, p = 2^61 - 1, polynomial surrogates] A scale on the gate rows (with the down columns compensating) changes f: the gate nonlinearity is not homogene
+N1   holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] A scale c_i on a norm weight and 1/c_i on column i of every matrix that reads it leaves f unchanged (the fold 
+N2   holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] Folding every norm weight into the matrices that read it (RMSNorm or LayerNorm) leaves f unchanged.
+C1   holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] The composition of the symmetries H1, A1, A3, A6, M1 and N1, with random elements, leaves f unchanged.
+H8   fails as expected  [F_p, p = 2^61 - 1, polynomial surrogates] With RMSNorm, subtracting from every embedding row its mean (what the fuse_layer_norms of QuaRot and SpinQuant
+H8n  holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] With LayerNorm (the mean subtracted), subtracting from every embedding row its mean leaves f unchanged.
+K1   holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] The KV cache is unchanged by a signed permutation of the hidden coordinates (H1).
+K1t  holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] K1 with the head tied to the embedding.
+K2   holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] The KV cache is unchanged by an orthogonal Q applied to the stream with the norm weights folded (H4).
+K3   holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] The KV cache is unchanged by the gauge of the feed-forward units (M1).
+K3n  holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] The KV cache is unchanged by the gauge of the norm weights (N1).
+K4   holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] A permutation of the key/value groups (A6) permutes the groups of the KV cache: the new group g holds the old 
+K4n  fails as expected  [F_p, p = 2^61 - 1, polynomial surrogates] The KV cache is not unchanged by a non-trivial permutation of the key/value groups.
+K5   holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] Under the value/output gauge (A1) the keys are unchanged and the values of group g are mapped by A_g: v -> A_g
+K5n  fails as expected  [F_p, p = 2^61 - 1, polynomial surrogates] The KV cache is not unchanged by the value/output gauge: the values move.
+K6   holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] Under the query/key gauge of RoPE (A3) the values are unchanged and each key plane of the cache is mapped by i
+K6n  fails as expected  [F_p, p = 2^61 - 1, polynomial surrogates] The KV cache is not unchanged by the query/key gauge of RoPE: the keys move.
+K8   fails as expected  [F_p, p = 2^61 - 1, polynomial surrogates] The cache of the model with the permuted body and the unpermuted embedding ('encrypting the body', H3) is not 
+K9   holds as expected  [F_p, p = 2^61 - 1, polynomial surrogates] The cache of the model with the permuted body and the key applied at the interface (H3k) is the original's: th
+46 claims, 0 unexpected

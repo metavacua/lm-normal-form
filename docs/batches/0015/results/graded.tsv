@@ -1,0 +1,29 @@
+prediction	subject	result	seen
+Q1	poly, 46 claims, 6 trials	as predicted	unexpected: []
+Q1	oracle, 46 claims, 4 trials	as predicted	unexpected: []
+Q1	float, 46 claims, 6 trials	as predicted	unexpected: []
+Q2	oracle	as predicted	largest per-trial bound 2.61e-31 (limit 2.7e-31)
+Q2	poly	as predicted	largest per-trial bound 6.64e-08 (limit 7e-08)
+Q3	untied-eps0-logits	as predicted	rank deficiency 142, predicted 142 (formula 142)
+Q3	untied-eps0-logprobs	as predicted	rank deficiency 148, predicted 148 (formula 148)
+Q3	untied-eps-logits	as predicted	rank deficiency 141, predicted 141 (formula 141)
+Q3	tied-eps0-logits	as predicted	rank deficiency 121, predicted 121 (formula 121)
+Q3	tied-eps-logits	as predicted	rank deficiency 120, predicted 120 (formula 120)
+Q3	mha-untied-eps0-logits	as predicted	rank deficiency 82, predicted 82 (formula 82)
+Q3	nope-untied-eps0-logits	as predicted	rank deficiency 190, predicted 190 (formula 190)
+Q4	transformers float64, norm and rotary tables in float64	as predicted	max relative 1.01e-14 (limit 1e-10), top-1 1
+Q4	transformers float32, as shipped	as predicted	max relative 4.83e-06 (limit 0.0001), top-1 1
+Q5	SmolLM2 causal, RoPE	as predicted	argmax agreement 0.28, mean KL 2.5
+Q6	SmolLM2 last position	as predicted	median logit difference 19.8, mean KL 1.19
+Q7a	BERT-tiny, positions zero	as predicted	max relative equivariance error 1.33e-15
+Q7b	BERT-tiny, as shipped	as predicted	median relative equivariance error 0.705
+Q8	formal float64, 11 gauges	as predicted	H1 1.26e-13, A6 1.35e-13, M1 2.34e-13, A1-1 1.33e-13, A1-10 1.51e-13, A1-100 3.61e-13, A1-1000 2.84e-12, A3 9.95e-14, N1 9.77e-14, H4 3.14e-13, C1 4e-13
+Q9	cache against the predicted, float64	as predicted	predicted: H1 2.23e-15, A6 3.93e-15, M1 3.64e-15, A1-1 3.51e-15, A1-10 3.52e-15, A1-100 1.73e-14, A1-1000 1.02e-13, A3 1.95e-15, N1 1.5e-15, H4 6.88e-15; moved: A6 1.65, A1-1 0.793, A1-10 2.71, A1-100 20.9, A1-1000 196, A3 2.41
+Q10	float32 on the written files	as predicted	max|d| / generations identical of 4: H1 6.68e-05/4, A6 4.96e-05/4, M1 8.2e-05/4, N1 5.15e-05/4, H4 0.000103/4, C1 0.000101/4
+Q11	the cost of conditioning	REFUTED	float32 kappa 1 4.96e-05, kappa 10 6.68e-05, kappa 100 0.000115, kappa 1000 0.00055; bfloat16 kappa 1 1, kappa 10 1.12, kappa 100 1.31, kappa 1000 8.31
+Q12	embedding centering, the control	as predicted	formal float64 max|d| 0.857, float32 0.857, generations identical 1/4
+Q13	body permuted, and with the key	as predicted	perplexity original 23.5, body only 7.51e+11, with the key 23.5; logit difference with the key 7.15e-05
+Q14	matching against the public base	as predicted	coordinates recovered 1, repaired perplexity 23.5 against 23.5
+Q15	the adapter attack	as predicted	training perplexity 4.75e+10 at step 0, minimum 48.6 in 300 steps
+Q16	the cache of the keyed and of the body-only model	as predicted	keyed 2.17e-15, body only 0.99
+Q17	training dynamics under the symmetries	as predicted	sgd/signed loss 3.55e-15 params 1.41e-15; adam/signed loss 1.49e-12 params 3.6e-12; sgd/orthogonal loss 6.88e-15 params 2.78e-15; adam/orthogonal loss 0.0282 params 0.718; sgd/scaling loss 0.538 params 0.278; adam/scaling loss 0.0734 params 0.721

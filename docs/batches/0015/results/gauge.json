@@ -1,0 +1,232 @@
+{
+ "model_dir": "/home/runner/.cache/huggingface/hub/models--HuggingFaceTB--SmolLM2-135M-Instruct/snapshots/12fd25f77366fa6b3b4b768ec3050bf629380bac",
+ "tied": true,
+ "gauges": {
+  "H1 signed permutation of the hidden coordinates": {
+   "formal_float64_max_abs_difference": 1.2612133559741778e-13,
+   "untied_by_the_gauge": false,
+   "cache_difference_from_the_original": 2.2287040920457634e-15,
+   "cache_difference_from_the_predicted": 2.2287040920457634e-15,
+   "float32": {
+    "max_abs_difference": 6.67572021484375e-05,
+    "top1_agreement": 1.0,
+    "generations_identical": 4,
+    "of": 4
+   },
+   "bfloat16": {
+    "max_abs_difference": 0.625,
+    "top1_agreement": 0.9841269841269841,
+    "generations_identical": 1,
+    "of": 4
+   },
+   "seconds": 13.6
+  },
+  "A6 heads and key/value groups permuted": {
+   "formal_float64_max_abs_difference": 1.3500311979441904e-13,
+   "untied_by_the_gauge": false,
+   "cache_difference_from_the_original": 1.6542365727479875,
+   "cache_difference_from_the_predicted": 3.930003141548282e-15,
+   "float32": {
+    "max_abs_difference": 4.9591064453125e-05,
+    "top1_agreement": 1.0,
+    "generations_identical": 4,
+    "of": 4
+   },
+   "bfloat16": {
+    "max_abs_difference": 0.625,
+    "top1_agreement": 1.0,
+    "generations_identical": 3,
+    "of": 4
+   },
+   "seconds": 13.0
+  },
+  "M1 units permuted and scaled": {
+   "formal_float64_max_abs_difference": 2.3447910280083306e-13,
+   "untied_by_the_gauge": false,
+   "cache_difference_from_the_original": 3.636306676495719e-15,
+   "cache_difference_from_the_predicted": 3.636306676495719e-15,
+   "float32": {
+    "max_abs_difference": 8.20159912109375e-05,
+    "top1_agreement": 1.0,
+    "generations_identical": 4,
+    "of": 4
+   },
+   "bfloat16": {
+    "max_abs_difference": 1.46875,
+    "top1_agreement": 1.0,
+    "generations_identical": 2,
+    "of": 4
+   },
+   "seconds": 13.2
+  },
+  "A1 value/output gauge, kappa 1": {
+   "formal_float64_max_abs_difference": 1.3322676295501878e-13,
+   "untied_by_the_gauge": false,
+   "cache_difference_from_the_original": 0.7929275403792114,
+   "cache_difference_from_the_predicted": 3.508931376382395e-15,
+   "float32": {
+    "max_abs_difference": 4.9591064453125e-05,
+    "top1_agreement": 1.0,
+    "generations_identical": 4,
+    "of": 4
+   },
+   "bfloat16": {
+    "max_abs_difference": 1.0,
+    "top1_agreement": 1.0,
+    "generations_identical": 2,
+    "of": 4
+   },
+   "seconds": 12.9
+  },
+  "A1 value/output gauge, kappa 10": {
+   "formal_float64_max_abs_difference": 1.509903313490213e-13,
+   "untied_by_the_gauge": false,
+   "cache_difference_from_the_original": 2.70987414374313,
+   "cache_difference_from_the_predicted": 3.5231435794319638e-15,
+   "float32": {
+    "max_abs_difference": 6.67572021484375e-05,
+    "top1_agreement": 1.0,
+    "generations_identical": 4,
+    "of": 4
+   },
+   "bfloat16": {
+    "max_abs_difference": 1.125,
+    "top1_agreement": 1.0,
+    "generations_identical": 1,
+    "of": 4
+   },
+   "seconds": 13.0
+  },
+  "A1 value/output gauge, kappa 100": {
+   "formal_float64_max_abs_difference": 3.6060043839825084e-13,
+   "untied_by_the_gauge": false,
+   "cache_difference_from_the_original": 20.919808088309463,
+   "cache_difference_from_the_predicted": 1.7309148096776288e-14,
+   "float32": {
+    "max_abs_difference": 0.00011539459228515625,
+    "top1_agreement": 1.0,
+    "generations_identical": 4,
+    "of": 4
+   },
+   "bfloat16": {
+    "max_abs_difference": 1.3125,
+    "top1_agreement": 0.9841269841269841,
+    "generations_identical": 2,
+    "of": 4
+   },
+   "seconds": 13.0
+  },
+  "A1 value/output gauge, kappa 1000": {
+   "formal_float64_max_abs_difference": 2.8350655156827997e-12,
+   "untied_by_the_gauge": false,
+   "cache_difference_from_the_original": 195.52564104614052,
+   "cache_difference_from_the_predicted": 1.0243104873232682e-13,
+   "float32": {
+    "max_abs_difference": 0.0005502700805664062,
+    "top1_agreement": 1.0,
+    "generations_identical": 4,
+    "of": 4
+   },
+   "bfloat16": {
+    "max_abs_difference": 8.3125,
+    "top1_agreement": 0.9047619047619048,
+    "generations_identical": 1,
+    "of": 4
+   },
+   "seconds": 12.7
+  },
+  "A3 query/key complex scalars": {
+   "formal_float64_max_abs_difference": 9.947598300641403e-14,
+   "untied_by_the_gauge": false,
+   "cache_difference_from_the_original": 2.405338843138661,
+   "cache_difference_from_the_predicted": 1.9536939354742333e-15,
+   "float32": {
+    "max_abs_difference": 5.340576171875e-05,
+    "top1_agreement": 1.0,
+    "generations_identical": 4,
+    "of": 4
+   },
+   "bfloat16": {
+    "max_abs_difference": 0.75,
+    "top1_agreement": 1.0,
+    "generations_identical": 2,
+    "of": 4
+   },
+   "seconds": 12.9
+  },
+  "N1 norm gauge": {
+   "formal_float64_max_abs_difference": 9.769962616701378e-14,
+   "untied_by_the_gauge": false,
+   "cache_difference_from_the_original": 1.4971440539231551e-15,
+   "cache_difference_from_the_predicted": 1.4971440539231551e-15,
+   "float32": {
+    "max_abs_difference": 5.14984130859375e-05,
+    "top1_agreement": 1.0,
+    "generations_identical": 4,
+    "of": 4
+   },
+   "bfloat16": {
+    "max_abs_difference": 1.15625,
+    "top1_agreement": 1.0,
+    "generations_identical": 2,
+    "of": 4
+   },
+   "seconds": 13.1
+  },
+  "H4 random orthogonal Q, norms folded, head untied": {
+   "formal_float64_max_abs_difference": 3.135269821541442e-13,
+   "untied_by_the_gauge": true,
+   "cache_difference_from_the_original": 6.8775054977094935e-15,
+   "cache_difference_from_the_predicted": 6.8775054977094935e-15,
+   "float32": {
+    "max_abs_difference": 0.00010323524475097656,
+    "top1_agreement": 1.0,
+    "generations_identical": 4,
+    "of": 4
+   },
+   "bfloat16": {
+    "max_abs_difference": 2.53125,
+    "top1_agreement": 0.9523809523809523,
+    "generations_identical": 2,
+    "of": 4
+   },
+   "seconds": 15.4
+  },
+  "C1 composition": {
+   "formal_float64_max_abs_difference": 3.9968028886505635e-13,
+   "untied_by_the_gauge": false,
+   "cache_difference_from_the_original": 3.1576043283378024,
+   "float32": {
+    "max_abs_difference": 0.0001010894775390625,
+    "top1_agreement": 1.0,
+    "generations_identical": 4,
+    "of": 4
+   },
+   "bfloat16": {
+    "max_abs_difference": 1.078125,
+    "top1_agreement": 1.0,
+    "generations_identical": 2,
+    "of": 4
+   },
+   "seconds": 14.7
+  },
+  "H8 control: the embedding centered (QuaRot, SpinQuant)": {
+   "formal_float64_max_abs_difference": 0.8568121802671147,
+   "untied_by_the_gauge": true,
+   "cache_difference_from_the_original": 0.03730961965158573,
+   "float32": {
+    "max_abs_difference": 0.8568248748779297,
+    "top1_agreement": 1.0,
+    "generations_identical": 1,
+    "of": 4
+   },
+   "bfloat16": {
+    "max_abs_difference": 1.375,
+    "top1_agreement": 0.9841269841269841,
+    "generations_identical": 1,
+    "of": 4
+   },
+   "seconds": 13.4
+  }
+ }
+}

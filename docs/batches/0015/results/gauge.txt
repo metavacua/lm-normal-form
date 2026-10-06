@@ -1,0 +1,12 @@
+H1 signed permutation of the hidden coordinates         formal 1.26e-13 | cache vs predicted 2.23e-15, vs original 2.23e-15 | float32 6.68e-05, gen 4/4 | bf16 6.25e-01, gen 1/4
+A6 heads and key/value groups permuted                  formal 1.35e-13 | cache vs predicted 3.93e-15, vs original 1.65e+00 | float32 4.96e-05, gen 4/4 | bf16 6.25e-01, gen 3/4
+M1 units permuted and scaled                            formal 2.34e-13 | cache vs predicted 3.64e-15, vs original 3.64e-15 | float32 8.20e-05, gen 4/4 | bf16 1.47e+00, gen 2/4
+A1 value/output gauge, kappa 1                          formal 1.33e-13 | cache vs predicted 3.51e-15, vs original 7.93e-01 | float32 4.96e-05, gen 4/4 | bf16 1.00e+00, gen 2/4
+A1 value/output gauge, kappa 10                         formal 1.51e-13 | cache vs predicted 3.52e-15, vs original 2.71e+00 | float32 6.68e-05, gen 4/4 | bf16 1.12e+00, gen 1/4
+A1 value/output gauge, kappa 100                        formal 3.61e-13 | cache vs predicted 1.73e-14, vs original 2.09e+01 | float32 1.15e-04, gen 4/4 | bf16 1.31e+00, gen 2/4
+A1 value/output gauge, kappa 1000                       formal 2.84e-12 | cache vs predicted 1.02e-13, vs original 1.96e+02 | float32 5.50e-04, gen 4/4 | bf16 8.31e+00, gen 1/4
+A3 query/key complex scalars                            formal 9.95e-14 | cache vs predicted 1.95e-15, vs original 2.41e+00 | float32 5.34e-05, gen 4/4 | bf16 7.50e-01, gen 2/4
+N1 norm gauge                                           formal 9.77e-14 | cache vs predicted 1.50e-15, vs original 1.50e-15 | float32 5.15e-05, gen 4/4 | bf16 1.16e+00, gen 2/4
+H4 random orthogonal Q, norms folded, head untied       formal 3.14e-13 | cache vs predicted 6.88e-15, vs original 6.88e-15 | float32 1.03e-04, gen 4/4 | bf16 2.53e+00, gen 2/4
+C1 composition                                          formal 4.00e-13 | cache vs predicted n/a, vs original 3.16e+00 | float32 1.01e-04, gen 4/4 | bf16 1.08e+00, gen 2/4
+H8 control: the embedding centered (QuaRot, SpinQuant)  formal 8.57e-01 | cache vs predicted n/a, vs original 3.73e-02 | float32 8.57e-01, gen 1/4 | bf16 1.38e+00, gen 1/4

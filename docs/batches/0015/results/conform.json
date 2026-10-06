@@ -1,0 +1,30 @@
+{
+ "model_dir": "/home/runner/.cache/huggingface/hub/models--HuggingFaceTB--SmolLM2-135M-Instruct/snapshots/12fd25f77366fa6b3b4b768ec3050bf629380bac",
+ "arch": {
+  "d": 576,
+  "n_heads": 9,
+  "n_kv": 3,
+  "hd": 64,
+  "d_ff": 1536,
+  "n_layers": 30,
+  "vocab": 49152,
+  "tied": true,
+  "pos": "rope",
+  "causal": true,
+  "norm": "rms"
+ },
+ "sequences": 24,
+ "positions": 353,
+ "comparisons": {
+  "transformers float64, norm and rotary tables in float64": {
+   "max_abs_difference": 2.984279490192421e-13,
+   "max_relative_to_scale": 1.0067723423105404e-14,
+   "top1_agreement": 1.0
+  },
+  "transformers float32, as shipped": {
+   "max_abs_difference": 0.00013932588121257083,
+   "max_relative_to_scale": 4.8348798672592395e-06,
+   "top1_agreement": 1.0
+  }
+ }
+}
