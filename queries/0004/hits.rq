@@ -7,7 +7,7 @@ PREFIX b: <urn:lmnf:b4:>
 SELECT ?model ?kind (COUNT(*) AS ?prompts) (SUM(IF(?h = 1, 1, 0)) AS ?top1_hits) (AVG(?ptarget) AS ?mean_p_target) WHERE {
   { SELECT ?model ?p ?kind
            (MAX(IF(?rank = 1 && STRSTARTS(?target, ?token) && STRLEN(?token) > 1, 1, 0)) AS ?h)
-           (SUM(IF(STRSTARTS(?target, ?token) && STRLEN(?token) > 1, ?prob, 0.0)) AS ?ptarget) WHERE {
+           (SUM(IF(STRSTARTS(?target, ?token) && STRLEN(?token) > 1, ?prob, 0e0)) AS ?ptarget) WHERE {
       ?p a b:Prompt ; b:kind ?kind ; b:target ?target .
       FILTER(?target != "")
       ?a b:prompt ?p ; b:model ?model ; b:rank ?rank ; b:token ?token ; b:prob ?prob .

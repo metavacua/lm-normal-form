@@ -7,4 +7,5 @@
   "\($s) <urn:lmnf:b4:text> \(.prompt | @json) .",
   "\($s) <urn:lmnf:b4:target> \(.target | @json) .",
   "\($s) <urn:lmnf:b4:alt> \(.alt | @json) .",
-  (if .country != "" then "\($s) <urn:lmnf:b4:country> <\(.country)> ." else empty end)
+  (if .country != "" then "\($s) <urn:lmnf:b4:country> <\(.country)> ." else empty end),
+  (if .partnerLabel != "" then "\($s) <urn:lmnf:b4:partnerLabel> \(.partnerLabel | @json) ." else empty end)

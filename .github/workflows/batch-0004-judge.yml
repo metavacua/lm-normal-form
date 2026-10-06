@@ -6,9 +6,12 @@
 # or this file change, against the run named in RUN_ID, so that a question can
 # be asked again without reading the models again.
 #
-# The authority, the prompts and every model's answers are loaded into
-# Oxigraph, each in its own named graph, and the questions in queries/0004/
-# are asked over their union.
+# The run's artifacts are the raw data: Wikidata's answer, the countries, the
+# prompts and each model's answers. Their RDF forms are derived here, by the
+# jq files in batches/0004/, so that a change to them needs no new run. The
+# authority, the prompts and every model's answers are loaded into Oxigraph,
+# each in its own named graph, and the questions in queries/0004/ are asked
+# over their union.
 name: batch 0004 judge
 
 on:
@@ -23,7 +26,7 @@ on:
     paths:
       - ".github/workflows/batch-0004-judge.yml"
       - "queries/0004/**"
-      - "batches/0004/answers-to-nt.jq"
+      - "batches/0004/*-to-nt.jq"
 
 permissions:
   contents: read
@@ -67,8 +70,10 @@ jobs:
           python -m pip install --quiet oxigraph
           oxigraph --version | tee out/oxigraph.version
           echo "$RUN_ID" > out/run-id.txt
-          oxigraph load --location work/store --file prepare/authority.nt --graph urn:lmnf:b4:g:authority
-          oxigraph load --location work/store --file prepare/prompts.nt --graph urn:lmnf:b4:g:prompts
+          jq -r -f batches/0004/authority-to-nt.jq prepare/countries.json > work/authority.nt
+          jq -r -f batches/0004/prompts-to-nt.jq prepare/prompts.json > work/prompts.nt
+          oxigraph load --location work/store --file work/authority.nt --graph urn:lmnf:b4:g:authority
+          oxigraph load --location work/store --file work/prompts.nt --graph urn:lmnf:b4:g:prompts
           for dir in answers/answers-*; do
             cell="$(basename "$dir")"
             model="$(cat "$dir/model.txt")"
@@ -94,6 +99,10 @@ jobs:
         name: "relational reflexivity: forward and back"
         continue-on-error: true
         run: oxigraph query --location work/store --union-default-graph --results-format tsv --query-file queries/0004/reflexivity.rq | tee out/reflexivity.tsv
+      - id: identity
+        name: "identity as a preference between X and Y"
+        continue-on-error: true
+        run: oxigraph query --location work/store --union-default-graph --results-format tsv --query-file queries/0004/identity.rq | tee out/identity.tsv
       - id: soundness
         name: "soundness against the authority"
         continue-on-error: true

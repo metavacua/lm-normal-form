@@ -20,9 +20,9 @@
         {kind: "story_out",  prompt: "In the story, the capital of \($xl) is \($cy). Outside the story, the capital of \($xl) is", target: " \($c)",  alt: " \($cy)"},
         {kind: "affirm",     prompt: "True or false: the capital of \($xl) is the capital of \($xl). Answer:",           target: " True",   alt: " False"},
         {kind: "affirm_ctrl", prompt: "True or false: the capital of \($xl) is the capital of \($yl). Answer:",         target: " False",  alt: " True"} )
-    | . + {country: $x.country, countryLabel: $xl, capital: $x.canonical[0].capital, capitalLabel: $c, partner: $y.country} ]
+    | . + {country: $x.country, countryLabel: $xl, capital: $x.canonical[0].capital, capitalLabel: $c, partner: $y.country, partnerLabel: $yl} ]
   + [ $invented[] as $name
       | ( {kind: "invented_fwd",   prompt: "The capital of \($name) is",                target: "",          alt: ""},
           {kind: "invented_ident", prompt: "The capital of \($name) is the capital of", target: " \($name)", alt: ""} )
-      | . + {country: "", countryLabel: $name, capital: "", capitalLabel: "", partner: ""} ]
+      | . + {country: "", countryLabel: $name, capital: "", capitalLabel: "", partner: "", partnerLabel: ""} ]
 | to_entries | map(.value + {id: "\(.value.kind)-\(.key)"})
