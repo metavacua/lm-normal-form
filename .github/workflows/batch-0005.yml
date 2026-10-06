@@ -116,7 +116,7 @@ jobs:
           python -m pip install --quiet -r work/llama.cpp/requirements/requirements-convert_hf_to_gguf.txt
           python -m pip freeze > out/versions.txt
           hf download "$MODEL" --include "*.safetensors" "*.json" "*.txt" "*.model" --local-dir work/model
-          free -m; df -h .
+          grep -m1 "model name" /proc/cpuinfo | tee out/cpu.txt; free -m; df -h .
       - id: convert
         name: "convert_hf_to_gguf: safetensors to a float16 GGUF"
         continue-on-error: true
@@ -221,6 +221,7 @@ jobs:
           python -m pip install --quiet transformers trl datasets accelerate
           python -m pip freeze > out/versions.txt
           echo "TRAIN ${#TRAIN} bytes, RELOAD ${#RELOAD} bytes" | tee out/invocation-sizes.txt
+          grep -m1 "model name" /proc/cpuinfo | tee out/cpu.txt
           wc -l prepare/corpus.jsonl
       - id: train
         name: "transformers and TRL: fine-tune the student on the corpus, then read every prompt"
