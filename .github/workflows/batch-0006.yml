@@ -440,7 +440,7 @@ jobs:
       # gguf-py's own name map, from library parameter names to GGUF names, over the safetensors header's names
       # as the safetensors library reads them: how many map, and which do not.
       NM: |
-        import sys,gguf;from safetensors import safe_open;a=sys.argv;h=list(safe_open(a[1],'np').keys());M=gguf.get_tensor_name_map(getattr(gguf.MODEL_ARCH,a[2]),int(a[3]));u=[n for n in h if M.get_name(n)is None];print(a[1],len(h),'tensors in the header',len(h)-len(u),'mapped',len(u),'unmapped',u[:12])
+        import sys,gguf;from safetensors import safe_open;a=sys.argv;h=list(safe_open(a[1],'np').keys());M=gguf.get_tensor_name_map(getattr(gguf.MODEL_ARCH,a[2]),int(a[3]));u=[n for n in h if M.get_name(n,try_suffixes=('.weight','.bias'))is None];print(a[1],len(h),'tensors in the header',len(h)-len(u),'mapped',len(u),'unmapped',u[:12])
     steps:
       - uses: actions/setup-python@v7
         with:
