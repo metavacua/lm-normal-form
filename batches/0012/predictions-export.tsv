@@ -1,0 +1,8 @@
+id	args	env	ir_version	opset	ort	sha_equal	log	risk	note
+E2a	--opset 19	-	9	19	near	no	-	low-medium	torch writes the IR version of its own table for the opset
+E2b	--opset 20	-	9	20	near	no	-	low-medium	the same
+E3	--opset 21	-	10	21	near	no	highest opset version supported	medium	past what the exporter supports: a warning, and IR 10
+E6a		PYTHONHASHSEED=1	8	18	same	yes	-	low-medium	the export is a function of the weights and the packages, not of Python's hash seed
+E6b		OMP_NUM_THREADS=1	8	18	same	yes	-	low-medium	nor of the number of threads
+E7a		ATEN_CPU_CAPABILITY=default	8	18	same	yes	-	medium	nor of the vector instructions torch uses (the rotary table is computed at export)
+E7b		ATEN_CPU_CAPABILITY=avx2	8	18	same	yes	-	medium	the same

@@ -1,0 +1,13 @@
+F1a predicted ir_version and producer as the original's seen (8, 'pytorch') ok
+F1b predicted more than one opset_import entry seen 9 ok
+F1c predicted no Constant nodes seen 0 ok
+F1d predicted more initializers than the original's seen 2986 ok
+F1e predicted ReduceMean has noop_with_empty_axes written out seen ['noop_with_empty_axes'] ok
+none census: {('', 'Unsqueeze'): 946, ('', 'Mul'): 487, ('', 'Shape'): 458, ('', 'Gather'): 397, ('', 'Concat'): 304, ('', 'MatMul'): 272, ('', 'Reshape'): 244, ('', 'Add'): 212} domains ['', 'ai.onnx.ml', 'ai.onnx.preview', 'ai.onnx.preview.training', 'ai.onnx.training', 'com.microsoft', 'com.microsoft.experimental', 'com.microsoft.nchwc', 'org.pytorch.aten'] nodes 4524 initializers 2986
+F2a predicted at least one node in com.microsoft seen 60 ok
+F2b predicted 30 QuickGelu seen 30 ok
+F2c predicted SimplifiedLayerNormalization in the default domain, at most 61 seen 61 ok
+F3 predicted refuse if a default-domain SimplifiedLayerNormalization is present, else accept seen refuse: ==> Context: Bad node spec for node. Name: /model/layers.0/input_layernorm/Mul_1/SimplifiedLayerNormFusion/ OpType: SimplifiedLayerNormalization ok
+F4a predicted the saved file is accepted again seen accept ok
+F4b predicted its logits are the saving session's, byte for byte seen True ok
+all census: {('', 'Unsqueeze'): 524, ('', 'Gather'): 367, ('', 'Concat'): 244, ('', 'Reshape'): 244, ('', 'MatMul'): 242, ('', 'Mul'): 211, ('', 'Shape'): 185, ('', 'Add'): 151} domains ['', 'ai.onnx.ml', 'ai.onnx.preview', 'ai.onnx.preview.training', 'ai.onnx.training', 'com.microsoft', 'com.microsoft.experimental', 'com.microsoft.nchwc', 'org.pytorch.aten'] nodes 3146 initializers 652

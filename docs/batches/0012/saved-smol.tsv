@@ -1,0 +1,12 @@
+id	predicted	seen	as_predicted
+F1a	ir_version and producer as the original's	(8, 'pytorch')	yes
+F1b	more than one opset_import entry	9	yes
+F1c	no Constant nodes	0	yes
+F1d	more initializers than the original's	2986	yes
+F1e	ReduceMean has noop_with_empty_axes written out	['noop_with_empty_axes']	yes
+F2a	at least one node in com.microsoft	60	yes
+F2b	30 QuickGelu	30	yes
+F2c	SimplifiedLayerNormalization in the default domain, at most 61	61	yes
+F3	refuse if a default-domain SimplifiedLayerNormalization is present, else accept	refuse: ==> Context: Bad node spec for node. Name: /model/layers.0/input_layernorm/Mul_1/SimplifiedLayerNormFusion/ OpType: SimplifiedLayerNormalization	yes
+F4a	the saved file is accepted again	accept	yes
+F4b	its logits are the saving session's, byte for byte	True	yes
