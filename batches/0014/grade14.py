@@ -244,6 +244,7 @@ def main(d, tsv=None):
         if m not in MODELS or dt not in ("float32", "bfloat16", "float16"):
             continue
         o0 = s["variants"].get("orig") or {}
+        stored = lambda v: ((manifests.get(f"xrt-{rt}-{m}") or {}).get("variants") or {}).get(v, {}).get("stored_dtype")
         bad, seen = [], []
         for v in EXACT:
             o = s["variants"].get(v)
@@ -257,7 +258,7 @@ def main(d, tsv=None):
                         bad.append(f"{v} {key} {med:.3g} outside [{lo:.3g}, {hi:.3g}]")
             if o.get("peak_rss_mb") and o0.get("peak_rss_mb") and not 0.95 <= o["peak_rss_mb"] / o0["peak_rss_mb"] <= 1.05:
                 bad.append(f"{v} peak memory {o['peak_rss_mb'] / o0['peak_rss_mb']:.2f}")
-            if o.get("bytes") and o0.get("bytes") and o["bytes"] != o0["bytes"] and s["variants"][v].get("artifact_sha256") != "skip":
+            if o.get("bytes") and o0.get("bytes") and o["bytes"] != o0["bytes"] and stored(v) == stored("orig"):
                 bad.append(f"{v} sizes {o['bytes']} against {o0['bytes']}")
             seen.append(v)
         say("P12", f"{rt} {dt} / {m}", None if not seen else not bad, f"{len(seen)} variants inside the original's own spread (3% beyond it) in prefill and decode, memory within 5%, sizes equal" if not bad else "; ".join(bad[:4]))
