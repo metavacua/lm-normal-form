@@ -165,8 +165,9 @@ when the terms change.
 - **Automation** ([Acceptable Use Policies](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies),
   section 4): no "automated excessive bulk activity", no "undue burden".
   *Here:* the workflow token is read-only except where a judge reads another
-  run's artifacts (`actions: read`); no job pushes, comments or opens
-  issues.
+  run's artifacts (`actions: read`) and, from batch 0008 on, where a
+  final `report` job writes one commit status naming the batch run
+  (`statuses: write`); no job pushes, comments or opens issues.
 - **API** ([Terms of Service](https://docs.github.com/en/site-policy/github-terms/github-terms-of-service),
   effective 2026-04-27, section H). *Here:* results are read back with a
   few requests, one at a time.

@@ -185,8 +185,11 @@ change when a batch reports.
   fiction lives. The model's probabilities are its graded attitude, not
   truth values, until calibration against status says what they track.
 - **Known, from batch 0004.** On *capital of* over 189 determined
-  countries: the reflexivity schema holds as a preference in every model
-  measured, including two that store none of the relation; soundness orders
+  countries: the identity prompt prefers X to the paired Y in every model
+  measured, including two that store none of the relation and (0007) one
+  variant whose fragment is destroyed; this is consistent with positional
+  copying and is not evidence of a logical property until the negated
+  control ("is not the capital of") has been run; soundness orders
   the models and its failures are gaps rather than gluts; fiction scoping
   fails in opposite directions, base models collapsing the story into fact
   and instruction-tuned models overriding the story with the fact; a
