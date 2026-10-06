@@ -1,0 +1,12 @@
+?model	?countries	?dropped_by_more_than_0_1	?mean_p_plain	?mean_p_with_distractor
+"Qwen/Qwen3-0.6B--drop-12-13-23-25"	189	0	"0.01697031379870785"^^<http://www.w3.org/2001/XMLSchema#double>	"0.05346745434337705"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-0.6B--drop-13"	189	20	"0.1568215991577821"^^<http://www.w3.org/2001/XMLSchema#double>	"0.2206674934114645"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-0.6B--drop-2-3"	189	3	"0.0030052916608903457"^^<http://www.w3.org/2001/XMLSchema#double>	"0.0027412047146631864"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-0.6B--layers-all"	189	4	"0.20570489977222567"^^<http://www.w3.org/2001/XMLSchema#double>	"0.40557930500881034"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-1.7B--q4_0-all-imatrix-fragment"	189	9	"0.34257607216249664"^^<http://www.w3.org/2001/XMLSchema#double>	"0.7458080466004998"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-1.7B--q4_0-all-imatrix-licence"	189	9	"0.35251644600508725"^^<http://www.w3.org/2001/XMLSchema#double>	"0.7205719608929384"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-1.7B--q4_0-embd-rep"	189	2	"0.40896353372036304"^^<http://www.w3.org/2001/XMLSchema#double>	"0.8392685562899166"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-1.7B--q4_0-qk-rep"	189	1	"0.3762414316718489"^^<http://www.w3.org/2001/XMLSchema#double>	"0.8315023569761405"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-1.7B--q4_0-vo-rep"	189	4	"0.39623970048332086"^^<http://www.w3.org/2001/XMLSchema#double>	"0.8224060980903106"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-1.7B--q4_k_m-imatrix-fragment"	189	3	"0.4207269271077002"^^<http://www.w3.org/2001/XMLSchema#double>	"0.8218491355456726"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-1.7B--q4_k_m-no-imatrix"	189	8	"0.5076315720783113"^^<http://www.w3.org/2001/XMLSchema#double>	"0.8294617323467779"^^<http://www.w3.org/2001/XMLSchema#double>
