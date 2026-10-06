@@ -1,0 +1,12 @@
+?model	?countries	?prefers_x	?prefers_y	?neither_in_top_20	?mean_p_x	?mean_p_y
+"Qwen/Qwen3-0.6B--drop-12-13-23-25"	189	169	1	19	"0.11083863814583884"^^<http://www.w3.org/2001/XMLSchema#double>	"0.009456309661145954"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-0.6B--drop-13"	189	170	1	18	"0.09175730233112177"^^<http://www.w3.org/2001/XMLSchema#double>	"0.007188418205535639"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-0.6B--drop-2-3"	189	56	0	133	"0.0424635512209504"^^<http://www.w3.org/2001/XMLSchema#double>	"0.021362152584770693"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-0.6B--layers-all"	189	171	1	17	"0.06357561288998143"^^<http://www.w3.org/2001/XMLSchema#double>	"0.0064283604137146825"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-1.7B--q4_0-all-imatrix-fragment"	189	172	1	16	"0.16028097411073522"^^<http://www.w3.org/2001/XMLSchema#double>	"0.019204379047786165"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-1.7B--q4_0-all-imatrix-licence"	189	172	2	15	"0.17876240640200888"^^<http://www.w3.org/2001/XMLSchema#double>	"0.021423863604906664"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-1.7B--q4_0-embd-rep"	189	172	1	16	"0.2595000276239388"^^<http://www.w3.org/2001/XMLSchema#double>	"0.027471815219196522"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-1.7B--q4_0-qk-rep"	189	172	1	16	"0.17753665175201894"^^<http://www.w3.org/2001/XMLSchema#double>	"0.02062198632678058"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-1.7B--q4_0-vo-rep"	189	172	1	16	"0.24967368645292357"^^<http://www.w3.org/2001/XMLSchema#double>	"0.027175319414826225"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-1.7B--q4_k_m-imatrix-fragment"	189	172	1	16	"0.23918229387060827"^^<http://www.w3.org/2001/XMLSchema#double>	"0.026238165660086462"^^<http://www.w3.org/2001/XMLSchema#double>
+"Qwen/Qwen3-1.7B--q4_k_m-no-imatrix"	189	172	1	16	"0.26694230588255"^^<http://www.w3.org/2001/XMLSchema#double>	"0.0245641965639551"^^<http://www.w3.org/2001/XMLSchema#double>

@@ -1,0 +1,1 @@
+total {'dead_qk_dims': 0, 'dead_qk_heads': 0, 'dead_v_dims': 0, 'dead_v_heads': 0, 'dead_ffn': 0, 'dup_ffn': 0} heads 15 kv heads 5 head dim 64

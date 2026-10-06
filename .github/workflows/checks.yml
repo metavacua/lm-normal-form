@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Two existing linters, on every pull request and on main.
-name: checks
+name: licence and workflow lint
 
 on:
   pull_request:

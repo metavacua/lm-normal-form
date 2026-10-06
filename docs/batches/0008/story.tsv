@@ -1,0 +1,12 @@
+?model	?countries	?inside_story	?override	?inside_other	?outside_canonical	?collapse	?outside_other
+"Qwen/Qwen3-0.6B--drop-12-13-23-25"	189	101	1	87	15	90	84
+"Qwen/Qwen3-0.6B--drop-13"	189	146	0	43	15	156	18
+"Qwen/Qwen3-0.6B--drop-2-3"	189	78	1	110	1	38	150
+"Qwen/Qwen3-0.6B--layers-all"	189	164	0	25	11	140	38
+"Qwen/Qwen3-1.7B--q4_0-all-imatrix-fragment"	189	131	31	27	123	15	51
+"Qwen/Qwen3-1.7B--q4_0-all-imatrix-licence"	189	101	55	33	109	16	64
+"Qwen/Qwen3-1.7B--q4_0-embd-rep"	189	86	65	38	124	11	54
+"Qwen/Qwen3-1.7B--q4_0-qk-rep"	189	69	69	51	126	11	52
+"Qwen/Qwen3-1.7B--q4_0-vo-rep"	189	52	82	55	145	5	39
+"Qwen/Qwen3-1.7B--q4_k_m-imatrix-fragment"	189	77	78	34	111	19	59
+"Qwen/Qwen3-1.7B--q4_k_m-no-imatrix"	189	101	61	27	133	11	45

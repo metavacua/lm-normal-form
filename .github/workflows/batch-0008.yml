@@ -1,0 +1,315 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0008: a selection signal instead of a partition; layer removal by
+# influence; the census of exactly contractible structure; replication of
+# batch 0007's three smallest effects. Written down in docs/batches/0008.md.
+#
+# prepare   the authority, the prompts (batch 0004's) and the fragment corpus
+# quantize  seven cells: Qwen3-1.7B through llama.cpp's quantizer, three
+#           replicates of batch 0007 and four importance-matrix variants
+# layers    four cells: Qwen3-0.6B read through PyTorch with decoder layers
+#           removed by batch 0006's influence profile, and unmodified
+# census    one cell: exactly contractible structure in three models
+# judge     batch-0004-judge.yml, over this run's artifacts
+name: batch 0008
+
+on:
+  push:
+    branches: ["batch/0008-**"]
+    paths: [".github/workflows/batch-0008.yml", "batches/0008/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  statuses: write
+
+concurrency:
+  group: batch-0008-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  USER_AGENT: "lm-normal-form batch 0008 (https://github.com/metavacua/lm-normal-form)"
+
+jobs:
+  prepare:
+    name: authority, prompts and corpus
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Ask Wikidata for the capitals of sovereign states
+        run: |
+          mkdir -p out
+          curl -sSfG -A "$USER_AGENT" -H "Accept: application/sparql-results+json" \
+            --data-urlencode "query@batches/0004/authority.rq" https://query.wikidata.org/sparql -o out/wikidata.json
+          date -u +%Y-%m-%dT%H:%M:%SZ > out/fetched-at.txt
+      - name: Countries, prompts, and the fragment as text
+        run: |
+          jq -f batches/0004/countries.jq out/wikidata.json > out/countries.json
+          jq -r --rawfile inv batches/0004/invented.txt -f batches/0004/prompts.jq out/countries.json > out/prompts.json
+          jq -r '.[] | [.id, .prompt] | @tsv' out/prompts.json > out/prompts.tsv
+          jq -r --rawfile inv batches/0005/invented-train.txt -f batches/0005/corpus.jq out/countries.json | jq -r .text > out/fragment.txt
+          jq -c '{countries: length, determined: (map(select(.determined)) | length)}' out/countries.json | tee out/counts.json
+          wc -l out/prompts.tsv out/fragment.txt; wc -c out/fragment.txt LICENSES/AGPL-3.0-or-later.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: prepare
+          path: out/
+          retention-days: 7
+
+  smoke:
+    name: smoke, the written code parses
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: python -m py_compile batches/0008/*.py && python -m pip install --quiet pyflakes && python -m pyflakes batches/0008/*.py
+
+  quantize:
+    name: "${{ matrix.cell }} ${{ matrix.label }}"
+    needs: [prepare, smoke]
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Replicates of batch 0007's cells 01 to 03, whose effects were at the run-to-run floor.
+          - { cell: "01", label: "Qwen3-1.7B--q4_0-embd-rep", ftype: Q4_0, signal: none, args: "--pure --token-embedding-type q4_0 --output-tensor-type q4_0 --tensor-type attn_q=f16 --tensor-type attn_k=f16 --tensor-type attn_v=f16 --tensor-type attn_output=f16 --tensor-type ffn_up=f16 --tensor-type ffn_gate=f16 --tensor-type ffn_down=f16" }
+          - { cell: "02", label: "Qwen3-1.7B--q4_0-qk-rep", ftype: Q4_0, signal: none, args: "--pure --token-embedding-type f16 --output-tensor-type f16 --tensor-type attn_v=f16 --tensor-type attn_output=f16 --tensor-type ffn_up=f16 --tensor-type ffn_gate=f16 --tensor-type ffn_down=f16" }
+          - { cell: "03", label: "Qwen3-1.7B--q4_0-vo-rep", ftype: Q4_0, signal: none, args: "--pure --token-embedding-type f16 --output-tensor-type f16 --tensor-type attn_q=f16 --tensor-type attn_k=f16 --tensor-type ffn_up=f16 --tensor-type ffn_gate=f16 --tensor-type ffn_down=f16" }
+          # A selection signal: llama.cpp's importance matrix from a corpus, used by its quantizer to
+          # protect the weights that corpus activates. The fragment's own sentences against a licence text.
+          - { cell: "04", label: "Qwen3-1.7B--q4_0-all-imatrix-fragment", ftype: Q4_0, signal: fragment, args: "--pure --token-embedding-type f16 --output-tensor-type f16" }
+          - { cell: "05", label: "Qwen3-1.7B--q4_0-all-imatrix-licence", ftype: Q4_0, signal: licence, args: "--pure --token-embedding-type f16 --output-tensor-type f16" }
+          - { cell: "06", label: "Qwen3-1.7B--q4_k_m-imatrix-fragment", ftype: Q4_K_M, signal: fragment, args: "--token-embedding-type f16 --output-tensor-type f16" }
+          - { cell: "07", label: "Qwen3-1.7B--q4_k_m-no-imatrix", ftype: Q4_K_M, signal: none, args: "--token-embedding-type f16 --output-tensor-type f16" }
+    env:
+      MODEL: Qwen/Qwen3-1.7B
+      LABEL: ${{ matrix.label }}
+      FTYPE: ${{ matrix.ftype }}
+      QARGS: ${{ matrix.args }}
+      SIGNAL: ${{ matrix.signal }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v8
+        with:
+          name: prepare
+          path: prepare
+      - name: Build llama.cpp, install its converter's requirements, download the model
+        run: |
+          mkdir -p out work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          echo "$MODEL--${LABEL#*--}" > out/model.txt
+          curl -sSf "https://huggingface.co/api/models/$MODEL" | jq -r .sha | tee out/model.revision.txt
+          git clone --depth 1 https://github.com/ggml-org/llama.cpp work/llama.cpp
+          git -C work/llama.cpp rev-parse HEAD | tee out/llama.cpp.revision.txt
+          cmake -S work/llama.cpp -B work/build -DCMAKE_BUILD_TYPE=Release -DLLAMA_CURL=OFF -DLLAMA_BUILD_TESTS=OFF
+          /usr/bin/time -v cmake --build work/build --target llama-server llama-quantize llama-imatrix -j "$(nproc)" 2> out/build.time
+          python -m pip install --quiet -r work/llama.cpp/requirements/requirements-convert_hf_to_gguf.txt
+          python -m pip freeze > out/versions.txt
+          hf download "$MODEL" --include "*.safetensors" "*.json" "*.txt" "*.model" --local-dir work/model
+          grep -m1 "model name" /proc/cpuinfo | tee out/cpu.txt; free -m; df -h .
+      - id: convert
+        name: "convert_hf_to_gguf: safetensors to a float16 GGUF"
+        continue-on-error: true
+        run: /usr/bin/time -v python work/llama.cpp/convert_hf_to_gguf.py work/model --outfile work/model.gguf --outtype f16 2> out/convert.time
+      - id: imatrix
+        name: "llama-imatrix: the importance matrix from the signal corpus"
+        if: matrix.signal != 'none'
+        continue-on-error: true
+        run: |
+          if [ "$SIGNAL" = fragment ]; then cp prepare/fragment.txt work/signal.txt; else cp LICENSES/AGPL-3.0-or-later.txt work/signal.txt; fi
+          wc -c work/signal.txt | tee out/signal-size.txt
+          /usr/bin/time -v work/build/bin/llama-imatrix -m work/model.gguf -f work/signal.txt -o work/imatrix.gguf -c 512 2> out/imatrix.time | tail -n 8 | tee out/imatrix.log
+          du -b work/imatrix.gguf | tee -a out/sizes.txt
+      - id: quantize
+        name: "llama-quantize: the variant"
+        continue-on-error: true
+        run: |
+          IM=""; [ "$SIGNAL" != none ] && IM="--imatrix work/imatrix.gguf"
+          # shellcheck disable=SC2086
+          /usr/bin/time -v work/build/bin/llama-quantize $IM $QARGS work/model.gguf work/variant.gguf "$FTYPE" 2> out/quantize.time | tail -n 40 > out/quantize.log
+          du -b work/model.gguf work/variant.gguf | tee -a out/sizes.txt
+      - id: types
+        name: "gguf-dump: the variant's tensor types"
+        continue-on-error: true
+        run: |
+          python work/llama.cpp/gguf-py/gguf/scripts/gguf_dump.py --json work/variant.gguf > out/variant.gguf.json
+          jq -c '.tensors | to_entries | map(.value.type) | group_by(.) | map({(.[0] | tostring): length}) | add' out/variant.gguf.json | tee out/tensor-types.json
+      - id: serve
+        name: "llama.cpp: load and serve the variant"
+        continue-on-error: true
+        run: |
+          work/build/bin/llama-server -m work/variant.gguf --host 127.0.0.1 --port 8080 -c 256 > out/server.log 2>&1 &
+          for _ in $(seq 120); do curl -sf http://127.0.0.1:8080/health > out/health.json && break; sleep 1; done
+          cat out/health.json
+      - id: answers
+        name: "llama.cpp: the next-token distribution for every prompt"
+        continue-on-error: true
+        run: |
+          SECONDS=0
+          while IFS=$'\t' read -r id prompt; do
+            jq -cn --arg p "$prompt" '{prompt: $p, n_predict: 1, temperature: 0, n_probs: 20, cache_prompt: false}' \
+            | curl -sS http://127.0.0.1:8080/completion -H 'Content-Type: application/json' -d @- \
+            | jq -c --arg id "$id" '{id: $id, probs: (.completion_probabilities[0].top_logprobs | map({token, logprob}))}' \
+            || printf '{"id":"%s","probs":[],"unparsable":true}\n' "$id"
+          done < prepare/prompts.tsv > out/answers.jsonl
+          echo "answers: $(wc -l < out/answers.jsonl) of $(wc -l < prepare/prompts.tsv) prompts in $SECONDS s" | tee out/answers.time
+          grep -h "VmHWM\|VmRSS" "/proc/$(pgrep -n llama-server)/status" | tee out/server.memory
+          { echo "answers=$(wc -l < out/answers.jsonl)"; echo "unparsable=$(grep -c unparsable out/answers.jsonl || true)"; echo "seconds=$SECONDS"; echo "server_vmhwm_kib=$(awk '/VmHWM/{print $2}' out/server.memory)"; } >> "$GITHUB_OUTPUT"
+      - name: What the run used
+        if: always()
+        run: |
+          grep -h "Maximum resident\|Elapsed (wall" out/*.time || true
+          cat out/answers.time out/tensor-types.json out/sizes.txt || true
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: answers-${{ matrix.cell }}
+          path: out/
+          retention-days: 7
+
+  layers:
+    name: "${{ matrix.cell }} ${{ matrix.label }}"
+    needs: [prepare, smoke]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Qwen3-0.6B: batch 0006's influence profile puts layers 13, 12, 23, 25 lowest and 2, 3 among the highest after the first.
+          - { cell: "08", label: "Qwen3-0.6B--layers-all", drop: "" }
+          - { cell: "09", label: "Qwen3-0.6B--drop-13", drop: "13" }
+          - { cell: "10", label: "Qwen3-0.6B--drop-12-13-23-25", drop: "12,13,23,25" }
+          - { cell: "11", label: "Qwen3-0.6B--drop-2-3", drop: "2,3" }
+    env:
+      MODEL: Qwen/Qwen3-0.6B
+      LABEL: ${{ matrix.label }}
+      DROP: ${{ matrix.drop }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v8
+        with:
+          name: prepare
+          path: prepare
+      - name: Install
+        run: |
+          mkdir -p out
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          echo "$MODEL--${LABEL#*--}" > out/model.txt
+          curl -sSf "https://huggingface.co/api/models/$MODEL" | jq -r .sha | tee out/model.revision.txt
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers
+          python -m pip freeze > out/versions.txt
+          grep -m1 "model name" /proc/cpuinfo | tee out/cpu.txt
+      - id: answers
+        name: "transformers: remove the layers, read every prompt"
+        continue-on-error: true
+        run: |
+          /usr/bin/time -v python batches/0008/remove_layers.py "$MODEL" prepare/prompts.tsv "$DROP" out 2> out/answers.time | tee out/layers.txt
+          { echo "answers=$(wc -l < out/answers.jsonl)"; echo "peak_kib=$(awk '/Maximum resident/{print $NF}' out/answers.time)"; } >> "$GITHUB_OUTPUT"
+          du -sh out/model | tee out/model-size.txt
+      - name: What the run used
+        if: always()
+        run: grep -h "Maximum resident\|Elapsed (wall" out/*.time || true
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: answers-${{ matrix.cell }}
+          path: out/
+          retention-days: 7
+
+  census:
+    name: "12 census of exactly contractible structure, three models"
+    needs: smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p out
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers
+          python -m pip freeze > out/versions.txt
+      - id: tri390
+        name: "census: TriLM 390M"
+        continue-on-error: true
+        run: python batches/0008/census.py SpectraSuite/TriLM_390M_Unpacked | tee out/tri390.txt
+      - id: tri1100
+        name: "census: TriLM 1.1B, with its distinct values"
+        continue-on-error: true
+        run: python batches/0008/census.py SpectraSuite/TriLM_1.1B_Unpacked | tee out/tri1100.txt
+      - id: smol360
+        name: "census: SmolLM2-360M-Instruct"
+        continue-on-error: true
+        run: python batches/0008/census.py HuggingFaceTB/SmolLM2-360M-Instruct | tee out/smol360.txt
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cell-12
+          path: out/
+          retention-days: 7
+
+  judge:
+    needs: [prepare, quantize, layers]
+    if: always() && needs.prepare.result == 'success'
+    uses: ./.github/workflows/batch-0004-judge.yml
+    with:
+      run_id: ${{ github.run_id }}
+
+  report:
+    # A commit status named after the batch, so that the pull request's checks tab shows the batch run
+    # itself and not only the lint that carries the pull request's title.
+    name: report the batch run on the commit
+    needs: [prepare, smoke, quantize, layers, census, judge]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RESULTS: ${{ toJSON(needs) }}
+    steps:
+      - run: |
+          state=success; echo "$RESULTS" | jq -e '[.[] | .result] | all(. == "success")' > /dev/null || state=failure
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -f state="$state" -f context="batch 0008" \
+            -f description="$(echo "$RESULTS" | jq -r 'to_entries | map("\(.key) \(.value.result)") | join(", ")' | cut -c1-140)" \
+            -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" > /dev/null
