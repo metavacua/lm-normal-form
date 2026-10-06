@@ -1,0 +1,258 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0005: where the loss falls under ternarization, and whether a student
+# of the determined fragment can be trained on a hosted runner. Written down
+# in docs/batches/0005.md.
+#
+# prepare   the authority, the prompts (batch 0004's) and the students' corpus
+# quantize  ten cells: a sound model quantized by llama.cpp's own quantizer,
+#           all linear weights or one tensor class at a time, then read out
+# student   two cells: SmolLM2-135M-Instruct fine-tuned on the corpus, once
+#           with transformers' online ternary linear layers and once in float
+# judge     batch-0004-judge.yml, over this run's artifacts
+name: batch 0005
+
+on:
+  push:
+    branches: ["batch/0005-**"]
+    paths: [".github/workflows/batch-0005.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: batch-0005-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  USER_AGENT: "lm-normal-form batch 0005 (https://github.com/metavacua/lm-normal-form)"
+
+jobs:
+  prepare:
+    name: authority, prompts and corpus
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Ask Wikidata for the capitals of sovereign states
+        run: |
+          mkdir -p out
+          curl -sSfG -A "$USER_AGENT" -H "Accept: application/sparql-results+json" \
+            --data-urlencode "query@batches/0004/authority.rq" https://query.wikidata.org/sparql -o out/wikidata.json
+          date -u +%Y-%m-%dT%H:%M:%SZ > out/fetched-at.txt
+      - name: Countries, prompts and the students' corpus
+        run: |
+          jq -f batches/0004/countries.jq out/wikidata.json > out/countries.json
+          jq -r --rawfile inv batches/0004/invented.txt -f batches/0004/prompts.jq out/countries.json > out/prompts.json
+          jq -r '.[] | [.id, .prompt] | @tsv' out/prompts.json > out/prompts.tsv
+          jq -c --rawfile inv batches/0005/invented-train.txt -f batches/0005/corpus.jq out/countries.json > out/corpus.jsonl
+          jq -c '{countries: length, determined: (map(select(.determined)) | length)}' out/countries.json | tee out/counts.json
+          wc -l out/prompts.tsv out/corpus.jsonl
+          jq -r 'limit(3; .text)' out/corpus.jsonl
+      - uses: actions/upload-artifact@v7
+        with:
+          name: prepare
+          path: out/
+          retention-days: 1
+
+  quantize:
+    name: "${{ matrix.cell }} ${{ matrix.label }}"
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { cell: "01", repo: "Qwen/Qwen3-1.7B", label: "Qwen3-1.7B--tq2_0-all", ftype: TQ2_0, args: "--pure --token-embedding-type f16 --output-tensor-type f16" }
+          - { cell: "02", repo: "Qwen/Qwen3-1.7B", label: "Qwen3-1.7B--q4_0-all", ftype: Q4_0, args: "--pure --token-embedding-type f16 --output-tensor-type f16" }
+          - { cell: "03", repo: "Qwen/Qwen3-1.7B", label: "Qwen3-1.7B--q8_0-all", ftype: Q8_0, args: "--pure --token-embedding-type f16 --output-tensor-type f16" }
+          - { cell: "04", repo: "Qwen/Qwen3-1.7B", label: "Qwen3-1.7B--tq2_0-ffn", ftype: F16, args: "--tensor-type ffn_up=tq2_0 --tensor-type ffn_gate=tq2_0 --tensor-type ffn_down=tq2_0" }
+          - { cell: "05", repo: "Qwen/Qwen3-1.7B", label: "Qwen3-1.7B--tq2_0-attn", ftype: F16, args: "--tensor-type attn_q=tq2_0 --tensor-type attn_k=tq2_0 --tensor-type attn_v=tq2_0 --tensor-type attn_output=tq2_0" }
+          - { cell: "06", repo: "Qwen/Qwen3-1.7B", label: "Qwen3-1.7B--tq2_0-embd-out", ftype: F16, args: "--token-embedding-type tq2_0 --output-tensor-type tq2_0" }
+          - { cell: "07", repo: "HuggingFaceTB/SmolLM2-1.7B-Instruct", label: "SmolLM2-1.7B-Instruct--tq2_0-all", ftype: TQ2_0, args: "--pure --token-embedding-type f16 --output-tensor-type f16" }
+          - { cell: "08", repo: "HuggingFaceTB/SmolLM2-1.7B-Instruct", label: "SmolLM2-1.7B-Instruct--tq2_0-ffn", ftype: F16, args: "--tensor-type ffn_up=tq2_0 --tensor-type ffn_gate=tq2_0 --tensor-type ffn_down=tq2_0" }
+          - { cell: "09", repo: "HuggingFaceTB/SmolLM2-1.7B-Instruct", label: "SmolLM2-1.7B-Instruct--tq2_0-attn", ftype: F16, args: "--tensor-type attn_q=tq2_0 --tensor-type attn_k=tq2_0 --tensor-type attn_v=tq2_0 --tensor-type attn_output=tq2_0" }
+          - { cell: "10", repo: "SpectraSuite/TriLM_1.1B_Unpacked", label: "TriLM_1.1B--tq2_0-all", ftype: TQ2_0, args: "--pure --token-embedding-type f16 --output-tensor-type f16" }
+    env:
+      MODEL: ${{ matrix.repo }}
+      LABEL: ${{ matrix.label }}
+      FTYPE: ${{ matrix.ftype }}
+      QARGS: ${{ matrix.args }}
+      # gguf-py: for every two-dimensional float16 tensor whose rows are blocks of 256, the number of
+      # distinct values, and the number of elements changed by a TQ2_0 round trip.
+      EXACT: |
+        import sys,numpy as np,gguf;from gguf.quants import quantize,dequantize;r=gguf.GGUFReader(sys.argv[1]);Q=gguf.GGMLQuantizationType;n=e=0
+        for t in r.tensors:
+         if t.tensor_type==Q.F16 and len(t.shape)==2 and t.data.shape[-1]%256==0:w=t.data.astype(np.float32);u=int((dequantize(quantize(w,Q.TQ2_0),Q.TQ2_0)!=w).sum());n+=1;e+=u;print(t.name,len(np.unique(w)),u)
+        print('tensors',n,'elements changed by the round trip',e)
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v8
+        with:
+          name: prepare
+          path: prepare
+      - name: Build llama.cpp, install its converter's requirements, download the model
+        run: |
+          mkdir -p out work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          echo "$MODEL--${LABEL#*--}" > out/model.txt
+          git clone --depth 1 https://github.com/ggml-org/llama.cpp work/llama.cpp
+          git -C work/llama.cpp rev-parse HEAD | tee out/llama.cpp.revision.txt
+          cmake -S work/llama.cpp -B work/build -DCMAKE_BUILD_TYPE=Release -DLLAMA_CURL=OFF -DLLAMA_BUILD_TESTS=OFF
+          /usr/bin/time -v cmake --build work/build --target llama-server llama-quantize -j "$(nproc)" 2> out/build.time
+          python -m pip install --quiet -r work/llama.cpp/requirements/requirements-convert_hf_to_gguf.txt
+          python -m pip freeze > out/versions.txt
+          hf download "$MODEL" --include "*.safetensors" "*.json" "*.txt" "*.model" --local-dir work/model
+          free -m; df -h .
+      - id: convert
+        name: "convert_hf_to_gguf: safetensors to a float16 GGUF"
+        continue-on-error: true
+        run: /usr/bin/time -v python work/llama.cpp/convert_hf_to_gguf.py work/model --outfile work/model.gguf --outtype f16 2> out/convert.time
+      - id: exact
+        name: "gguf-py: distinct values per tensor and the TQ2_0 round trip"
+        if: matrix.cell == '10'
+        continue-on-error: true
+        run: PYTHONPATH=work/llama.cpp/gguf-py /usr/bin/time -v python -c "$EXACT" work/model.gguf 2> out/exact.time | tee out/exact.txt | tail -n 3
+      - id: quantize
+        name: "llama-quantize: the variant"
+        continue-on-error: true
+        run: |
+          # shellcheck disable=SC2086
+          /usr/bin/time -v work/build/bin/llama-quantize $QARGS work/model.gguf work/variant.gguf "$FTYPE" 2> out/quantize.time | tail -n 40 > out/quantize.log
+          ls -l work/model.gguf work/variant.gguf | tee out/sizes.txt
+      - id: types
+        name: "gguf-dump: the variant's tensor types"
+        continue-on-error: true
+        run: |
+          python work/llama.cpp/gguf-py/gguf/scripts/gguf_dump.py --json work/variant.gguf > out/variant.gguf.json
+          jq -c '.tensors | to_entries | map(.value.type) | group_by(.) | map({(.[0] | tostring): length}) | add' out/variant.gguf.json | tee out/tensor-types.json
+      - id: serve
+        name: "llama.cpp: load and serve the variant"
+        continue-on-error: true
+        run: |
+          work/build/bin/llama-server -m work/variant.gguf --host 127.0.0.1 --port 8080 -c 256 > out/server.log 2>&1 &
+          curl -sSf --retry 120 --retry-delay 1 --retry-connrefused --retry-all-errors http://127.0.0.1:8080/health
+      - id: answers
+        name: "llama.cpp: the next-token distribution for every prompt"
+        continue-on-error: true
+        run: |
+          SECONDS=0
+          while IFS=$'\t' read -r id prompt; do
+            jq -cn --arg p "$prompt" '{prompt: $p, n_predict: 1, temperature: 0, n_probs: 20, cache_prompt: false}' \
+            | curl -sS http://127.0.0.1:8080/completion -H 'Content-Type: application/json' -d @- \
+            | jq -c --arg id "$id" '{id: $id, probs: (.completion_probabilities[0].top_logprobs | map({token, logprob}))}'
+          done < prepare/prompts.tsv > out/answers.jsonl
+          echo "answers: $(wc -l < out/answers.jsonl) of $(wc -l < prepare/prompts.tsv) prompts in $SECONDS s" | tee out/answers.time
+      - name: What the run used
+        if: always()
+        run: |
+          grep -h "Maximum resident\|Elapsed (wall" out/*.time || true
+          cat out/answers.time out/tensor-types.json || true
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: answers-${{ matrix.cell }}
+          path: out/
+          retention-days: 1
+
+  student:
+    name: "${{ matrix.cell }} ${{ matrix.label }}"
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { cell: "11", label: "SmolLM2-135M-Instruct--student-ternary", weights: ternary }
+          - { cell: "12", label: "SmolLM2-135M-Instruct--student-float", weights: float }
+    env:
+      MODEL: HuggingFaceTB/SmolLM2-135M-Instruct
+      LABEL: ${{ matrix.label }}
+      WEIGHTS: ${{ matrix.weights }}
+      # transformers and TRL: load the model; for the ternary student, swap every linear layer but
+      # the head for transformers' own online ternary layer and put the weights back; fine-tune on
+      # the corpus with TRL's trainer; then, in the same process, the twenty most probable next
+      # tokens for every prompt; then save.
+      TRAIN: |
+        import sys,json,torch,transformers as t;from datasets import load_dataset;from trl import SFTConfig,SFTTrainer;from transformers import BitNetQuantConfig;from transformers.integrations import replace_with_bitnet_linear
+        m,corpus,prompts,out,w,lr=sys.argv[1:7];k=t.AutoTokenizer.from_pretrained(m);g=t.AutoModelForCausalLM.from_pretrained(m).float()
+        if w=='ternary':s=g.state_dict();c=BitNetQuantConfig(linear_class='autobitlinear',quantization_mode='online');replace_with_bitnet_linear(g,modules_to_not_convert=['lm_head'],quantization_config=c);print(g.load_state_dict(s,strict=False));g.config.quantization_config=c
+        d=load_dataset('json',data_files=corpus)['train'];SFTTrainer(model=g,processing_class=k,args=SFTConfig(output_dir=out,num_train_epochs=3,per_device_train_batch_size=16,max_length=32,learning_rate=float(lr),logging_steps=10,save_strategy='no',report_to=[],use_cpu=True),train_dataset=d).train()
+        g.eval();torch.set_grad_enabled(False);a=open(out+'/answers.jsonl','w')
+        for l in open(prompts):
+         i,p=l.rstrip('\n').split('\t');x=k(p,return_tensors='pt');v,j=g(**x).logits[0,-1].softmax(-1).topk(20);a.write(json.dumps({'id':i,'probs':[{'token':k.decode([int(b)]),'logprob':float(q.log())}for b,q in zip(j,v)]})+'\n')
+        a.close();g.save_pretrained(out+'/model');k.save_pretrained(out+'/model')
+      # The saved student, loaded again by the library and read on the first prompt.
+      RELOAD: |
+        import sys,torch,transformers as t;torch.set_grad_enabled(False);m=sys.argv[1];k=t.AutoTokenizer.from_pretrained(m);g=t.AutoModelForCausalLM.from_pretrained(m);print(type(g.model.layers[0].mlp.up_proj).__name__);x=k(sys.argv[2],return_tensors='pt');v,j=g(**x).logits[0,-1].softmax(-1).topk(5);print([(k.decode([int(a)]),round(float(b),4))for a,b in zip(j,v)])
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v8
+        with:
+          name: prepare
+          path: prepare
+      - name: Install
+        run: |
+          mkdir -p out
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          echo "$MODEL--${LABEL#*--}" > out/model.txt
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers trl datasets accelerate
+          python -m pip freeze > out/versions.txt
+          echo "TRAIN ${#TRAIN} bytes, RELOAD ${#RELOAD} bytes" | tee out/invocation-sizes.txt
+          wc -l prepare/corpus.jsonl
+      - id: train
+        name: "transformers and TRL: fine-tune the student on the corpus, then read every prompt"
+        continue-on-error: true
+        run: /usr/bin/time -v python -c "$TRAIN" "$MODEL" prepare/corpus.jsonl prepare/prompts.tsv out "$WEIGHTS" 3e-4 2> out/train.time | grep -v "it/s\]" | tail -n 60 | tee out/train.log
+      - id: reload
+        name: "transformers: load the saved student and read the first prompt"
+        continue-on-error: true
+        run: python -c "$RELOAD" out/model "$(head -n 1 prepare/prompts.tsv | cut -f2)" 2> out/reload.err | tee out/reload.txt
+      - name: What the run used
+        if: always()
+        run: |
+          echo "answers: $(wc -l < out/answers.jsonl) of $(wc -l < prepare/prompts.tsv) prompts"
+          grep -h "Maximum resident\|Elapsed (wall" out/*.time || true
+          grep -h "train_loss\|train_runtime\|train_samples_per_second" out/train.log || true
+          tail -n 3 out/reload.err || true
+          du -sh out/model || true
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: answers-${{ matrix.cell }}
+          path: out/
+          retention-days: 1
+
+  judge:
+    needs: [prepare, quantize, student]
+    if: always() && needs.prepare.result == 'success'
+    uses: ./.github/workflows/batch-0004-judge.yml
+    with:
+      run_id: ${{ github.run_id }}
