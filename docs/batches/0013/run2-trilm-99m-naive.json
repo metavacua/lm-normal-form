@@ -1,0 +1,50 @@
+{
+ "config_torch_dtype": "float16",
+ "dims": {
+  "F": 1280,
+  "H": 512,
+  "L": 16,
+  "hd": 64,
+  "nh": 8,
+  "nkv": 8,
+  "rep": 1
+ },
+ "model": "SpectraSuite/TriLM_99M_Unpacked",
+ "naive": {
+  "12x20 matrix of 0, 1, 2, two rows alike in signature": {
+   "distinct_outputs_signature_then_columns": 2,
+   "distinct_outputs_sort_rows_then_columns": 40,
+   "images": 40
+  },
+  "model.layers.0.mlp.gate_proj.weight": {
+   "distinct_outputs_signature_then_columns": 12,
+   "distinct_outputs_sort_rows_then_columns": 12,
+   "images": 12,
+   "shape": [
+    1280,
+    512
+   ]
+  },
+  "model.layers.0.self_attn.k_proj.weight": {
+   "distinct_outputs_signature_then_columns": 12,
+   "distinct_outputs_sort_rows_then_columns": 12,
+   "images": 12,
+   "shape": [
+    512,
+    512
+   ]
+  },
+  "model.layers.0.self_attn.q_proj.weight": {
+   "distinct_outputs_signature_then_columns": 12,
+   "distinct_outputs_sort_rows_then_columns": 12,
+   "images": 12,
+   "shape": [
+    512,
+    512
+   ]
+  }
+ },
+ "seconds": 2.074827194213867,
+ "tensors": 147,
+ "tied": false
+}

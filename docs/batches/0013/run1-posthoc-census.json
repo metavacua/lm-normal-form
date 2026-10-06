@@ -1,0 +1,2720 @@
+{
+ "floatlm-99m": {
+  "embedding": {
+   "columns_zero_in_both": 0,
+   "head_zero_columns": 0,
+   "head_zero_rows": 0,
+   "zero_columns": 0,
+   "zero_rows": 0
+  },
+  "layers": [
+   {
+    "layer": 0,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 1,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 2,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 3,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 4,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 5,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 6,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 7,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 8,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 9,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 10,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 11,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 12,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 13,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 14,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 15,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   }
+  ],
+  "totals": {
+   "layers_with_dead_pairs": [],
+   "mixed_cases": 0,
+   "qk": {
+    "both_zero": 0,
+    "key_planes_zero": 0,
+    "mixed_key_zero_query_not": 0,
+    "query_planes_zero": 0
+   },
+   "units": {
+    "both_zero": 0,
+    "down_zero": 0,
+    "gate_zero": 0,
+    "mixed_up_zero_down_not": 0,
+    "up_zero": 0
+   },
+   "vo": {
+    "both_zero": 0,
+    "mixed_value_zero_o_not": 0,
+    "o_columns_zero": 0,
+    "value_rows_zero": 0
+   }
+  }
+ },
+ "smol-base": {
+  "embedding": {
+   "zero_columns": 0,
+   "zero_rows": 0
+  },
+  "layers": [
+   {
+    "layer": 0,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 1,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 2,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 3,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 4,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 5,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 6,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 7,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 8,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 9,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 10,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 11,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 12,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 13,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 14,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 15,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 16,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 17,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 18,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 19,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 20,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 21,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 22,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 23,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 24,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 25,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 26,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 27,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 28,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 29,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   }
+  ],
+  "totals": {
+   "layers_with_dead_pairs": [],
+   "mixed_cases": 0,
+   "qk": {
+    "both_zero": 0,
+    "key_planes_zero": 0,
+    "mixed_key_zero_query_not": 0,
+    "query_planes_zero": 0
+   },
+   "units": {
+    "both_zero": 0,
+    "down_zero": 0,
+    "gate_zero": 0,
+    "mixed_up_zero_down_not": 0,
+    "up_zero": 0
+   },
+   "vo": {
+    "both_zero": 0,
+    "mixed_value_zero_o_not": 0,
+    "o_columns_zero": 0,
+    "value_rows_zero": 0
+   }
+  }
+ },
+ "smol-instruct": {
+  "embedding": {
+   "zero_columns": 0,
+   "zero_rows": 0
+  },
+  "layers": [
+   {
+    "layer": 0,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 1,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 2,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 3,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 4,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 5,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 6,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 7,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 8,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 9,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 10,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 11,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 12,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 13,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 14,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 15,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 16,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 17,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 18,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 19,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 20,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 21,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 22,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 23,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 24,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 25,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 26,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 27,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 28,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 29,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   }
+  ],
+  "totals": {
+   "layers_with_dead_pairs": [],
+   "mixed_cases": 0,
+   "qk": {
+    "both_zero": 0,
+    "key_planes_zero": 0,
+    "mixed_key_zero_query_not": 0,
+    "query_planes_zero": 0
+   },
+   "units": {
+    "both_zero": 0,
+    "down_zero": 0,
+    "gate_zero": 0,
+    "mixed_up_zero_down_not": 0,
+    "up_zero": 0
+   },
+   "vo": {
+    "both_zero": 0,
+    "mixed_value_zero_o_not": 0,
+    "o_columns_zero": 0,
+    "value_rows_zero": 0
+   }
+  }
+ },
+ "trilm-390m": {
+  "embedding": {
+   "columns_zero_in_both": 0,
+   "head_zero_columns": 0,
+   "head_zero_rows": 0,
+   "zero_columns": 0,
+   "zero_rows": 402
+  },
+  "layers": [
+   {
+    "layer": 0,
+    "qk": {
+     "both_zero": 173,
+     "key_planes_zero": 173,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 173
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 1,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 2,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 3,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 4,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 5,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 6,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 7,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 8,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 9,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 10,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 11,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 12,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 13,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 14,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 15,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 16,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 17,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 18,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 19,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 20,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 21,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 22,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 23,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   }
+  ],
+  "totals": {
+   "layers_with_dead_pairs": [
+    0
+   ],
+   "mixed_cases": 0,
+   "qk": {
+    "both_zero": 173,
+    "key_planes_zero": 173,
+    "mixed_key_zero_query_not": 0,
+    "query_planes_zero": 173
+   },
+   "units": {
+    "both_zero": 0,
+    "down_zero": 0,
+    "gate_zero": 0,
+    "mixed_up_zero_down_not": 0,
+    "up_zero": 0
+   },
+   "vo": {
+    "both_zero": 0,
+    "mixed_value_zero_o_not": 0,
+    "o_columns_zero": 0,
+    "value_rows_zero": 0
+   }
+  }
+ },
+ "trilm-99m": {
+  "embedding": {
+   "columns_zero_in_both": 0,
+   "head_zero_columns": 0,
+   "head_zero_rows": 0,
+   "zero_columns": 0,
+   "zero_rows": 402
+  },
+  "layers": [
+   {
+    "layer": 0,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 1,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 2,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 3,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 4,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 5,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 6,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 7,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 8,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 9,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 10,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 11,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 12,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 13,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 14,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   },
+   {
+    "layer": 15,
+    "qk": {
+     "both_zero": 0,
+     "key_planes_zero": 0,
+     "mixed_key_zero_query_not": 0,
+     "query_planes_zero": 0
+    },
+    "units": {
+     "both_zero": 0,
+     "down_zero": 0,
+     "gate_zero": 0,
+     "mixed_up_zero_down_not": 0,
+     "up_zero": 0
+    },
+    "vo": {
+     "both_zero": 0,
+     "mixed_value_zero_o_not": 0,
+     "o_columns_zero": 0,
+     "value_rows_zero": 0
+    }
+   }
+  ],
+  "totals": {
+   "layers_with_dead_pairs": [],
+   "mixed_cases": 0,
+   "qk": {
+    "both_zero": 0,
+    "key_planes_zero": 0,
+    "mixed_key_zero_query_not": 0,
+    "query_planes_zero": 0
+   },
+   "units": {
+    "both_zero": 0,
+    "down_zero": 0,
+    "gate_zero": 0,
+    "mixed_up_zero_down_not": 0,
+    "up_zero": 0
+   },
+   "vo": {
+    "both_zero": 0,
+    "mixed_value_zero_o_not": 0,
+    "o_columns_zero": 0,
+    "value_rows_zero": 0
+   }
+  }
+ }
+}

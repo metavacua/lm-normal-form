@@ -1,0 +1,166 @@
+{
+ "canon": {
+  "all_parts": [
+   {
+    "canonical_roots_of_the_image": {
+     "bag_root": "2691c9257725fea209bb1cc12a036df4e3cf29db5b9e80a242f0aa689b0e554e",
+     "labelled_root": "5df3f2deed630b5f9533469ee3e4a076fd172c5bf83defcfe5dcc2ec259bbfb8"
+    },
+    "canonical_tensors_equal": 215,
+    "raw_roots_of_the_image": {
+     "bag_root": "2d989b0c34369e6f9d06c5760fe85f4b97cf459db10c89f1d2bb645b2cb1ed89",
+     "labelled_root": "b295d8131dec34aaa0d59e05fc05c88b48a7516fb1363ac091b885208949ec58"
+    },
+    "raw_tensors_changed": 219
+   },
+   {
+    "canonical_tensors_equal": 215,
+    "raw_tensors_changed": 219
+   },
+   {
+    "canonical_tensors_equal": 215,
+    "raw_tensors_changed": 219
+   }
+  ],
+  "canonical_form_idempotent": true,
+  "canonical_roots": {
+   "bag_root": "1f78ae48996002aa7a8368b532ff09e7c9b36c8ab4caf1a1739840da2cd5765d",
+   "labelled_root": "a8ceab0314253e4d1a1034dc9abf86604de32438789475f1188a47870b65bb95"
+  },
+  "negative_controls": {
+   "one float32 ulp in one query weight": {
+    "canonical_tensors_equal": 218,
+    "differing": [
+     "model.layers.5.self_attn.q_proj.weight"
+    ],
+    "differing_count": 1,
+    "layers_touched": [
+     5
+    ]
+   },
+   "one gate row negated": {
+    "canonical_tensors_equal": 216,
+    "differing": [
+     "model.layers.3.mlp.down_proj.weight",
+     "model.layers.3.mlp.gate_proj.weight",
+     "model.layers.3.mlp.up_proj.weight"
+    ],
+    "differing_count": 3,
+    "layers_touched": [
+     3
+    ]
+   },
+   "one unit's gate and up rows exchanged": {
+    "canonical_tensors_equal": 216,
+    "differing": [
+     "model.layers.3.mlp.down_proj.weight",
+     "model.layers.3.mlp.gate_proj.weight",
+     "model.layers.3.mlp.up_proj.weight"
+    ],
+    "differing_count": 3,
+    "layers_touched": [
+     3
+    ]
+   },
+   "two embedding columns exchanged, nothing else": {
+    "canonical_tensors_equal": 1,
+    "differing": [
+     "lm_head.weight",
+     "model.layers.0.input_layernorm.weight",
+     "model.layers.0.mlp.down_proj.weight",
+     "model.layers.0.mlp.gate_proj.weight",
+     "model.layers.0.mlp.up_proj.weight",
+     "model.layers.0.post_attention_layernorm.weight",
+     "...",
+     "model.layers.9.self_attn.q_proj.weight",
+     "model.layers.9.self_attn.v_proj.weight",
+     "model.norm.weight"
+    ],
+    "differing_count": 218,
+    "layers_touched": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     22,
+     23
+    ]
+   }
+  },
+  "raw_roots": {
+   "bag_root": "f4f2c39163ecf085a835fd7d5c19643a7820790b31aaad7fc903c09fea02d247",
+   "labelled_root": "01b6561e5e9011c6b672e57c786b3d8daac9a855829424fb748c12acceed310b"
+  },
+  "single_parts": {
+   "heads": [
+    {
+     "canonical_tensors_equal": 219,
+     "raw_tensors_changed": 96
+    }
+   ],
+   "qk": [
+    {
+     "canonical_tensors_equal": 215,
+     "raw_tensors_changed": 48
+    }
+   ],
+   "residual": [
+    {
+     "canonical_tensors_equal": 219,
+     "raw_tensors_changed": 219
+    }
+   ],
+   "units": [
+    {
+     "canonical_tensors_equal": 219,
+     "raw_tensors_changed": 72
+    }
+   ],
+   "units-signed": [
+    {
+     "canonical_tensors_equal": 219,
+     "raw_tensors_changed": 48
+    }
+   ],
+   "vo": [
+    {
+     "canonical_tensors_equal": 219,
+     "raw_tensors_changed": 48
+    }
+   ]
+  },
+  "tensors": 219
+ },
+ "config_torch_dtype": "float16",
+ "dims": {
+  "F": 2560,
+  "H": 1024,
+  "L": 24,
+  "hd": 64,
+  "nh": 16,
+  "nkv": 16,
+  "rep": 1
+ },
+ "model": "SpectraSuite/TriLM_390M_Unpacked",
+ "seconds": 1873.3910474777222,
+ "tensors": 219,
+ "tied": false
+}
