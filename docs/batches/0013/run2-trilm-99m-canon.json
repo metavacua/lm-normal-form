@@ -1,0 +1,213 @@
+{
+ "canon": {
+  "all_parts": [
+   {
+    "canonical_roots_of_the_image": {
+     "bag_root": "c613eae709f179447dc94b090e7a173e60521fe3ce9405652a39a54249e2817a",
+     "labelled_root": "74b1a9fed8eec3a00d2f1f0c95c1fc0fc4f517499ae09fdedd714d47ee93d82f"
+    },
+    "canonical_tensors_equal": 147,
+    "raw_roots_of_the_image": {
+     "bag_root": "7c8db299709661a93661084d37ab97fd3592d2433666f9ab52a1689bff774bad",
+     "labelled_root": "aa2d3dd2e33e2b2ada20bcbb6cd21cf77f1289887ceaddce2dae5090befe1492"
+    },
+    "raw_tensors_changed": 147
+   },
+   {
+    "canonical_tensors_equal": 147,
+    "raw_tensors_changed": 147
+   },
+   {
+    "canonical_tensors_equal": 147,
+    "raw_tensors_changed": 147
+   },
+   {
+    "canonical_tensors_equal": 147,
+    "raw_tensors_changed": 147
+   },
+   {
+    "canonical_tensors_equal": 147,
+    "raw_tensors_changed": 147
+   },
+   {
+    "canonical_tensors_equal": 147,
+    "raw_tensors_changed": 147
+   },
+   {
+    "canonical_tensors_equal": 147,
+    "raw_tensors_changed": 147
+   },
+   {
+    "canonical_tensors_equal": 147,
+    "raw_tensors_changed": 147
+   }
+  ],
+  "canonical_form_idempotent": true,
+  "canonical_roots": {
+   "bag_root": "c613eae709f179447dc94b090e7a173e60521fe3ce9405652a39a54249e2817a",
+   "labelled_root": "74b1a9fed8eec3a00d2f1f0c95c1fc0fc4f517499ae09fdedd714d47ee93d82f"
+  },
+  "negative_controls": {
+   "one float32 ulp in one query weight": {
+    "canonical_tensors_equal": 147,
+    "differing": [],
+    "differing_count": 0,
+    "layers_touched": []
+   },
+   "one gate row negated": {
+    "canonical_tensors_equal": 144,
+    "differing": [
+     "model.layers.3.mlp.down_proj.weight",
+     "model.layers.3.mlp.gate_proj.weight",
+     "model.layers.3.mlp.up_proj.weight"
+    ],
+    "differing_count": 3,
+    "layers_touched": [
+     3
+    ]
+   },
+   "one unit's gate and up rows exchanged": {
+    "canonical_tensors_equal": 144,
+    "differing": [
+     "model.layers.3.mlp.down_proj.weight",
+     "model.layers.3.mlp.gate_proj.weight",
+     "model.layers.3.mlp.up_proj.weight"
+    ],
+    "differing_count": 3,
+    "layers_touched": [
+     3
+    ]
+   },
+   "two embedding columns exchanged, nothing else": {
+    "canonical_tensors_equal": 1,
+    "differing": [
+     "lm_head.weight",
+     "model.layers.0.input_layernorm.weight",
+     "model.layers.0.mlp.down_proj.weight",
+     "model.layers.0.mlp.gate_proj.weight",
+     "model.layers.0.mlp.up_proj.weight",
+     "model.layers.0.post_attention_layernorm.weight",
+     "...",
+     "model.layers.9.self_attn.q_proj.weight",
+     "model.layers.9.self_attn.v_proj.weight",
+     "model.norm.weight"
+    ],
+    "differing_count": 146,
+    "layers_touched": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15
+    ]
+   }
+  },
+  "raw_roots": {
+   "bag_root": "4ef92463c931d0acbe349baf999936a1ae2dcbdb5fdf836819ef629d0c413c5f",
+   "labelled_root": "14b9eebbd87484e502089c3b5ddd9397939354d25e3df541111b0814eaa54395"
+  },
+  "single_parts": {
+   "heads": [
+    {
+     "canonical_tensors_equal": 147,
+     "raw_tensors_changed": 64
+    },
+    {
+     "canonical_tensors_equal": 147,
+     "raw_tensors_changed": 64
+    }
+   ],
+   "qk": [
+    {
+     "canonical_tensors_equal": 147,
+     "raw_tensors_changed": 32
+    },
+    {
+     "canonical_tensors_equal": 147,
+     "raw_tensors_changed": 32
+    }
+   ],
+   "residual": [
+    {
+     "canonical_tensors_equal": 147,
+     "raw_tensors_changed": 147
+    },
+    {
+     "canonical_tensors_equal": 147,
+     "raw_tensors_changed": 147
+    }
+   ],
+   "units": [
+    {
+     "canonical_tensors_equal": 147,
+     "raw_tensors_changed": 48
+    },
+    {
+     "canonical_tensors_equal": 147,
+     "raw_tensors_changed": 48
+    }
+   ],
+   "units-signed": [
+    {
+     "canonical_tensors_equal": 147,
+     "raw_tensors_changed": 32
+    },
+    {
+     "canonical_tensors_equal": 147,
+     "raw_tensors_changed": 32
+    }
+   ],
+   "vo": [
+    {
+     "canonical_tensors_equal": 147,
+     "raw_tensors_changed": 32
+    },
+    {
+     "canonical_tensors_equal": 147,
+     "raw_tensors_changed": 32
+    }
+   ],
+   "zsigns": [
+    {
+     "canonical_tensors_equal": 147,
+     "raw_tensors_changed": 114
+    },
+    {
+     "canonical_tensors_equal": 147,
+     "raw_tensors_changed": 114
+    }
+   ]
+  },
+  "tensors": 147,
+  "zero_census": {
+   "tensors_with_16_or_more_zeros": 113,
+   "tensors_with_1_to_15_zeros": 1,
+   "tensors_with_no_zeros": 33
+  }
+ },
+ "config_torch_dtype": "float16",
+ "dims": {
+  "F": 1280,
+  "H": 512,
+  "L": 16,
+  "hd": 64,
+  "nh": 8,
+  "nkv": 8,
+  "rep": 1
+ },
+ "model": "SpectraSuite/TriLM_99M_Unpacked",
+ "seconds": 276.3310270309448,
+ "tensors": 147,
+ "tied": false
+}

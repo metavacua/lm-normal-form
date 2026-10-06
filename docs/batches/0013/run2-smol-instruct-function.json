@@ -1,0 +1,78 @@
+{
+ "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+ "seconds": 39.973912715911865,
+ "variants": {
+  "all": {
+   "max_abs": 0.000141143798828125,
+   "mean_abs": 8.342131176926777e-06,
+   "mean_kl": 1.1431327101879992e-11,
+   "nonfinite": false,
+   "top1": 1.0,
+   "top5_prompts": "3/3"
+  },
+  "canonical": {
+   "max_abs": 0.00022411346435546875,
+   "mean_abs": 8.91127138040095e-06,
+   "mean_kl": 1.2290528715461017e-11,
+   "nonfinite": false,
+   "top1": 1.0,
+   "top5_prompts": "3/3"
+  },
+  "heads": {
+   "max_abs": 0.000118255615234375,
+   "mean_abs": 5.76377490336848e-06,
+   "mean_kl": 6.240479371239544e-12,
+   "nonfinite": false,
+   "top1": 1.0,
+   "top5_prompts": "3/3"
+  },
+  "identity": {
+   "max_abs": 0.0,
+   "mean_abs": 0.0,
+   "mean_kl": 0.0,
+   "nonfinite": false,
+   "top1": 1.0,
+   "top5_prompts": "3/3"
+  },
+  "qk": {
+   "max_abs": 0.0,
+   "mean_abs": 0.0,
+   "mean_kl": 0.0,
+   "nonfinite": false,
+   "top1": 1.0,
+   "top5_prompts": "3/3"
+  },
+  "residual": {
+   "max_abs": 0.0001125335693359375,
+   "mean_abs": 7.248497508005956e-06,
+   "mean_kl": 1.0231591315107952e-11,
+   "nonfinite": false,
+   "top1": 1.0,
+   "top5_prompts": "3/3"
+  },
+  "units": {
+   "max_abs": 0.00014781951904296875,
+   "mean_abs": 7.04149984313935e-06,
+   "mean_kl": 7.160564259856851e-12,
+   "nonfinite": false,
+   "top1": 1.0,
+   "top5_prompts": "3/3"
+  },
+  "units-signed": {
+   "max_abs": 0.0,
+   "mean_abs": 0.0,
+   "mean_kl": 0.0,
+   "nonfinite": false,
+   "top1": 1.0,
+   "top5_prompts": "3/3"
+  },
+  "vo": {
+   "max_abs": 0.0,
+   "mean_abs": 0.0,
+   "mean_kl": 0.0,
+   "nonfinite": false,
+   "top1": 1.0,
+   "top5_prompts": "3/3"
+  }
+ }
+}

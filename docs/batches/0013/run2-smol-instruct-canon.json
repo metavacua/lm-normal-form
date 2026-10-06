@@ -1,0 +1,231 @@
+{
+ "canon": {
+  "all_parts": [
+   {
+    "canonical_roots_of_the_image": {
+     "bag_root": "6cc1b35d95a298c07d36475adbe82404aee68670eee7f61831a7d43239eb87a5",
+     "labelled_root": "d7439dc373f76c58458b3a193c10d296071b182729d913846af3d57ddb52d956"
+    },
+    "canonical_tensors_equal": 272,
+    "raw_roots_of_the_image": {
+     "bag_root": "b0ec267d6804c05f6235a9203ccf1f932d195500dc6dc3b5319e83c5a1770275",
+     "labelled_root": "8afd5bfc17c2b7ec0fb3db2cd5fa1ea0615eb8354607da0da753bbdc1127fbaa"
+    },
+    "raw_tensors_changed": 272
+   },
+   {
+    "canonical_tensors_equal": 272,
+    "raw_tensors_changed": 272
+   },
+   {
+    "canonical_tensors_equal": 272,
+    "raw_tensors_changed": 272
+   },
+   {
+    "canonical_tensors_equal": 272,
+    "raw_tensors_changed": 272
+   },
+   {
+    "canonical_tensors_equal": 272,
+    "raw_tensors_changed": 272
+   },
+   {
+    "canonical_tensors_equal": 272,
+    "raw_tensors_changed": 272
+   },
+   {
+    "canonical_tensors_equal": 272,
+    "raw_tensors_changed": 272
+   },
+   {
+    "canonical_tensors_equal": 272,
+    "raw_tensors_changed": 272
+   }
+  ],
+  "canonical_form_idempotent": true,
+  "canonical_roots": {
+   "bag_root": "6cc1b35d95a298c07d36475adbe82404aee68670eee7f61831a7d43239eb87a5",
+   "labelled_root": "d7439dc373f76c58458b3a193c10d296071b182729d913846af3d57ddb52d956"
+  },
+  "negative_controls": {
+   "one float32 ulp in one query weight": {
+    "canonical_tensors_equal": 271,
+    "differing": [
+     "model.layers.5.self_attn.q_proj.weight"
+    ],
+    "differing_count": 1,
+    "layers_touched": [
+     5
+    ]
+   },
+   "one gate row negated": {
+    "canonical_tensors_equal": 269,
+    "differing": [
+     "model.layers.3.mlp.down_proj.weight",
+     "model.layers.3.mlp.gate_proj.weight",
+     "model.layers.3.mlp.up_proj.weight"
+    ],
+    "differing_count": 3,
+    "layers_touched": [
+     3
+    ]
+   },
+   "one unit's gate and up rows exchanged": {
+    "canonical_tensors_equal": 269,
+    "differing": [
+     "model.layers.3.mlp.down_proj.weight",
+     "model.layers.3.mlp.gate_proj.weight",
+     "model.layers.3.mlp.up_proj.weight"
+    ],
+    "differing_count": 3,
+    "layers_touched": [
+     3
+    ]
+   },
+   "two embedding columns exchanged, nothing else": {
+    "canonical_tensors_equal": 1,
+    "differing": [
+     "model.layers.0.input_layernorm.weight",
+     "model.layers.0.mlp.down_proj.weight",
+     "model.layers.0.mlp.gate_proj.weight",
+     "model.layers.0.mlp.up_proj.weight",
+     "model.layers.0.post_attention_layernorm.weight",
+     "model.layers.0.self_attn.k_proj.weight",
+     "...",
+     "model.layers.9.self_attn.q_proj.weight",
+     "model.layers.9.self_attn.v_proj.weight",
+     "model.norm.weight"
+    ],
+    "differing_count": 271,
+    "layers_touched": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     22,
+     23,
+     24,
+     25,
+     26,
+     27,
+     28,
+     29
+    ]
+   }
+  },
+  "raw_roots": {
+   "bag_root": "a946aed21e6ec2017c515d587d5ad72d654eb7c8f92fd9e04c4ca99898d9d3e2",
+   "labelled_root": "476ff7a1fd9097fb56d98c60df3c25e52cf08f54bb02a7ec3f523a049754fca9"
+  },
+  "single_parts": {
+   "heads": [
+    {
+     "canonical_tensors_equal": 272,
+     "raw_tensors_changed": 108
+    },
+    {
+     "canonical_tensors_equal": 272,
+     "raw_tensors_changed": 118
+    }
+   ],
+   "qk": [
+    {
+     "canonical_tensors_equal": 272,
+     "raw_tensors_changed": 60
+    },
+    {
+     "canonical_tensors_equal": 272,
+     "raw_tensors_changed": 60
+    }
+   ],
+   "residual": [
+    {
+     "canonical_tensors_equal": 272,
+     "raw_tensors_changed": 272
+    },
+    {
+     "canonical_tensors_equal": 272,
+     "raw_tensors_changed": 272
+    }
+   ],
+   "units": [
+    {
+     "canonical_tensors_equal": 272,
+     "raw_tensors_changed": 90
+    },
+    {
+     "canonical_tensors_equal": 272,
+     "raw_tensors_changed": 90
+    }
+   ],
+   "units-signed": [
+    {
+     "canonical_tensors_equal": 272,
+     "raw_tensors_changed": 60
+    },
+    {
+     "canonical_tensors_equal": 272,
+     "raw_tensors_changed": 60
+    }
+   ],
+   "vo": [
+    {
+     "canonical_tensors_equal": 272,
+     "raw_tensors_changed": 60
+    },
+    {
+     "canonical_tensors_equal": 272,
+     "raw_tensors_changed": 60
+    }
+   ],
+   "zsigns": [
+    {
+     "canonical_tensors_equal": 272,
+     "raw_tensors_changed": 0
+    },
+    {
+     "canonical_tensors_equal": 272,
+     "raw_tensors_changed": 0
+    }
+   ]
+  },
+  "tensors": 272,
+  "zero_census": {
+   "tensors_with_16_or_more_zeros": 0,
+   "tensors_with_1_to_15_zeros": 0,
+   "tensors_with_no_zeros": 272
+  }
+ },
+ "config_torch_dtype": "bfloat16",
+ "dims": {
+  "F": 1536,
+  "H": 576,
+  "L": 30,
+  "hd": 64,
+  "nh": 9,
+  "nkv": 3,
+  "rep": 3
+ },
+ "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+ "seconds": 723.9880394935608,
+ "tensors": 272,
+ "tied": true
+}

@@ -1,0 +1,75 @@
+prediction	model	result	seen
+P1	smol-instruct	as predicted	no tie of unlike items in any class
+P1	smol-base	as predicted	no tie of unlike items in any class
+P1	floatlm-99m	as predicted	no tie of unlike items in any class
+P10	smol-instruct	as predicted	mlp.gate_proj.weight: naive 12, signature 1 of 12; self_attn.k_proj.weight: naive 12, signature 1 of 12; self_attn.q_proj.weight: naive 12, signature 1 of 12; 12x20 matrix of 0, 1, 2, two rows alike in signature: naive 40, signature 2 of 40
+P11	smol-instruct	as predicted	identity: max|d| 0, KL 0, top1 1.0000, top5 3/3; units-signed: max|d| 0, KL 0, top1 1.0000, top5 3/3; vo: max|d| 0, KL 0, top1 1.0000, top5 3/3; qk: max|d| 0, KL 0, top1 1.0000, top5 3/3; units: max|d| 0.000148, KL 7.16e-12, top1 1.0000, top5 3/3; heads: max|d| 0.000118, KL 6.24e-12, top1 1.0000, top5 3/3; residual: max|d| 0.000113, KL 1.02e-11, top1 1.0000, top5 3/3; all: max|d| 0.000141, KL 1.14e-11, top1 1.0000, top5 3/3
+P12	smol-instruct	as predicted	tensors 272; whole group and the sign of zeros [272, 272, 272, 272, 272, 272, 272, 272]; parts {'heads': [272, 272], 'qk': [272, 272], 'residual': [272, 272], 'units': [272, 272], 'units-signed': [272, 272], 'vo': [272, 272], 'zsigns': [272, 272]}; idempotent True; roots equal True; nothing raised
+P12	smol-base	as predicted	tensors 272; whole group and the sign of zeros [272, 272, 272, 272, 272, 272, 272, 272]; parts {'heads': [272, 272], 'qk': [272, 272], 'residual': [272, 272], 'units': [272, 272], 'units-signed': [272, 272], 'vo': [272, 272], 'zsigns': [272, 272]}; idempotent True; roots equal True; nothing raised
+P12	floatlm-99m	as predicted	tensors 147; whole group and the sign of zeros [147, 147, 147, 147, 147, 147, 147, 147]; parts {'heads': [147, 147], 'qk': [147, 147], 'residual': [147, 147], 'units': [147, 147], 'units-signed': [147, 147], 'vo': [147, 147], 'zsigns': [147, 147]}; idempotent True; roots equal True; nothing raised
+P12	trilm-99m	as predicted	tensors 147; whole group and the sign of zeros [147, 147, 147, 147, 147, 147, 147, 147]; parts {'heads': [147, 147], 'qk': [147, 147], 'residual': [147, 147], 'units': [147, 147], 'units-signed': [147, 147], 'vo': [147, 147], 'zsigns': [147, 147]}; idempotent True; roots equal True; nothing raised
+P12	trilm-390m	as predicted	tensors 219; whole group and the sign of zeros [219, 219, 219]; parts {'heads': [219], 'qk': [219], 'residual': [219], 'units': [219], 'units-signed': [219], 'vo': [219], 'zsigns': [219]}; idempotent True; roots equal True; nothing raised
+P13	smol-instruct	as predicted	dead pairs: units 0, vo 0, qk 0 (layers []); mixed 0; zero embedding columns 0
+P13	smol-base	as predicted	dead pairs: units 0, vo 0, qk 0 (layers []); mixed 0; zero embedding columns 0
+P13	floatlm-99m	as predicted	dead pairs: units 0, vo 0, qk 0 (layers []); mixed 0; zero embedding columns 0
+P13	trilm-99m	as predicted	dead pairs: units 0, vo 0, qk 0 (layers []); mixed 0; zero embedding columns 0
+P13	trilm-390m	as predicted	dead pairs: units 0, vo 0, qk 173 (layers [0]); mixed 0; zero embedding columns 0
+P14	smol-instruct	as predicted	raw tensors changed by the sign of zeros [0, 0], tensors with 16 or more zeros 0, with 1 to 15 0, with none 272; canonical equal [272, 272]
+P14	smol-base	as predicted	raw tensors changed by the sign of zeros [0, 0], tensors with 16 or more zeros 0, with 1 to 15 0, with none 272; canonical equal [272, 272]
+P14	floatlm-99m	as predicted	raw tensors changed by the sign of zeros [13, 16], tensors with 16 or more zeros 2, with 1 to 15 45, with none 100; canonical equal [147, 147]
+P14	trilm-99m	as predicted	raw tensors changed by the sign of zeros [114, 114], tensors with 16 or more zeros 113, with 1 to 15 1, with none 33; canonical equal [147, 147]
+P14	trilm-390m	as predicted	raw tensors changed by the sign of zeros [170], tensors with 16 or more zeros 170, with 1 to 15 0, with none 49; canonical equal [219]
+P16	smol-instruct	as predicted	canonical form as a model: max|d| 0.000224, KL 1.23e-11, top1 1.0000, top5 3/3
+P17	smol-instruct	as predicted	canonical roots equal the first run's: True (predicted True); first run 6cc1b35d95a298c0…, now 6cc1b35d95a298c0…
+P17	smol-base	as predicted	canonical roots equal the first run's: True (predicted True); first run fb3799bf60d67e85…, now fb3799bf60d67e85…
+P17	floatlm-99m	as predicted	canonical roots equal the first run's: False (predicted False); first run 9eea74a8241cebbf…, now 7a10951dbbb65de5…
+P17	trilm-99m	as predicted	canonical roots equal the first run's: False (predicted False); first run d0127c8beb95bb63…, now c613eae709f17944…
+P17	trilm-390m	as predicted	canonical roots equal the first run's: False (predicted False); first run 1f78ae48996002aa…, now 93ec5e45d97f2247…
+P18	smol-instruct	as predicted	unlike embedding rows lost to signature ties: 0; a tie of unlike items anywhere: False (predicted False)
+P18	smol-base	as predicted	unlike embedding rows lost to signature ties: 0; a tie of unlike items anywhere: False (predicted False)
+P18	floatlm-99m	as predicted	unlike embedding rows lost to signature ties: 0; a tie of unlike items anywhere: False (predicted False)
+P18	trilm-99m	as predicted	unlike embedding rows lost to signature ties: 0; a tie of unlike items anywhere: True (predicted True)
+P18	trilm-390m	as predicted	unlike embedding rows lost to signature ties: 0; a tie of unlike items anywhere: True (predicted True)
+P2	trilm-99m	as predicted	ties: {'down rows': '16 matrices, 434 items', 'down columns': '16 matrices, 4167 items', 'gate rows': '16 matrices, 4503 items', 'gate columns': '16 matrices, 119 items', 'k rows': '16 matrices, 312 items', 'k columns': '16 matrices, 1120 items', 'o rows': '16 matrices, 1015 items', 'o columns': '16 matrices, 587 items', 'q rows': '16 matrices, 327 items', 'q columns': '16 matrices, 1122 items', 'up rows': '16 matrices, 4479 items', 'up columns': '16 matrices, 466 items', 'v rows': '16 matrices, 660 items', 'v columns': '16 matrices, 897 items'}
+P2	trilm-390m	as predicted	ties: {'down rows': '24 matrices, 1417 items', 'down columns': '24 matrices, 11450 items', 'gate rows': '24 matrices, 12124 items', 'gate columns': '24 matrices, 274 items', 'k rows': '24 matrices, 611 items', 'k columns': '24 matrices, 3269 items', 'o rows': '24 matrices, 3415 items', 'o columns': '24 matrices, 1724 items', 'q rows': '24 matrices, 733 items', 'q columns': '24 matrices, 3569 items', 'up rows': '24 matrices, 12002 items', 'up columns': '24 matrices, 1559 items', 'v rows': '24 matrices, 1633 items', 'v columns': '24 matrices, 2674 items'}
+P3	smol-instruct	as predicted	embedding columns distinct up to sign: True
+P3	smol-base	as predicted	embedding columns distinct up to sign: True
+P3	floatlm-99m	as predicted	embedding columns distinct up to sign: True
+P3	trilm-99m	as predicted	embedding columns distinct up to sign: True
+P3	trilm-390m	as predicted	embedding columns distinct up to sign: True
+P4	smol-instruct	as predicted	units not told apart by the joint signature: 0; layers discrete by separate signatures 30 / joint 30 / anchored 30 of 30
+P4	smol-base	as predicted	units not told apart by the joint signature: 0; layers discrete by separate signatures 30 / joint 30 / anchored 30 of 30
+P4	floatlm-99m	as predicted	units not told apart by the joint signature: 0; layers discrete by separate signatures 16 / joint 16 / anchored 16 of 16
+P4	trilm-99m	as predicted	units not told apart by the joint signature: 0; layers discrete by separate signatures 16 / joint 16 / anchored 16 of 16
+P4	trilm-390m	as predicted	units not told apart by the joint signature: 0; layers discrete by separate signatures 24 / joint 24 / anchored 24 of 24
+P5	smol-instruct	as predicted	layers with heads and groups discrete anchored 30, heads discrete index-free 30, of 30
+P5	smol-base	as predicted	layers with heads and groups discrete anchored 30, heads discrete index-free 30, of 30
+P5	floatlm-99m	as predicted	layers with heads and groups discrete anchored 16, heads discrete index-free 16, of 16
+P5	trilm-99m	as predicted	layers with heads and groups discrete anchored 16, heads discrete index-free 16, of 16
+P5	trilm-390m	as predicted	layers with heads and groups discrete anchored 24, heads discrete index-free 24, of 24
+P6	smol-instruct	as predicted	P3, P4 and P5 hold
+P6	smol-base	as predicted	P3, P4 and P5 hold
+P6	floatlm-99m	as predicted	P3, P4 and P5 hold
+P6	trilm-99m	as predicted	P3, P4 and P5 hold
+P6	trilm-390m	as predicted	P3, P4 and P5 hold
+P7	smol-instruct	as predicted	tensors 272; whole group canonical equal [272, 272, 272, 272, 272, 272, 272, 272], raw changed [272, 272, 272, 272, 272, 272, 272, 272]; idempotent True; canonical roots equal True; raw roots differ True; residual: equal [272, 272], raw [272, 272]; units: equal [272, 272], raw [90, 90]; units-signed: equal [272, 272], raw [60, 60]; vo: equal [272, 272], raw [60, 60]; qk: equal [272, 272], raw [60, 60]; heads: equal [272, 272], raw [108, 118]
+P8	smol-base	as predicted	tensors 272; whole group [272, 272, 272, 272, 272, 272, 272, 272]; parts {'heads': [272, 272], 'qk': [272, 272], 'residual': [272, 272], 'units': [272, 272], 'units-signed': [272, 272], 'vo': [272, 272], 'zsigns': [272, 272]}; idempotent True; canonical roots equal True
+P8	floatlm-99m	as predicted	tensors 147; whole group [147, 147, 147, 147, 147, 147, 147, 147]; parts {'heads': [147, 147], 'qk': [147, 147], 'residual': [147, 147], 'units': [147, 147], 'units-signed': [147, 147], 'vo': [147, 147], 'zsigns': [147, 147]}; idempotent True; canonical roots equal True
+P8	trilm-99m	as predicted	tensors 147; whole group [147, 147, 147, 147, 147, 147, 147, 147]; parts {'heads': [147, 147], 'qk': [147, 147], 'residual': [147, 147], 'units': [147, 147], 'units-signed': [147, 147], 'vo': [147, 147], 'zsigns': [147, 147]}; idempotent True; canonical roots equal True
+P8	trilm-390m	as predicted	tensors 219; whole group [219, 219, 219]; parts {'heads': [219], 'qk': [219], 'residual': [219], 'units': [219], 'units-signed': [219], 'vo': [219], 'zsigns': [219]}; idempotent True; canonical roots equal True
+P9	smol-instruct	as predicted	gate row negated: 3 ['model.layers.3.mlp.down_proj.weight', 'model.layers.3.mlp.gate_proj.weight', 'model.layers.3.mlp.up_proj.weight']; gate/up exchanged: 3 ['model.layers.3.mlp.down_proj.weight', 'model.layers.3.mlp.gate_proj.weight', 'model.layers.3.mlp.up_proj.weight']; ulp: 1 ['model.layers.5.self_attn.q_proj.weight'] layers [5]; embedding columns exchanged: 271 differ, 1 equal, listing ['model.layers.0.input_layernorm.weight', 'model.layers.0.mlp.down_proj.weight', 'model.layers.0.mlp.gate_proj.weight', 'model.layers.0.mlp.up_proj.weight', 'model.layers.0.post_attention_layernorm.weight', 'model.layers.0.self_attn.k_proj.weight', '...', 'model.layers.9.self_attn.q_proj.weight', 'model.layers.9.self_attn.v_proj.weight', 'model.norm.weight']
+control	smol-instruct	as predicted	raw roots {'bag_root': 'a946aed21e6ec2017c515d587d5ad72d654eb7c8f92fd9e04c4ca99898d9d3e2', 'labelled_root': '476ff7a1fd9097fb56d98c60df3c25e52cf08f54bb02a7ec3f523a049754fca9'}
+control	smol-instruct	as predicted	self-test: selftest: all ok
+control	smol-instruct	as predicted	steps: check success, canon success, naive success, function success
+control	smol-base	as predicted	self-test: selftest: all ok
+control	smol-base	as predicted	steps: check success, canon success, naive success, function skipped
+control	floatlm-99m	as predicted	self-test: selftest: all ok
+control	floatlm-99m	as predicted	steps: check success, canon success, naive success, function skipped
+control	trilm-99m	as predicted	self-test: selftest: all ok
+control	trilm-99m	as predicted	steps: check success, canon success, naive success, function skipped
+control	trilm-390m	as predicted	self-test: selftest: all ok
+control	trilm-390m	as predicted	steps: check success, canon success, naive success, function skipped
+observed	smol-base	as predicted	naive/signature distinct outputs: mlp.gate_proj.weight: 12/1; self_attn.k_proj.weight: 12/1; self_attn.q_proj.weight: 12/1
+observed	floatlm-99m	as predicted	naive/signature distinct outputs: mlp.gate_proj.weight: 12/1; self_attn.k_proj.weight: 12/1; self_attn.q_proj.weight: 12/1
+observed	trilm-99m	as predicted	naive/signature distinct outputs: mlp.gate_proj.weight: 12/12; self_attn.k_proj.weight: 12/12; self_attn.q_proj.weight: 12/12
+observed	trilm-390m	as predicted	naive/signature distinct outputs: mlp.gate_proj.weight: 12/12; self_attn.k_proj.weight: 12/12; self_attn.q_proj.weight: 12/12
