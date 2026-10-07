@@ -315,13 +315,32 @@ def main(d, tsv=None):
         e, d = e64(o), same(nv).get("nmse")
         say("observed", f"null variant, {dt}", None, "no summary" if e is None or d is None else f"e = {f(e)}; NMSE against own original / e = {f(d / e)}")
 
+    # addendum 3: the null and the variants in one job on one machine (P17)
+    same_w, diff_w = ("heads", "units_blk", "resid_blk"), ("units", "resid", "scale", "perm", "all", "canon")
+    same_c, diff_c = ("heads", "perm", "resid", "resid_blk", "units", "units_blk"), ("scale", "all", "canon")
+    for dt, label, same_v, diff_v in (("q8_0", "Q8_0 weights", same_w, diff_w), ("q4_0", "Q4_0 weights", same_w, diff_w), ("float32-kvf16", "f16 cache", EXACT, ()),
+                                      ("float32-kvq8_0", "Q8_0 cache", same_c, diff_c), ("float32-kvq4_0", "Q4_0 cache", same_c, diff_c),
+                                      ("float32-kvq8_0-norot", "Q8_0 cache, not rotated", same_c, diff_c), ("float32-kvq4_0-norot", "Q4_0 cache, not rotated", same_c, diff_c)):
+        m = "smol-instruct-nullsame"
+        null = same(var(S, m, "llamacpp", dt, "nullall")).get("nmse")
+        nv = {v: same(var(S, m, "llamacpp", dt, v)).get("nmse") for v in same_v + diff_v}
+        if null is None or any(x is None for x in nv.values()):
+            say("P17", label, None, "no summary")
+            continue
+        a = sorted((nv[v] / null, v) for v in same_v)
+        b = sorted((nv[v] / null, v) for v in diff_v)
+        ok_a = a[-1][0] <= 4
+        ok_b = (not b) or b[0][0] > a[-1][0]
+        fmt = lambda xs: ", ".join(f"{v} {x:.3g}" for x, v in xs)
+        say("P17", label, bool(ok_a and ok_b), f"null NMSE {f(null)}; claimed the same, in units of the null: {fmt(a)}" + (f"; claimed different: {fmt(b)}" if b else "") + ("" if ok_a else " [a variant claimed the same is above 4 x the null]") + ("" if ok_b else " [the classes overlap]"))
+
     # controls
     for (m, rt, dt), s in sorted(S.items()):
         dtm = s.get("determinism")
         if dtm is not None and m in MODELS:
             say("control", f"determinism {rt} {dt} / {m}", all(dtm.values()), f"the original run twice: {dtm}")
     for key, mf in sorted(manifests.items()):
-        if key == "xrt-null":
+        if key in ("xrt-null", "xrt-nullsame"):
             continue          # its variant nullall has other significands by design
         vs = mf["variants"]
         if any("tensors_with_other_significands" in x for x in vs.values()):
