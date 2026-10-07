@@ -1,0 +1,20 @@
+['model.layers.15.self_attn.v_proj.weight']
+(512, 512) distinct values: 3
+zero rows: 0 min/max row norm: 6.296624171559748 10.391155120405436
+pairs of rows with |cos| = 1: 10 [(np.int64(86), np.int64(93), np.float64(-1.0000000000000002)), (np.int64(86), np.int64(99), np.float64(-1.0000000000000002)), (np.int64(86), np.int64(103), np.float64(-1.0000000000000002)), (np.int64(86), np.int64(122), np.float64(1.0000000000000002)), (np.int64(93), np.int64(99), np.float64(1.0000000000000002)), (np.int64(93), np.int64(103), np.float64(1.0000000000000002)), (np.int64(93), np.int64(122), np.float64(-1.0000000000000002)), (np.int64(99), np.int64(103), np.float64(1.0000000000000002)), (np.int64(99), np.int64(122), np.float64(-1.0000000000000002)), (np.int64(103), np.int64(122), np.float64(-1.0000000000000002))]
+0 zero rows 0 pairs |cos|>1-1e-9: 0
+1 zero rows 0 pairs |cos|>1-1e-9: 0
+2 zero rows 0 pairs |cos|>1-1e-9: 0
+3 zero rows 0 pairs |cos|>1-1e-9: 0
+4 zero rows 0 pairs |cos|>1-1e-9: 0
+5 zero rows 0 pairs |cos|>1-1e-9: 0
+6 zero rows 0 pairs |cos|>1-1e-9: 0
+7 zero rows 0 pairs |cos|>1-1e-9: 0
+8 zero rows 0 pairs |cos|>1-1e-9: 0
+9 zero rows 0 pairs |cos|>1-1e-9: 0
+10 zero rows 0 pairs |cos|>1-1e-9: 0
+11 zero rows 0 pairs |cos|>1-1e-9: 0
+12 zero rows 0 pairs |cos|>1-1e-9: 0
+13 zero rows 0 pairs |cos|>1-1e-9: 0
+14 zero rows 0 pairs |cos|>1-1e-9: 0
+15 zero rows 0 pairs |cos|>1-1e-9: 10
