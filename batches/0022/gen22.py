@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Batch 0022: the Lean definition of the forward pass (batch 0021's Model.lean) run over F_p, against the exact arithmetic of model.py and gauge.py (batch 0015) over F_p (ops.FieldOps).
-#   gen22.py OUTDIR [--seed N]   writes OUTDIR/ConformGen.lean (the data of a random model in the layout of model.py, and the models that the Lean definitions of the gauges make from it, with a
+#   gen22.py OUTDIR [--seed N | --start N]   (the seed N as it is, or the first seed from N, default 0, whose draw is generic) writes OUTDIR/ConformGen.lean (the data of a random model in the layout of model.py, and the models that the Lean definitions of the gauges make from it, with a
 #                                main that prints their weights, caches, streams and logits) and OUTDIR/expected.txt (what every printed array is, according to model.py and gauge.py)
 # Why F_p with a small p and not the rationals: the nonlinearities of FieldOps (a square, a reciprocal of a square plus three) double the degree of the rational function at every
 # application, so exact rationals have thousands of digits after two layers; in F_p the numbers stay below p. p = 1000003 is prime (Lean proves it by norm_num). A wrong wiring that
@@ -17,7 +17,11 @@ import gauge as G
 from ops import FieldOps
 
 P = 1000003
-ARCH = Arch(d=2, n_heads=4, n_kv=2, hd=2, d_ff=2, n_layers=2, vocab=3, tied=False, pos="rope", causal=True, norm="rms")
+# The architecture is small because the Lean definition is run by the interpreter and recomputes shared subterms (a function is not a table): the cost of one layer grows with the
+# fourth power of the hidden dimension. LMNF22_ARCH=d3 (hidden dimension 3, three units: the architecture of the registration; the default) or d2 (2 and 2: amendment 1, which turned out
+# not to be needed: a model of d2 takes about 20 seconds in Lean; see docs/batches/0022.md, amendment 2).
+_ARCHS = {"d3": dict(d=3, d_ff=3), "d2": dict(d=2, d_ff=2)}
+ARCH = Arch(**_ARCHS[os.environ.get("LMNF22_ARCH", "d3")], n_heads=4, n_kv=2, hd=2, n_layers=2, vocab=3, tied=False, pos="rope", causal=True, norm="rms")
 TOKENS = [2, 0]
 TS = [2]                                  # the rotary planes: plane j rotates by the point of the circle of t = TS[j], (1 - t^2) / (1 + t^2), 2 t / (1 + t^2)
 FLAT = (("wq", "wq"), ("wk", "wk"), ("wv", "wv"), ("wo", "wo"), ("wg", "wg"), ("wu", "wu"), ("wd", "wd"), ("attn_norm", "an"), ("mlp_norm", "mn"))
@@ -337,25 +341,28 @@ def write_expected(path, out):
                 f.write(" ".join(str(int(v)) for v in r) + "\n")
 
 
-def main(argv):
-    outdir = argv[0]
-    seed = int(argv[argv.index("--seed") + 1]) if "--seed" in argv else None
-    os.makedirs(outdir, exist_ok=True)
-    chosen = None
-    for s in ([seed] if seed is not None else range(1000)):
+def choose(seed=None, start=0):
+    """(case, expected arrays, seed): the seed as it is, or the first seed from `start` whose draw is generic."""
+    for s in ([seed] if seed is not None else range(start, start + 1000)):
         try:
             case = Case(s)
             exp = case.expected()
         except (ZeroDivisionError, AssertionError):
             continue
         if seed is not None or case.generic(exp):
-            chosen = s
-            break
-    if chosen is None:
-        raise SystemExit("no seed makes the parameters generic")
+            return case, exp, s
+    raise SystemExit("no seed makes the parameters generic")
+
+
+def main(argv):
+    outdir = argv[0]
+    seed = int(argv[argv.index("--seed") + 1]) if "--seed" in argv else None
+    start = int(argv[argv.index("--start") + 1]) if "--start" in argv else 0
+    os.makedirs(outdir, exist_ok=True)
+    case, exp, chosen = choose(seed, start)
     open(os.path.join(outdir, "ConformGen.lean"), "w").write(case.lean())
     write_expected(os.path.join(outdir, "expected.txt"), exp)
-    print(f"seed {chosen}: {len(exp)} arrays expected; generic: {case.generic(exp)}")
+    print(f"seed {chosen}: {len(exp)} arrays expected; generic: {case.generic(exp)}; architecture {os.environ.get('LMNF22_ARCH', 'd3')}: {ARCH}")
     return 0
 
 

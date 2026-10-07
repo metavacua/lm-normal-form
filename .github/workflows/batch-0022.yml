@@ -20,9 +20,19 @@ concurrency:
 
 jobs:
   run:
-    name: "01 the definition of the forward pass, run"
+    name: "01 the definition of the forward pass, run (${{ matrix.name }})"
     runs-on: ubuntu-latest
     timeout-minutes: 170
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {name: "d3", arch: "d3", start: "0"}        # the architecture of the registration
+          - {name: "d2", arch: "d2", start: "0"}        # amendment 1
+          - {name: "d2-s100", arch: "d2", start: "100"}
+          - {name: "d2-s200", arch: "d2", start: "200"}
+    env:
+      LMNF22_ARCH: ${{ matrix.arch }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -37,7 +47,7 @@ jobs:
       - name: The data of a random model and what exact arithmetic says of it
         run: |
           mkdir -p out/conform
-          python batches/0022/gen22.py out/conform | tee out/conform/gen.txt
+          python batches/0022/gen22.py out/conform --start ${{ matrix.start }} | tee out/conform/gen.txt
       - name: The Lean definition, run (four processes, each a group of models)
         working-directory: batches/0020
         run: |
@@ -64,6 +74,6 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: conform-0022
+          name: conform-0022-${{ matrix.name }}
           path: out/conform/
           retention-days: 14
