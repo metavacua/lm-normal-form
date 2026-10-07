@@ -1,0 +1,36 @@
+| model | runtime | dtype | e (NMSE against the float64 reference) | perplexity | prefill tok/s | decode tok/s | peak RSS MB |
+|---|---|---|---|---|---|---|---|
+| floatlm-99m | candle | float32 | 4.66e-13 | 40.75 | 824 | 42.3 | 577 |
+| floatlm-99m | ctranslate2 | float32 | 3.52e-13 | 40.75 | 73017 | 143.2 | 756 |
+| floatlm-99m | llamacpp | float16 | 2.59e-07 | 40.75 | 640 | 238.0 | 266 |
+| floatlm-99m | llamacpp | float32 | 5.09e-13 | 40.75 | 533 | 111.6 | 491 |
+| floatlm-99m | onnxruntime | float32 | 4.28e-13 | 40.75 | 1152 | n/a | 822 |
+| floatlm-99m | pytorch | bfloat16 | 0.000206 | 40.95 | 5219 | 71.2 | 716 |
+| floatlm-99m | pytorch | float32 | 3.8e-13 | 40.75 | 1658 | 64.7 | 935 |
+| smol-base | candle | float32 | 8.99e-12 | 24.49 | 384 | 50.5 | 782 |
+| smol-base | ctranslate2 | float32 | 3.36e-12 | 24.49 | 30801 | 59.1 | 905 |
+| smol-base | llamacpp | float16 | 3.42e-06 | 24.49 | 759 | 158.2 | 327 |
+| smol-base | llamacpp | float32 | 1.35e-12 | 24.49 | 641 | 80.3 | 605 |
+| smol-base | onnxruntime | float32 | 2.31e-12 | 24.49 | 522 | n/a | 1239 |
+| smol-base | pytorch | bfloat16 | 0.00419 | 24.5 | 78 | 31.9 | 669 |
+| smol-base | pytorch | float32 | 3.75e-12 | 24.49 | 406 | 19.7 | 1105 |
+| smol-instruct | candle | float32 | 1.62e-12 | 27.83 | 303 | 49.5 | 782 |
+| smol-instruct | ctranslate2 | float32 | 1.51e-12 | 27.83 | 40359 | 78.0 | 907 |
+| smol-instruct | ctranslate2 | int8 | 0.0255 | 28.72 | 34111 | 78.7 | 4438 |
+| smol-instruct | llamacpp | float16 | 2.34e-07 | 27.83 | 970 | 95.1 | 580 |
+| smol-instruct | llamacpp | float32 | 7.76e-13 | 27.83 | 498 | 54.9 | 607 |
+| smol-instruct | llamacpp | float32-kvf16 | 2.27e-07 | 27.83 | 569 | 65.1 | 766 |
+| smol-instruct | llamacpp | float32-kvq4_0 | 0.0152 | 28.85 | 298 | 64.0 | 749 |
+| smol-instruct | llamacpp | float32-kvq8_0 | 5.89e-05 | 27.84 | 384 | 62.8 | 755 |
+| smol-instruct | llamacpp | q4_0 | 0.0869 | 34.43 | 2153 | 405.6 | 426 |
+| smol-instruct | llamacpp | q8_0 | 0.00183 | 28.04 | 2207 | 262.2 | 539 |
+| smol-instruct | onnxruntime | float32 | 1.81e-12 | 27.83 | 521 | n/a | 1232 |
+| smol-instruct | pytorch | bfloat16 | 0.00116 | 27.83 | 1014 | 30.6 | 678 |
+| smol-instruct | pytorch | float32 | 2.14e-12 | 27.83 | 474 | 19.3 | 1105 |
+| trilm-99m | candle | float32 | 1.33e-13 | 59.76 | 650 | 90.9 | 577 |
+| trilm-99m | ctranslate2 | float32 | 2.55e-13 | 59.76 | 54729 | 111.4 | 754 |
+| trilm-99m | llamacpp | float16 | 1.23e-07 | 59.76 | 632 | 202.2 | 266 |
+| trilm-99m | llamacpp | float32 | 7.57e-14 | 59.76 | 529 | 106.4 | 491 |
+| trilm-99m | onnxruntime | float32 | 2.59e-13 | 59.76 | 755 | n/a | 822 |
+| trilm-99m | pytorch | bfloat16 | 0.000118 | 59.78 | 387 | 67.2 | 731 |
+| trilm-99m | pytorch | float32 | 1.75e-13 | 59.76 | 1450 | 57.3 | 930 |
