@@ -1,0 +1,146 @@
+{
+ "tolerance_invariant": 1e-09,
+ "tolerance_violated": 0.0001,
+ "arch": {
+  "d": 4,
+  "n_heads": 4,
+  "n_kv": 2,
+  "hd": 2,
+  "d_ff": 3,
+  "n_layers": 1,
+  "vocab": 5,
+  "tied": false,
+  "pos": "rope",
+  "causal": true,
+  "norm": "rms"
+ },
+ "seeds": [
+  31,
+  32,
+  33
+ ],
+ "families": {
+  "hidden-norms-fixed": [
+   {
+    "candidates": 384,
+    "invariant": 16,
+    "violated": 368,
+    "unclear": 0,
+    "largest_difference_of_the_invariant": 0.0,
+    "smallest_difference_of_the_violated": 2.4969842931510318,
+    "seed": 31
+   },
+   {
+    "candidates": 384,
+    "invariant": 16,
+    "violated": 368,
+    "unclear": 0,
+    "largest_difference_of_the_invariant": 0.0,
+    "smallest_difference_of_the_violated": 3.6544385177908474,
+    "seed": 32
+   },
+   {
+    "candidates": 384,
+    "invariant": 16,
+    "violated": 368,
+    "unclear": 0,
+    "largest_difference_of_the_invariant": 0.0,
+    "smallest_difference_of_the_violated": 1.5648345844655926,
+    "seed": 33
+   }
+  ],
+  "hidden-norms-permuted": [
+   {
+    "candidates": 384,
+    "invariant": 384,
+    "violated": 0,
+    "unclear": 0,
+    "largest_difference_of_the_invariant": 4.468647674116255e-15,
+    "smallest_difference_of_the_violated": null,
+    "seed": 31
+   },
+   {
+    "candidates": 384,
+    "invariant": 384,
+    "violated": 0,
+    "unclear": 0,
+    "largest_difference_of_the_invariant": 2.220446049250313e-15,
+    "smallest_difference_of_the_violated": null,
+    "seed": 32
+   },
+   {
+    "candidates": 384,
+    "invariant": 384,
+    "violated": 0,
+    "unclear": 0,
+    "largest_difference_of_the_invariant": 7.16093850883226e-15,
+    "smallest_difference_of_the_violated": null,
+    "seed": 33
+   }
+  ],
+  "units": [
+   {
+    "candidates": 1728,
+    "invariant": 48,
+    "violated": 1680,
+    "unclear": 0,
+    "largest_difference_of_the_invariant": 4.440892098500626e-16,
+    "smallest_difference_of_the_violated": 1.1250343984808893,
+    "seed": 31,
+    "the_invariant_ones_are_exactly_those_with_the_same_permutation_of_the_three_matrices": true
+   },
+   {
+    "candidates": 1728,
+    "invariant": 48,
+    "violated": 1680,
+    "unclear": 0,
+    "largest_difference_of_the_invariant": 7.771561172376096e-16,
+    "smallest_difference_of_the_violated": 0.9314575343649355,
+    "seed": 32,
+    "the_invariant_ones_are_exactly_those_with_the_same_permutation_of_the_three_matrices": true
+   },
+   {
+    "candidates": 1728,
+    "invariant": 48,
+    "violated": 1680,
+    "unclear": 0,
+    "largest_difference_of_the_invariant": 8.881784197001252e-16,
+    "smallest_difference_of_the_violated": 0.6570325092020163,
+    "seed": 33,
+    "the_invariant_ones_are_exactly_those_with_the_same_permutation_of_the_three_matrices": true
+   }
+  ],
+  "heads": [
+   {
+    "candidates": 48,
+    "invariant": 8,
+    "violated": 40,
+    "unclear": 0,
+    "largest_difference_of_the_invariant": 1.2212453270876722e-15,
+    "smallest_difference_of_the_violated": 2.7830652728203376,
+    "seed": 31,
+    "the_invariant_ones_are_exactly_those_that_keep_each_head_with_its_group": true
+   },
+   {
+    "candidates": 48,
+    "invariant": 8,
+    "violated": 40,
+    "unclear": 0,
+    "largest_difference_of_the_invariant": 1.2663481374630692e-15,
+    "smallest_difference_of_the_violated": 1.9525481151243083,
+    "seed": 32,
+    "the_invariant_ones_are_exactly_those_that_keep_each_head_with_its_group": true
+   },
+   {
+    "candidates": 48,
+    "invariant": 8,
+    "violated": 40,
+    "unclear": 0,
+    "largest_difference_of_the_invariant": 2.886579864025407e-15,
+    "smallest_difference_of_the_violated": 1.8261151250632142,
+    "seed": 33,
+    "the_invariant_ones_are_exactly_those_that_keep_each_head_with_its_group": true
+   }
+  ]
+ }
+}

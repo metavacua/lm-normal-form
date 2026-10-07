@@ -1,0 +1,60 @@
+{
+ "key": "smol-instruct",
+ "repo": "HuggingFaceTB/SmolLM2-135M-Instruct",
+ "revision": "12fd25f77366fa6b3b4b768ec3050bf629380bac",
+ "steps": 10,
+ "learning_rates": {
+  "sgd": 0.05,
+  "adamw": 2e-05
+ },
+ "parameters": 134515008,
+ "optimizers": {
+  "sgd": {
+   "loss_first_step": 3.498176097462441,
+   "loss_last_step": 18.35072127473177,
+   "function_change_of_the_reference_run_relative": 1.2550411225153408,
+   "variants": {
+    "signed_permutation_of_the_hidden_coordinates": {
+     "difference_before_training_relative": 5.1843536826424324e-15,
+     "difference_after_training_over_the_change_of_the_reference_run": 7.221554072509273e-12
+    },
+    "rotation_of_the_stream": {
+     "difference_before_training_relative": 1.0233761907898376e-14,
+     "difference_after_training_over_the_change_of_the_reference_run": 8.24684000242722e-10
+    },
+    "scaling_of_the_feed_forward_units": {
+     "difference_before_training_relative": 0.0,
+     "difference_after_training_over_the_change_of_the_reference_run": 0.5433274741689026
+    },
+    "invertible_matrix_on_the_value_dimensions": {
+     "difference_before_training_relative": 3.940151339364165e-15,
+     "difference_after_training_over_the_change_of_the_reference_run": 0.9305265197662103
+    }
+   }
+  },
+  "adamw": {
+   "loss_first_step": 3.498176097462441,
+   "loss_last_step": 0.9435437301474324,
+   "function_change_of_the_reference_run_relative": 0.6607612616096656,
+   "variants": {
+    "signed_permutation_of_the_hidden_coordinates": {
+     "difference_before_training_relative": 5.1843536826424324e-15,
+     "difference_after_training_over_the_change_of_the_reference_run": 2.3170370780455025e-14
+    },
+    "rotation_of_the_stream": {
+     "difference_before_training_relative": 1.0233761907898376e-14,
+     "difference_after_training_over_the_change_of_the_reference_run": 1.5985386690816936
+    },
+    "scaling_of_the_feed_forward_units": {
+     "difference_before_training_relative": 0.0,
+     "difference_after_training_over_the_change_of_the_reference_run": 0.4591732548748581
+    },
+    "invertible_matrix_on_the_value_dimensions": {
+     "difference_before_training_relative": 3.940151339364165e-15,
+     "difference_after_training_over_the_change_of_the_reference_run": 0.12761187826184237
+    }
+   }
+  }
+ },
+ "seconds": 197
+}

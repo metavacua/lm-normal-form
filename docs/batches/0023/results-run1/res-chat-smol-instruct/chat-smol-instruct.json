@@ -1,0 +1,50 @@
+{
+ "key": "smollm2",
+ "repo": "HuggingFaceTB/SmolLM2-135M-Instruct",
+ "revision": "12fd25f77366fa6b3b4b768ec3050bf629380bac",
+ "new_tokens": 64,
+ "prompts": {
+  "conversation": {
+   "prompt_tokens": 37,
+   "original_text": "Hello!<|im_end|>",
+   "original_contains_tool_call_tag": false,
+   "variants": {
+    "H1_signed_permutation": {
+     "identical_tokens": true,
+     "first_difference": null,
+     "text": "Hello!<|im_end|>"
+    },
+    "M1_units": {
+     "identical_tokens": true,
+     "first_difference": null,
+     "text": "Hello!<|im_end|>"
+    },
+    "A1_value_output": {
+     "identical_tokens": true,
+     "first_difference": null,
+     "text": "Hello!<|im_end|>"
+    },
+    "A6_head_swap": {
+     "identical_tokens": true,
+     "first_difference": null,
+     "text": "Hello!<|im_end|>"
+    },
+    "H4_rotation_of_the_stream": {
+     "identical_tokens": true,
+     "first_difference": null,
+     "text": "Hello!<|im_end|>"
+    },
+    "ALL": {
+     "identical_tokens": true,
+     "first_difference": null,
+     "text": "Hello!<|im_end|>"
+    },
+    "broken_control": {
+     "identical_tokens": false,
+     "first_difference": 0,
+     "text": " {}) {}) {}) {}) {}) {}) {}) {}) {}) {}) {}) {}) {}) {}) {}) {}) {}) {}) {}) {}) {}) {}) {}) {})biltbiltbiltmontonmontonmontonmontonmontonmontonmonton {}) {}) {}) {})biltbiltmontonmontonmontonmontonmontonmonton {}) {}) {})biltbiltmontonmontonmontonmontonmontonmontonbiltbilt {}) {}) {})montonmonton"
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "transformers": "5.19.0",
+ "torch": "2.14.1+cpu",
+ "float64": {
+  "relative_difference": 2.1435122838112953e-16,
+  "argmax_agreement": 1.0,
+  "positions": 2500,
+  "contexts": 780
+ },
+ "generation_from_0_1_2_float64": [
+  3,
+  2,
+  3,
+  2,
+  3,
+  2,
+  3,
+  2
+ ],
+ "float32": {
+  "relative_difference": 1.2369376745856312e-07,
+  "argmax_agreement": 1.0,
+  "positions": 2500,
+  "contexts": 780
+ },
+ "membership_control": {
+  "mean_loss_nats": 1.6964848546824676,
+  "ln_output_vocabulary": 1.6094379124341003,
+  "fraction_of_ln_vocabulary": 1.0540853061655036
+ }
+}

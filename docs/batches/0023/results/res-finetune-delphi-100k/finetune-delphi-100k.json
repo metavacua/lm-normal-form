@@ -1,0 +1,60 @@
+{
+ "key": "delphi-100k",
+ "repo": "delphi-suite/v0-llama2-100k",
+ "revision": "c1372fb65245458f2ee3be71f838e088e6a53d77",
+ "steps": 10,
+ "learning_rates": {
+  "sgd": 0.05,
+  "adamw": 2e-05
+ },
+ "parameters": 298416,
+ "optimizers": {
+  "sgd": {
+   "loss_first_step": 6.758735571224623,
+   "loss_last_step": 9.434152561959722,
+   "function_change_of_the_reference_run_relative": 1.765894951112642,
+   "variants": {
+    "signed_permutation_of_the_hidden_coordinates": {
+     "difference_before_training_relative": 1.2956271170226664e-15,
+     "difference_after_training_over_the_change_of_the_reference_run": 4.523340439676474e-12
+    },
+    "rotation_of_the_stream": {
+     "difference_before_training_relative": 1.919798721794281e-15,
+     "difference_after_training_over_the_change_of_the_reference_run": 6.520007779194212e-12
+    },
+    "scaling_of_the_feed_forward_units": {
+     "difference_before_training_relative": 0.0,
+     "difference_after_training_over_the_change_of_the_reference_run": 0.9919130267273115
+    },
+    "invertible_matrix_on_the_value_dimensions": {
+     "difference_before_training_relative": 1.0035532797749795e-15,
+     "difference_after_training_over_the_change_of_the_reference_run": 1.1034318117941397
+    }
+   }
+  },
+  "adamw": {
+   "loss_first_step": 6.758735571224623,
+   "loss_last_step": 4.645510514658809,
+   "function_change_of_the_reference_run_relative": 0.13384808055743097,
+   "variants": {
+    "signed_permutation_of_the_hidden_coordinates": {
+     "difference_before_training_relative": 1.2956271170226664e-15,
+     "difference_after_training_over_the_change_of_the_reference_run": 8.784969480770947e-15
+    },
+    "rotation_of_the_stream": {
+     "difference_before_training_relative": 1.919798721794281e-15,
+     "difference_after_training_over_the_change_of_the_reference_run": 0.09754093106774518
+    },
+    "scaling_of_the_feed_forward_units": {
+     "difference_before_training_relative": 0.0,
+     "difference_after_training_over_the_change_of_the_reference_run": 0.34538907609320263
+    },
+    "invertible_matrix_on_the_value_dimensions": {
+     "difference_before_training_relative": 1.0035532797749795e-15,
+     "difference_after_training_over_the_change_of_the_reference_run": 0.07281645606662197
+    }
+   }
+  }
+ },
+ "seconds": 9
+}

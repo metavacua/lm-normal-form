@@ -1,0 +1,117 @@
+{
+ "smoke": false,
+ "learning_rate": 0.02,
+ "alpha_of_the_target": 0.3,
+ "runs": [
+  {
+   "seed": 21,
+   "steps": 300,
+   "loss_first": 1.6490762861979862,
+   "loss_last": 1.5308573718902985,
+   "entropy_floor_of_the_target": 0.8922264688367402,
+   "expected": 26,
+   "initial": {
+    "deficiency": 26,
+    "sv_at_cut": 7.504581703312721e-05,
+    "sv_after_cut": 5.075736045115623e-15,
+    "soft_directions_below_1e-3": 68,
+    "soft_directions_below_1e-5": 2
+   },
+   "trained": {
+    "deficiency": 26,
+    "sv_at_cut": 0.0003073381560594187,
+    "sv_after_cut": 4.814407069826637e-14,
+    "soft_directions_below_1e-3": 1,
+    "soft_directions_below_1e-5": 1
+   }
+  },
+  {
+   "seed": 22,
+   "steps": 300,
+   "loss_first": 1.6834149340345577,
+   "loss_last": 1.5410385058869942,
+   "entropy_floor_of_the_target": 0.8731192772312855,
+   "expected": 26,
+   "initial": {
+    "deficiency": 26,
+    "sv_at_cut": 3.5692791801125646e-05,
+    "sv_after_cut": 6.5540115550990635e-15,
+    "soft_directions_below_1e-3": 67,
+    "soft_directions_below_1e-5": 2
+   },
+   "trained": {
+    "deficiency": 26,
+    "sv_at_cut": 0.00030496084729748907,
+    "sv_after_cut": 6.39326667165835e-14,
+    "soft_directions_below_1e-3": 9,
+    "soft_directions_below_1e-5": 1
+   }
+  },
+  {
+   "seed": 23,
+   "steps": 300,
+   "loss_first": 1.7034230202695895,
+   "loss_last": 1.4956340883810813,
+   "entropy_floor_of_the_target": 0.88343593083981,
+   "expected": 26,
+   "initial": {
+    "deficiency": 26,
+    "sv_at_cut": 0.0004921910264349785,
+    "sv_after_cut": 1.1050452011258202e-14,
+    "soft_directions_below_1e-3": 27,
+    "soft_directions_below_1e-5": 1
+   },
+   "trained": {
+    "deficiency": 26,
+    "sv_at_cut": 0.00022334132982082403,
+    "sv_after_cut": 9.343970504861468e-14,
+    "soft_directions_below_1e-3": 1,
+    "soft_directions_below_1e-5": 1
+   }
+  },
+  {
+   "seed": 24,
+   "steps": 300,
+   "loss_first": 1.7312267764542286,
+   "loss_last": 1.5358082094766423,
+   "entropy_floor_of_the_target": 0.8844192597614327,
+   "expected": 26,
+   "initial": {
+    "deficiency": 26,
+    "sv_at_cut": 0.0010185319927343375,
+    "sv_after_cut": 1.8974605485480647e-14,
+    "soft_directions_below_1e-3": 43,
+    "soft_directions_below_1e-5": 1
+   },
+   "trained": {
+    "deficiency": 26,
+    "sv_at_cut": 0.00014279198462004535,
+    "sv_after_cut": 9.62701266065809e-14,
+    "soft_directions_below_1e-3": 9,
+    "soft_directions_below_1e-5": 1
+   }
+  },
+  {
+   "seed": 25,
+   "steps": 300,
+   "loss_first": 1.660876648896972,
+   "loss_last": 1.5357542114542317,
+   "entropy_floor_of_the_target": 0.8972180938015034,
+   "expected": 26,
+   "initial": {
+    "deficiency": 26,
+    "sv_at_cut": 0.00010210370383027536,
+    "sv_after_cut": 6.558982280887621e-15,
+    "soft_directions_below_1e-3": 39,
+    "soft_directions_below_1e-5": 1
+   },
+   "trained": {
+    "deficiency": 26,
+    "sv_at_cut": 7.528933283462544e-05,
+    "sv_after_cut": 6.967603841793735e-14,
+    "soft_directions_below_1e-3": 5,
+    "soft_directions_below_1e-5": 1
+   }
+  }
+ ]
+}

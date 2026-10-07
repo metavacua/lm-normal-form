@@ -1,0 +1,36 @@
+{
+ "model_type": "gpt2",
+ "torch": "2.14.1+cpu",
+ "layers": 12,
+ "membership": {
+  "tokens": 114,
+  "mean_loss_nats": 2.494630785938189,
+  "ln_output_vocabulary": 10.82490511970208,
+  "fraction_of_ln_vocabulary": 0.23045290082014552
+ },
+ "float64_islands_patched": true,
+ "layernorm_transformations": {
+  "L1_all_ones_added_to_the_outputs_of_the_two_output_projections": {
+   "largest": 2.7273749732224647e-15,
+   "smallest": 9.876987347553108e-16
+  },
+  "L2_dual_shift_of_the_readers_of_the_two_layernorms": {
+   "largest": 1.2066636752541176e-14,
+   "smallest": 4.322695824798215e-15
+  },
+  "L3_embedding_rows_of_five_tokens_shifted": {
+   "unshifted_columns_largest": 0.0,
+   "shifted_columns_against_prediction_largest": 9.345580881015716e-16
+  }
+ },
+ "absolute_positions": {
+  "1": {
+   "largest": 0.6847064763674457,
+   "smallest": 0.4300564080070062
+  },
+  "16": {
+   "largest": 0.6545177717192124,
+   "smallest": 0.3606989141408513
+  }
+ }
+}
