@@ -52,7 +52,7 @@ jobs:
         run: python -m pip install --quiet "numpy==${PIN_NUMPY}"
       - name: Syntax of every script
         run: python -m py_compile batches/0023/*.py
-      - name: The grader can fail (every claim holds on a fixture built to satisfy it, is refuted when one of its own inputs is violated, is not run without data)
+      - name: "The grader can fail (every claim holds on a fixture built to satisfy it, is refuted when one of its own inputs is violated, is not run without data)"
         run: python batches/0023/grade23.py --selftest
       - name: Every text that a mutant replaces occurs exactly once in its file
         run: python batches/0023/mutate23.py --check
@@ -127,7 +127,7 @@ jobs:
         run: python batches/0023/bridge23.py export work
       - name: Transformers
         run: python batches/0023/bridge23.py torch work out/bridge-torch.json
-      - name: Build candle (the lockfile is committed; nothing is resolved at build time)
+      - name: "Build candle (the lockfile is committed; nothing is resolved at build time)"
         run: cargo build --release --locked --manifest-path batches/0023/candle/Cargo.toml
       - name: Run candle on every sequence
         run: batches/0023/candle/target/release/lmnf-candle-logits work/ckpt work/candle_inputs.json work/candle f32
@@ -174,7 +174,7 @@ jobs:
           EOF
           { python --version; python -m pip freeze; grep -m1 'model name' /proc/cpuinfo; free -g | head -2; } > "out/versions-${{ matrix.file }}.txt"
           cat "out/versions-${{ matrix.file }}.txt"
-      - name: Run (llama family: batches/0023/systems23.py; the others: batches/0023/outside23.py)
+      - name: "Run (the Llama family with systems23.py, the other architectures with outside23.py)"
         run: |
           if [ "${{ matrix.type }}" = "llama" ]; then
             python batches/0023/systems23.py llama "${{ matrix.repo }}" "${{ matrix.rev }}" "out/${{ matrix.file }}.json"
@@ -243,11 +243,11 @@ jobs:
           python -m pip install --quiet "torch==${PIN_TORCH}" --index-url https://download.pytorch.org/whl/cpu
           python -m pip install --quiet "transformers==${PIN_TRANSFORMERS}" "numpy==${PIN_NUMPY}" "safetensors==${PIN_SAFETENSORS}" "huggingface_hub==${PIN_HUB}" "tokenizers==${PIN_TOKENIZERS}" "ml_dtypes==${PIN_MLDTYPES}"
           { python --version; python -m pip freeze; } > out/versions-smoke.txt
-      - name: numpy: the rank experiment, the trained point, on a draw that is not registered
+      - name: "numpy, the rank experiment and the trained point, on a draw that is not registered"
         run: |
           python batches/0023/cov23.py out/smoke-cov.json --smoke
           python batches/0023/fibre23.py out/smoke-fibre.json --smoke
-      - name: Transformers, float64, a random small model of each architecture (the kinematics; the architectures outside the Llama family)
+      - name: "Transformers, float64, a random small model of each architecture (the kinematics; the architectures outside the Llama family)"
         run: |
           python batches/0023/systems23.py llama - - out/smoke-systems-llama.json --random-small
           python batches/0023/outside23.py qwen3 - - out/smoke-outside-qwen3.json --random-small
@@ -280,7 +280,7 @@ jobs:
           path: results
       - name: What was produced
         run: ls -l results
-      - name: Grade (fails if a claim is refuted or not run, or a control fails)
+      - name: "Grade (fails if a claim is refuted or not run, or a control fails)"
         run: python batches/0023/grade23.py results graded
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: ${{ !cancelled() }}
