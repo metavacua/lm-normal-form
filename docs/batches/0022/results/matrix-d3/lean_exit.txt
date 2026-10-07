@@ -1,0 +1,5 @@
+group [orig fold] exit 0
+group [qk hp m1 n1] exit 0
+group [h1 h4 ov] exit 0
+group [perm orig1] exit 0
+seconds 1367
