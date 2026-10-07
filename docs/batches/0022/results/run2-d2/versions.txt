@@ -1,0 +1,4 @@
+error: no default toolchain configured. run `elan default stable` to install & configure the latest Lean 4 stable release.
+error: no default toolchain configured. run `elan default stable` to install & configure the latest Lean 4 stable release.
+Python 3.12.14
+numpy==2.5.3
