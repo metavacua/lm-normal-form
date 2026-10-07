@@ -17,7 +17,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from common import texts_and_ids, wikitext_windows, logit_metrics, median, first_divergence, dump
 
-VARIANTS = ["orig", "scale", "perm", "all", "canon", "broken", "heads", "units", "units_blk", "resid", "resid_blk", "nullall"]      # the driver runs those that are present in WORK/variants
+VARIANTS = ["orig", "scale", "perm", "all", "canon", "broken", "heads", "units", "units_blk", "resid", "resid_blk", "nullall", "nullm", "nullr1", "nullr2", "nullr3", "nullr4", "nullr5", "nullr6"]      # the driver runs those that are present in WORK/variants
 
 
 def eos_ids(orig_dir, tok):
@@ -76,9 +76,20 @@ def run_all(runtime, dtype, work, rounds):
         order = present[r % len(present):] + present[:r % len(present)]
         for v in order:
             subprocess.run([sys.executable, __file__, "one", runtime, dtype, v, str(r), work], check=True)
+            if rounds == 1 and v != "orig" and os.environ.get("LMNF_CLEAN") == "1":
+                clean(work, v)
     subprocess.run([sys.executable, __file__, "one", runtime, dtype, "orig", "100", work], check=True)
     subprocess.run([sys.executable, os.path.join(HERE, "ref64.py"), "margins", runtime, dtype, work], check=True)
     summarize(runtime, dtype, work, rounds, present)
+
+
+def clean(work, v):
+    """Batch 0024 only (LMNF_CLEAN=1, one round): after a variant has been run, its converted files and its weights are deleted, so that twenty variants fit on the disk of a runner. The original is kept (the determinism run and the margins use it)."""
+    import glob, shutil
+    for f in glob.glob(os.path.join(work, "gguf", f"{v}-*.gguf")) + glob.glob(os.path.join(work, "variants", v, "model.safetensors")):
+        os.remove(f)
+    for d in glob.glob(os.path.join(work, "ct2", f"{v}-*")):
+        shutil.rmtree(d)
 
 
 def summarize(runtime, dtype, work, rounds, variants):

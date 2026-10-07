@@ -15,6 +15,8 @@
 #           every runtime must show to be broken
 #   nullall (addendum 2, not in ALL: named on the command line) every norm weight multiplied by 1 + 2^-23, one unit in the last place of float32: a variant that is not an
 #           exact symmetry but changes the arithmetic by the least that float32 can express, the control for the noise of quantized runs
+#   nullm, nullr1 .. nullr6 (batch 0024, not in ALL: named on the command line) seven more variants of the same kind as nullall, to measure how much the noise of one unit in the last place varies:
+#           nullm every norm weight times 1 - 2^-24 (one unit below, in float32); nullr<k> every norm weight times 1 + s 2^-23, the sign s of each element drawn from a generator seeded with 1000 + k
 # A variant is written in the dtype of the original file if every value survives the round trip through that dtype, and in float32 if not (the
 # manifest says which). Usage: variants.py REPO REVISION OUTDIR [variant ...]
 import hashlib, json, os, shutil, sys, time
@@ -29,6 +31,7 @@ import forms as F
 import symmetry as S
 import canon as C
 import special
+import nulls
 
 SEED = 14
 ALL = ("orig", "scale", "perm", "all", "canon", "broken", "heads", "units", "units_blk", "resid", "resid_blk")
@@ -110,8 +113,8 @@ def make(P, d, tied, variant):
         return S.apply_residual(P, d, rng.permutation(d.H), np.ones(d.H))
     if variant == "resid_blk":
         return S.apply_residual(P, d, blk_perm(d.H, rng), np.ones(d.H))
-    if variant == "nullall":
-        return {k: ((a.astype(np.float64) * (1.0 + 2.0 ** -23)).astype(np.float32) if k.endswith("layernorm.weight") or k == "model.norm.weight" else a) for k, a in P.items()}
+    if variant in nulls.NULLS:
+        return nulls.make_null(P, variant)
     if variant == "broken":
         R = S.apply_residual(P, d, rng.permutation(d.H), np.ones(d.H))
         R[F.EMBED] = P[F.EMBED]
