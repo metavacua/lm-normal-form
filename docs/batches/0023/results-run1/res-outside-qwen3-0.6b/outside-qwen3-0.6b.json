@@ -1,0 +1,107 @@
+{
+ "model_type": "qwen3",
+ "hidden": 1024,
+ "heads": 16,
+ "kv_heads": 8,
+ "head_dim": 128,
+ "layers": 28,
+ "tied_head": true,
+ "sequence_lengths": [
+  16,
+  11,
+  13,
+  16,
+  17,
+  13
+ ],
+ "torch": "2.14.1+cpu",
+ "qk_norm": true,
+ "membership": {
+  "tokens": 113,
+  "mean_loss_nats": 2.0844707320508684,
+  "ln_output_vocabulary": 11.931214658529285,
+  "fraction_of_ln_vocabulary": 0.17470733631975516
+ },
+ "float64_islands_patched": true,
+ "determinism_largest_relative_difference": 0.0,
+ "translation": {
+  "1": {
+   "largest": 9.924173106414813e-15,
+   "smallest": 3.560078282881447e-15
+  },
+  "16": {
+   "largest": 1.0100542913210363e-14,
+   "smallest": 3.782861229865002e-15
+  },
+  "128": {
+   "largest": 9.164360332290202e-15,
+   "smallest": 3.583626708420234e-15
+  }
+ },
+ "phase": {
+  "shift": 16,
+  "logits": {
+   "largest": 0.719474928383112,
+   "smallest": 0.4751695642143803
+  },
+  "keys_of_the_gauged_model_against_the_original_at_the_shifted_positions": {
+   "largest": 0.8103736505785086,
+   "smallest": 0.07379544065527326
+  },
+  "keys_moved_by_the_shift_control": {
+   "smallest_over_sentences_of_the_mean_over_layers": 0.2709459695244874
+  }
+ },
+ "dilation": {
+  "0.5": {
+   "largest": 0.506137418804216,
+   "smallest": 0.1791844994490953
+  },
+  "2.0": {
+   "largest": 0.4362408010000545,
+   "smallest": 0.22246188701793268
+  }
+ },
+ "rotation": {
+  "layers_compared": 29,
+  "logits": {
+   "largest": 2.005188705287075e-14,
+   "smallest": 1.1780565987468937e-14
+  },
+  "stream_equals_the_original_times_Q_transpose": {
+   "largest": 3.272055823334864e-14
+  },
+  "gram_matrix_of_every_layer": {
+   "largest": 4.199921756762941e-14
+  },
+  "stream_moved_at_the_embedding": {
+   "smallest": 1.4140483169301363
+  }
+ },
+ "rotation_without_the_fold_control": {
+  "smallest": 1.3035456640334806,
+  "largest": 1.7103320265166815
+ },
+ "qk_norm_transformations": {
+  "T1_scalar_pair_per_group_and_plane": {
+   "largest": 0.6244163178297496,
+   "smallest": 0.39715717639610854
+  },
+  "T2_rotation_of_a_plane_on_keys_and_queries": {
+   "largest": 1.0091338655612647,
+   "smallest": 0.6033880473009086
+  },
+  "T3_positive_scalar_on_one_query_head": {
+   "largest": 7.023902376606628e-06,
+   "smallest": 2.0531439311633775e-06
+  },
+  "T4_scalar_moved_from_the_query_gain_to_the_key_gain": {
+   "largest": 1.0895585288832274e-14,
+   "smallest": 3.2829306925251116e-15
+  },
+  "T2_with_the_angles_of_a_shift_of_16_positions": {
+   "largest": 0.719474928383112,
+   "smallest": 0.4751695642143803
+  }
+ }
+}

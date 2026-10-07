@@ -1,0 +1,50 @@
+{
+ "model_type": "gpt_neox",
+ "torch": "2.14.1+cpu",
+ "layers": 12,
+ "membership": {
+  "tokens": 114,
+  "mean_loss_nats": 2.465363613190532,
+  "ln_output_vocabulary": 10.825839875788878,
+  "fraction_of_ln_vocabulary": 0.22772954722008404
+ },
+ "float64_islands_patched": true,
+ "translation": {
+  "1": {
+   "largest": 1.6978786593322842e-15,
+   "smallest": 9.753390471014917e-16
+  },
+  "16": {
+   "largest": 1.6917685626201904e-15,
+   "smallest": 8.97584730019455e-16
+  },
+  "128": {
+   "largest": 1.8930274387526843e-15,
+   "smallest": 8.955278306422396e-16
+  }
+ },
+ "dilation": {
+  "0.5": {
+   "largest": 0.004627804614626166,
+   "smallest": 0.0009501067382191832
+  },
+  "2.0": {
+   "largest": 0.0032497879405004658,
+   "smallest": 0.0011316540601760928
+  }
+ },
+ "layernorm_transformations": {
+  "writer_shift": {
+   "largest": 1.553195601233138e-15,
+   "smallest": 1.0058074313913411e-15
+  },
+  "rotation_fixing_the_all_ones_vector": {
+   "largest": 2.590870500264186e-15,
+   "smallest": 1.0709519083044007e-15
+  },
+  "general_orthogonal_rotation": {
+   "largest": 0.002095381909434616,
+   "smallest": 0.0016191950690356497
+  }
+ }
+}

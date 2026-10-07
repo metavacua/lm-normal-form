@@ -1,0 +1,20 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+[package]
+name = "lmnf-candle-logits"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Batch 0023: the logits of every position of every sequence, for a Llama checkpoint in a Hugging Face directory, in candle"
+
+[dependencies]
+candle-core = "=0.11.0"
+candle-nn = "=0.11.0"
+candle-transformers = "=0.11.0"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+anyhow = "1"
+
+[profile.release]
+opt-level = 3
+debug = false

@@ -1,0 +1,1012 @@
+{
+ "configurations": [
+  "matrix-d3",
+  "matrix-d2",
+  "matrix-d2-s100",
+  "matrix-d2-s200"
+ ],
+ "mutants": {
+  "M01": {
+   "file": "batches/0015/model.py",
+   "predicted": "detected",
+   "why": "the scale of the scores",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    }
+   }
+  },
+  "M02": {
+   "file": "batches/0015/model.py",
+   "predicted": "detected",
+   "why": "the causal mask points the other way",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    }
+   }
+  },
+  "M03": {
+   "file": "batches/0015/model.py",
+   "predicted": "detected",
+   "why": "no causal mask: position 0 reads position 1",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    }
+   }
+  },
+  "M04": {
+   "file": "batches/0015/model.py",
+   "predicted": "detected",
+   "why": "a position may not read itself: the first position reads nothing and the normalization divides by zero",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "error",
+     "detail": "no seed makes the parameters generic"
+    },
+    "matrix-d2": {
+     "status": "error",
+     "detail": "no seed makes the parameters generic"
+    },
+    "matrix-d2-s100": {
+     "status": "error",
+     "detail": "no seed makes the parameters generic"
+    },
+    "matrix-d2-s200": {
+     "status": "error",
+     "detail": "no seed makes the parameters generic"
+    }
+   }
+  },
+  "M05": {
+   "file": "batches/0015/model.py",
+   "predicted": "detected",
+   "why": "the keys are not rotated",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "67 arrays differ, e.g. orig.k0, orig.h0, orig.q1, orig.k1"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "67 arrays differ, e.g. orig.k0, orig.h0, orig.q1, orig.k1"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "67 arrays differ, e.g. orig.k0, orig.h0, orig.q1, orig.k1"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "67 arrays differ, e.g. orig.k0, orig.h0, orig.q1, orig.k1"
+    }
+   }
+  },
+  "M06": {
+   "file": "batches/0015/model.py",
+   "predicted": "detected",
+   "why": "a sign of the rotation",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "77 arrays differ, e.g. orig.q0, orig.k0, orig.h0, orig.q1"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "77 arrays differ, e.g. orig.q0, orig.k0, orig.h0, orig.q1"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "77 arrays differ, e.g. orig.q0, orig.k0, orig.h0, orig.q1"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "77 arrays differ, e.g. orig.q0, orig.k0, orig.h0, orig.q1"
+    }
+   }
+  },
+  "M07": {
+   "file": "batches/0015/model.py",
+   "predicted": "survives",
+   "why": "the pairing of the coordinates of a rotary plane, half-split or interleaved, is the same with one plane of two coordinates",
+   "detected": false,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2-s100": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2-s200": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    }
+   }
+  },
+  "M08": {
+   "file": "batches/0015/model.py",
+   "predicted": "detected",
+   "why": "the heads of a group read the wrong group",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    }
+   }
+  },
+  "M09": {
+   "file": "batches/0015/model.py",
+   "predicted": "detected",
+   "why": "the weights are normalized over the wrong axis",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    }
+   }
+  },
+  "M10": {
+   "file": "batches/0015/model.py",
+   "predicted": "detected",
+   "why": "no residual connection around the attention",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    }
+   }
+  },
+  "M11": {
+   "file": "batches/0015/model.py",
+   "predicted": "detected",
+   "why": "no residual connection around the gated block",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    }
+   }
+  },
+  "M12": {
+   "file": "batches/0015/model.py",
+   "predicted": "detected",
+   "why": "the gate and the up matrices exchanged",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    }
+   }
+  },
+  "M13": {
+   "file": "batches/0015/model.py",
+   "predicted": "detected",
+   "why": "the norm weight is not applied",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "69 arrays differ, e.g. orig.q0, orig.k0, orig.v0, orig.h0"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "69 arrays differ, e.g. orig.q0, orig.k0, orig.v0, orig.h0"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "69 arrays differ, e.g. orig.q0, orig.k0, orig.v0, orig.h0"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "69 arrays differ, e.g. orig.q0, orig.k0, orig.v0, orig.h0"
+    }
+   }
+  },
+  "M14": {
+   "file": "batches/0015/model.py",
+   "predicted": "detected",
+   "why": "the mean of the squares is divided by the wrong number",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "87 arrays differ, e.g. orig.q0, orig.k0, orig.v0, orig.h0"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "87 arrays differ, e.g. orig.q0, orig.k0, orig.v0, orig.h0"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "87 arrays differ, e.g. orig.q0, orig.k0, orig.v0, orig.h0"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "87 arrays differ, e.g. orig.q0, orig.k0, orig.v0, orig.h0"
+    }
+   }
+  },
+  "M15": {
+   "file": "batches/0015/model.py",
+   "predicted": "detected",
+   "why": "no final norm",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "11 arrays differ, e.g. orig.logits, fold.logits, orig1.logits, orig1.logits_def"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "11 arrays differ, e.g. orig.logits, fold.logits, orig1.logits, orig1.logits_def"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "11 arrays differ, e.g. orig.logits, fold.logits, orig1.logits, orig1.logits_def"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "11 arrays differ, e.g. orig.logits, fold.logits, orig1.logits, orig1.logits_def"
+    }
+   }
+  },
+  "M16": {
+   "file": "batches/0015/model.py",
+   "predicted": "detected",
+   "why": "the head is the embedding although the head is untied",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "20 arrays differ, e.g. orig.head, orig.logits, fold.head, fold.logits"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "20 arrays differ, e.g. orig.head, orig.logits, fold.head, fold.logits"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "20 arrays differ, e.g. orig.head, orig.logits, fold.head, fold.logits"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "20 arrays differ, e.g. orig.head, orig.logits, fold.head, fold.logits"
+    }
+   }
+  },
+  "M17": {
+   "file": "batches/0015/model.py",
+   "predicted": "detected",
+   "why": "the cache keeps the keys before the rotation (the logits are right)",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "19 arrays differ, e.g. orig.k0, orig.k1, fold.k0, fold.k1"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "19 arrays differ, e.g. orig.k0, orig.k1, fold.k0, fold.k1"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "19 arrays differ, e.g. orig.k0, orig.k1, fold.k0, fold.k1"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "19 arrays differ, e.g. orig.k0, orig.k1, fold.k0, fold.k1"
+    }
+   }
+  },
+  "M18": {
+   "file": "batches/0015/model.py",
+   "predicted": "detected",
+   "why": "the folded model forgets the final norm weight",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "4 arrays differ, e.g. fold.head, fold.logits, h4.head, h4.logits"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "4 arrays differ, e.g. fold.head, fold.logits, h4.head, h4.logits"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "4 arrays differ, e.g. fold.head, fold.logits, h4.head, h4.logits"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "4 arrays differ, e.g. fold.head, fold.logits, h4.head, h4.logits"
+    }
+   }
+  },
+  "M19": {
+   "file": "batches/0015/model.py",
+   "predicted": "detected",
+   "why": "the fold forgets the norm weight of the gated block",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "20 arrays differ, e.g. fold.l0.wg, fold.l0.wu, fold.l1.wg, fold.l1.wu"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "20 arrays differ, e.g. fold.l0.wg, fold.l0.wu, fold.l1.wg, fold.l1.wu"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "20 arrays differ, e.g. fold.l0.wg, fold.l0.wu, fold.l1.wg, fold.l1.wu"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "20 arrays differ, e.g. fold.l0.wg, fold.l0.wu, fold.l1.wg, fold.l1.wu"
+    }
+   }
+  },
+  "M20": {
+   "file": "batches/0015/ops.py",
+   "predicted": "detected",
+   "why": "the surrogate of the exponential",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    }
+   }
+  },
+  "M21": {
+   "file": "batches/0015/ops.py",
+   "predicted": "detected",
+   "why": "the surrogate of the gate function",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    }
+   }
+  },
+  "M22": {
+   "file": "batches/0015/ops.py",
+   "predicted": "detected",
+   "why": "the surrogate of the normalization",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "87 arrays differ, e.g. orig.q0, orig.k0, orig.v0, orig.h0"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "87 arrays differ, e.g. orig.q0, orig.k0, orig.v0, orig.h0"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "87 arrays differ, e.g. orig.q0, orig.k0, orig.v0, orig.h0"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "87 arrays differ, e.g. orig.q0, orig.k0, orig.v0, orig.h0"
+    }
+   }
+  },
+  "M23": {
+   "file": "batches/0015/ops.py",
+   "predicted": "detected",
+   "why": "the scale of the scores (the surrogate)",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "57 arrays differ, e.g. orig.h0, orig.q1, orig.k1, orig.v1"
+    }
+   }
+  },
+  "G01": {
+   "file": "batches/0015/gauge.py",
+   "predicted": "detected",
+   "why": "H1: the final norm weight is not permuted",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "2 arrays differ, e.g. h1.gf, h1.logits"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "2 arrays differ, e.g. h1.gf, h1.logits"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "2 arrays differ, e.g. h1.gf, h1.logits"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "2 arrays differ, e.g. h1.gf, h1.logits"
+    }
+   }
+  },
+  "G02": {
+   "file": "batches/0015/gauge.py",
+   "predicted": "detected",
+   "why": "H1: the layer norm weights are not permuted",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "13 arrays differ, e.g. h1.l0.an, h1.l0.mn, h1.l1.an, h1.l1.mn"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "13 arrays differ, e.g. h1.l0.an, h1.l0.mn, h1.l1.an, h1.l1.mn"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "13 arrays differ, e.g. h1.l0.an, h1.l0.mn, h1.l1.an, h1.l1.mn"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "13 arrays differ, e.g. h1.l0.an, h1.l0.mn, h1.l1.an, h1.l1.mn"
+    }
+   }
+  },
+  "G03": {
+   "file": "batches/0015/gauge.py",
+   "predicted": "detected",
+   "why": "H4: the writers are rotated by Q and not by its transpose",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "10 arrays differ, e.g. h4.l0.wo, h4.l0.wd, h4.l1.wo, h4.l1.wd"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "10 arrays differ, e.g. h4.l0.wo, h4.l0.wd, h4.l1.wo, h4.l1.wd"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "10 arrays differ, e.g. h4.l0.wo, h4.l0.wd, h4.l1.wo, h4.l1.wd"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "10 arrays differ, e.g. h4.l0.wo, h4.l0.wd, h4.l1.wo, h4.l1.wd"
+    }
+   }
+  },
+  "G04": {
+   "file": "batches/0015/gauge.py",
+   "predicted": "detected",
+   "why": "A1: the transpose in place of the inverse",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "8 arrays differ, e.g. ov.l0.wo, ov.l1.wo, ov.h0, ov.q1"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "8 arrays differ, e.g. ov.l0.wo, ov.l1.wo, ov.h0, ov.q1"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "8 arrays differ, e.g. ov.l0.wo, ov.l1.wo, ov.h0, ov.q1"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "8 arrays differ, e.g. ov.l0.wo, ov.l1.wo, ov.h0, ov.q1"
+    }
+   }
+  },
+  "G05": {
+   "file": "batches/0015/gauge.py",
+   "predicted": "detected",
+   "why": "A3: the queries are scaled by the same complex number as the keys",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "9 arrays differ, e.g. qk.l0.wq, qk.l1.wq, qk.q0, qk.h0"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "9 arrays differ, e.g. qk.l0.wq, qk.l1.wq, qk.q0, qk.h0"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "9 arrays differ, e.g. qk.l0.wq, qk.l1.wq, qk.q0, qk.h0"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "9 arrays differ, e.g. qk.l0.wq, qk.l1.wq, qk.q0, qk.h0"
+    }
+   }
+  },
+  "G06": {
+   "file": "batches/0015/gauge.py",
+   "predicted": "detected",
+   "why": "A3: keys and queries exchanged",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "9 arrays differ, e.g. qk.l0.wk, qk.l1.wk, qk.k0, qk.h0"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "9 arrays differ, e.g. qk.l0.wk, qk.l1.wk, qk.k0, qk.h0"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "9 arrays differ, e.g. qk.l0.wk, qk.l1.wk, qk.k0, qk.h0"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "9 arrays differ, e.g. qk.l0.wk, qk.l1.wk, qk.k0, qk.h0"
+    }
+   }
+  },
+  "G07": {
+   "file": "batches/0015/gauge.py",
+   "predicted": "detected",
+   "why": "M1: the down column is scaled by c and not by 1/c",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "8 arrays differ, e.g. m1.l0.wd, m1.l1.wd, m1.h0, m1.q1"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "8 arrays differ, e.g. m1.l0.wd, m1.l1.wd, m1.h0, m1.q1"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "8 arrays differ, e.g. m1.l0.wd, m1.l1.wd, m1.h0, m1.q1"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "8 arrays differ, e.g. m1.l0.wd, m1.l1.wd, m1.h0, m1.q1"
+    }
+   }
+  },
+  "G08": {
+   "file": "batches/0015/gauge.py",
+   "predicted": "detected",
+   "why": "M1: the scale is applied after the permutation instead of before",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "8 arrays differ, e.g. m1.l0.wu, m1.l1.wu, m1.h0, m1.q1"
+    },
+    "matrix-d2": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2-s100": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "7 arrays differ, e.g. m1.l0.wu, m1.h0, m1.q1, m1.k1"
+    }
+   }
+  },
+  "G09": {
+   "file": "batches/0015/gauge.py",
+   "predicted": "detected",
+   "why": "A6: the group permutation is not applied to the heads",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "9 arrays differ, e.g. hp.l0.wq, hp.l0.wo, hp.q0, hp.h0"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "11 arrays differ, e.g. hp.l0.wq, hp.l0.wo, hp.l1.wq, hp.l1.wo"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "9 arrays differ, e.g. hp.l0.wq, hp.l0.wo, hp.q0, hp.h0"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "9 arrays differ, e.g. hp.l0.wq, hp.l0.wo, hp.q0, hp.h0"
+    }
+   }
+  },
+  "G10": {
+   "file": "batches/0015/gauge.py",
+   "predicted": "detected",
+   "why": "N1: the readers are scaled by c and not by 1/c",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "19 arrays differ, e.g. n1.l0.wq, n1.l0.wk, n1.l0.wv, n1.l0.wg"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "19 arrays differ, e.g. n1.l0.wq, n1.l0.wk, n1.l0.wv, n1.l0.wg"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "19 arrays differ, e.g. n1.l0.wq, n1.l0.wk, n1.l0.wv, n1.l0.wg"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "19 arrays differ, e.g. n1.l0.wq, n1.l0.wk, n1.l0.wv, n1.l0.wg"
+    }
+   }
+  },
+  "G11": {
+   "file": "batches/0015/gauge.py",
+   "predicted": "survives",
+   "why": "N1 on the final norm: the generator takes the scale 1 there, so the direction of the scale is not tested",
+   "detected": false,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2-s100": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2-s200": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    }
+   }
+  },
+  "G12": {
+   "file": "batches/0015/gauge.py",
+   "predicted": "survives",
+   "why": "A3: the second row of a rotary plane is j + 1 or j + hd/2: the same with one plane",
+   "detected": false,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2-s100": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2-s200": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    }
+   }
+  },
+  "H01": {
+   "file": "batches/0022/gen22.py",
+   "predicted": "detected",
+   "why": "the positions start at 1: the logits are the same, the cache is not",
+   "detected": true,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "mismatch",
+     "detail": "38 arrays differ, e.g. orig.q0, orig.k0, orig.q1, orig.k1"
+    },
+    "matrix-d2": {
+     "status": "mismatch",
+     "detail": "38 arrays differ, e.g. orig.q0, orig.k0, orig.q1, orig.k1"
+    },
+    "matrix-d2-s100": {
+     "status": "mismatch",
+     "detail": "38 arrays differ, e.g. orig.q0, orig.k0, orig.q1, orig.k1"
+    },
+    "matrix-d2-s200": {
+     "status": "mismatch",
+     "detail": "38 arrays differ, e.g. orig.q0, orig.k0, orig.q1, orig.k1"
+    }
+   }
+  },
+  "H02": {
+   "file": "batches/0022/gen22.py",
+   "predicted": "survives",
+   "why": "the recurrence of the rotation is wrong from the third position on: only two positions are run",
+   "detected": false,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2-s100": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2-s200": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    }
+   }
+  },
+  "B01": {
+   "file": "batches/0015/model.py",
+   "predicted": "survives",
+   "why": "the tied head is wrong: the run has an untied head",
+   "detected": false,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2-s100": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2-s200": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    }
+   }
+  },
+  "B02": {
+   "file": "batches/0015/model.py",
+   "predicted": "survives",
+   "why": "LayerNorm does not subtract the mean: the run uses the RMS norm",
+   "detected": false,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2-s100": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2-s200": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    }
+   }
+  },
+  "B03": {
+   "file": "batches/0015/model.py",
+   "predicted": "survives",
+   "why": "the mask of a non-causal model: the run is causal",
+   "detected": false,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2-s100": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2-s200": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    }
+   }
+  },
+  "B04": {
+   "file": "batches/0015/model.py",
+   "predicted": "survives",
+   "why": "the fold does not untie the head: the head of the run is untied already",
+   "detected": false,
+   "per_configuration": {
+    "matrix-d3": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2-s100": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    },
+    "matrix-d2-s200": {
+     "status": "equal",
+     "detail": "278 arrays equal"
+    }
+   }
+  }
+ },
+ "unmutated": {
+  "matrix-d3": {
+   "status": "equal",
+   "detail": "278 arrays equal"
+  },
+  "matrix-d2": {
+   "status": "equal",
+   "detail": "278 arrays equal"
+  },
+  "matrix-d2-s100": {
+   "status": "equal",
+   "detail": "278 arrays equal"
+  },
+  "matrix-d2-s200": {
+   "status": "equal",
+   "detail": "278 arrays equal"
+  }
+ }
+}

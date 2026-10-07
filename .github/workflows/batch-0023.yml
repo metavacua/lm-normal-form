@@ -1,0 +1,286 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0023 (docs/batches/0023.md): the special theory of the transformer language model, measured on language models (public checkpoints) and on the Llama decoder equations (a finite instance with
+# random parameters, which is not a language model). Two triggers by the message of the commit: [smoke] runs the code on small random models of each architecture (no download of a checkpoint; the
+# results are not graded and are not evidence), [run] runs the registered experiments and grades them. Nothing here masks a failure: no `|| true`, no `continue-on-error`, no discarded stderr; the
+# only `if: always()`-like steps are the uploads of artifacts, which cannot change the conclusion of a job; the grading job fails if any registered claim is not "as predicted" or any control fails.
+# The actions are pinned by the commit that their tag pointed to on 2026-10-07; the Python packages and the Rust crates (Cargo.lock) by version, and the run checks the versions it got.
+name: batch 0023
+
+on:
+  push:
+    branches: ["batch/0023-**"]
+    paths: [".github/workflows/batch-0023.yml", "batches/0023/**", "batches/0015/**", "batches/0022/**", "docs/batches/0022/results/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-0023-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  PIN_TORCH: "2.14.1"
+  PIN_TRANSFORMERS: "5.19.0"
+  PIN_NUMPY: "2.5.3"
+  PIN_HUB: "1.33.0"
+  PIN_SAFETENSORS: "0.8.0"
+  PIN_TOKENIZERS: "0.23.2"
+  PIN_MLDTYPES: "0.6.0"
+  PIN_SENTENCEPIECE: "0.2.2"
+  PIN_PROTOBUF: "7.36.2"
+
+jobs:
+  checks:
+    name: "00 the grader's self-test, the targets of the mutants, the syntax of every script"
+    if: contains(github.event.head_commit.message, '[run]') || contains(github.event.head_commit.message, '[smoke]') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: python -m pip install --quiet "numpy==${PIN_NUMPY}"
+      - name: Syntax of every script
+        run: python -m py_compile batches/0023/*.py
+      - name: "The grader can fail (every claim holds on a fixture built to satisfy it, is refuted when one of its own inputs is violated, is not run without data)"
+        run: python batches/0023/grade23.py --selftest
+      - name: Every text that a mutant replaces occurs exactly once in its file
+        run: python batches/0023/mutate23.py --check
+      - name: The finite instance agrees with model.py (batch 0015) and its Jacobian with finite differences
+        run: python batches/0023/finite23.py
+
+  numpy:
+    name: "01 ${{ matrix.name }}"
+    if: contains(github.event.head_commit.message, '[run]') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {name: "rank (the dimension of the group, the position structure, the vocabulary rule, the dependencies)", out: "cov", cmd: "python batches/0023/cov23.py out/cov.json"}
+          - {name: "the group at a trained point", out: "fibre", cmd: "python batches/0023/fibre23.py out/fibre.json"}
+          - {name: "the discrete symmetries, counted", out: "discrete", cmd: "python batches/0023/discrete23.py out/discrete.json"}
+          - {name: "the power of the conformance test (mutants)", out: "mutate", cmd: "python batches/0023/mutate23.py out/mutate.json"}
+          - {name: "the velocity of each training rule at ten points, under seven equivalence transformations", out: "opt-field", cmd: "python batches/0023/opt23.py field out/opt-field.json"}
+          - {name: "gradient descent, 200 steps, from theta and from g.theta", out: "opt-sgd", cmd: "python batches/0023/opt23.py sgd out/opt-sgd.json"}
+          - {name: "Adam, 200 steps, from theta and from g.theta", out: "opt-adam", cmd: "python batches/0023/opt23.py adam out/opt-adam.json"}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.12"
+      - name: Install and record the versions
+        run: |
+          mkdir -p out
+          python -m pip install --quiet "numpy==${PIN_NUMPY}"
+          python - <<'EOF'
+          import numpy, sys
+          assert numpy.__version__ == "2.5.3", numpy.__version__
+          print(sys.version, numpy.__version__)
+          EOF
+          { python --version; python -m pip freeze; grep -m1 'model name' /proc/cpuinfo; } > "out/versions-${{ matrix.out }}.txt"
+          cat "out/versions-${{ matrix.out }}.txt"
+      - name: Run
+        run: ${{ matrix.cmd }}
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: ${{ !cancelled() }}
+        with:
+          name: res-${{ matrix.out }}
+          path: out/
+          retention-days: 30
+
+  runtimes:
+    name: "02 the finite instance as a checkpoint: Transformers and candle on every input"
+    if: contains(github.event.head_commit.message, '[run]') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.12"
+      - name: Install and record the versions
+        run: |
+          mkdir -p out work
+          python -m pip install --quiet "torch==${PIN_TORCH}" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet "transformers==${PIN_TRANSFORMERS}" "numpy==${PIN_NUMPY}" "safetensors==${PIN_SAFETENSORS}" "huggingface_hub==${PIN_HUB}" "tokenizers==${PIN_TOKENIZERS}" "ml_dtypes==${PIN_MLDTYPES}" "sentencepiece==${PIN_SENTENCEPIECE}" "protobuf==${PIN_PROTOBUF}"
+          python - <<'EOF'
+          import torch, transformers
+          assert transformers.__version__ == "5.19.0", transformers.__version__
+          assert torch.__version__.startswith("2.14.1"), torch.__version__
+          print(torch.__version__, transformers.__version__)
+          EOF
+          { python --version; python -m pip freeze; rustc --version; cargo --version; grep -m1 'model name' /proc/cpuinfo; } > out/versions-runtimes.txt
+          cat out/versions-runtimes.txt
+      - name: Write the checkpoint and the reference logits
+        run: python batches/0023/bridge23.py export work
+      - name: Transformers
+        run: python batches/0023/bridge23.py torch work out/bridge-torch.json
+      - name: "Build candle (the lockfile is committed; nothing is resolved at build time)"
+        run: cargo build --release --locked --manifest-path batches/0023/candle/Cargo.toml
+      - name: Run candle on every sequence
+        run: batches/0023/candle/target/release/lmnf-candle-logits work/ckpt work/candle_inputs.json work/candle f32
+      - name: Compare candle with the reference
+        run: python batches/0023/bridge23.py candle work work/candle.logits.f32 out/bridge-candle.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: ${{ !cancelled() }}
+        with:
+          name: res-runtimes
+          path: out/
+          retention-days: 30
+
+  systems:
+    name: "03 kinematics on ${{ matrix.key }}"
+    if: contains(github.event.head_commit.message, '[run]') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {key: "smol-instruct", type: llama, repo: "HuggingFaceTB/SmolLM2-135M-Instruct", rev: "12fd25f77366fa6b3b4b768ec3050bf629380bac", file: "systems-smol-instruct"}
+          - {key: "smol-base", type: llama, repo: "HuggingFaceTB/SmolLM2-135M", rev: "93efa2f097d58c2a74874c7e644dbc9b0cee75a2", file: "systems-smol-base"}
+          - {key: "floatlm-99m", type: llama, repo: "SpectraSuite/FloatLM_99M", rev: "0516fbe2979fcad7c26805885273562c88c3de90", file: "systems-floatlm-99m"}
+          - {key: "trilm-99m", type: llama, repo: "SpectraSuite/TriLM_99M_Unpacked", rev: "61cd2c766000fc544595d6570ad1990017d0cb43", file: "systems-trilm-99m"}
+          - {key: "delphi-100k", type: llama, repo: "delphi-suite/v0-llama2-100k", rev: "c1372fb65245458f2ee3be71f838e088e6a53d77", file: "systems-delphi-100k"}
+          - {key: "qwen3-0.6b", type: qwen3, repo: "Qwen/Qwen3-0.6B", rev: "c1899de289a04d12100db370d81485cdf75e47ca", file: "outside-qwen3-0.6b"}
+          - {key: "gpt2", type: gpt2, repo: "openai-community/gpt2", rev: "607a30d783dfa663caf39e06633721c8d4cfcd7e", file: "outside-gpt2"}
+          - {key: "pythia-160m", type: gpt_neox, repo: "EleutherAI/pythia-160m", rev: "50f5173d932e8e61f858120bcb800b97af589f46", file: "outside-pythia-160m"}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.12"
+      - name: Install and record the versions
+        run: |
+          mkdir -p out
+          python -m pip install --quiet "torch==${PIN_TORCH}" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet "transformers==${PIN_TRANSFORMERS}" "numpy==${PIN_NUMPY}" "safetensors==${PIN_SAFETENSORS}" "huggingface_hub==${PIN_HUB}" "tokenizers==${PIN_TOKENIZERS}" "ml_dtypes==${PIN_MLDTYPES}" "sentencepiece==${PIN_SENTENCEPIECE}" "protobuf==${PIN_PROTOBUF}"
+          python - <<'EOF'
+          import torch, transformers
+          assert transformers.__version__ == "5.19.0", transformers.__version__
+          assert torch.__version__.startswith("2.14.1"), torch.__version__
+          EOF
+          { python --version; python -m pip freeze; grep -m1 'model name' /proc/cpuinfo; free -g | head -2; } > "out/versions-${{ matrix.file }}.txt"
+          cat "out/versions-${{ matrix.file }}.txt"
+      - name: "Run (the Llama family with systems23.py, the other architectures with outside23.py)"
+        run: |
+          if [ "${{ matrix.type }}" = "llama" ]; then
+            python batches/0023/systems23.py llama "${{ matrix.repo }}" "${{ matrix.rev }}" "out/${{ matrix.file }}.json"
+          else
+            python batches/0023/outside23.py "${{ matrix.type }}" "${{ matrix.repo }}" "${{ matrix.rev }}" "out/${{ matrix.file }}.json"
+          fi
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: ${{ !cancelled() }}
+        with:
+          name: res-${{ matrix.file }}
+          path: out/
+          retention-days: 30
+
+  conversation:
+    name: "04 conversation and tool call, and fine-tuning, on ${{ matrix.file }}"
+    if: contains(github.event.head_commit.message, '[run]') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {file: "chat-qwen3-0.6b", cmd: "python batches/0023/chat23.py qwen3 Qwen/Qwen3-0.6B c1899de289a04d12100db370d81485cdf75e47ca out/chat-qwen3-0.6b.json"}
+          - {file: "chat-smol-instruct", cmd: "python batches/0023/chat23.py smollm2 HuggingFaceTB/SmolLM2-135M-Instruct 12fd25f77366fa6b3b4b768ec3050bf629380bac out/chat-smol-instruct.json"}
+          - {file: "finetune-smol-instruct", cmd: "python batches/0023/finetune23.py smol-instruct HuggingFaceTB/SmolLM2-135M-Instruct 12fd25f77366fa6b3b4b768ec3050bf629380bac out/finetune-smol-instruct.json"}
+          - {file: "finetune-delphi-100k", cmd: "python batches/0023/finetune23.py delphi-100k delphi-suite/v0-llama2-100k c1372fb65245458f2ee3be71f838e088e6a53d77 out/finetune-delphi-100k.json"}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.12"
+      - name: Install and record the versions
+        run: |
+          mkdir -p out
+          python -m pip install --quiet "torch==${PIN_TORCH}" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet "transformers==${PIN_TRANSFORMERS}" "numpy==${PIN_NUMPY}" "safetensors==${PIN_SAFETENSORS}" "huggingface_hub==${PIN_HUB}" "tokenizers==${PIN_TOKENIZERS}" "ml_dtypes==${PIN_MLDTYPES}" "sentencepiece==${PIN_SENTENCEPIECE}" "protobuf==${PIN_PROTOBUF}"
+          python - <<'EOF'
+          import torch, transformers
+          assert transformers.__version__ == "5.19.0", transformers.__version__
+          assert torch.__version__.startswith("2.14.1"), torch.__version__
+          EOF
+          { python --version; python -m pip freeze; grep -m1 'model name' /proc/cpuinfo; free -g | head -2; } > "out/versions-${{ matrix.file }}.txt"
+          cat "out/versions-${{ matrix.file }}.txt"
+      - name: Run
+        run: ${{ matrix.cmd }}
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: ${{ !cancelled() }}
+        with:
+          name: res-${{ matrix.file }}
+          path: out/
+          retention-days: 30
+
+  smoke:
+    name: "05 smoke ${{ matrix.piece }}: the code on small or unregistered subjects (not graded, not evidence)"
+    if: contains(github.event.head_commit.message, '[smoke]') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        piece: [rank, random_small, numpy_others, tokenizer, chat, chat_qwen3, bridge]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.12"
+      - name: Install and record the versions
+        run: |
+          mkdir -p out
+          python -m pip install --quiet "torch==${PIN_TORCH}" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet "transformers==${PIN_TRANSFORMERS}" "numpy==${PIN_NUMPY}" "safetensors==${PIN_SAFETENSORS}" "huggingface_hub==${PIN_HUB}" "tokenizers==${PIN_TOKENIZERS}" "ml_dtypes==${PIN_MLDTYPES}" "sentencepiece==${PIN_SENTENCEPIECE}" "protobuf==${PIN_PROTOBUF}"
+          { python --version; python -m pip freeze; } > out/versions-smoke.txt
+      - name: Run the piece
+        run: bash "batches/0023/smoke/${{ matrix.piece }}.sh"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: ${{ !cancelled() }}
+        with:
+          name: smoke-${{ matrix.piece }}
+          path: out/
+          retention-days: 14
+
+  grade:
+    name: "06 grade against the registered claims"
+    if: ${{ !cancelled() && (contains(github.event.head_commit.message, '[run]') || github.event_name == 'workflow_dispatch') }}
+    needs: [checks, numpy, runtimes, systems, conversation]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          pattern: res-*
+          merge-multiple: true
+          path: results
+      - name: What was produced
+        run: ls -l results
+      - name: "Grade (fails if a claim is refuted or not run, or a control fails)"
+        run: python batches/0023/grade23.py results graded
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: ${{ !cancelled() }}
+        with:
+          name: graded
+          path: graded/
+          retention-days: 90

@@ -1,0 +1,85 @@
+{
+ "model_type": "llama",
+ "hidden": 576,
+ "heads": 9,
+ "kv_heads": 3,
+ "head_dim": 64,
+ "layers": 30,
+ "tied_head": true,
+ "sequence_lengths": [
+  16,
+  11,
+  13,
+  16,
+  17,
+  13
+ ],
+ "torch": "2.14.1+cpu",
+ "qk_norm": false,
+ "membership": {
+  "tokens": 114,
+  "mean_loss_nats": 1.9343726413715783,
+  "ln_output_vocabulary": 10.802672816507345,
+  "fraction_of_ln_vocabulary": 0.17906426254210928
+ },
+ "float64_islands_patched": true,
+ "determinism_largest_relative_difference": 0.0,
+ "translation": {
+  "1": {
+   "largest": 5.9692243911617235e-15,
+   "smallest": 1.81830344544369e-15
+  },
+  "16": {
+   "largest": 2.8817496774860857e-15,
+   "smallest": 2.1217724373741977e-15
+  },
+  "128": {
+   "largest": 3.656888247019739e-15,
+   "smallest": 1.9311292078100267e-15
+  }
+ },
+ "phase": {
+  "shift": 16,
+  "logits": {
+   "largest": 3.5579824801885e-15,
+   "smallest": 2.1295772761072115e-15
+  },
+  "keys_of_the_gauged_model_against_the_original_at_the_shifted_positions": {
+   "largest": 2.5955802606419823e-15,
+   "smallest": 7.475994917410305e-16
+  },
+  "keys_moved_by_the_shift_control": {
+   "smallest_over_sentences_of_the_mean_over_layers": 0.49116967396029826
+  }
+ },
+ "dilation": {
+  "0.5": {
+   "largest": 0.6188604606380073,
+   "smallest": 0.25175747259280945
+  },
+  "2.0": {
+   "largest": 0.5372026914797097,
+   "smallest": 0.16793201702533464
+  }
+ },
+ "rotation": {
+  "layers_compared": 31,
+  "logits": {
+   "largest": 1.1886863768357693e-14,
+   "smallest": 6.6804749250641756e-15
+  },
+  "stream_equals_the_original_times_Q_transpose": {
+   "largest": 1.2000247917426323e-14
+  },
+  "gram_matrix_of_every_layer": {
+   "largest": 1.2723376777467483e-14
+  },
+  "stream_moved_at_the_embedding": {
+   "smallest": 1.3962978795261565
+  }
+ },
+ "rotation_without_the_fold_control": {
+  "smallest": 1.405081664429142,
+  "largest": 2.9085836715016797
+ }
+}
