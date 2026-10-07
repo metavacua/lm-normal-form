@@ -285,12 +285,44 @@ def main(d, tsv=None):
         else:
             grade_ratio("P15", S, "smol-instruct", "llamacpp", dt, f"cache {t}", ("heads", "perm", "resid", "resid_blk", "units", "units_blk"), ("scale", "all", "canon"))
 
+    # addendum 1: the quantized cache with the rotation disabled (P15n), and what the rotation does (P15r)
+    for t in ("q8_0", "q4_0"):
+        dt = f"float32-kv{t}-norot"
+        if ("smol-instruct", "llamacpp", dt) not in S:
+            say("P15n", f"cache {t}, rotation disabled", None, "no summary")
+        else:
+            grade_ratio("P15n", S, "smol-instruct", "llamacpp", dt, f"cache {t}, rotation disabled", ("heads", "perm", "resid", "resid_blk", "units", "units_blk"), ("scale", "all", "canon"))
+        a, b = e64(var(S, "smol-instruct", "llamacpp", f"float32-kv{t}", "orig")), e64(var(S, "smol-instruct", "llamacpp", dt, "orig"))
+        lim = 0.8 if t == "q4_0" else 1.0
+        say("P15r", f"cache {t}, rotated against not rotated", None if a is None or b is None else bool(a <= lim * b), f"e with the rotation {f(a)}, without {f(b)} (limit {lim} x)")
+
+    # addendum 2: the control for the noise of quantized runs (P16): the null variant, one unit in the last place of float32 in every norm weight, against the original of the same cell
+    fine, coarse = ("q8_0", "float32-kvf16", "float32-kvq8_0"), ("q4_0", "float32-kvq4_0")
+    for dt in ("float32",) + fine + coarse:
+        o, nv = var(S, "smol-instruct-null", "llamacpp", dt, "orig"), var(S, "smol-instruct-null", "llamacpp", dt, "nullall")
+        e, d = e64(o), same(nv).get("nmse")
+        if e is None or d is None:
+            say("P16", f"null variant, {dt}", None, "no summary")
+        elif dt == "float32":
+            ev = e64(nv)
+            say("P16", f"null variant, {dt}", bool(ev is not None and d <= 4 * max(e, ev)), f"NMSE against own original {f(d)}, bound 4 max e = {f(4 * max(e, ev)) if ev is not None else 'n/a'}")
+        elif dt in fine:
+            say("P16", f"null variant, {dt}", bool(d / e >= 0.1), f"e = {f(e)}; NMSE against own original / e = {f(d / e)} (at least 0.1 predicted)")
+        else:
+            say("P16", f"null variant, {dt}", bool(d / e < 0.2), f"e = {f(e)}; NMSE against own original / e = {f(d / e)} (below 0.2 predicted)")
+    for dt in ("float32-kvq8_0-norot", "float32-kvq4_0-norot"):
+        o, nv = var(S, "smol-instruct-null", "llamacpp", dt, "orig"), var(S, "smol-instruct-null", "llamacpp", dt, "nullall")
+        e, d = e64(o), same(nv).get("nmse")
+        say("observed", f"null variant, {dt}", None, "no summary" if e is None or d is None else f"e = {f(e)}; NMSE against own original / e = {f(d / e)}")
+
     # controls
     for (m, rt, dt), s in sorted(S.items()):
         dtm = s.get("determinism")
         if dtm is not None and m in MODELS:
             say("control", f"determinism {rt} {dt} / {m}", all(dtm.values()), f"the original run twice: {dtm}")
     for key, mf in sorted(manifests.items()):
+        if key == "xrt-null":
+            continue          # its variant nullall has other significands by design
         vs = mf["variants"]
         if any("tensors_with_other_significands" in x for x in vs.values()):
             bad = [v for v, x in vs.items() if x.get("tensors_with_other_significands") or not x.get("same_tensor_names", True)]

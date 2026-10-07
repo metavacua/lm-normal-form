@@ -17,7 +17,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from common import texts_and_ids, wikitext_windows, logit_metrics, median, first_divergence, dump
 
-VARIANTS = ["orig", "scale", "perm", "all", "canon", "broken", "heads", "units", "units_blk", "resid", "resid_blk"]
+VARIANTS = ["orig", "scale", "perm", "all", "canon", "broken", "heads", "units", "units_blk", "resid", "resid_blk", "nullall"]      # the driver runs those that are present in WORK/variants
 
 
 def eos_ids(orig_dir, tok):

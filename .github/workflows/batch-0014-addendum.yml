@@ -1,0 +1,152 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0014, addenda 1 and 2 (docs/batches/0014.md): the cells that were registered after the heavy run's workflow was written, run for a commit whose message contains [run-addendum]
+# (not [run]: the heavy jobs of batch-0014.yml are not repeated).
+#   norot   the KV cache of llama.cpp in Q8_0 and in Q4_0 with the Hadamard rotation turned off, original and every variant of SmolLM2-135M-Instruct (addendum 1: P15n, P15r)
+#   nullvariant  the control for the noise of quantized runs (addendum 2: P16): the original and the null variant `nullall` (every norm weight times 1 + 2^-23) in llama.cpp with float32 weights
+#           and f32, f16, Q8_0, Q4_0 cache, and with Q8_0 and Q4_0 weights
+name: batch 0014 addendum
+
+on:
+  push:
+    branches: ["batch/0014-**"]
+    paths: [".github/workflows/batch-0014-addendum.yml", "batches/0014/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-0014-addendum-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  LLAMACPP_TAG: b11450
+  LMNF_THREADS: "4"
+
+jobs:
+  norot:
+    name: "09b the quantized KV cache of llama.cpp with the rotation off"
+    if: contains(github.event.head_commit.message, '[run-addendum]') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      REPO: HuggingFaceTB/SmolLM2-135M-Instruct
+      HF_REVISION: 12fd25f77366fa6b3b4b768ec3050bf629380bac
+      LMNF_MODEL: smol-instruct
+      W: work/norot
+      O: out/norot
+      LLAMACPP_DIR: ${{ github.workspace }}/llama-b11450
+      LLAMACPP_SRC: ${{ github.workspace }}/llama.cpp-src
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p "$W" "$O"
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers numpy safetensors huggingface_hub ml_dtypes pandas pyarrow sentencepiece protobuf
+          python -m pip freeze > "$O/versions.txt"
+          grep -m1 'model name' /proc/cpuinfo | tee "$O/cpu.txt"
+          curl -sSL -o l.tgz "https://github.com/ggml-org/llama.cpp/releases/download/$LLAMACPP_TAG/llama-$LLAMACPP_TAG-bin-ubuntu-x64.tar.gz"
+          tar xzf l.tgz
+          git clone --quiet --depth 1 --branch "$LLAMACPP_TAG" https://github.com/ggml-org/llama.cpp llama.cpp-src
+          python -m pip install --quiet ./llama.cpp-src/gguf-py
+          g++ -O2 -std=c++17 -I llama.cpp-src/include -I llama.cpp-src/ggml/include -I llama.cpp-src/vendor batches/0014/llamacpp/lmnf_llama.cpp \
+            -o "llama-$LLAMACPP_TAG/lmnf-llama" -L"llama-$LLAMACPP_TAG" -lllama -lggml -lggml-base "-Wl,-rpath,\$ORIGIN"
+      - name: Variants and inputs
+        run: |
+          python batches/0014/variants.py "$REPO" "$HF_REVISION" "$W/variants" 2>&1 | tail -n 14
+          python batches/0014/xrt.py prepare "$W/variants/orig" "$W"
+      - id: kvnorot
+        name: llama.cpp, the quantized KV cache with the rotation disabled
+        continue-on-error: true
+        run: |
+          python batches/0014/xrt.py all llamacpp float32-kvq8_0-norot "$W" 1
+          python batches/0014/xrt.py all llamacpp float32-kvq4_0-norot "$W" 1
+      - name: Keep
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: |
+          echo "$STEPS" > "$O/outcomes.json"
+          cp "$W"/summary-*.json "$W/inputs.json" "$W/variants/manifest.json" "$O/" 2>/dev/null || true
+          mkdir -p "$O/res" && cp "$W"/res/*.json "$O/res/" 2>/dev/null || true
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: xrt-norot
+          path: out/norot/
+          retention-days: 14
+
+  nullvariant:
+    name: "09c the control for the noise of quantized runs"
+    if: contains(github.event.head_commit.message, '[run-addendum]') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      REPO: HuggingFaceTB/SmolLM2-135M-Instruct
+      HF_REVISION: 12fd25f77366fa6b3b4b768ec3050bf629380bac
+      LMNF_MODEL: smol-instruct-null
+      W: work/null
+      O: out/null
+      LLAMACPP_DIR: ${{ github.workspace }}/llama-b11450
+      LLAMACPP_SRC: ${{ github.workspace }}/llama.cpp-src
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p "$W" "$O"
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers numpy safetensors huggingface_hub ml_dtypes pandas pyarrow sentencepiece protobuf
+          python -m pip freeze > "$O/versions.txt"
+          grep -m1 'model name' /proc/cpuinfo | tee "$O/cpu.txt"
+          curl -sSL -o l.tgz "https://github.com/ggml-org/llama.cpp/releases/download/$LLAMACPP_TAG/llama-$LLAMACPP_TAG-bin-ubuntu-x64.tar.gz"
+          tar xzf l.tgz
+          git clone --quiet --depth 1 --branch "$LLAMACPP_TAG" https://github.com/ggml-org/llama.cpp llama.cpp-src
+          python -m pip install --quiet ./llama.cpp-src/gguf-py
+          g++ -O2 -std=c++17 -I llama.cpp-src/include -I llama.cpp-src/ggml/include -I llama.cpp-src/vendor batches/0014/llamacpp/lmnf_llama.cpp \
+            -o "llama-$LLAMACPP_TAG/lmnf-llama" -L"llama-$LLAMACPP_TAG" -lllama -lggml -lggml-base "-Wl,-rpath,\$ORIGIN"
+      - name: The original and the null variant
+        run: |
+          python batches/0014/variants.py "$REPO" "$HF_REVISION" "$W/variants" orig nullall 2>&1 | tail -n 6
+          python batches/0014/xrt.py prepare "$W/variants/orig" "$W"
+      - id: cells
+        name: llama.cpp, float32 and the quantized forms, the original and the null variant
+        continue-on-error: true
+        run: |
+          python batches/0014/xrt.py all llamacpp float32 "$W" 1
+          python batches/0014/xrt.py all llamacpp float32-kvf16 "$W" 1
+          python batches/0014/xrt.py all llamacpp float32-kvq8_0 "$W" 1
+          python batches/0014/xrt.py all llamacpp float32-kvq4_0 "$W" 1
+          python batches/0014/xrt.py all llamacpp q8_0 "$W" 1
+          python batches/0014/xrt.py all llamacpp q4_0 "$W" 1
+          python batches/0014/xrt.py all llamacpp float32-kvq8_0-norot "$W" 1
+          python batches/0014/xrt.py all llamacpp float32-kvq4_0-norot "$W" 1
+      - name: Keep
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: |
+          echo "$STEPS" > "$O/outcomes.json"
+          cp "$W"/summary-*.json "$W/inputs.json" "$W/variants/manifest.json" "$O/" 2>/dev/null || true
+          mkdir -p "$O/res" && cp "$W"/res/*.json "$O/res/" 2>/dev/null || true
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: xrt-null
+          path: out/null/
+          retention-days: 14

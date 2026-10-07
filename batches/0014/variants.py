@@ -13,6 +13,8 @@
 #   canon   the canonical form of batch 0013 (amended): everything sorted by content, signs and powers of two normalized, zeros +0.0
 #   broken  the permutation of the hidden coordinates applied to the layers and the final norm but not to the embedding and the head: a control that
 #           every runtime must show to be broken
+#   nullall (addendum 2, not in ALL: named on the command line) every norm weight multiplied by 1 + 2^-23, one unit in the last place of float32: a variant that is not an
+#           exact symmetry but changes the arithmetic by the least that float32 can express, the control for the noise of quantized runs
 # A variant is written in the dtype of the original file if every value survives the round trip through that dtype, and in float32 if not (the
 # manifest says which). Usage: variants.py REPO REVISION OUTDIR [variant ...]
 import hashlib, json, os, shutil, sys, time
@@ -108,6 +110,8 @@ def make(P, d, tied, variant):
         return S.apply_residual(P, d, rng.permutation(d.H), np.ones(d.H))
     if variant == "resid_blk":
         return S.apply_residual(P, d, blk_perm(d.H, rng), np.ones(d.H))
+    if variant == "nullall":
+        return {k: ((a.astype(np.float64) * (1.0 + 2.0 ** -23)).astype(np.float32) if k.endswith("layernorm.weight") or k == "model.norm.weight" else a) for k, a in P.items()}
     if variant == "broken":
         R = S.apply_residual(P, d, rng.permutation(d.H), np.ones(d.H))
         R[F.EMBED] = P[F.EMBED]

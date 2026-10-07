@@ -19,9 +19,11 @@ def version():
 
 
 def split(dtype):
-    """'float32-kvq8_0' -> ('float32', 'q8_0'); 'float32' -> ('float32', 'f32'); 'q8_0' -> ('q8_0', 'f16')."""
-    w, _, kv = dtype.partition("-kv")
-    return w, kv or ("f32" if w == "float32" else "f16")
+    """'float32-kvq8_0' -> ('float32', 'q8_0', False); 'float32' -> ('float32', 'f32', False); 'q8_0' -> ('q8_0', 'f16', False); 'float32-kvq4_0-norot' -> ('float32', 'q4_0', True): the last
+    suffix turns off the Hadamard rotation that llama.cpp applies to a quantized cache (LLAMA_ATTN_ROT_DISABLE=1; addendum 1 of docs/batches/0014.md)."""
+    w, _, rest = dtype.partition("-kv")
+    kv, _, flag = rest.partition("-")
+    return w, kv or ("f32" if w == "float32" else "f16"), flag == "norot"
 
 
 def gguf(model_dir, work, dtype):
@@ -45,8 +47,10 @@ def gguf(model_dir, work, dtype):
 def run(model_dir, ids, wins, dtype, work, tag, full=True):
     path = gguf(model_dir, work, dtype)
     out = os.path.join(work, "res", f"{tag}-llamacpp")
-    subprocess.run([os.path.join(REL, "lmnf-llama"), path, os.path.join(work, "inputs.json"), out, "1" if full else "0", os.environ.get("LMNF_THREADS", "4"), split(dtype)[1]], check=True)
+    env = dict(os.environ, LLAMA_ATTN_ROT_DISABLE="1") if split(dtype)[2] else os.environ
+    subprocess.run([os.path.join(REL, "lmnf-llama"), path, os.path.join(work, "inputs.json"), out, "1" if full else "0", os.environ.get("LMNF_THREADS", "4"), split(dtype)[1]], check=True, env=env)
     res = json.load(open(out + ".json"))
+    res["attn_rot_disabled"] = bool(split(dtype)[2])
     res["gguf_bytes"] = os.path.getsize(path)
     res["artifact_sha256"] = sha256_file(path)
     logits = None
