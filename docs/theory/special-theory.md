@@ -1,0 +1,114 @@
+# The special theory of transformer language models (draft 1, written before the runs of batch 0023)
+
+- **Status.** A draft. Every statement carries one of these tags, and nothing is stated without one.
+  **[proved]** a theorem machine-checked in Lean 4.34.1 (soundness only: that the transformations preserve the function; nothing about whether there are others).
+  **[derived]** obtained by a program or by hand from the rules of the derivation, not proved.
+  **[tested]** a finite check of the statement on exact arithmetic or on a small instance, which could have failed.
+  **[measured]** a number from a run on a named system.
+  **[registered]** a claim of batch 0023 (`docs/batches/0023.md`), written before its run; its result is in the table of §7 once the run is graded.
+  **[conjecture]** none of the above.
+- **Branch.** `batch/0023-special-theory`, on top of batch 0022. **Written:** 2026-10-07.
+- **What this is not.** It is not a physical theory of the machines that run language models. The correspondence is between two mathematical structures: the program that defines a transformer language model, and the spacetime models of special and general relativity. The machines, their arithmetic and their number formats are treated in §6 as the instrument that measures the first structure, with its own fixed structure.
+
+## 0. Terms
+
+The words of the machine-learning literature are replaced by the older words where the older words are exact. A word is defined once and not used for anything else.
+
+| word used here | what it is | the word it replaces |
+|---|---|---|
+| **program scheme** | a family of programs with free numerical constants (Strachey, Paterson and Hewitt, 1960s–70s) | "architecture" |
+| **the scheme** | the Llama decoder, as implemented by `LlamaForCausalLM` of Hugging Face Transformers; other schemes are named when they occur | |
+| **constants** (also **parameters**) | the numbers in a checkpoint file | "weights" |
+| **instance** | the scheme with its dimensions and constants fixed | |
+| **function of an instance** | the map from a finite string of symbols (token numbers) to a vector of scores, one for each symbol that might follow | "model", "logits" |
+| **checkpoint** | an instance in the standard files (`config.json`, `model.safetensors`, a tokenizer) that the standard libraries load | |
+| **language model** | in this repository, a checkpoint that (1) loads in Transformers, (2) has constants obtained by fitting to text, or by construction against a written specification of a language, and (3) passes the registered test: its mean loss on one fixed English text (`batches/0023/membership.txt`) is at most 0.9 ln(size of its vocabulary), the loss of a function that knows nothing being ln(size). The test can fail: a function with random constants scores about 1 (batch 0023, control). | "model" |
+| **finite instance** | an instance whose input strings are few enough to list, so that its function is a table; the one used here is the scheme at hidden size 4, two layers, five symbols, with seeded random constants. It is **not** a language model: nothing was fitted and it fails the test. Claims about it are claims about the scheme's equations. | "tiny model" |
+| **stream** | the vector that each position carries from layer to layer, to which each layer adds | "residual stream" |
+| **cache** | the keys and values of the attention step, stored so that earlier positions are not computed again | "KV cache" |
+| **equivalence transformation** | a change of the constants that leaves the function unchanged (compare α-conversion in the λ-calculus: a renaming that leaves the meaning unchanged) | "gauge transformation", "symmetry" |
+| **normal form** | one chosen constant vector for each class of equivalent ones (as in Church–Rosser) | "canonical form" |
+| **absolute object** | a part of the scheme that is the same in every instance and is held fixed (Anderson 1967) | |
+| **runtime** | a program that executes the scheme on a machine; it has its own arithmetic and, if it quantizes, its own grid | "inference engine" |
+
+## 1. The object
+
+A **function of an instance** is a total function F from the strings of length at most T over an alphabet of V symbols to R^V, computed by a fixed finite sequence of arithmetic operations (sums, products, the exponential, the reciprocal, the square root, sine and cosine, and the function s/(1+e^-s)) on the constants θ ∈ R^N and the string. Generation is the iteration of F with a rule for choosing the next symbol (the largest score, or a draw): a transducer whose state is the string so far. Every behaviour of a language model, conversation and procedure calls included, is a property of F and of that rule.
+
+The **layer** is h ↦ h + a(h) and then h ↦ h + m(h): two additions to a vector that each position carries, where a mixes positions (a weighted average of earlier positions, the weights being a normalized exponential of a bilinear form of the positions' vectors) and m acts on each position alone (a product of a gated and a plain linear image).
+
+**Equivalence of instances.** Two constant vectors θ, θ′ are *equivalent* if F_θ = F_θ′ (equality as functions: extensional, not intensional). The set of functions the scheme can express is Θ/≈. Batches 0013 to 0022 are the study of which transformations of θ keep it in its class, and of what each does to the intermediate states.
+
+## 2. The group, and what is held fixed
+
+**[proved, soundness]** (batches 0020, 0021: 71 theorems, axioms `propext`, `Classical.choice`, `Quot.sound` only; the nonlinearities are arbitrary functions) For the Llama decoder with arbitrary exponential, gate function and norm scale, each of the following changes the constants and leaves the function unchanged. **[derived]** (batch 0019, a Datalog program) The group generated by them is the group of the scheme, for every one of the seven configurations tested; **[tested]** (batch 0015, rank of the Jacobian of the function with respect to the constants, seven configurations) its dimension is as the derivation says, at generic points.
+
+| name | what changes | what it is | dimension |
+|---|---|---|---|
+| H1 | the hidden coordinates | a signed permutation, with the norm weights permuted along | finite |
+| H4 | the hidden coordinates | an orthogonal matrix, after the norm weights are folded into the readers and the head is made separate | d(d−1)/2 |
+| N1 | a norm weight and the columns that read it | a scalar c_i and 1/c_i | d per norm |
+| M1 | a unit of the gated block | a permutation, and a scalar on the up row with the inverse on the down column | d_ff per layer |
+| A1 | the value dimensions of a key/value group | an invertible matrix A on the value rows, A⁻¹ on the output columns of the group's heads | n_kv hd² per layer |
+| A3 | a rotary plane of a group | a complex scalar on the keys, its inverse transpose on the queries | n_kv hd per layer |
+| A6 | the heads and the groups | permutations | finite |
+
+For the model SmolLM2-135M the dimension is 455,040 of 134,515,008 constants (0.34%), for FloatLM-99M 700,672 of 99,762,688 (0.70%) **[derived]**, generic points.
+
+**What is held fixed (the absolute objects).** The rotary table (the rotation of plane p at position t is by tθ_p, with θ_p fixed); the epsilon of the norm; the elementwise nonlinearities (they fix the coordinate axes of the units); the inner product that the norm uses; the causal mask; whether the head is the embedding. **Klein's reading** (the Erlangen programme, 1872): the group of a structure is the stabilizer of what is fixed, and changing what is fixed changes the group. **[tested]** (batch 0015, the Jacobian rank, exact in all seven; the configuration is hidden 6, four heads in two groups, head dimension 4, 8 units, two layers, 7 symbols, norm weights free): the dimension is 142 with the rotary table, 190 without it (no position structure: an arbitrary invertible matrix on the queries and keys of each group, in place of a complex scalar); 141 for a positive epsilon (the scale of the stream is no longer free); 121 with the head tied to the embedding (the rotations are lost); 148 if the function is the log-probabilities (a shift is free).
+
+**[registered]** R1–R3 repeat the count on fresh draws, R5 tests the formula's behaviour for vocabularies at most as large as the hidden size (where the first layer has extra freedom: a finding of this batch's pilot, explained only in part), F1 asks whether the dimension is the same at a point that training has reached.
+
+## 3. How the states transform
+
+A state is a tensor with indices of definite kinds: the stream has an index in the hidden coordinates, the keys an index in the rotary planes, the values an index in the value dimensions, the scores none. The table below is the law of transformation. **[proved]** (batch 0021): the stream is fixed by N1, M1, A1, A3, A6 and moved by H1, H4; the cache is fixed by N1, M1, H1, H4 and moved by A1, A3, A6; both are moved only by compositions; the scores are fixed by everything. **[tested]** (batch 0022: the Lean definition run on a random instance over the field of 1000003 elements agrees with the Python definition on 314 arrays in each of four configurations; batch 0023, mutants: how much that agreement can detect is the subject of M-claims).
+
+What survives every equivalence transformation, and so can be measured without fixing a form: the scores; the attention weights (up to the order of the heads); the Gram matrix of the stream at each layer when epsilon is positive (it is moved by no generator but the orthogonal ones, which preserve it); the singular values of the product of the output and value matrices of a head, and of the bilinear form of its queries and keys. What does not: the keys, queries, values, stream coordinates; the norms and the mutual products of the keys (A3 rescales them) and of the values (A1 changes them); any statistic taken channel by channel. A method that selects channels or scales therefore chooses a form. QuaRot and SpinQuant choose the form that is best for quantization (abstracts, checked 2026-10-07: rotations leave the full-precision output unchanged and change the error of the quantized one, by up to 13 points between random rotations in the second).
+
+**Position.** The rotary table makes every score a function of t − s. **[registered]** K1: shifting all positions by c changes the scores by at most 1e-6, for five Llama-family language models; Q1, P1 for Qwen3 and Pythia; G4 for GPT-2, which has learned absolute positions and must fail. **[registered]** K2: on the cache, the shift is the weight-level equivalence transformation that rotates plane p by cθ_p: the keys, after the rotary embedding, of the transformed model at the original positions equal those of the original at the shifted positions. The translation of the positions, which acts on the inputs, is therefore a member of the group of the constants (the phase part of A3) as far as the cache is concerned. **[registered]** Q2: for Qwen3, which normalizes the queries and the keys between the projection and the rotary embedding, it is not.
+
+## 4. Causal structure
+
+Take as events the pairs (t, l) of a position and a layer, ordered by (t, l) ≼ (t′, l′) iff t ≤ t′ and l ≤ l′. The causal mask and the order of the layers make the output at (t′, l′) depend only on the input at events below it. **[registered]** R6 measures this on the finite instance: the derivative of the stream at t′ after a layer with respect to the stream at t is zero (at most 1e-14) for t > t′ and not zero (at least 1e-8) for t ≤ t′. As an ordered set this is the product of two chains, which is exactly the causal order of two-dimensional Minkowski space written in null coordinates (u, v) = (x⁰ − x¹, x⁰ + x¹): (u, v) ≼ (u′, v′) iff u ≤ u′ and v ≤ v′, restricted to a lattice. That is a statement about order alone. The causal automorphisms of the continuum are all maps (u, v) ↦ (f(u), g(v)) with f and g increasing, an infinite-dimensional group; those of the lattice are the identity. What would fix lengths is not the order but the rotary table and the norm, and their groups are those of §2: of the translations of the position axis, those survive; the dilation does not **[registered]** (K3, Q8, P2: multiplying the angles by 0.5 or 2 changes the scores by at least 1e-3, because the frequencies are fixed). There is nothing that corresponds to a boost.
+
+## 5. Dynamics
+
+**In depth.** Each layer commutes with the stream's equivalence transformations: layer(Qh) = Q layer(h) for the orthogonal part H, with the readers and writers transformed (**[proved]**, `layerFn_stream`). A single Q serves all layers because the addition of h to its image is not changed by anything else (**[derived]** by an argument that a layer-dependent Q would need a linear term from a block that has none; no theorem).
+
+**Generation.** Because F is unchanged, so are the tokens that greedy generation produces, in exact arithmetic. **[registered]** C: a conversation with Qwen3-0.6B and with SmolLM2-135M-Instruct, and a request for a tool call to Qwen3-0.6B (the chat template of the checkpoint, which takes a list of tools and answers in a `<tool_call>` block), run in float64 on the original and on eight transformed copies of the weights, give the same 64 tokens; a variant with the permutation applied to the layers but not to the embedding must give different tokens.
+
+**Training.** The optimizer is itself fixed structure. A step of gradient descent with the Euclidean norm of the constants as its metric commutes with the transformations that are orthogonal on the constants, and with no others. Adam, which divides each coordinate by its own scale, commutes with the signed permutations only. **[measured]** (batch 0015, Q17: a random Llama of 32 hidden units, 100 steps, float64) SGD against a rotation: loss difference 7e-15; Adam against a rotation: 0.028, 72% of the constants different; SGD against a scaling of the units: 0.54; Adam: 0.073. The consequence is the analogue of the hole argument: two constant vectors that are the same function, trained by Adam, become different functions; the state of a training run is the pair (function, form). **[registered]** H: the same on SmolLM2-135M-Instruct and on delphi-suite/v0-llama2-100k with the optimizers of PyTorch. **[registered]** O: *in continuous time a rule defines a dynamics on functions if and only if the velocity it gives the function is the same at gauge-related constants.* The test is of that velocity, at ten random points, for seven transformations: gradient descent is the same under the four that are orthogonal on the constants and under no other; Adam's first step under the signed permutation, the unit permutation and the head swap; natural gradient (the direction F⁺g, F the Fisher metric of the predictive distributions, F⁺ its pseudo-inverse) under all seven, because the function-space velocity J F⁺ Jᵀ r depends on the model only through its function; the same rule damped by a fixed multiple of the identity of the constants, (F + λI)⁻¹g, under the orthogonal ones only (the metric of the constants returns as the absolute object), and damped by the Euclidean metric of the scores, (F + λJᵀJ)⁻¹g, a metric on functions, under all seven. The comparison is of the predictive distributions (the scores minus their mean over the symbols), because the least-squares problem that defines the natural-gradient direction fixes J v only up to a shift of all the scores of a context, which no distribution sees. The covariant rule is stated and measured here as a velocity field and not as an update: the step in the constants is at least 100 times that of gradient descent (**[registered]** O6), and the natural-gradient proximal step (minimize L + η⁻¹ KL(f_k‖f)), which is covariant in discrete time if solved, was tried and its inner problem did not converge at this size (pilot, `docs/batches/0023.md`). That is a limit of the construction and not a result about it: it says that covariance forces large moves of the constants along directions in which the function barely changes, and that the nonlinear model punishes them.
+
+## 6. The instrument
+
+A runtime has its own fixed structure: its arithmetic (float32, float16, bfloat16) and, if it quantizes, the grid of its blocks. An equivalence transformation that is exact in real arithmetic is a symmetry of the runtime only if it preserves the grid. **[measured]** (batch 0014, one machine per cell, post hoc thresholds, one realization of the null per cell): the classification of the exact transformations into those that commute with block quantization of the weights and of the cache, and those that do not, is the one derived from the block structure in all seven cells; the narrowest separation (2.5×) is in the cell Q8_0 weights, where the same class itself spans a factor of about three over processors. Batch 0024 measures the spread of the null (eight perturbations of one unit in the last place) and re-grades. **[derived]** llama.cpp (build b11450) rotates the queries and keys of a quantized cache by a Hadamard matrix after the rotary embedding; this is the transformation (Q, P) = (I, H) below, which no change of constants reproduces for a fixed table; the cache of that runtime is a form chosen by the runtime.
+
+**[registered]** B: the finite instance, written as a checkpoint, run in Transformers (float64 and float32) and in candle (Rust, float32) on every one of its 625 sequences of four symbols, which contain all 780 contexts: the largest differences from the reference (numpy, float64) are at most 1e-10, 1e-5 and 1e-5 in relative norm, and the largest score is the same at every position. What this shows is the conformance of the runtimes to the equations at one size, on all inputs; it says nothing about language models.
+
+## 7. Evidence, by system
+
+The language models, with the registered test of §0 (S0, Q0, G0, P0) applied to each, and the batch 0023 claims about them; the results are filled in after the run.
+
+| system | architecture | the claims | result |
+|---|---|---|---|
+| SmolLM2-135M-Instruct, SmolLM2-135M | Llama, tied head | S0, K1, K2, K3, K5 (each system), H, C | pending |
+| FloatLM 99M, TriLM 99M (ternary) | Llama, untied head | the same | pending |
+| delphi-suite/v0-llama2-100k | Llama, hidden 48, 4 layers, GQA 8/4, tied head, vocabulary 4096 | the same, and H | pending |
+| Qwen3-0.6B | Llama with a norm of the queries and keys | Q0–Q9, C | pending |
+| GPT-2 (124M) | LayerNorm, learned positions, tied head | G0–G4 | pending |
+| Pythia-160M | LayerNorm, parallel residual, rotary on a quarter of each head | P0–P5 | pending |
+| the finite instance (not a language model) | the Llama equations, hidden 4 | R, F, D, O1–O8, M, B | pending |
+
+## 8. First steps toward a general covariant version
+
+**8.1 The formal move.** *(Kretschmann 1917; Anderson 1967.)* Any theory can be written so that it is formally invariant under a larger group, by promoting a fixed object to a variable that the group also moves. Here: let the group act on the table as well. For any invertible Q and orthogonal P, replacing (W_q, W_k, R_t) by (Q W_q, Q W_k, P R_t Q⁻¹) leaves every score unchanged and moves the keys and queries after the rotary embedding by P; the price is that P R_t Q⁻¹ is no longer a rotation. **[checked, unregistered; float64, head dimension 8, hidden 12, six positions]** scores unchanged to 1e-13 with the table moved, error 1.6e3 with the same Q and the table fixed; the same pair (A, A⁻ᵀ) that is exact without a rotary table (1e-13) gives error 3.6e2 with it, and a complex scalar on each plane (key C, query C⁻ᵀ) is exact to 1.6e-14. llama.cpp's cache rotation is the case Q = I, P = Hadamard.
+
+**8.2 The enlargement.** The position-dependent form of the attention, in which the queries and keys have their own projection at every position and there is no rotary embedding, has an invertible matrix per key/value group as its group, and the rotary form is the submanifold W_t = R_t W. **[registered]** R3, R4: the deficiency of the position-dependent form is 62 (30 gauge dimensions, 32 for the queries' projection at position 0, which the softmax over one position never reads); at the point W_t = R_t W the fibre of the larger form has dimension 62 and its intersection with the tangent space of the submanifold has dimension 26, which is the fibre of the rotary form: the group of the special theory is the part of the larger group that preserves the constraint.
+
+**8.3 A symmetry that appears when two fixed things are freed.** Let the position of token t be the proper time τ_t = Σ_{i<t} exp(b + w·x_i) (b and w constants, x_i the normalized input of the layer), and the angle of plane p at token t be θ_p τ_t. If the frequencies θ_p are constants of the scheme, nothing changes. If τ is dynamical and the frequencies are fixed, nothing changes. If the frequencies are parameters and τ is fixed, nothing changes. If both are free there is one new equivalence transformation per layer: b → b + s, θ → θ e^−s. **[registered]** R2a–R2c: the deficiency is 26, 26, 26 and 28. This is the first appearance, in this scheme, of a symmetry that is a reparametrization of the sequence coordinate, and it appears only when the clock rate and the interval are both dynamical.
+
+**8.4 What stays fixed in every such extension.** The order of events (§4); the alphabet; the arithmetic of the runtime. **[conjecture]** A general covariant version would have the order of events, and not their positions, as its only absolute structure, and observables that are functions of the order and of the content alone. This batch does not attempt the analogue of the field equations (what relates the interval to the content), and nothing here supports a claim about it.
+
+## 9. What would refute this, and what is not claimed
+
+The theory is refuted for a system by any [registered] claim of §7 that comes out REFUTED for it, and the table says which. It is not claimed that the list of transformations is complete (the proofs are of soundness; the Jacobian counts are at generic points and for the continuous part; the discrete part is counted only for permutations of the families of D1–D3); that anything holds for mixtures of experts, latent attention, sliding windows, biases or sandwich norms (nothing was derived or run for them); or that the finite instance, which is not a language model, says anything about language models.
