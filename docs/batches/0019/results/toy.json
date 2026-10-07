@@ -1,0 +1,5628 @@
+{
+ "gqa-untied": {
+  "derived_dimension_unfolded": 172,
+  "derived_groups": {
+   "res": "O",
+   "qk0": "Cplx",
+   "qk1": "Cplx",
+   "ov0": "GL",
+   "ov1": "GL",
+   "na0": "Mono",
+   "nm0": "Mono",
+   "unit0": "Mono",
+   "na1": "Mono",
+   "nm1": "Mono",
+   "unit1": "Mono",
+   "nf": "Mono",
+   "grp0": "Perm",
+   "hin0": "Perm",
+   "ugate0": "Perm",
+   "grp1": "Perm",
+   "hin1": "Perm",
+   "ugate1": "Perm",
+   "vocab": "Triv",
+   "tok": "Triv",
+   "tok2": "Triv"
+  },
+  "generators": {
+   "H1": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 3.774758283725532e-15,
+    "states": {
+     "emb": {
+      "derived": "signed_perm",
+      "measured": {
+       "-1": "signed_perm"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "signed_perm",
+      "measured": {
+       "2": "signed_perm"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "signed_perm",
+      "measured": {
+       "2": "signed_perm"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "H4": {
+    "program": "folded, untied",
+    "allowed": true,
+    "logit_change": 9.936496070395151e-15,
+    "states": {
+     "emb": {
+      "derived": "orthogonal",
+      "measured": {
+       "-1": "orthogonal"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "orthogonal",
+      "measured": {
+       "2": "orthogonal"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "H4t": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 9.547918011776346e-15,
+    "states": {
+     "emb": {
+      "derived": "orthogonal",
+      "measured": {
+       "-1": "orthogonal"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "gl",
+      "measured": {
+       "0": "gl",
+       "1": "gl"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "gl",
+      "measured": {
+       "0": "gl",
+       "1": "gl"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "orthogonal",
+      "measured": {
+       "2": "orthogonal"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "gl",
+      "measured": {
+       "2": "gl"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "N1": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 5.10702591327572e-15,
+    "states": {
+     "emb": {
+      "derived": "invariant",
+      "measured": {
+       "-1": "invariant"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "monomial",
+      "measured": {
+       "0": "monomial",
+       "1": "monomial"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "monomial",
+      "measured": {
+       "0": "monomial",
+       "1": "monomial"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "monomial",
+      "measured": {
+       "2": "monomial"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "M1": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 2.1094237467877974e-15,
+    "states": {
+     "emb": {
+      "derived": "invariant",
+      "measured": {
+       "-1": "invariant"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "monomial",
+      "measured": {
+       "0": "monomial",
+       "1": "monomial"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "monomial",
+      "measured": {
+       "0": "monomial",
+       "1": "monomial"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "A1": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 5.773159728050814e-15,
+    "states": {
+     "emb": {
+      "derived": "invariant",
+      "measured": {
+       "-1": "invariant"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "gl",
+      "measured": {
+       "0": "gl",
+       "1": "gl"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "gl",
+      "measured": {
+       "0": "gl",
+       "1": "gl"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "A3": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 4.385380947269368e-15,
+    "states": {
+     "emb": {
+      "derived": "invariant",
+      "measured": {
+       "-1": "invariant"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "complex_plane",
+      "measured": {
+       "0": "complex_plane",
+       "1": "complex_plane"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "complex_plane",
+      "measured": {
+       "0": "complex_plane",
+       "1": "complex_plane"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "A6": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 4.3298697960381105e-15,
+    "states": {
+     "emb": {
+      "derived": "invariant",
+      "measured": {
+       "-1": "invariant"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "A4": {
+    "program": "unfolded",
+    "allowed": false,
+    "logit_change": 3.351242260206723,
+    "states": {}
+   },
+   "M2": {
+    "program": "unfolded",
+    "allowed": false,
+    "logit_change": 4.971145549930786,
+    "states": {}
+   }
+  },
+  "library_checks_empty": true
+ },
+ "gqa-tied": {
+  "derived_dimension_unfolded": 136,
+  "derived_groups": {
+   "res": "SP",
+   "qk0": "Cplx",
+   "qk1": "Cplx",
+   "ov0": "GL",
+   "ov1": "GL",
+   "na0": "Mono",
+   "nm0": "Mono",
+   "unit0": "Mono",
+   "na1": "Mono",
+   "nm1": "Mono",
+   "unit1": "Mono",
+   "grp0": "Perm",
+   "hin0": "Perm",
+   "ugate0": "Perm",
+   "grp1": "Perm",
+   "hin1": "Perm",
+   "ugate1": "Perm",
+   "vocab": "Triv",
+   "tok": "Triv",
+   "tok2": "Triv"
+  },
+  "generators": {
+   "H1": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 4.6629367034256575e-15,
+    "states": {
+     "emb": {
+      "derived": "signed_perm",
+      "measured": {
+       "-1": "signed_perm"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "signed_perm",
+      "measured": {
+       "2": "signed_perm"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "signed_perm",
+      "measured": {
+       "2": "signed_perm"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "H4": {
+    "program": "folded, untied",
+    "allowed": true,
+    "logit_change": 7.993605777301127e-15,
+    "states": {
+     "emb": {
+      "derived": "orthogonal",
+      "measured": {
+       "-1": "orthogonal"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "orthogonal",
+      "measured": {
+       "2": "orthogonal"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "H4t": {
+    "program": "unfolded",
+    "allowed": false,
+    "logit_change": 4.805637804233209,
+    "states": {}
+   },
+   "N1": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 4.676814491233472e-15,
+    "states": {
+     "emb": {
+      "derived": "invariant",
+      "measured": {
+       "-1": "invariant"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "monomial",
+      "measured": {
+       "0": "monomial",
+       "1": "monomial"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "monomial",
+      "measured": {
+       "0": "monomial",
+       "1": "monomial"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "M1": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 3.552713678800501e-15,
+    "states": {
+     "emb": {
+      "derived": "invariant",
+      "measured": {
+       "-1": "invariant"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "monomial",
+      "measured": {
+       "0": "monomial",
+       "1": "monomial"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "monomial",
+      "measured": {
+       "0": "monomial",
+       "1": "monomial"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "A1": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 4.274358644806853e-15,
+    "states": {
+     "emb": {
+      "derived": "invariant",
+      "measured": {
+       "-1": "invariant"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "gl",
+      "measured": {
+       "0": "gl",
+       "1": "gl"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "gl",
+      "measured": {
+       "0": "gl",
+       "1": "gl"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "A3": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 6.494804694057166e-15,
+    "states": {
+     "emb": {
+      "derived": "invariant",
+      "measured": {
+       "-1": "invariant"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "complex_plane",
+      "measured": {
+       "0": "complex_plane",
+       "1": "complex_plane"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "complex_plane",
+      "measured": {
+       "0": "complex_plane",
+       "1": "complex_plane"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "A6": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 3.552713678800501e-15,
+    "states": {
+     "emb": {
+      "derived": "invariant",
+      "measured": {
+       "-1": "invariant"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "A4": {
+    "program": "unfolded",
+    "allowed": false,
+    "logit_change": 6.0515403053118355,
+    "states": {}
+   },
+   "M2": {
+    "program": "unfolded",
+    "allowed": false,
+    "logit_change": 5.399187999537814,
+    "states": {}
+   }
+  },
+  "library_checks_empty": true
+ },
+ "mha-untied": {
+  "derived_dimension_unfolded": 252,
+  "derived_groups": {
+   "res": "O",
+   "qk0": "Cplx",
+   "qk1": "Cplx",
+   "ov0": "GL",
+   "ov1": "GL",
+   "na0": "Mono",
+   "nm0": "Mono",
+   "unit0": "Mono",
+   "na1": "Mono",
+   "nm1": "Mono",
+   "unit1": "Mono",
+   "nf": "Mono",
+   "grp0": "Perm",
+   "hin0": "Perm",
+   "ugate0": "Perm",
+   "grp1": "Perm",
+   "hin1": "Perm",
+   "ugate1": "Perm",
+   "vocab": "Triv",
+   "tok": "Triv",
+   "tok2": "Triv"
+  },
+  "generators": {
+   "H1": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 6.439293542825908e-15,
+    "states": {
+     "emb": {
+      "derived": "signed_perm",
+      "measured": {
+       "-1": "signed_perm"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "signed_perm",
+      "measured": {
+       "2": "signed_perm"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "signed_perm",
+      "measured": {
+       "2": "signed_perm"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "H4": {
+    "program": "folded, untied",
+    "allowed": true,
+    "logit_change": 1.0880185641326534e-14,
+    "states": {
+     "emb": {
+      "derived": "orthogonal",
+      "measured": {
+       "-1": "orthogonal"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "orthogonal",
+      "measured": {
+       "2": "orthogonal"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "H4t": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 2.1260770921571748e-14,
+    "states": {
+     "emb": {
+      "derived": "orthogonal",
+      "measured": {
+       "-1": "orthogonal"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "gl",
+      "measured": {
+       "0": "gl",
+       "1": "gl"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "gl",
+      "measured": {
+       "0": "gl",
+       "1": "gl"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "orthogonal",
+      "measured": {
+       "2": "orthogonal"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "gl",
+      "measured": {
+       "2": "gl"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "N1": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 7.91033905045424e-15,
+    "states": {
+     "emb": {
+      "derived": "invariant",
+      "measured": {
+       "-1": "invariant"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "monomial",
+      "measured": {
+       "0": "monomial",
+       "1": "monomial"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "monomial",
+      "measured": {
+       "0": "monomial",
+       "1": "monomial"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "monomial",
+      "measured": {
+       "2": "monomial"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "M1": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 2.831068712794149e-15,
+    "states": {
+     "emb": {
+      "derived": "invariant",
+      "measured": {
+       "-1": "invariant"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "monomial",
+      "measured": {
+       "0": "monomial",
+       "1": "monomial"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "monomial",
+      "measured": {
+       "0": "monomial",
+       "1": "monomial"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "A1": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 4.884981308350689e-15,
+    "states": {
+     "emb": {
+      "derived": "invariant",
+      "measured": {
+       "-1": "invariant"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "gl",
+      "measured": {
+       "0": "gl",
+       "1": "gl"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "gl",
+      "measured": {
+       "0": "gl",
+       "1": "gl"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "A3": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 6.661338147750939e-15,
+    "states": {
+     "emb": {
+      "derived": "invariant",
+      "measured": {
+       "-1": "invariant"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "complex_plane",
+      "measured": {
+       "0": "complex_plane",
+       "1": "complex_plane"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "complex_plane",
+      "measured": {
+       "0": "complex_plane",
+       "1": "complex_plane"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "A6": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 4.6629367034256575e-15,
+    "states": {
+     "emb": {
+      "derived": "invariant",
+      "measured": {
+       "-1": "invariant"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "A4": {
+    "program": "unfolded",
+    "allowed": false,
+    "logit_change": 3.3559236838438773,
+    "states": {}
+   },
+   "M2": {
+    "program": "unfolded",
+    "allowed": false,
+    "logit_change": 5.252336272092818,
+    "states": {}
+   }
+  },
+  "library_checks_empty": true
+ },
+ "gqa-untied-eps0": {
+  "derived_dimension_unfolded": 173,
+  "derived_groups": {
+   "qk0": "Cplx",
+   "qk1": "Cplx",
+   "ov0": "GL",
+   "ov1": "GL",
+   "na0": "Mono",
+   "nm0": "Mono",
+   "unit0": "Mono",
+   "na1": "Mono",
+   "nm1": "Mono",
+   "unit1": "Mono",
+   "nf": "Mono",
+   "grp0": "Perm",
+   "hin0": "Perm",
+   "ugate0": "Perm",
+   "grp1": "Perm",
+   "hin1": "Perm",
+   "ugate1": "Perm",
+   "res": "CO",
+   "vocab": "Triv",
+   "tok": "Triv",
+   "tok2": "Triv"
+  },
+  "generators": {
+   "H1": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 3.608224830031759e-15,
+    "states": {
+     "emb": {
+      "derived": "signed_perm",
+      "measured": {
+       "-1": "signed_perm"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "signed_perm",
+      "measured": {
+       "0": "signed_perm",
+       "1": "signed_perm"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "signed_perm",
+      "measured": {
+       "2": "signed_perm"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "signed_perm",
+      "measured": {
+       "2": "signed_perm"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "H4": {
+    "program": "folded, untied",
+    "allowed": true,
+    "logit_change": 1.0269562977782698e-14,
+    "states": {
+     "emb": {
+      "derived": "orthogonal",
+      "measured": {
+       "-1": "orthogonal"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "orthogonal",
+      "measured": {
+       "2": "orthogonal"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "H4t": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 1.1546319456101628e-14,
+    "states": {
+     "emb": {
+      "derived": "orthogonal",
+      "measured": {
+       "-1": "orthogonal"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "gl",
+      "measured": {
+       "0": "gl",
+       "1": "gl"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "gl",
+      "measured": {
+       "0": "gl",
+       "1": "gl"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "orthogonal",
+      "measured": {
+       "0": "orthogonal",
+       "1": "orthogonal"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "orthogonal",
+      "measured": {
+       "2": "orthogonal"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "gl",
+      "measured": {
+       "2": "gl"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "N1": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 3.774758283725532e-15,
+    "states": {
+     "emb": {
+      "derived": "invariant",
+      "measured": {
+       "-1": "invariant"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "monomial",
+      "measured": {
+       "0": "monomial",
+       "1": "monomial"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "monomial",
+      "measured": {
+       "0": "monomial",
+       "1": "monomial"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "monomial",
+      "measured": {
+       "2": "monomial"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "M1": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 1.7763568394002505e-15,
+    "states": {
+     "emb": {
+      "derived": "invariant",
+      "measured": {
+       "-1": "invariant"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "monomial",
+      "measured": {
+       "0": "monomial",
+       "1": "monomial"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "monomial",
+      "measured": {
+       "0": "monomial",
+       "1": "monomial"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "A1": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 3.9968028886505635e-15,
+    "states": {
+     "emb": {
+      "derived": "invariant",
+      "measured": {
+       "-1": "invariant"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "gl",
+      "measured": {
+       "0": "gl",
+       "1": "gl"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "gl",
+      "measured": {
+       "0": "gl",
+       "1": "gl"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "A3": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 3.552713678800501e-15,
+    "states": {
+     "emb": {
+      "derived": "invariant",
+      "measured": {
+       "-1": "invariant"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "complex_plane",
+      "measured": {
+       "0": "complex_plane",
+       "1": "complex_plane"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "complex_plane",
+      "measured": {
+       "0": "complex_plane",
+       "1": "complex_plane"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "A6": {
+    "program": "unfolded",
+    "allowed": true,
+    "logit_change": 3.6637359812630166e-15,
+    "states": {
+     "emb": {
+      "derived": "invariant",
+      "measured": {
+       "-1": "invariant"
+      },
+      "agree": true
+     },
+     "h": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_a": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "q": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "k": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "v": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "score": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "pat": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "oh": {
+      "derived": "perm",
+      "measured": {
+       "0": "perm",
+       "1": "perm"
+      },
+      "agree": true
+     },
+     "ao": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "hm": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xt_m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gate": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "gact": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "up": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "m": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "mo": {
+      "derived": "invariant",
+      "measured": {
+       "0": "invariant",
+       "1": "invariant"
+      },
+      "agree": true
+     },
+     "xhat_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "xt_f": {
+      "derived": "invariant",
+      "measured": {
+       "2": "invariant"
+      },
+      "agree": true
+     },
+     "logits": {
+      "derived": "invariant",
+      "measured": {
+       "-": "invariant"
+      },
+      "agree": true
+     }
+    }
+   },
+   "A4": {
+    "program": "unfolded",
+    "allowed": false,
+    "logit_change": 3.3512389093641257,
+    "states": {}
+   },
+   "M2": {
+    "program": "unfolded",
+    "allowed": false,
+    "logit_change": 4.97115343824598,
+    "states": {}
+   }
+  },
+  "library_checks_empty": true
+ }
+}

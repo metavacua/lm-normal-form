@@ -1,0 +1,140 @@
+[
+ {
+  "config": "untied-eps0-logits",
+  "derived": 142,
+  "formula": 142,
+  "groups": {
+   "grp": "Perm",
+   "hin": "Perm",
+   "na": "Mono",
+   "nf": "Mono",
+   "nm": "Mono",
+   "ov": "GL",
+   "qk": "Cplx",
+   "res": "CO",
+   "tok": "Triv",
+   "ugate": "Perm",
+   "unit": "Mono",
+   "vocab": "Triv"
+  },
+  "library_checks_empty": true
+ },
+ {
+  "config": "untied-eps0-logprobs",
+  "derived": 148,
+  "formula": 148,
+  "groups": {
+   "grp": "Perm",
+   "hin": "Perm",
+   "na": "Mono",
+   "nf": "Mono",
+   "nm": "Mono",
+   "ov": "GL",
+   "qk": "Cplx",
+   "res": "CO",
+   "tok": "Triv",
+   "ugate": "Perm",
+   "unit": "Mono",
+   "vocab": "Triv"
+  },
+  "library_checks_empty": true
+ },
+ {
+  "config": "untied-eps-logits",
+  "derived": 141,
+  "formula": 141,
+  "groups": {
+   "grp": "Perm",
+   "hin": "Perm",
+   "na": "Mono",
+   "nf": "Mono",
+   "nm": "Mono",
+   "ov": "GL",
+   "qk": "Cplx",
+   "res": "O",
+   "tok": "Triv",
+   "ugate": "Perm",
+   "unit": "Mono",
+   "vocab": "Triv"
+  },
+  "library_checks_empty": true
+ },
+ {
+  "config": "tied-eps0-logits",
+  "derived": 121,
+  "formula": 121,
+  "groups": {
+   "grp": "Perm",
+   "hin": "Perm",
+   "na": "Mono",
+   "nm": "Mono",
+   "ov": "GL",
+   "qk": "Cplx",
+   "res": "SSP",
+   "tok": "Triv",
+   "ugate": "Perm",
+   "unit": "Mono",
+   "vocab": "Triv"
+  },
+  "library_checks_empty": true
+ },
+ {
+  "config": "tied-eps-logits",
+  "derived": 120,
+  "formula": 120,
+  "groups": {
+   "grp": "Perm",
+   "hin": "Perm",
+   "na": "Mono",
+   "nm": "Mono",
+   "ov": "GL",
+   "qk": "Cplx",
+   "res": "SP",
+   "tok": "Triv",
+   "ugate": "Perm",
+   "unit": "Mono",
+   "vocab": "Triv"
+  },
+  "library_checks_empty": true
+ },
+ {
+  "config": "mha-untied-eps0-logits",
+  "derived": 82,
+  "formula": 82,
+  "groups": {
+   "grp": "Perm",
+   "hin": "Perm",
+   "na": "Mono",
+   "nf": "Mono",
+   "nm": "Mono",
+   "ov": "GL",
+   "qk": "Cplx",
+   "res": "CO",
+   "tok": "Triv",
+   "ugate": "Perm",
+   "unit": "Mono",
+   "vocab": "Triv"
+  },
+  "library_checks_empty": true
+ },
+ {
+  "config": "nope-untied-eps0-logits",
+  "derived": 190,
+  "formula": 190,
+  "groups": {
+   "grp": "Perm",
+   "hin": "Perm",
+   "na": "Mono",
+   "nf": "Mono",
+   "nm": "Mono",
+   "ov": "GL",
+   "qk": "GL",
+   "res": "CO",
+   "tok": "Triv",
+   "ugate": "Perm",
+   "unit": "Mono",
+   "vocab": "Triv"
+  },
+  "library_checks_empty": true
+ }
+]
