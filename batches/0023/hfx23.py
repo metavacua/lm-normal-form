@@ -79,18 +79,18 @@ def patch_used(model_type):
     return Pos.rope_calls > 0 and (Pos.norm_calls > 0 or model_type == "gpt_neox")
 
 
-def random_small_config(model_type):
+def random_small_config(model_type, vocab=64):
     from transformers import GPT2Config, GPTNeoXConfig, LlamaConfig, Qwen3Config
     if model_type == "llama":
-        return LlamaConfig(vocab_size=64, hidden_size=16, intermediate_size=32, num_hidden_layers=2, num_attention_heads=4, num_key_value_heads=2, head_dim=4, max_position_embeddings=512,
+        return LlamaConfig(vocab_size=vocab, hidden_size=16, intermediate_size=32, num_hidden_layers=2, num_attention_heads=4, num_key_value_heads=2, head_dim=4, max_position_embeddings=512,
                            rms_norm_eps=1e-6, rope_theta=10000.0, tie_word_embeddings=True)
     if model_type == "qwen3":
-        return Qwen3Config(vocab_size=64, hidden_size=16, intermediate_size=32, num_hidden_layers=2, num_attention_heads=4, num_key_value_heads=2, head_dim=4, max_position_embeddings=512,
+        return Qwen3Config(vocab_size=vocab, hidden_size=16, intermediate_size=32, num_hidden_layers=2, num_attention_heads=4, num_key_value_heads=2, head_dim=4, max_position_embeddings=512,
                            rms_norm_eps=1e-6, rope_theta=1000000.0, tie_word_embeddings=True)
     if model_type == "gpt2":
-        return GPT2Config(vocab_size=64, n_embd=16, n_layer=2, n_head=4, n_positions=512, n_inner=64)
+        return GPT2Config(vocab_size=vocab, n_embd=16, n_layer=2, n_head=4, n_positions=512, n_inner=64)
     if model_type == "gpt_neox":
-        return GPTNeoXConfig(vocab_size=64, hidden_size=16, intermediate_size=64, num_hidden_layers=2, num_attention_heads=4, rotary_pct=0.5, max_position_embeddings=512, use_parallel_residual=True)
+        return GPTNeoXConfig(vocab_size=vocab, hidden_size=16, intermediate_size=64, num_hidden_layers=2, num_attention_heads=4, rotary_pct=0.5, max_position_embeddings=512, use_parallel_residual=True)
     raise ValueError(model_type)
 
 
@@ -112,11 +112,11 @@ def load_model(model_type, repo=None, rev=None, random_small=False, seed=0):
     """(model in float64, tokenizer or None, config dict, restore function of the float64 patches)."""
     from transformers import AutoModelForCausalLM, AutoTokenizer
     if random_small:
-        cfg = random_small_config(model_type)
+        tok = AutoTokenizer.from_pretrained(repo, revision=rev) if repo else None          # with a repository, only its tokenizer is read (its weights are not): the paths that read text can then be run on a random model
+        cfg = random_small_config(model_type, len(tok) if tok is not None else 64)
         torch.manual_seed(seed)
         m = AutoModelForCausalLM.from_config(cfg, attn_implementation="sdpa").to(DT)
         randomize(m, seed)
-        tok = None
     else:
         m = AutoModelForCausalLM.from_pretrained(repo, revision=rev, dtype=DT, attn_implementation="sdpa")
         tok = AutoTokenizer.from_pretrained(repo, revision=rev)
