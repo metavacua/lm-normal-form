@@ -16,7 +16,7 @@ sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(HERE, "..", "0015"))
 from finite23 import ARCH, make_spec, init_theta, to_dict, unpack, forward_pb, ops_of, selftest  # noqa: E402
 
-SEED = 41
+SEED = int(os.environ.get("LMNF_BRIDGE_SEED", "41"))          # 41 is the registered instance; the smoke run uses another
 LENGTH = 4
 CFG = {"architectures": ["LlamaForCausalLM"], "model_type": "llama", "hidden_size": ARCH.d, "intermediate_size": ARCH.d_ff, "num_hidden_layers": ARCH.n_layers, "num_attention_heads": ARCH.n_heads,
        "num_key_value_heads": ARCH.n_kv, "head_dim": ARCH.hd, "vocab_size": ARCH.vocab, "max_position_embeddings": 512, "rms_norm_eps": 1e-6, "rope_theta": 10000.0, "tie_word_embeddings": False,

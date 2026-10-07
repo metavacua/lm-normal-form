@@ -18,7 +18,7 @@ from model import Arch, forward, init_params  # noqa: E402
 from ops import FloatOps  # noqa: E402
 
 ARCH = Arch(d=4, n_heads=4, n_kv=2, hd=2, d_ff=3, n_layers=1, vocab=5, tied=False)
-SEEDS = [31, 32, 33]
+SEEDS = [int(x) for x in os.environ.get("LMNF_SEEDS", "31,32,33").split(",")]          # the registered draws; the smoke run sets LMNF_SEEDS to a draw that is not registered
 SEQS = 4
 T = 4
 INVARIANT, VIOLATED = 1e-9, 1e-4          # a candidate is invariant if the largest difference of the logits is at most the first, violated if at least the second; anything between is "unclear" and refutes

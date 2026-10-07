@@ -32,8 +32,9 @@ import gauge as G  # noqa: E402
 A, OPS, SPEC, GROUPS = ARCH, ops_of(), make_spec(ARCH), contexts(ARCH)
 NCTX = sum(len(g) for g in GROUPS)
 V = A.vocab
-TEACHER_SEED, STUDENT_SEED, GAUGE_SEED, SHARPNESS = 101, 202, 7, 6.0
-FIELD_SEEDS = list(range(301, 311))          # ten points, not used in any pilot (the pilots used the student seed 202 and seed 5)
+TEACHER_SEED, GAUGE_SEED, SHARPNESS = 101, 7, 6.0
+STUDENT_SEED = int(os.environ.get("LMNF_STUDENT_SEED", "202"))          # the registered runs use 202 and the points 301 to 310; the smoke run sets other values
+FIELD_SEEDS = [int(x) for x in os.environ.get("LMNF_FIELD_SEEDS", ",".join(str(s) for s in range(301, 311))).split(",")]          # ten points, not used in any pilot (the pilots used the student seed 202 and seed 5)
 RCOND = 1e-10
 RULES = ("sgd", "adam", "ngd-pinv", "ngd-euclid", "ngd-covdamp:1e-6", "ngd-covdamp:1e-2")
 
@@ -181,6 +182,7 @@ TRAJ = {"sgd": (1.0, 200, 10), "adam": (0.01, 200, 10)}
 def trajectory_experiment(kind, out):
     selftest()
     lr, steps, rec = TRAJ[kind]
+    steps = int(os.environ.get("LMNF_STEPS", steps))
     ps = teacher()
     th0 = init_theta(SPEC, np.random.default_rng(STUDENT_SEED), A, OPS)
     res = {"kind": kind, "lr": lr, "steps": steps, "record_every": rec, "n_contexts": NCTX, "gauges": {}}

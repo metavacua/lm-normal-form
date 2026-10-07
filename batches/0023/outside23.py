@@ -72,7 +72,7 @@ def gpt2_tests(m, tok, seqs, base, res, seed=6, random_small=False):
     del m2
     gc.collect()
     V = m.config.vocab_size
-    toks = [int(t) for t in rs.choice(V, 5, replace=False)]
+    toks = sorted(int(t) for t in rs.choice(V, 5, replace=False))          # in increasing order: the columns of the logits that change are read in that order
     cs = [float(x) for x in rs.randn(5)]
     m2 = X.gpt2_embedding_shift(m, toks, cs)
     rows = []

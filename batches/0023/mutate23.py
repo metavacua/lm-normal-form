@@ -65,6 +65,9 @@ MUTANTS = {
 }
 
 
+SMOKE_MUTANT = {"SMOKE": (M15 + "model.py", [("scale = ops.const(ops.attn_scale(a.hd))", "scale = ops.const(3)")], "detected", "smoke only: not one of the registered mutants")}
+
+
 def parse(path):
     out, cur = {}, None
     for line in open(path):
@@ -91,7 +94,7 @@ def prepare(mutant_id, workdir):
                 shutil.copy(os.path.join(ROOT, d, f), os.path.join(workdir, d, f))
     if mutant_id is None:
         return
-    path, edits, _, _ = MUTANTS[mutant_id]
+    path, edits, _, _ = {**MUTANTS, **SMOKE_MUTANT}[mutant_id]
     src = open(os.path.join(workdir, path)).read()
     for old, new in edits:
         n = src.count(old)
@@ -142,7 +145,7 @@ def main(out, ids):
     res["unmutated"] = {cfg: {"status": s, "detail": d} for cfg, (s, d) in base.items()}
     print("unmutated:", {cfg: s for cfg, (s, d) in base.items()}, flush=True)
     for mid in (ids or list(MUTANTS)):
-        path, edits, predicted, why = MUTANTS[mid]
+        path, edits, predicted, why = {**MUTANTS, **SMOKE_MUTANT}[mid]
         per = {cfg: run_one(mid, cfg, arch) for cfg, arch in CONFIGS}
         statuses = [s for s, _ in per.values()]
         detected = any(s in ("mismatch", "error") for s in statuses)

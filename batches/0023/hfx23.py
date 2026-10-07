@@ -407,6 +407,14 @@ def gpt2_embedding_shift(m, tokens, c):
 # GPT-NeoX (Pythia): gpt_neox.{embed_in, layers[i].{input_layernorm, attention.{query_key_value, dense}, post_attention_layernorm, mlp.{dense_h_to_4h, dense_4h_to_h}}, final_layer_norm}, embed_out;
 # every Linear has a bias except embed_out; parallel residual: x + attention(ln1(x)) + mlp(ln2(x))
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+def neox_head(m):
+    """The output matrix of GPT-NeoX: `embed_out` in earlier versions of Transformers, `lm_head` in later ones."""
+    for name in ("embed_out", "lm_head"):
+        if hasattr(m, name):
+            return getattr(m, name)
+    raise AttributeError("GPT-NeoX with neither embed_out nor lm_head")
+
+
 def neox_writer_shift(m, u_attn, u_mlp, c_attn, c_mlp, u_embed):
     """The same blindness, in the layout (out, in): the attention's dense and the MLP's dense_4h_to_h get u[:, ...] (a column vector times the all-ones row) added to the weight, c to the bias; embed_in gets
     u_embed[v] added to every coordinate of the row of token v."""
@@ -436,8 +444,8 @@ def neox_fold_rotate(m, Q):
                 ln.weight.fill_(1.0)
                 ln.bias.zero_()
         gam, bet = m.gpt_neox.final_layer_norm.weight.clone(), m.gpt_neox.final_layer_norm.bias.clone()
-        offset = (m.embed_out.weight @ bet).clone()
-        m.embed_out.weight.mul_(gam[None, :])
+        offset = (neox_head(m).weight @ bet).clone()
+        neox_head(m).weight.mul_(gam[None, :])
         m.gpt_neox.final_layer_norm.weight.fill_(1.0)
         m.gpt_neox.final_layer_norm.bias.zero_()
         E = m.gpt_neox.embed_in.weight
@@ -448,7 +456,7 @@ def neox_fold_rotate(m, Q):
             for lin in (layer.attention.dense, layer.mlp.dense_4h_to_h):
                 lin.weight.copy_(Q @ lin.weight)
                 lin.bias.copy_(Q @ lin.bias)
-        m.embed_out.weight.copy_(m.embed_out.weight @ Q.T)
+        neox_head(m).weight.copy_(neox_head(m).weight @ Q.T)
     return m, offset
 
 
