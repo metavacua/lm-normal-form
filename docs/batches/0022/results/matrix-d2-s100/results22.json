@@ -1,0 +1,47 @@
+{
+ "ok": true,
+ "categories": {
+  "R1 the original model": {
+   "arrays": 64,
+   "good": 64,
+   "mismatches": [],
+   "not_run": 0
+  },
+  "R2 the definition of the logits (one layer)": {
+   "arrays": 3,
+   "good": 3,
+   "mismatches": [],
+   "not_run": 0
+  },
+  "R3 the weights that the Lean gauges make (flat layout, against gauge.py)": {
+   "arrays": 147,
+   "good": 147,
+   "mismatches": [],
+   "not_run": 0
+  },
+  "R4 what the transformed model computes (against model.py)": {
+   "arrays": 63,
+   "good": 63,
+   "mismatches": [],
+   "not_run": 0
+  },
+  "R5 the logits of the transformed model are the original's": {
+   "arrays": 7,
+   "good": 7,
+   "mismatches": [],
+   "not_run": 0
+  },
+  "R6 permutations": {
+   "arrays": 2,
+   "good": 2,
+   "mismatches": [],
+   "not_run": 0
+  },
+  "R7 the table: which arrays move (Lean against Lean)": {
+   "arrays": 28,
+   "good": 28,
+   "mismatches": [],
+   "not_run": 0
+  }
+ }
+}

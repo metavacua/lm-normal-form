@@ -1,0 +1,80 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0022: the Lean definition of the forward pass (batch 0021) run over F_p (p = 1000003) on a random model in the layout of model.py, and the models that the Lean definitions of the gauges
+# make from it, against the exact arithmetic of model.py and gauge.py (batch 0015, ops.FieldOps) over the same field. Written down in docs/batches/0022.md. The Lean project is that of batch 0020.
+name: batch 0022
+
+on:
+  push:
+    branches: ["batch/0022-**"]
+    paths: [".github/workflows/batch-0022.yml", "batches/0020/**", "batches/0022/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-0022-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  run:
+    name: "01 the definition of the forward pass, run (${{ matrix.name }})"
+    runs-on: ubuntu-latest
+    timeout-minutes: 170
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {name: "d3", arch: "d3", start: "0"}        # the architecture of the registration
+          - {name: "d2", arch: "d2", start: "0"}        # amendment 1
+          - {name: "d2-s100", arch: "d2", start: "100"}
+          - {name: "d2-s200", arch: "d2", start: "200"}
+    env:
+      LMNF22_ARCH: ${{ matrix.arch }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --quiet numpy
+      - id: build
+        uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: batches/0020
+          build: true
+      - name: The data of a random model and what exact arithmetic says of it
+        run: |
+          mkdir -p out/conform
+          python batches/0022/gen22.py out/conform --start ${{ matrix.start }} | tee out/conform/gen.txt
+      - name: The Lean definition, run (four processes, each a group of models)
+        working-directory: batches/0020
+        run: |
+          cp ../../out/conform/ConformGen.lean ConformGen.lean
+          start=$(date +%s)
+          i=0
+          for g in "perm orig1" "orig fold" "h1 h4 ov" "qk hp m1 n1"; do
+            read -r -a args <<< "$g"
+            ( timeout 8400 lake env lean --run ConformGen.lean "${args[@]}" > "../../out/conform/lean_out_$i.txt" 2> "../../out/conform/lean_err_$i.txt"; echo "group [$g] exit $?" >> ../../out/conform/lean_exit.txt ) &
+            i=$((i+1))
+          done
+          wait
+          echo "seconds $(( $(date +%s) - start ))" >> ../../out/conform/lean_exit.txt
+          cat ../../out/conform/lean_exit.txt
+          cat ../../out/conform/lean_out_*.txt > ../../out/conform/lean_out.txt
+          grep '^#' ../../out/conform/lean_out.txt || true
+          tail -n 3 ../../out/conform/lean_err_*.txt || true
+      - name: Compare
+        if: always()
+        run: python batches/0022/check22.py out/conform/lean_out.txt out/conform/expected.txt out/conform
+      - name: Keep the versions
+        if: always()
+        run: |
+          { lean --version; lake --version; python --version; python -m pip freeze | grep -i numpy; } 2>&1 | tee out/conform/versions.txt || true
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: conform-0022-${{ matrix.name }}
+          path: out/conform/
+          retention-days: 14
