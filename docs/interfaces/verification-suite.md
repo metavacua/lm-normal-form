@@ -34,7 +34,7 @@ Nothing here is a claim about a particular model; the results are in the batch d
 |---|---|---|---|---|---|
 | V0 | artifact and identity | corrupt, truncated, mislabelled or substituted files; hidden changes between revisions | file and header hashes; tensor census (names, shapes, dtypes); no NaN, Inf; subnormal count; identity roots of batch 0011 (`bag_root`, `labelled_root`); canonical roots of batch 0013; tokenizer and config hashes; pinned revision | every hash and root as recorded; census as the declared architecture needs | 0011, 0013 |
 | V1 | structure | an architecture the later tiers do not model; degenerate weights | architecture flags (norm, RoPE type and theta, biases, query/key norms, GQA ratio, gate, tying, sliding window, softcap); the census of dead rows, columns, planes and units; ties of unlike items at each level (the special-case certificate); zeros and negative zeros; repeated tensors | every flag in the supported set; dead structure and ties reported, not hidden | 0013 |
-| V2 | formal | a forward pass that is not the architecture it claims to be; a symmetry that does not hold | one definition of the forward pass generic over the arithmetic, checked against the reference in float64; the symmetry claims for the architecture class proved over F_p by randomized identity testing (error at most D/p) and checked in float64 on the real weights; the dimension of the continuous symmetry group by the rank of the Jacobian | generic forward = reference to 1e-9 (float64); every claim as stated, counterexamples failing | 0015 |
+| V2 | formal | a forward pass that is not the architecture it claims to be; a symmetry that does not hold | one definition of the forward pass generic over the arithmetic, checked against the reference in float64; the symmetry claims for the architecture class proved over F_p by randomized identity testing (error at most D/p) and checked in float64 on the real weights; the dimension of the continuous symmetry group by the rank of the Jacobian | generic forward = reference to 1e-9 (float64); every claim as stated, counterexamples failing | 0015 (randomized, over F_p; float64; the dimension of the group); 0019 (the group derived by a Datalog program, and which state each gauge moves, measured); 0020 and 0021 (theorems of Lean 4 with Mathlib, for every nonlinearity: the library of the derivation, and the gauges of a whole decoder with what each moves in the stream and in the cache) |
 | V3 | conformance across runtimes | a runtime or a converter that computes something else | the logits of every position of a fixed prompt set in at least three runtimes and two dtypes; each runtime against the reference and against its own original | NMSE, max difference, KL and top-1 within the noise floor of that runtime pair; the pair is *not comparable* if the original itself is outside its pre-registered bound | 0014 |
 | V4 | behaviour | a model that scores the same on logits and differs on text, or the reverse | greedy generation (32 tokens, plain and chat prompts) token for token; perplexity on held-out windows; a small downstream benchmark set with confidence intervals; chat-template and special-token handling; stopping | generations identical except at positions where the reference's top-2 margin is below the noise floor; perplexity within noise | 0014 (generation, perplexity); benchmarks, chat template: not yet |
 | V5 | implementation invariants | a runtime whose answer depends on how it was asked | KV-cache against full forward; batch of 1 against a batch with padding; padding side; chunked prefill; thread count; (GPU against CPU) | agreement to the noise floor of the pair of modes | not yet |
@@ -52,6 +52,25 @@ Nothing here is a claim about a particular model; the results are in the batch d
 - *Ternary weights* (TriLM): single matrices are not in the special case (ties); dead structure; quantization types made for ternary values (TQ2_0) against generic ones. V1, V7.
 - *Instruct models*: chat template, special tokens and stopping, the generation of a reply. V4.
 - *Anything with query/key norms, biases, windows, soft-capping or experts*: V1 says *unsupported* and V2 and V6 do not run.
+
+## Gauges, and what a fingerprint can be invariant to
+
+A transformation that leaves the function of a checkpoint unchanged (a *gauge*) changes some of the arrays of the forward pass and not others. Which, for the architecture class of V2 (RMSNorm, rotary
+embeddings, grouped-query attention, a gated feed-forward block, norm weights kept), is stated and proved for every nonlinearity by batch 0021, and measured on small models and on SmolLM2-135M
+by batch 0019 (no tied head with a learned final norm, no LayerNorm, no partial rotary embedding):
+
+| gauge | residual stream | queries | keys | values | logits |
+|---|---|---|---|---|---|
+| signed permutation of the hidden coordinates (norm weights permuted along); orthogonal matrix (norm weights folded) | moved by the matrix | fixed | fixed | fixed | fixed |
+| scaling of a norm weight (the readers compensate); scaling of the up branch and permutation of the units of the gated block | fixed | fixed | fixed | fixed | fixed |
+| value/output gauge, per group, any invertible matrix | fixed | fixed | fixed | moved by the matrix | fixed |
+| complex scalar per rotary plane (keys by the scalar, queries by its inverse transpose) | fixed | moved | moved | fixed | fixed |
+| permutation of the heads and of the groups | fixed | permuted | permuted | permuted | fixed |
+
+So a quantity computed from the cache alone is equal for two checkpoints that differ by a gauge of the hidden coordinates, and in general not for two that differ by a gauge inside the attention block; a quantity
+computed from the stream alone is the reverse; the logits are equal for all of them. Neither state is invariant under the whole group, which is why an identity check that has to survive every
+function-preserving transformation is computed from the logits, or from the quotient of the weights by the whole group. Of the quotient only the discrete part (the permutations) has an implementation (the
+canonical form of batch 0013); the continuous gauges (the rotations of the hidden coordinates, the value/output matrices, the rotary-plane scalars) have none.
 
 ## The certificate
 
