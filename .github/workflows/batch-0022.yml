@@ -55,7 +55,8 @@ jobs:
           start=$(date +%s)
           i=0
           for g in "perm orig1" "orig fold" "h1 h4 ov" "qk hp m1 n1"; do
-            ( timeout 8400 lake env lean --run ConformGen.lean $g > "../../out/conform/lean_out_$i.txt" 2> "../../out/conform/lean_err_$i.txt"; echo "group [$g] exit $?" >> ../../out/conform/lean_exit.txt ) &
+            read -r -a args <<< "$g"
+            ( timeout 8400 lake env lean --run ConformGen.lean "${args[@]}" > "../../out/conform/lean_out_$i.txt" 2> "../../out/conform/lean_err_$i.txt"; echo "group [$g] exit $?" >> ../../out/conform/lean_exit.txt ) &
             i=$((i+1))
           done
           wait
