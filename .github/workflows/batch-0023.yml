@@ -36,6 +36,8 @@ env:
   PIN_SAFETENSORS: "0.8.0"
   PIN_TOKENIZERS: "0.23.2"
   PIN_MLDTYPES: "0.6.0"
+  PIN_SENTENCEPIECE: "0.2.2"
+  PIN_PROTOBUF: "7.36.2"
 
 jobs:
   checks:
@@ -114,7 +116,7 @@ jobs:
         run: |
           mkdir -p out work
           python -m pip install --quiet "torch==${PIN_TORCH}" --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install --quiet "transformers==${PIN_TRANSFORMERS}" "numpy==${PIN_NUMPY}" "safetensors==${PIN_SAFETENSORS}" "huggingface_hub==${PIN_HUB}" "tokenizers==${PIN_TOKENIZERS}" "ml_dtypes==${PIN_MLDTYPES}"
+          python -m pip install --quiet "transformers==${PIN_TRANSFORMERS}" "numpy==${PIN_NUMPY}" "safetensors==${PIN_SAFETENSORS}" "huggingface_hub==${PIN_HUB}" "tokenizers==${PIN_TOKENIZERS}" "ml_dtypes==${PIN_MLDTYPES}" "sentencepiece==${PIN_SENTENCEPIECE}" "protobuf==${PIN_PROTOBUF}"
           python - <<'EOF'
           import torch, transformers
           assert transformers.__version__ == "5.19.0", transformers.__version__
@@ -166,7 +168,7 @@ jobs:
         run: |
           mkdir -p out
           python -m pip install --quiet "torch==${PIN_TORCH}" --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install --quiet "transformers==${PIN_TRANSFORMERS}" "numpy==${PIN_NUMPY}" "safetensors==${PIN_SAFETENSORS}" "huggingface_hub==${PIN_HUB}" "tokenizers==${PIN_TOKENIZERS}" "ml_dtypes==${PIN_MLDTYPES}"
+          python -m pip install --quiet "transformers==${PIN_TRANSFORMERS}" "numpy==${PIN_NUMPY}" "safetensors==${PIN_SAFETENSORS}" "huggingface_hub==${PIN_HUB}" "tokenizers==${PIN_TOKENIZERS}" "ml_dtypes==${PIN_MLDTYPES}" "sentencepiece==${PIN_SENTENCEPIECE}" "protobuf==${PIN_PROTOBUF}"
           python - <<'EOF'
           import torch, transformers
           assert transformers.__version__ == "5.19.0", transformers.__version__
@@ -210,7 +212,7 @@ jobs:
         run: |
           mkdir -p out
           python -m pip install --quiet "torch==${PIN_TORCH}" --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install --quiet "transformers==${PIN_TRANSFORMERS}" "numpy==${PIN_NUMPY}" "safetensors==${PIN_SAFETENSORS}" "huggingface_hub==${PIN_HUB}" "tokenizers==${PIN_TOKENIZERS}" "ml_dtypes==${PIN_MLDTYPES}"
+          python -m pip install --quiet "transformers==${PIN_TRANSFORMERS}" "numpy==${PIN_NUMPY}" "safetensors==${PIN_SAFETENSORS}" "huggingface_hub==${PIN_HUB}" "tokenizers==${PIN_TOKENIZERS}" "ml_dtypes==${PIN_MLDTYPES}" "sentencepiece==${PIN_SENTENCEPIECE}" "protobuf==${PIN_PROTOBUF}"
           python - <<'EOF'
           import torch, transformers
           assert transformers.__version__ == "5.19.0", transformers.__version__
@@ -245,7 +247,7 @@ jobs:
         run: |
           mkdir -p out
           python -m pip install --quiet "torch==${PIN_TORCH}" --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install --quiet "transformers==${PIN_TRANSFORMERS}" "numpy==${PIN_NUMPY}" "safetensors==${PIN_SAFETENSORS}" "huggingface_hub==${PIN_HUB}" "tokenizers==${PIN_TOKENIZERS}" "ml_dtypes==${PIN_MLDTYPES}"
+          python -m pip install --quiet "transformers==${PIN_TRANSFORMERS}" "numpy==${PIN_NUMPY}" "safetensors==${PIN_SAFETENSORS}" "huggingface_hub==${PIN_HUB}" "tokenizers==${PIN_TOKENIZERS}" "ml_dtypes==${PIN_MLDTYPES}" "sentencepiece==${PIN_SENTENCEPIECE}" "protobuf==${PIN_PROTOBUF}"
           { python --version; python -m pip freeze; } > out/versions-smoke.txt
       - name: Run the piece
         run: bash "batches/0023/smoke/${{ matrix.piece }}.sh"
