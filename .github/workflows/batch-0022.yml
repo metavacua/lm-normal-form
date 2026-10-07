@@ -1,0 +1,62 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0022: the Lean definition of the forward pass (batch 0021) run over F_p (p = 1000003) on a random model in the layout of model.py, and the models that the Lean definitions of the gauges
+# make from it, against the exact arithmetic of model.py and gauge.py (batch 0015, ops.FieldOps) over the same field. Written down in docs/batches/0022.md. The Lean project is that of batch 0020.
+name: batch 0022
+
+on:
+  push:
+    branches: ["batch/0022-**"]
+    paths: [".github/workflows/batch-0022.yml", "batches/0020/**", "batches/0022/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-0022-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  run:
+    name: "01 the definition of the forward pass, run"
+    runs-on: ubuntu-latest
+    timeout-minutes: 170
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --quiet numpy
+      - id: build
+        uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: batches/0020
+          build: true
+      - name: The data of a random model and what exact arithmetic says of it
+        run: |
+          mkdir -p out/conform
+          python batches/0022/gen22.py out/conform | tee out/conform/gen.txt
+      - name: The Lean definition, run
+        working-directory: batches/0020
+        run: |
+          cp ../../out/conform/ConformGen.lean ConformGen.lean
+          start=$(date +%s)
+          timeout 9000 lake env lean --run ConformGen.lean > ../../out/conform/lean_out.txt 2> ../../out/conform/lean_err.txt; echo "exit $?" > ../../out/conform/lean_exit.txt
+          echo "seconds $(( $(date +%s) - start ))" | tee -a ../../out/conform/lean_exit.txt
+          cat ../../out/conform/lean_exit.txt
+          tail -n 5 ../../out/conform/lean_err.txt || true
+      - name: Compare
+        if: always()
+        run: python batches/0022/check22.py out/conform/lean_out.txt out/conform/expected.txt out/conform
+      - name: Keep the versions
+        if: always()
+        run: |
+          { lean --version; lake --version; python --version; python -m pip freeze | grep -i numpy; } 2>&1 | tee out/conform/versions.txt || true
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: conform-0022
+          path: out/conform/
+          retention-days: 14
