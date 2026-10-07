@@ -1,0 +1,191 @@
+{
+ "repo": "SpectraSuite/FloatLM_99M",
+ "revision": "0516fbe2979fcad7c26805885273562c88c3de90",
+ "dims": {
+  "H": 512,
+  "nh": 8,
+  "nkv": 8,
+  "hd": 64,
+  "F": 1280,
+  "L": 16,
+  "rep": 1
+ },
+ "tied": false,
+ "stored_dtype_of_original": "float16",
+ "seed": 14,
+ "gate": {
+  "architecture": "LlamaForCausalLM",
+  "checked": [
+   "model_type",
+   "attention_bias",
+   "mlp_bias",
+   "rope_scaling",
+   "sliding_window",
+   "softcapping",
+   "experts",
+   "qk_norm",
+   "hidden_act",
+   "pretraining_tp"
+  ]
+ },
+ "variants": {
+  "orig": {
+   "stored_dtype": "float16",
+   "tensors_not_exact_in_original_dtype": 0,
+   "seconds": 1.9,
+   "safetensors_bytes": 199541728,
+   "safetensors_sha256": "fb14781f1c4fa1a00b99fd42ed89e067cc2b83eddb615262232a826f4c04135e",
+   "tensors": 147,
+   "differs_from_original": 0,
+   "tensors_with_other_significands": [],
+   "same_tensor_names": true,
+   "config_keys_changed": [
+    "dtype"
+   ]
+  },
+  "scale": {
+   "stored_dtype": "float32",
+   "tensors_not_exact_in_original_dtype": 96,
+   "seconds": 1.1,
+   "safetensors_bytes": 399067104,
+   "safetensors_sha256": "4e0f5a636b7821175fef0bda83e7fbf1fd1a225a2bab03ca3176fe810e985d4c",
+   "tensors": 147,
+   "differs_from_original": 96,
+   "tensors_with_other_significands": [],
+   "same_tensor_names": true,
+   "config_keys_changed": [
+    "dtype",
+    "torch_dtype"
+   ]
+  },
+  "perm": {
+   "stored_dtype": "float16",
+   "tensors_not_exact_in_original_dtype": 0,
+   "seconds": 1.7,
+   "safetensors_bytes": 199541728,
+   "safetensors_sha256": "224c6cc5587be8fb9c2b80ac2b3a7226e94171f2325a7c3f5eaf933dd81c5549",
+   "tensors": 147,
+   "differs_from_original": 147,
+   "tensors_with_other_significands": [],
+   "same_tensor_names": true,
+   "config_keys_changed": [
+    "dtype"
+   ]
+  },
+  "all": {
+   "stored_dtype": "float32",
+   "tensors_not_exact_in_original_dtype": 96,
+   "seconds": 1.6,
+   "safetensors_bytes": 399067104,
+   "safetensors_sha256": "604bcb4783c3f88c3af103ff8ab334226530e083675b0e4338226a91c679e6ec",
+   "tensors": 147,
+   "differs_from_original": 147,
+   "tensors_with_other_significands": [],
+   "same_tensor_names": true,
+   "config_keys_changed": [
+    "dtype",
+    "torch_dtype"
+   ]
+  },
+  "canon": {
+   "stored_dtype": "float32",
+   "tensors_not_exact_in_original_dtype": 48,
+   "seconds": 2.5,
+   "safetensors_bytes": 399067104,
+   "safetensors_sha256": "6ee2c1a059c3dd4c6528de03955a39873de414fb1b6cceb763aeb7890e04b753",
+   "tensors": 147,
+   "differs_from_original": 147,
+   "tensors_with_other_significands": [],
+   "same_tensor_names": true,
+   "config_keys_changed": [
+    "dtype",
+    "torch_dtype"
+   ]
+  },
+  "broken": {
+   "stored_dtype": "float16",
+   "tensors_not_exact_in_original_dtype": 0,
+   "seconds": 1.6,
+   "safetensors_bytes": 199541728,
+   "safetensors_sha256": "4bad13300124ce061a7da58286e969ace96da442c92c8a3c9efce496d663e7f9",
+   "tensors": 147,
+   "differs_from_original": 145,
+   "tensors_with_other_significands": [],
+   "same_tensor_names": true,
+   "config_keys_changed": [
+    "dtype"
+   ]
+  },
+  "heads": {
+   "stored_dtype": "float16",
+   "tensors_not_exact_in_original_dtype": 0,
+   "seconds": 1.1,
+   "safetensors_bytes": 199541728,
+   "safetensors_sha256": "e68f86c78cb814a67e354bb655aa9d1c06df05afbfac15b784dd5e3be1be7fcf",
+   "tensors": 147,
+   "differs_from_original": 64,
+   "tensors_with_other_significands": [],
+   "same_tensor_names": true,
+   "config_keys_changed": [
+    "dtype"
+   ]
+  },
+  "units": {
+   "stored_dtype": "float16",
+   "tensors_not_exact_in_original_dtype": 0,
+   "seconds": 1.2,
+   "safetensors_bytes": 199541728,
+   "safetensors_sha256": "95b22ee451cee03cd35dacba64aefa38f1c8228572698fef1961a6e43aae7153",
+   "tensors": 147,
+   "differs_from_original": 48,
+   "tensors_with_other_significands": [],
+   "same_tensor_names": true,
+   "config_keys_changed": [
+    "dtype"
+   ]
+  },
+  "units_blk": {
+   "stored_dtype": "float32",
+   "tensors_not_exact_in_original_dtype": 32,
+   "seconds": 1.1,
+   "safetensors_bytes": 399067104,
+   "safetensors_sha256": "6b2fa28fd6a7dc7489958d9440c7810253bcb29da1452de7878eb9210ea7a3d2",
+   "tensors": 147,
+   "differs_from_original": 48,
+   "tensors_with_other_significands": [],
+   "same_tensor_names": true,
+   "config_keys_changed": [
+    "dtype",
+    "torch_dtype"
+   ]
+  },
+  "resid": {
+   "stored_dtype": "float16",
+   "tensors_not_exact_in_original_dtype": 0,
+   "seconds": 1.7,
+   "safetensors_bytes": 199541728,
+   "safetensors_sha256": "51aa887eca380475e701f57509b1557a886e112b78d5f533a6328d2a71a8dadc",
+   "tensors": 147,
+   "differs_from_original": 147,
+   "tensors_with_other_significands": [],
+   "same_tensor_names": true,
+   "config_keys_changed": [
+    "dtype"
+   ]
+  },
+  "resid_blk": {
+   "stored_dtype": "float16",
+   "tensors_not_exact_in_original_dtype": 0,
+   "seconds": 1.6,
+   "safetensors_bytes": 199541728,
+   "safetensors_sha256": "f8c99c3666064fd0018ada14149b29d98b23b26e1717e3763b9a061e11096eb7",
+   "tensors": 147,
+   "differs_from_original": 147,
+   "tensors_with_other_significands": [],
+   "same_tensor_names": true,
+   "config_keys_changed": [
+    "dtype"
+   ]
+  }
+ }
+}
