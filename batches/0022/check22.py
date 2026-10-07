@@ -17,7 +17,7 @@ def parse(path):
         if line.startswith("## "):
             cur = line[3:]
             out[cur] = []
-        elif cur is not None and line.strip():
+        elif cur is not None and line.strip() and not line.startswith("# "):
             out[cur].append([int(x) for x in line.split()])
     return out
 

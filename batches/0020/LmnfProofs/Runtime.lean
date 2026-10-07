@@ -42,6 +42,12 @@ def emitNat (label : String) (rows : List (List ℕ)) : IO Unit := do
     IO.println (" ".intercalate (r.map toString))
   (← IO.getStdout).flush
 
+/-- A line of timing, ignored by the checker. -/
+def stamp (label : String) (t0 : ℕ) : IO Unit := do
+  let t ← IO.monoMsNow
+  IO.println s!"# {label} elapsed_ms {t - t0}"
+  (← IO.getStdout).flush
+
 def tab (rows : List (List Fp)) (i j : ℕ) : Fp := (rows.getD i []).getD j 0
 
 def tab1 (xs : List Fp) (i : ℕ) : Fp := xs.getD i 0

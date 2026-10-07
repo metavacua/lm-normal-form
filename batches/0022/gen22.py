@@ -17,7 +17,7 @@ import gauge as G
 from ops import FieldOps
 
 P = 1000003
-ARCH = Arch(d=3, n_heads=4, n_kv=2, hd=2, d_ff=3, n_layers=2, vocab=3, tied=False, pos="rope", causal=True, norm="rms")
+ARCH = Arch(d=2, n_heads=4, n_kv=2, hd=2, d_ff=2, n_layers=2, vocab=3, tied=False, pos="rope", causal=True, norm="rms")
 TOKENS = [2, 0]
 TS = [2]                                  # the rotary planes: plane j rotates by the point of the circle of t = TS[j], (1 - t^2) / (1 + t^2), 2 t / (1 + t^2)
 FLAT = (("wq", "wq"), ("wk", "wk"), ("wv", "wv"), ("wo", "wo"), ("wg", "wg"), ("wu", "wu"), ("wd", "wd"), ("attn_norm", "an"), ("mlp_norm", "mn"))
@@ -308,16 +308,24 @@ class Case:
             n1_layers.append(f"mlpNorm (attnNorm {names[i]} (fun j => tab1 {lvec(list(self.cs[f'l{i}.attn_norm']))} j.val)) (fun j => tab1 {lvec(list(self.cs[f'l{i}.mlp_norm']))} j.val)")
         for tag, ls in (("ov", ov_layers), ("qk", qk_layers), ("hp", hp_layers), ("m1", m1_layers), ("n1", n1_layers)):
             w(f"def M_{tag} : {mty} := {{ M0 with layers := [{', '.join(ls)}] }}")
-        w("def main : IO Unit := do")
-        w(f'  emitNat "sigma" [(List.finRange {d}).map fun i => (sg1 i).val]')
-        w('  emitNat "sigma_heads" [' + ", ".join(f"(List.finRange {nh}).map fun i => (({lperm(self.sig_heads[i], nh)}) i).val" for i in range(a.n_layers)) + "]")
+        w("def main (args : List String) : IO UInt32 := do")
+        w("  let want : String → Bool := fun s => args.isEmpty || args.contains s")
+        w("  let t0 ← IO.monoMsNow")
+        w('  if want "perm" then')
+        w(f'    emitNat "sigma" [(List.finRange {d}).map fun i => (sg1 i).val]')
+        w('    emitNat "sigma_heads" [' + ", ".join(f"(List.finRange {nh}).map fun i => (({lperm(self.sig_heads[i], nh)}) i).val" for i in range(a.n_layers)) + "]")
         models = (("orig", "M0"), ("fold", "Mf"), ("h1", "Mh1"), ("h4", "Mh4"), ("ov", "M_ov"), ("qk", "M_qk"), ("hp", "M_hp"), ("m1", "M_m1"), ("n1", "M_n1"))
         for lab, mname in models:
-            w(f'  emitWeights "{lab}" {mname}')
-        w('  emitRun "orig1" E M0one toks')
-        w('  emitLogitsDef "orig1" E M0one toks')
-        for lab, mname in models:
-            w(f'  emitRun "{lab}" E {mname} toks')
+            w(f'  if want "{lab}" then')
+            w(f'    emitWeights "{lab}" {mname}')
+            w(f'    emitRun "{lab}" E {mname} toks')
+            w(f'    stamp "{lab}" t0')
+        w('  if want "orig1" then')
+        w('    emitRun "orig1" E M0one toks')
+        w('    stamp "orig1 tables" t0')
+        w('    emitLogitsDef "orig1" E M0one toks')
+        w('    stamp "orig1 definition" t0')
+        w("  return 0")
         return "\n".join(L) + "\n"
 
 

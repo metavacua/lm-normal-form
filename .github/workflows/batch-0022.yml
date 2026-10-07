@@ -38,15 +38,22 @@ jobs:
         run: |
           mkdir -p out/conform
           python batches/0022/gen22.py out/conform | tee out/conform/gen.txt
-      - name: The Lean definition, run
+      - name: The Lean definition, run (four processes, each a group of models)
         working-directory: batches/0020
         run: |
           cp ../../out/conform/ConformGen.lean ConformGen.lean
           start=$(date +%s)
-          timeout 9000 lake env lean --run ConformGen.lean > ../../out/conform/lean_out.txt 2> ../../out/conform/lean_err.txt; echo "exit $?" > ../../out/conform/lean_exit.txt
-          echo "seconds $(( $(date +%s) - start ))" | tee -a ../../out/conform/lean_exit.txt
+          i=0
+          for g in "perm orig1" "orig fold" "h1 h4 ov" "qk hp m1 n1"; do
+            ( timeout 8400 lake env lean --run ConformGen.lean $g > "../../out/conform/lean_out_$i.txt" 2> "../../out/conform/lean_err_$i.txt"; echo "group [$g] exit $?" >> ../../out/conform/lean_exit.txt ) &
+            i=$((i+1))
+          done
+          wait
+          echo "seconds $(( $(date +%s) - start ))" >> ../../out/conform/lean_exit.txt
           cat ../../out/conform/lean_exit.txt
-          tail -n 5 ../../out/conform/lean_err.txt || true
+          cat ../../out/conform/lean_out_*.txt > ../../out/conform/lean_out.txt
+          grep '^#' ../../out/conform/lean_out.txt || true
+          tail -n 3 ../../out/conform/lean_err_*.txt || true
       - name: Compare
         if: always()
         run: python batches/0022/check22.py out/conform/lean_out.txt out/conform/expected.txt out/conform
