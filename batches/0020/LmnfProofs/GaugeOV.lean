@@ -9,6 +9,8 @@ import LmnfProofs.Attention
 /-! The value/output gauge (the generator A1 of the Datalog program), in the model: `A g` on the values of the key/value group `g`, `B g` on the output columns of the heads of that group,
 with `B g * A g = 1`. The function of the layer is unchanged; of the cache, the values move by `A g` and the queries and keys do not move. -/
 
+set_option linter.unusedSectionVars false
+
 namespace Lmnf
 
 open Matrix

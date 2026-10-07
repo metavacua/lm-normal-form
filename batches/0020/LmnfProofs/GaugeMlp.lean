@@ -9,6 +9,8 @@ import LmnfProofs.Mlp
 /-! The unit gauges of the gated feed-forward block (the generator M1), in the model: the up branch scaled by nonzero `c` and the down columns by `c⁻¹`, and the units permuted. The
 function of the layer is unchanged, and the cache (which belongs to the attention block) is untouched: neither the residual stream nor the cache moves, only the activations of the block. -/
 
+set_option linter.unusedSectionVars false
+
 namespace Lmnf
 
 open Matrix
@@ -31,7 +33,9 @@ theorem mlpOut_scale (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (c : Fi
 
 theorem layerFn_mlpScale (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (c : Fin nu → K) (hc : ∀ i, c i ≠ 0)
     (h : St K T d) : layerFn E (mlpScale L c) h = layerFn E L h :=
-  layerFn_congr (fun _ _ => rfl) (fun y => mlpOut_scale E L c hc _) h
+  layerFn_congr (E := E) (L := L) (L' := mlpScale L c)
+    (fun h t => afterAttn_of_caches (fun _ _ _ _ => rfl) (fun _ _ _ _ => rfl) (fun _ _ _ => rfl) (fun _ => rfl) h t)
+    (fun y => mlpOut_scale E L c hc _) h
 
 def unitPerm (L : Layer K d hv nu Hh Gr P) (σ : Equiv.Perm (Fin nu)) : Layer K d hv nu Hh Gr P :=
   { L with Wg := L.Wg.submatrix σ id, Wu := L.Wu.submatrix σ id, Wd := L.Wd.submatrix id σ }
@@ -43,7 +47,9 @@ theorem mlpOut_unitPerm (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (σ 
 
 theorem layerFn_unitPerm (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (σ : Equiv.Perm (Fin nu))
     (h : St K T d) : layerFn E (unitPerm L σ) h = layerFn E L h :=
-  layerFn_congr (fun _ _ => rfl) (fun y => mlpOut_unitPerm E L σ _) h
+  layerFn_congr (E := E) (L := L) (L' := unitPerm L σ)
+    (fun h t => afterAttn_of_caches (fun _ _ _ _ => rfl) (fun _ _ _ _ => rfl) (fun _ _ _ => rfl) (fun _ => rfl) h t)
+    (fun y => mlpOut_unitPerm E L σ _) h
 
 end
 

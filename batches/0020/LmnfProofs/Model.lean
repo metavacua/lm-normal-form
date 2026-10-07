@@ -18,6 +18,8 @@ The correspondence with `model.py` (the flattened layout of Hugging Face's Llama
 by a later batch.
 -/
 
+set_option linter.unusedSectionVars false
+
 namespace Lmnf
 
 open Matrix

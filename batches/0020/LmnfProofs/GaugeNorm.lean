@@ -8,6 +8,8 @@ import LmnfProofs.Glue
 /-! The gauge of a norm weight (the generator N1), in the model: the weight of a norm multiplied coordinate by coordinate by nonzero `c`, the columns of every matrix that reads the normalized
 vector multiplied by `c⁻¹`. The function of the layer is unchanged, and so is the cache: the vector that the readers see is changed (it is multiplied by `c`), the readers compensate. -/
 
+set_option linter.unusedSectionVars false
+
 namespace Lmnf
 
 open Matrix
@@ -73,7 +75,9 @@ theorem mlpOut_mlpNorm (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (c : 
 
 theorem layerFn_mlpNorm (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (c : Fin d → K) (hc : ∀ i, c i ≠ 0)
     (h : St K T d) : layerFn E (mlpNorm L c) h = layerFn E L h :=
-  layerFn_congr (fun _ _ => rfl) (fun y => mlpOut_mlpNorm E L c hc y) h
+  layerFn_congr (E := E) (L := L) (L' := mlpNorm L c)
+    (fun h t => afterAttn_of_caches (fun _ _ _ _ => rfl) (fun _ _ _ _ => rfl) (fun _ _ _ => rfl) (fun _ => rfl) h t)
+    (fun y => mlpOut_mlpNorm E L c hc y) h
 
 end
 

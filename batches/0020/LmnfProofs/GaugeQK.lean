@@ -10,6 +10,8 @@ import LmnfProofs.Attention
 the queries of the heads of that group. The rotation of every position and plane is a complex scalar (a hypothesis on the environment, true of every rotary embedding), and a complex scalar
 commutes with it. The function of the layer is unchanged; of the cache, the keys move by the scalar, the queries by the scalar's inverse transpose, the values do not move. -/
 
+set_option linter.unusedSectionVars false
+
 namespace Lmnf
 
 open Matrix

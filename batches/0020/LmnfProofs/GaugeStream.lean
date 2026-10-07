@@ -11,6 +11,8 @@ norm is replaced by a weight `ν` that is compatible with `Q` (`Compat`: for a s
 
 The stream is not invariant (`Q` moves it) but equivariant (`layerFn_stream`); the cache is invariant (`qv_stream`, `kv_stream`, `vv_stream`); the logits are invariant (`logits_stream`). -/
 
+set_option linter.unusedSectionVars false
+
 namespace Lmnf
 
 open Matrix

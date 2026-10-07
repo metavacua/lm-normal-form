@@ -9,6 +9,8 @@ import LmnfProofs.Attention
 /-! A permutation `σ` of the heads and a permutation `τ` of the key/value groups, compatible with the map of heads to groups (the generator A6), in the model. The function of the layer is
 unchanged; the queries are permuted by `σ`, the keys and the values by `τ`. -/
 
+set_option linter.unusedSectionVars false
+
 namespace Lmnf
 
 open Matrix

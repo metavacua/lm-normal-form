@@ -9,6 +9,8 @@ import LmnfProofs.GaugeStream
 nonlinearity, every permutation `σ` and signs `s` with `s i * s i = 1`, the logits are unchanged. (2) H4 with the norm weights folded away (every norm weight constant): every orthogonal
 matrix. -/
 
+set_option linter.unusedSectionVars false
+
 namespace Lmnf
 
 open Matrix

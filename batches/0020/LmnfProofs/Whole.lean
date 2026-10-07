@@ -14,6 +14,8 @@ import LmnfProofs.GaugeStream
 stream and to the cache (`table_*`): the stream gauge moves the stream and leaves the cache, the value/output, query/key and head gauges move the cache and leave the stream, the feed-forward
 and norm-weight gauges move neither, a composition of the stream gauge and the value gauge moves both (`both_moved`). -/
 
+set_option linter.unusedSectionVars false
+
 namespace Lmnf
 
 open Matrix
