@@ -5,8 +5,8 @@
 #   gen22.py OUTDIR [--seed N | --start N]   (the seed N as it is, or the first seed from N, default 0, whose draw is generic) writes OUTDIR/ConformGen.lean (the data of a random model in the layout of model.py, and the models that the Lean definitions of the gauges make from it, with a
 #                                main that prints their weights, caches, streams and logits) and OUTDIR/expected.txt (what every printed array is, according to model.py and gauge.py)
 # Why F_p with a small p and not the rationals: the nonlinearities of FieldOps (a square, a reciprocal of a square plus three) double the degree of the rational function at every
-# application, so exact rationals have thousands of digits after two layers; in F_p the numbers stay below p. p = 1000003 is prime (Lean proves it by norm_num). A wrong wiring that
-# agrees in every one of the ~10^2 printed entries at a random draw has probability about p^-100.
+# application, so exact rationals have thousands of digits after two layers; in F_p the numbers stay below p. p = 1000003 is prime (Lean proves it by norm_num). No bound is claimed for
+# the probability that a wrong wiring agrees at a random draw (the degree of the logits as polynomials in the weights is far above p): agreement in hundreds of arrays is evidence.
 import os, sys, random
 import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
