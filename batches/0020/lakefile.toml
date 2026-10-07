@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+name = "lmnf_proofs"
+version = "0.1.0"
+defaultTargets = ["LmnfProofs"]
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "d13f23b723b8a846827a245b89c10fc7d3f11612"   # the tag v4.34.1, whose lean-toolchain is the Lean installed on the author's machine
+
+[[lean_lib]]
+name = "LmnfProofs"
