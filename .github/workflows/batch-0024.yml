@@ -1,0 +1,166 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0024 (docs/batches/0024.md): how much the noise of a quantized run varies. For each of eight cells (llama.cpp with Q8_0 or Q4_0 weights, with the cache in f16, Q8_0 or Q4_0 with and without the
+# rotation, and CTranslate2 in int8), in one job on one machine: the original, the nine exact variants of batch 0013, the broken control and eight null variants (one unit in the last place of the norm
+# weights, eight perturbations), through the driver of batch 0014. Run for a commit whose message contains the bracketed word run. Nothing here masks a failure (no `|| true`, no `continue-on-error`, no
+# discarded stderr, no `if: always()` on a step that computes); the uploads cannot change a job's conclusion; the grading job fails if any claim is not as predicted or any control fails.
+# The environment is that of the job `nullsame` of batch 0014's addendum 3 (versions below, recorded in its artifact), the llama.cpp release is checked against its checksum and its source against its commit.
+name: batch 0024
+
+on:
+  push:
+    branches: ["batch/0024-**"]
+    paths: [".github/workflows/batch-0024.yml", "batches/0014/**", "batches/0024/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-0024-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  LLAMACPP_TAG: b11450
+  LLAMACPP_COMMIT: a46709b683aba9274d8ab29f5b42f7e551d1dff6
+  LLAMACPP_SHA256: a9a5c229a56ff61be66ad5ae0ddb2051201dbc091ccda1062553fbdf1152adc1
+  LMNF_THREADS: "4"
+  LMNF_CLEAN: "1"
+  REPO: HuggingFaceTB/SmolLM2-135M-Instruct
+  HF_REVISION: 12fd25f77366fa6b3b4b768ec3050bf629380bac
+  LMNF_MODEL: smol-instruct-nullspread
+
+jobs:
+  checks:
+    name: "00 the grader's self-test, the null variants, the syntax of every script"
+    if: contains(github.event.head_commit.message, '[run]') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: python -m pip install --quiet numpy==2.5.3
+      - name: Syntax
+        run: python -m py_compile batches/0024/*.py batches/0014/nulls.py
+      - name: The null variants change only the norm weights, by at most two units in the last place, distinctly
+        run: python batches/0024/test_nulls.py
+      - name: "The grader can fail (each claim holds on a fixture built to satisfy it, is refuted when its inputs are violated, is not run without data)"
+        run: python batches/0024/grade24.py --selftest
+
+  cells:
+    name: "01 ${{ matrix.label }}"
+    if: contains(github.event.head_commit.message, '[run]') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {label: "llama.cpp, Q8_0 weights", runtime: llamacpp, dtype: q8_0}
+          - {label: "llama.cpp, Q4_0 weights", runtime: llamacpp, dtype: q4_0}
+          - {label: "llama.cpp, f16 cache", runtime: llamacpp, dtype: float32-kvf16}
+          - {label: "llama.cpp, Q8_0 cache, rotated", runtime: llamacpp, dtype: float32-kvq8_0}
+          - {label: "llama.cpp, Q4_0 cache, rotated", runtime: llamacpp, dtype: float32-kvq4_0}
+          - {label: "llama.cpp, Q8_0 cache, not rotated", runtime: llamacpp, dtype: float32-kvq8_0-norot}
+          - {label: "llama.cpp, Q4_0 cache, not rotated", runtime: llamacpp, dtype: float32-kvq4_0-norot}
+          - {label: "CTranslate2, int8", runtime: ctranslate2, dtype: int8}
+    env:
+      W: work
+      O: out
+      LLAMACPP_DIR: ${{ github.workspace }}/llama-b11450
+      LLAMACPP_SRC: ${{ github.workspace }}/llama.cpp-src
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.12"
+      - name: Free disk space (twenty variants and their converted files; the preinstalled toolchains that are not used here)
+        run: |
+          df -h / | tail -1
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h / | tail -1
+      - name: Install and record the versions
+        run: |
+          mkdir -p "$W" "$O"
+          python -m pip install --quiet torch==2.14.1 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers==5.19.0 numpy==2.5.3 safetensors==0.8.0 huggingface_hub==1.33.0 ml_dtypes==0.6.0 pandas==3.0.6 pyarrow==25.0.1 sentencepiece==0.2.2 protobuf==7.36.2 tokenizers==0.23.2 ctranslate2==4.8.2
+          python - <<'EOF'
+          import torch, transformers, numpy
+          assert transformers.__version__ == "5.19.0", transformers.__version__
+          assert torch.__version__.startswith("2.14.1"), torch.__version__
+          assert numpy.__version__ == "2.5.3", numpy.__version__
+          EOF
+          { python --version; python -m pip freeze; grep -m1 'model name' /proc/cpuinfo; } > "$O/versions.txt"
+          grep -m1 'model name' /proc/cpuinfo | tee "$O/cpu.txt"
+      - name: llama.cpp (the release is checked against its checksum, the source against its commit; the harness program is compiled here)
+        if: matrix.runtime == 'llamacpp'
+        run: |
+          curl -sSL -o l.tgz "https://github.com/ggml-org/llama.cpp/releases/download/$LLAMACPP_TAG/llama-$LLAMACPP_TAG-bin-ubuntu-x64.tar.gz"
+          echo "$LLAMACPP_SHA256  l.tgz" | sha256sum -c -
+          tar xzf l.tgz
+          git clone --quiet --depth 1 --branch "$LLAMACPP_TAG" https://github.com/ggml-org/llama.cpp llama.cpp-src
+          test "$(git -C llama.cpp-src rev-parse HEAD)" = "$LLAMACPP_COMMIT"
+          python -m pip install --quiet ./llama.cpp-src/gguf-py
+          g++ -O2 -std=c++17 -I llama.cpp-src/include -I llama.cpp-src/ggml/include -I llama.cpp-src/vendor batches/0014/llamacpp/lmnf_llama.cpp \
+            -o "llama-$LLAMACPP_TAG/lmnf-llama" -L"llama-$LLAMACPP_TAG" -lllama -lggml -lggml-base "-Wl,-rpath,\$ORIGIN"
+      - name: The original, the nine exact variants, the broken control and the eight null variants
+        run: |
+          python batches/0014/variants.py "$REPO" "$HF_REVISION" "$W/variants" orig scale perm all canon broken heads units units_blk resid resid_blk nullall nullm nullr1 nullr2 nullr3 nullr4 nullr5 nullr6
+          python batches/0014/xrt.py prepare "$W/variants/orig" "$W"
+      - name: "The cell: every variant, then the original again (the determinism control)"
+        run: python batches/0014/xrt.py all "${{ matrix.runtime }}" "${{ matrix.dtype }}" "$W" 1
+      - name: Keep what the grader and a reader need
+        run: |
+          cell="${{ matrix.runtime }}-${{ matrix.dtype }}"
+          cp "$W"/summary-*.json "$O/"
+          cp "$W/inputs.json" "$O/inputs-$cell.json"
+          cp "$W/variants/manifest.json" "$O/manifest-$cell.json"
+          mv "$O/versions.txt" "$O/versions-$cell.txt"
+          mv "$O/cpu.txt" "$O/cpu-$cell.txt"
+          mkdir -p "$O/res-$cell"
+          cp "$W"/res/*.json "$O/res-$cell/"
+          df -h / | tail -1 > "$O/disk-$cell.txt"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: ${{ !cancelled() }}
+        with:
+          name: res-${{ matrix.runtime }}-${{ matrix.dtype }}
+          path: out/
+          retention-days: 90
+
+  grade:
+    name: "02 grade against the registered claims"
+    if: ${{ !cancelled() && (contains(github.event.head_commit.message, '[run]') || github.event_name == 'workflow_dispatch') }}
+    needs: [checks, cells]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          pattern: res-*
+          merge-multiple: true
+          path: results
+      - name: What was produced
+        run: ls -l results
+      - name: "Grade (fails if a claim is refuted or not run, or a control fails)"
+        run: python batches/0024/grade24.py results graded
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: ${{ !cancelled() }}
+        with:
+          name: graded
+          path: graded/
+          retention-days: 90
