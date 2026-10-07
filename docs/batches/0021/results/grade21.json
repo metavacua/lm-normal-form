@@ -1,0 +1,418 @@
+{
+ "theorems_listed": 71,
+ "claims": [
+  {
+   "id": "F1",
+   "theorem": "layerFn_ov",
+   "kind": "invariance",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "F2",
+   "theorem": "layerFn_qk",
+   "kind": "invariance",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "F3",
+   "theorem": "layerFn_headPerm",
+   "kind": "invariance",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "F4",
+   "theorem": "layerFn_mlpScale",
+   "kind": "invariance",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "F5",
+   "theorem": "layerFn_unitPerm",
+   "kind": "invariance",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "F6",
+   "theorem": "layerFn_attnNorm",
+   "kind": "invariance",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "F7",
+   "theorem": "layerFn_mlpNorm",
+   "kind": "invariance",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "S1",
+   "theorem": "layerFn_stream",
+   "kind": "equivariance",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "S2",
+   "theorem": "logits_stream",
+   "kind": "invariance",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "S3",
+   "theorem": "logits_signedPerm",
+   "kind": "invariance",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "S4",
+   "theorem": "logits_orthogonal",
+   "kind": "invariance",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "C1",
+   "theorem": "layerFn_gauged",
+   "kind": "composition",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "C2",
+   "theorem": "logits_gauged",
+   "kind": "composition",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "K1",
+   "theorem": "qv_stream",
+   "kind": "cache",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "K2",
+   "theorem": "kv_stream",
+   "kind": "cache",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "K3",
+   "theorem": "vv_stream",
+   "kind": "cache",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "K4",
+   "theorem": "qv_ov",
+   "kind": "cache",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "K5",
+   "theorem": "kv_ov",
+   "kind": "cache",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "K6",
+   "theorem": "vv_ov",
+   "kind": "cache",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "K7",
+   "theorem": "qv_qk",
+   "kind": "cache",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "K8",
+   "theorem": "kv_qk",
+   "kind": "cache",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "K9",
+   "theorem": "vv_qk",
+   "kind": "cache",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "K10",
+   "theorem": "qv_head",
+   "kind": "cache",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "K11",
+   "theorem": "kv_head",
+   "kind": "cache",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "K12",
+   "theorem": "vv_head",
+   "kind": "cache",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "K13",
+   "theorem": "qv_attnNorm",
+   "kind": "cache",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "K14",
+   "theorem": "kv_attnNorm",
+   "kind": "cache",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "K15",
+   "theorem": "vv_attnNorm",
+   "kind": "cache",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "T1",
+   "theorem": "table_stream",
+   "kind": "table",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "T2",
+   "theorem": "table_ov",
+   "kind": "table",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "T3",
+   "theorem": "table_qk",
+   "kind": "table",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "T4",
+   "theorem": "table_head",
+   "kind": "table",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "T5",
+   "theorem": "table_mlpScale",
+   "kind": "table",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "T6",
+   "theorem": "table_unitPerm",
+   "kind": "table",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "T7",
+   "theorem": "table_attnNorm",
+   "kind": "table",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "T8",
+   "theorem": "table_mlpNorm",
+   "kind": "table",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  },
+  {
+   "id": "T9",
+   "theorem": "both_moved",
+   "kind": "table",
+   "status": "accepted",
+   "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+   ]
+  }
+ ],
+ "all_claims_accepted": true,
+ "crosscheck": {
+  "comparisons": 224,
+  "differences": 0,
+  "diffs": []
+ }
+}
