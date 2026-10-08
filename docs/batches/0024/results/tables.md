@@ -1,13 +1,13 @@
-| cell | NMSE of the eight nulls | largest / smallest null (N1: at most 3) | largest variant claimed the same / median null (N2: at most 4) | smallest variant claimed different / largest null (N3: at least 1.5) | broken / largest null | nulls |
-|---|---|---|---|---|---|---|
-| llama.cpp, Q8_0 weights | 0.000559 to 0.000791 | 1.41 | 0.95 | 2.20 | 3.52e+03 | 8 |
-| llama.cpp, Q4_0 weights | 0.000567 to 0.000863 | 1.52 | 1.31 | 49.12 | 3.25e+03 | 8 |
-| llama.cpp, f16 cache | 1.14e-07 to 1.56e-07 | 1.37 | 1.18 |  | 1.79e+07 | 8 |
-| llama.cpp, Q8_0 cache, rotated | 2.43e-05 to 3.49e-05 | 1.43 | 1.19 | 4.02 | 8.02e+04 | 8 |
-| llama.cpp, Q4_0 cache, rotated | 0.00116 to 0.00152 | 1.31 | 1.58 | 26.00 | 1.88e+03 | 8 |
-| llama.cpp, Q8_0 cache, not rotated | 4.19e-05 to 6.24e-05 | 1.49 | 1.21 | 5.79 | 4.48e+04 | 8 |
-| llama.cpp, Q4_0 cache, not rotated | 0.00112 to 0.00179 | 1.60 | 1.54 | 22.48 | 1.63e+03 | 8 |
-| CTranslate2, int8 | 0.00567 to 0.00711 | 1.25 | 83.21 |  | 403 | 8 |
+| cell | NMSE of the eight nulls | largest / smallest null (N1: at most 3) | largest variant claimed the same / median null (N2: at most 4) | smallest variant claimed different / largest null (N3: at least 1.5) | smallest variant claimed different / largest variant claimed the same (observed, no claim) | broken / largest null | nulls |
+|---|---|---|---|---|---|---|---|
+| llama.cpp, Q8_0 weights | 0.000559 to 0.000791 | 1.41 | 0.95 | 2.20 | 2.51 | 3.52e+03 | 8 |
+| llama.cpp, Q4_0 weights | 0.000567 to 0.000863 | 1.52 | 1.31 | 49.12 | 40.85 | 3.25e+03 | 8 |
+| llama.cpp, f16 cache | 1.14e-07 to 1.56e-07 | 1.37 | 1.18 |  |  | 1.79e+07 | 8 |
+| llama.cpp, Q8_0 cache, rotated | 2.43e-05 to 3.49e-05 | 1.43 | 1.19 | 4.02 | 4.08 | 8.02e+04 | 8 |
+| llama.cpp, Q4_0 cache, rotated | 0.00116 to 0.00152 | 1.31 | 1.58 | 26.00 | 18.42 | 1.88e+03 | 8 |
+| llama.cpp, Q8_0 cache, not rotated | 4.19e-05 to 6.24e-05 | 1.49 | 1.21 | 5.79 | 5.92 | 4.48e+04 | 8 |
+| llama.cpp, Q4_0 cache, not rotated | 0.00112 to 0.00179 | 1.60 | 1.54 | 22.48 | 17.44 | 1.63e+03 | 8 |
+| CTranslate2, int8 | 0.00567 to 0.00711 | 1.25 | 83.21 |  |  | 403 | 8 |
 
 #### llama.cpp, Q8_0 weights
 

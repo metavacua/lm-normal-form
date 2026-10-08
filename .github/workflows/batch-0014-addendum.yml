@@ -30,6 +30,7 @@ env:
   HF_HUB_DISABLE_TELEMETRY: "1"
   HF_HUB_DISABLE_PROGRESS_BARS: "1"
   LLAMACPP_TAG: b11450
+  LLAMACPP_SHA256: a9a5c229a56ff61be66ad5ae0ddb2051201dbc091ccda1062553fbdf1152adc1
   LMNF_THREADS: "4"
 
 jobs:
@@ -47,18 +48,19 @@ jobs:
       LLAMACPP_DIR: ${{ github.workspace }}/llama-b11450
       LLAMACPP_SRC: ${{ github.workspace }}/llama.cpp-src
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: "3.12"
       - name: Install
         run: |
           mkdir -p "$W" "$O"
           python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install --quiet transformers numpy safetensors huggingface_hub ml_dtypes pandas pyarrow sentencepiece protobuf
+          python -m pip install --quiet transformers==5.19.0 numpy safetensors huggingface_hub ml_dtypes pandas pyarrow sentencepiece protobuf
           python -m pip freeze > "$O/versions.txt"
           grep -m1 'model name' /proc/cpuinfo | tee "$O/cpu.txt"
           curl -sSL -o l.tgz "https://github.com/ggml-org/llama.cpp/releases/download/$LLAMACPP_TAG/llama-$LLAMACPP_TAG-bin-ubuntu-x64.tar.gz"
+          echo "$LLAMACPP_SHA256  l.tgz" | sha256sum -c -
           tar xzf l.tgz
           git clone --quiet --depth 1 --branch "$LLAMACPP_TAG" https://github.com/ggml-org/llama.cpp llama.cpp-src
           python -m pip install --quiet ./llama.cpp-src/gguf-py
@@ -82,12 +84,15 @@ jobs:
           echo "$STEPS" > "$O/outcomes.json"
           cp "$W"/summary-*.json "$W/inputs.json" "$W/variants/manifest.json" "$O/" 2>/dev/null || true
           mkdir -p "$O/res" && cp "$W"/res/*.json "$O/res/" 2>/dev/null || true
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: always()
         with:
           name: xrt-norot
           path: out/norot/
           retention-days: 14
+      - name: Every cell must have passed
+        if: always()
+        run: jq -e '[to_entries[] | select(.value.outcome == "failure")] | length == 0' "$O/outcomes.json"
 
   nullvariant:
     name: "09c the control for the noise of quantized runs"
@@ -103,18 +108,19 @@ jobs:
       LLAMACPP_DIR: ${{ github.workspace }}/llama-b11450
       LLAMACPP_SRC: ${{ github.workspace }}/llama.cpp-src
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: "3.12"
       - name: Install
         run: |
           mkdir -p "$W" "$O"
           python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install --quiet transformers numpy safetensors huggingface_hub ml_dtypes pandas pyarrow sentencepiece protobuf
+          python -m pip install --quiet transformers==5.19.0 numpy safetensors huggingface_hub ml_dtypes pandas pyarrow sentencepiece protobuf
           python -m pip freeze > "$O/versions.txt"
           grep -m1 'model name' /proc/cpuinfo | tee "$O/cpu.txt"
           curl -sSL -o l.tgz "https://github.com/ggml-org/llama.cpp/releases/download/$LLAMACPP_TAG/llama-$LLAMACPP_TAG-bin-ubuntu-x64.tar.gz"
+          echo "$LLAMACPP_SHA256  l.tgz" | sha256sum -c -
           tar xzf l.tgz
           git clone --quiet --depth 1 --branch "$LLAMACPP_TAG" https://github.com/ggml-org/llama.cpp llama.cpp-src
           python -m pip install --quiet ./llama.cpp-src/gguf-py
@@ -144,12 +150,15 @@ jobs:
           echo "$STEPS" > "$O/outcomes.json"
           cp "$W"/summary-*.json "$W/inputs.json" "$W/variants/manifest.json" "$O/" 2>/dev/null || true
           mkdir -p "$O/res" && cp "$W"/res/*.json "$O/res/" 2>/dev/null || true
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: always()
         with:
           name: xrt-null
           path: out/null/
           retention-days: 14
+      - name: Every cell must have passed
+        if: always()
+        run: jq -e '[to_entries[] | select(.value.outcome == "failure")] | length == 0' "$O/outcomes.json"
 
   nullsame:
     name: "09d the variants and the null variant in one job on one machine"
@@ -165,18 +174,19 @@ jobs:
       LLAMACPP_DIR: ${{ github.workspace }}/llama-b11450
       LLAMACPP_SRC: ${{ github.workspace }}/llama.cpp-src
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: "3.12"
       - name: Install
         run: |
           mkdir -p "$W" "$O"
           python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install --quiet transformers numpy safetensors huggingface_hub ml_dtypes pandas pyarrow sentencepiece protobuf
+          python -m pip install --quiet transformers==5.19.0 numpy safetensors huggingface_hub ml_dtypes pandas pyarrow sentencepiece protobuf
           python -m pip freeze > "$O/versions.txt"
           grep -m1 'model name' /proc/cpuinfo | tee "$O/cpu.txt"
           curl -sSL -o l.tgz "https://github.com/ggml-org/llama.cpp/releases/download/$LLAMACPP_TAG/llama-$LLAMACPP_TAG-bin-ubuntu-x64.tar.gz"
+          echo "$LLAMACPP_SHA256  l.tgz" | sha256sum -c -
           tar xzf l.tgz
           git clone --quiet --depth 1 --branch "$LLAMACPP_TAG" https://github.com/ggml-org/llama.cpp llama.cpp-src
           python -m pip install --quiet ./llama.cpp-src/gguf-py
@@ -205,9 +215,12 @@ jobs:
           echo "$STEPS" > "$O/outcomes.json"
           cp "$W"/summary-*.json "$W/inputs.json" "$W/variants/manifest.json" "$O/" 2>/dev/null || true
           mkdir -p "$O/res" && cp "$W"/res/*.json "$O/res/" 2>/dev/null || true
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: always()
         with:
           name: xrt-nullsame
           path: out/nullsame/
           retention-days: 14
+      - name: Every cell must have passed
+        if: always()
+        run: jq -e '[to_entries[] | select(.value.outcome == "failure")] | length == 0' "$O/outcomes.json"
