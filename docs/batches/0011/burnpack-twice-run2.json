@@ -1,0 +1,17 @@
+{
+ "bag_roots_equal": true,
+ "data_region_sha256_equal": true,
+ "data_start": [
+  59648,
+  59648
+ ],
+ "differing_bytes_before_data": 5327,
+ "differing_bytes_span": [
+  97,
+  59511
+ ],
+ "metadata_equal_without_param_id": true,
+ "param_ids_differing": 669,
+ "sha256_equal": false,
+ "sizes_equal": true
+}
