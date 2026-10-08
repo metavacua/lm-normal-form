@@ -5,8 +5,11 @@ structure from standard model formats, holding that structure in a standard grap
 database, and asking how far the model's computation can be expressed and checked
 with standard languages.
 
-**Status: research. Nothing here is established yet.** The first experiment is
-registered and has not produced results.
+**Status: research.** Results are of two kinds. Some are theorems checked by Lean,
+for a stated class of decoder. The rest are measurements, run in CI, on the
+models and runtimes named in each batch. Each batch document in `docs/batches/`
+states what its claims are, how each was graded and what it does not show.
+Statements about real checkpoints rest on the measurements, not on the theorems.
 
 ## What is being tested
 
@@ -19,19 +22,32 @@ registered and has not produced results.
    standards.
 3. **Termination by construction.** If a model's forward pass is a graph with
    no cycles and no control-flow operators, it terminates for structural
-   reasons. That is checked, not assumed.
+   reasons. Planned: no batch has tested this yet.
 4. **How far a query or rule engine can go.** Whether weights and token
    generation can be expressed in RDF, its extensions and rule-based reasoners
    is an open research question here, not a settled limit.
+5. **Symmetries of the weights.** Which changes of a decoder's parameters leave
+   its function unchanged (permutations, scalings, rotations, changes of basis),
+   which of its internal states move under them, and whether runtimes,
+   quantization and training treat equivalent parameters alike.
 
 ## How work is done
 
 - Each experiment is written down before it runs: premises, hypotheses and what
-  would count as an inconclusive result.
-- Experiments run in CI. A hypothesis that fails is a result. A run that could
-  not evaluate a check fails.
-- Models are fetched at their current published revision; the revision and file
-  digests are recorded with every result.
+  would count as an inconclusive result. Git history records the order.
+- Experiments run in CI. A hypothesis that fails is a result and stays one. A run
+  that could not evaluate a check must fail. The workflows of the early batches
+  (0002 to 0007) record each step's outcome in `outcomes.json` and do not fail the
+  job when a step fails, so a green job there is not evidence on its own.
+- A defect found later, in code, in text, or in a check that cannot fail, is
+  fixed and the wrong text is deleted. The record of what was there is the git
+  history, not a note in the document. A document states only what the committed
+  code and data support.
+- A count of claims that held separates controls, checks that cannot fail and
+  claims that put a prediction at risk. A bare count is not a result.
+- Models are fetched at their current published revision. From batch 0007 on the
+  revision is recorded with the result; batches 0002 to 0006 took the head of the
+  main branch without recording it. File digests are recorded from batch 0011 on.
 
 ## Lineage
 
