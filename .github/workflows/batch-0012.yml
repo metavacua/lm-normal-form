@@ -123,8 +123,19 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       RESULTS: ${{ toJSON(needs) }}
     steps:
+      # The success of a job is not evidence: an observation step is marked continue-on-error, so the job is green
+      # whatever the step did. The record is each job's outcomes.json (the workflow's own steps context).
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          path: artifacts
       - run: |
           state=success; echo "$RESULTS" | jq -e '[.[] | .result] | all(. == "success")' > /dev/null || state=failure
+          test -d artifacts || state=failure
+          find artifacts -name outcomes.json 2> /dev/null | sort | while read -r f; do
+            jq -r --arg f "$f" 'to_entries[] | select(.value.outcome == "failure") | "\($f): \(.key)"' "$f"
+          done | tee failed-steps.txt
+          if test -s failed-steps.txt; then state=failure; fi
           gh api "repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -f state="$state" -f context="batch 0012" \
-            -f description="$(echo "$RESULTS" | jq -r 'to_entries | map("\(.key) \(.value.result)") | join(", ")' | cut -c1-140)" \
+            -f description="$(echo "$(wc -l < failed-steps.txt) failed steps; $(echo "$RESULTS" | jq -r 'to_entries | map("\(.key) \(.value.result)") | join(", ")')" | cut -c1-140)" \
             -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" > /dev/null

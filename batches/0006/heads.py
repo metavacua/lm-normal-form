@@ -2,7 +2,9 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Per layer: the attention heads' query and output slices, cosine between
 # heads, and how many heads have another head above 0.9; key and value heads
-# likewise. Usage: heads.py MODEL
+# likewise. The cosine is of raw weight slices: it finds heads that are
+# duplicates in the same coordinates, not heads that compute the same
+# function in a rotated basis. Usage: heads.py MODEL
 import sys,transformers as t,numpy as np
 g=t.AutoModelForCausalLM.from_pretrained(sys.argv[1]).float();c=g.config;H=c.num_attention_heads;K=c.num_key_value_heads;d=c.hidden_size//H
 def dup(M):

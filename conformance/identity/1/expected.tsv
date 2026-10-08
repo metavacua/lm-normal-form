@@ -24,3 +24,5 @@ file	mode	verdict
 15-environment	write	OK
 16-bad-feature-kind	read	MALFORMED
 17-tensor-twice	read	OK
+18-no-subject	read	MALFORMED
+19-subject-no-root	read	MALFORMED

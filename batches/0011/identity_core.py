@@ -101,12 +101,12 @@ def verify(rec, mode="read"):
     if (s["canonicalization"].get("id"), s["canonicalization"].get("version"), s["hash"].get("alg")) != SCHEME:
         return "UNVERIFIABLE-SCHEME"
     sub = rec.get("subject")
-    if isinstance(sub, dict) and "tensors" in sub and "bag_root" in sub:
-        try:
-            return "OK" if bag_root(sub["tensors"]) == sub["bag_root"] else "MISMATCH"
-        except (KeyError, TypeError, ValueError):
-            return "MALFORMED"
-    return "OK"
+    if not (isinstance(sub, dict) and "tensors" in sub and "bag_root" in sub):
+        return "MALFORMED"
+    try:
+        return "OK" if bag_root(sub["tensors"]) == sub["bag_root"] else "MISMATCH"
+    except (KeyError, TypeError, ValueError):
+        return "MALFORMED"
 
 
 def table(path):

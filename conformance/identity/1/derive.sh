@@ -2,8 +2,9 @@
 # SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Derives the expected values of the identity fixture (docs/interfaces/identity.md, version 1) with
-# printf, xxd, sha256sum and jq only, not with batches/0011/identity_core.py, so that the code the
-# fixture tests does not grade itself. Writes digests.tsv, relations.tsv, records/*.json and
+# printf, xxd, sha256sum and jq only, not with batches/0011/identity_core.py: the digests and the
+# roots are computed independently of the code they test; the verdict rows (expected.tsv) are
+# written here by hand, as examples of the rules, and are not computed. Writes digests.tsv, relations.tsv, records/*.json and
 # expected.tsv next to this script. The files are frozen: run this again only to change the version.
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -70,6 +71,8 @@ mk 14-unknown-key          '. + {"x-extra": {"anything": [1, 2, 3]}}'
 mk 15-environment          '. + {environment: {cpu: "any", python: "any"}}'
 mk 16-bad-feature-kind     '.features = [{name: "x-note", needed_by: "sometimes"}]'
 mk 17-tensor-twice         '.subject.tensors += [.subject.tensors[0]]'
+mk 18-no-subject           'del(.subject)'
+mk 19-subject-no-root      'del(.subject.bag_root)'
 {
   printf 'file\tmode\tverdict\n'
   for m in read write; do printf '01-valid\t%s\tOK\n' "$m"; done
@@ -82,5 +85,6 @@ mk 17-tensor-twice         '.subject.tensors += [.subject.tensors[0]]'
   printf '12-other-producer\tread\tOK\n12-other-producer\twrite\tOK\n13-order-violated\tread\tMALFORMED\n'
   printf '14-unknown-key\tread\tOK\n14-unknown-key\twrite\tOK\n15-environment\tread\tOK\n15-environment\twrite\tOK\n'
   printf '16-bad-feature-kind\tread\tMALFORMED\n17-tensor-twice\tread\tOK\n'
+  printf '18-no-subject\tread\tMALFORMED\n19-subject-no-root\tread\tMALFORMED\n'
 } > expected.tsv
 echo "bag root of the valid record: $BAG"
