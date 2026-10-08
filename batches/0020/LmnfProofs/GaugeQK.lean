@@ -57,6 +57,7 @@ theorem qv_qk (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (a b : Gr → 
   rw [cplx_neg_transpose, ← Matrix.mulVec_mulVec, hR]
   exact rot_comm _ _ (cplx_comm_smul _ _ _ _ _) _
 
+/-- Definitional: `vv` does not read the fields `Wq`, `Wk` that `qkGauge` changes. -/
 theorem vv_qk (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (a b : Gr → P → K)
     (h : St K T d) (s : Fin T) (g : Gr) : vv E (qkGauge E L a b) h s g = vv E L h s g := rfl
 

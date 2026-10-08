@@ -1,7 +1,8 @@
 # SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # A Python port of Model.lean and Runtime.lean (structured layers, per head and plane, and the gauge definitions of batch 0021), run on the data of gen22.py: a check of the conventions that
-# does not need Lean. It was run before the output of the Lean run was read; it is not the registered test (that is the Lean run, compared by check22.py).
+# does not need Lean. It is not run by the workflow and no claim of the batch depends on it (the test is the Lean run, compared by check22.py); it shares its author's reading of the conventions
+# with the Lean code and is not independent of it.
 #   port22.py [--start N]    LMNF22_ARCH=d3 (default) or d2
 import os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))

@@ -11,8 +11,10 @@ import LmnfProofs.GaugeNorm
 import LmnfProofs.GaugeStream
 
 /-! All the gauges that leave the function of a layer unchanged, composed in any order, leave the logits of the model unchanged (`logits_gauged`); and the table of what each gauge does to the
-stream and to the cache (`table_*`): the stream gauge moves the stream and leaves the cache, the value/output, query/key and head gauges move the cache and leave the stream, the feed-forward
-and norm-weight gauges move neither, a composition of the stream gauge and the value gauge moves both (`both_moved`). -/
+stream and to the arrays `qv`, `kv`, `vv` (`table_*`): each entry is either an equality (the array is unchanged) or an explicit formula (the stream is `Q` applied to the original stream; the values are
+`A g` applied to the original values; the keys and queries are the scalar and its inverse transpose applied; the arrays are permuted). The formulas hold for every admissible parameter, including the
+identity gauge; that a formula changes the array for a non-identity gauge is not a statement of this file. The cache halves of `table_mlpScale`, `table_unitPerm`, `table_mlpNorm` hold by `rfl`: the
+arrays `qv`, `kv`, `vv` do not read the fields that these gauges change. -/
 
 set_option linter.unusedSectionVars false
 
@@ -59,7 +61,7 @@ theorem logits_gauged (E : Env K T Hh Gr P) (M M' : Model K d hv nu Hh Gr P V)
     logits E M' toks = logits E M toks :=
   logits_of_forall₂ E M M' hemb hhead hgf (fun _ _ hG => layerFn_gauged hG) hL toks
 
-/-- The stream gauge: the stream moves (equivariantly), the cache does not. -/
+/-- The stream gauge: the stream is `Q` applied to the original (equivariance), the arrays `qv`, `kv`, `vv` are equal. -/
 theorem table_stream (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) {Q Qi : Matrix (Fin d) (Fin d) K}
     (hQ : PreservesDot Q) (hi : LeftInv Q Qi) {ga gm : Fin d → K} (hca : Compat Q L.ga ga)
     (hcm : Compat Q L.gm gm) (h : St K T d) :
@@ -70,7 +72,7 @@ theorem table_stream (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) {Q Qi :
   ⟨layerFn_stream E L hQ hi hca hcm h, fun t hd p => qv_stream E L hQ hi hca h t hd p,
     fun s g p => kv_stream E L hQ hi hca h s g p, fun s g => vv_stream E L hQ hi hca h s g⟩
 
-/-- The value/output gauge: the stream does not move, the values move by `A`, the queries and keys do not. -/
+/-- The value/output gauge: the stream is equal, the values are `A g` applied to the original values, the queries and keys are equal. -/
 theorem table_ov (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (A B : Gr → Matrix (Fin hv) (Fin hv) K)
     (hBA : ∀ g, B g * A g = 1) (h : St K T d) :
     layerFn E (ovGauge E L A B) h = layerFn E L h ∧
@@ -79,7 +81,7 @@ theorem table_ov (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (A B : Gr �
     (∀ s g, vv E (ovGauge E L A B) h s g = A g *ᵥ vv E L h s g) :=
   ⟨layerFn_ov E L A B hBA h, qv_ov E L A B h, kv_ov E L A B h, vv_ov E L A B h⟩
 
-/-- The query/key gauge: the stream does not move, the keys move by the complex scalar, the queries by its inverse transpose, the values do not. -/
+/-- The query/key gauge: the stream is equal, the keys are the complex scalar applied to the original keys, the queries its inverse transpose applied, the values are equal. -/
 theorem table_qk (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (a b : Gr → P → K)
     (hnz : ∀ g p, a g p ^ 2 + b g p ^ 2 ≠ 0) (hrot : ∀ t p, ∃ c s, E.rot t p = cplx c s) (h : St K T d) :
     layerFn E (qkGauge E L a b) h = layerFn E L h ∧
@@ -89,7 +91,7 @@ theorem table_qk (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (a b : Gr �
     (∀ s g, vv E (qkGauge E L a b) h s g = vv E L h s g) :=
   ⟨layerFn_qk E L a b hnz hrot h, qv_qk E L a b hrot h, kv_qk E L a b hrot h, vv_qk E L a b h⟩
 
-/-- The permutation of heads and groups: the stream does not move, the cache is permuted. -/
+/-- The permutation of heads and groups: the stream is equal, the arrays `qv`, `kv`, `vv` are the original ones with the indices permuted. -/
 theorem table_head (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (σ : Equiv.Perm Hh) (τ : Equiv.Perm Gr)
     (hστ : ∀ hd, E.gr (σ hd) = τ (E.gr hd)) (h : St K T d) :
     layerFn E (headPerm L σ τ) h = layerFn E L h ∧
@@ -98,7 +100,7 @@ theorem table_head (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (σ : Equ
     (∀ s g, vv E (headPerm L σ τ) h s g = vv E L h s (τ g)) :=
   ⟨layerFn_headPerm E L σ τ hστ h, qv_head E L σ τ h, kv_head E L σ τ h, vv_head E L σ τ h⟩
 
-/-- The scaling of the up branch: neither the stream nor the cache moves. -/
+/-- The scaling of the up branch: the stream is equal, and the arrays `qv`, `kv`, `vv` are equal (by `rfl`). -/
 theorem table_mlpScale (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (c : Fin nu → K) (hc : ∀ i, c i ≠ 0)
     (h : St K T d) :
     layerFn E (mlpScale L c) h = layerFn E L h ∧
@@ -107,7 +109,7 @@ theorem table_mlpScale (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (c : 
     (∀ s g, vv E (mlpScale L c) h s g = vv E L h s g) :=
   ⟨layerFn_mlpScale E L c hc h, fun _ _ _ => rfl, fun _ _ _ => rfl, fun _ _ => rfl⟩
 
-/-- The permutation of the units: neither the stream nor the cache moves. -/
+/-- The permutation of the units: the stream is equal, and the arrays `qv`, `kv`, `vv` are equal (by `rfl`). -/
 theorem table_unitPerm (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (σ : Equiv.Perm (Fin nu)) (h : St K T d) :
     layerFn E (unitPerm L σ) h = layerFn E L h ∧
     (∀ t hd p, qv E (unitPerm L σ) h t hd p = qv E L h t hd p) ∧
@@ -115,7 +117,7 @@ theorem table_unitPerm (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (σ :
     (∀ s g, vv E (unitPerm L σ) h s g = vv E L h s g) :=
   ⟨layerFn_unitPerm E L σ h, fun _ _ _ => rfl, fun _ _ _ => rfl, fun _ _ => rfl⟩
 
-/-- The scaling of the weight of the attention norm: neither the stream nor the cache moves (what the readers see is multiplied by `c`, and they compensate). -/
+/-- The scaling of the weight of the attention norm: the stream is equal and the arrays `qv`, `kv`, `vv` are equal (what the readers see is multiplied by `c`, and they compensate). -/
 theorem table_attnNorm (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (c : Fin d → K) (hc : ∀ i, c i ≠ 0)
     (h : St K T d) :
     layerFn E (attnNorm L c) h = layerFn E L h ∧
@@ -124,7 +126,7 @@ theorem table_attnNorm (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (c : 
     (∀ s g, vv E (attnNorm L c) h s g = vv E L h s g) :=
   ⟨layerFn_attnNorm E L c hc h, qv_attnNorm E L c hc h, kv_attnNorm E L c hc h, vv_attnNorm E L c hc h⟩
 
-/-- The scaling of the weight of the feed-forward norm: neither the stream nor the cache moves. -/
+/-- The scaling of the weight of the feed-forward norm: the stream is equal, and the arrays `qv`, `kv`, `vv` are equal (by `rfl`). -/
 theorem table_mlpNorm (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (c : Fin d → K) (hc : ∀ i, c i ≠ 0)
     (h : St K T d) :
     layerFn E (mlpNorm L c) h = layerFn E L h ∧
@@ -133,7 +135,7 @@ theorem table_mlpNorm (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (c : F
     (∀ s g, vv E (mlpNorm L c) h s g = vv E L h s g) :=
   ⟨layerFn_mlpNorm E L c hc h, fun _ _ _ => rfl, fun _ _ _ => rfl, fun _ _ => rfl⟩
 
-/-- A composition of the stream gauge and the value/output gauge moves both the stream and the values, and still leaves the keys (and the function of the layer, up to the stream gauge) alone. -/
+/-- A composition of the stream gauge and the value/output gauge: the layer is equivariant (the output is `Q` applied to the original output), the values are `A g` applied to the original values, the keys are equal. The statement is an equality with explicit formulas; it holds for the identity gauge as well. -/
 theorem both_moved (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) {Q Qi : Matrix (Fin d) (Fin d) K}
     (hQ : PreservesDot Q) (hi : LeftInv Q Qi) {ga gm : Fin d → K} (hca : Compat Q L.ga ga)
     (hcm : Compat Q L.gm gm) (A B : Gr → Matrix (Fin hv) (Fin hv) K) (hBA : ∀ g, B g * A g = 1) (h : St K T d) :

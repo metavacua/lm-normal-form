@@ -18,12 +18,14 @@ from ops import FieldOps
 
 P = 1000003
 # The architecture is small because the Lean definition is run by the interpreter and recomputes shared subterms (a function is not a table): the cost of one layer grows with the
-# fourth power of the hidden dimension. LMNF22_ARCH=d3 (hidden dimension 3, three units: the architecture of the registration; the default) or d2 (2 and 2: amendment 1, which turned out
-# not to be needed: a model of d2 takes about 20 seconds in Lean; see docs/batches/0022.md, amendment 2).
-_ARCHS = {"d3": dict(d=3, d_ff=3), "d2": dict(d=2, d_ff=2)}
-ARCH = Arch(**_ARCHS[os.environ.get("LMNF22_ARCH", "d3")], n_heads=4, n_kv=2, hd=2, n_layers=2, vocab=3, tied=False, pos="rope", causal=True, norm="rms")
-TOKENS = [2, 0]
-TS = [2]                                  # the rotary planes: plane j rotates by the point of the circle of t = TS[j], (1 - t^2) / (1 + t^2), 2 t / (1 + t^2)
+# fourth power of the hidden dimension. LMNF22_ARCH=d3 (hidden dimension 3, three units, head dimension 2, one rotary plane, 2 positions; the default), d2 (hidden dimension 2, two units, head
+# dimension 2) or d2p2 (hidden dimension 2, two units, head dimension 4: two rotary planes, 3 positions). With head dimension 2 there is one plane and the rows of its two components are
+# adjacent, so the rotate-half pairing (i, i + hd/2) and the interleaved pairing (2i, 2i + 1) coincide; d2p2 separates them and has two plane indices.
+_ARCHS = {"d3": dict(d=3, d_ff=3, hd=2), "d2": dict(d=2, d_ff=2, hd=2), "d2p2": dict(d=2, d_ff=2, hd=4)}
+_NAME = os.environ.get("LMNF22_ARCH", "d3")
+ARCH = Arch(**_ARCHS[_NAME], n_heads=4, n_kv=2, n_layers=2, vocab=3, tied=False, pos="rope", causal=True, norm="rms")
+TOKENS = [2, 0, 1] if ARCH.hd == 4 else [2, 0]
+TS = [2, 3] if ARCH.hd == 4 else [2]      # the rotary planes: plane j rotates by the point of the circle of t = TS[j], (1 - t^2) / (1 + t^2), 2 t / (1 + t^2)
 FLAT = (("wq", "wq"), ("wk", "wk"), ("wv", "wv"), ("wo", "wo"), ("wg", "wg"), ("wu", "wu"), ("wd", "wd"), ("attn_norm", "an"), ("mlp_norm", "mn"))
 
 
@@ -183,8 +185,11 @@ class Case:
             for _ in range(nkv):
                 while True:
                     A = obj((hd, hd), lambda: rng.randrange(P))
-                    if (A[0, 0] * A[1, 1] - A[0, 1] * A[1, 0]) % P != 0:
+                    try:
+                        ops.matinv(A)                  # raises ZeroDivisionError if A is singular
                         break
+                    except ZeroDivisionError:
+                        pass
                 row.append(A)
             self.As.append(row)
         # A3: per layer, group and plane a complex scalar

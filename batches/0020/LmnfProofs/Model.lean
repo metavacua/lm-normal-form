@@ -11,8 +11,8 @@ import LmnfProofs.Norm
 The definitions of the forward pass of `batches/0015/model.py` in the form that a proof wants. The heads and the key/value groups are arbitrary finite types with a map from the heads to
 the groups; the head dimension of the queries and keys is a finite type `P` of rotary planes with a `2 × 2` block each; the rotation of every position and plane is given; and the three
 functions that make the model nonlinear (the exponential of the attention, the gate of the feed-forward block, the scale of the normalization) are *variables* (`Fns`). Nothing is said
-about their values, so a theorem about this model is a theorem for every nonlinearity. The cache of a layer is the triple `qv`, `kv`, `vv` (queries, keys and values after the rotation
-where there is one).
+about their values, so a theorem about this model is a theorem for every nonlinearity. The arrays of a layer that the theorems track are `qv`, `kv`, `vv` (queries, keys and values after the
+rotation where there is one); a key/value cache keeps only the last two.
 
 The correspondence with `model.py` (the flattened layout of Hugging Face's Llama, in which the queries of all heads are one matrix) is by reading; it is tested, in exact arithmetic,
 by a later batch.

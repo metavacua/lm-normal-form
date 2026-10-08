@@ -23,9 +23,11 @@ def ovGauge (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (A B : Gr → Ma
     Layer K d hv nu Hh Gr P :=
   { L with Wv := fun g => A g * L.Wv g, Wo := fun hd => L.Wo hd * B (E.gr hd) }
 
+/-- Definitional: `qv` does not read the fields `Wv`, `Wo` that `ovGauge` changes. -/
 theorem qv_ov (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (A B : Gr → Matrix (Fin hv) (Fin hv) K)
     (h : St K T d) (t : Fin T) (hd : Hh) (p : P) : qv E (ovGauge E L A B) h t hd p = qv E L h t hd p := rfl
 
+/-- Definitional: `kv` does not read the fields `Wv`, `Wo` that `ovGauge` changes. -/
 theorem kv_ov (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (A B : Gr → Matrix (Fin hv) (Fin hv) K)
     (h : St K T d) (s : Fin T) (g : Gr) (p : P) : kv E (ovGauge E L A B) h s g p = kv E L h s g p := rfl
 

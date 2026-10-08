@@ -75,7 +75,7 @@ theorem orth_leftInv {Q : Matrix (Fin d) (Fin d) K} (hQ : Qᵀ * Q = 1) : LeftIn
   intro x
   rw [Matrix.mulVec_mulVec, hQ, Matrix.one_mulVec]
 
-/-- H4, with every norm weight constant (the norm weights folded into the neighbouring matrices): every orthogonal matrix, for every model and nonlinearity. -/
+/-- H4 for models whose norm weights, including the final one, are constant vectors: every orthogonal matrix, for every such model and nonlinearity. Folding the norm weights of a general model into the neighbouring matrices (which needs the norm gauge on the final norm as well) is not formalized, so a model with non-constant weights is not covered by this statement. -/
 theorem logits_orthogonal (E : Env K T Hh Gr P) (M : Model K d hv nu Hh Gr P V) (toks : Fin T → V)
     {Q : Matrix (Fin d) (Fin d) K} (hQ : Qᵀ * Q = 1)
     (hc : ∀ L ∈ M.layers, (∃ c, L.ga = fun _ => c) ∧ (∃ c, L.gm = fun _ => c)) (hf : ∃ c, M.gf = fun _ => c) :

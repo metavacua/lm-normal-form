@@ -9,7 +9,7 @@ import LmnfProofs.Glue
 that read the stream are multiplied by `Qi` on the right, those that write to it by `Q` on the left; the embedding is carried by `Q` and the head reads through `Qi`; the weight of every
 norm is replaced by a weight `ν` that is compatible with `Q` (`Compat`: for a scalar weight any `Q`, for a general weight a signed permutation with the weight permuted).
 
-The stream is not invariant (`Q` moves it) but equivariant (`layerFn_stream`); the cache is invariant (`qv_stream`, `kv_stream`, `vv_stream`); the logits are invariant (`logits_stream`). -/
+The stream is equivariant (`layerFn_stream`: the output is `Q` applied to the original output); the arrays `qv`, `kv`, `vv` are equal (`qv_stream`, `kv_stream`, `vv_stream`); the logits are equal (`logits_stream`). -/
 
 set_option linter.unusedSectionVars false
 

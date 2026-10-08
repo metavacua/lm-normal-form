@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Training dynamics under the symmetries. A symmetry g of the function (f(g . theta) = f(theta)) is a symmetry of the gradient flow only if it is compatible with the update rule: an orthogonal
 # g maps the gradient of a function that it leaves invariant to the gradient at the image (so SGD from g . theta follows g . (SGD from theta)), but Adam divides each coordinate of the gradient by
-# the root of its own second moment, and only signed permutations (and the identity) commute with that; a scaling g (the unit gauge of a gated feed-forward block) commutes with neither, because the
+# the root of its own second moment, and only signed permutations (and the identity) commute with that (this follows from the update rules; the run illustrates it); a scaling g (the unit gauge of a gated feed-forward block) commutes with neither, because the
 # gradient of a scaled parameter is scaled the other way. The research notes name this as the reason that the standard basis of a trained model is not random (Elhage et al. 2023; He et al. 2024).
 # A tiny Llama (hidden 32, 4 heads, 2 key/value groups, 2 layers, vocabulary 64, untied head, the norm weights frozen at 1) is trained in float64 (Hugging Face's float32 islands patched) for
 # 100 full-batch steps on a fixed synthetic next-token task, by SGD (lr 0.2) and by Adam (lr 0.01), from theta and from g(theta), for g a signed permutation of the hidden coordinates, a random

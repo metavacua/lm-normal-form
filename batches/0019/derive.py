@@ -1,8 +1,8 @@
 # SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Runs states.dl (Souffle, interpreter mode: nothing is compiled) on the facts that ir.py makes of an architecture, and returns what the Datalog program derived: the group of each
+# Runs states.dl (Souffle, interpreter mode: nothing is compiled) on the facts that ir.py makes of an architecture, and returns what the Datalog program computed: the group of each
 # space, the dimension of the gauge group, and for each test generator whether it is inside the derived group and what class of transformation each state undergoes.
-#   derive.py CONFIG [CONFIG ...]    the derived dimension of the named configurations of batch 0015's symdim.py, against the formula of that file
+#   derive.py CONFIG [CONFIG ...]    the dimension computed for the named configurations of batch 0015's symdim.py, against the formula of that file
 import csv, os, subprocess, sys, tempfile
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)

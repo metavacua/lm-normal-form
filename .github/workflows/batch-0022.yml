@@ -27,10 +27,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {name: "d3", arch: "d3", start: "0"}        # the architecture of the registration
-          - {name: "d2", arch: "d2", start: "0"}        # amendment 1
+          - {name: "d3", arch: "d3", start: "0"}        # hidden dimension 3, head dimension 2
+          - {name: "d2", arch: "d2", start: "0"}        # hidden dimension 2, head dimension 2
           - {name: "d2-s100", arch: "d2", start: "100"}
           - {name: "d2-s200", arch: "d2", start: "200"}
+          - {name: "d2p2", arch: "d2p2", start: "0"}    # head dimension 4: two rotary planes, 3 positions
     env:
       LMNF22_ARCH: ${{ matrix.arch }}
     steps:

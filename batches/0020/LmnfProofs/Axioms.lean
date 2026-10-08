@@ -11,7 +11,6 @@ import LmnfProofs.Compose
 
 #print axioms Lmnf.preservesDot_of_transpose_mul
 #print axioms Lmnf.rms_equivariant
-#print axioms Lmnf.rms_scale
 #print axioms Lmnf.mulVec_weighted_sum
 #print axioms Lmnf.ov_gauge
 #print axioms Lmnf.bilinear_gauge

@@ -1,4 +1,4 @@
-# id	theorem	kind	what the theorem says (for every field, every nonlinearity, every environment E unless a hypothesis is named)
+# id	theorem	kind	what the theorem says (for every field, every nonlinearity, every environment E unless a hypothesis is named); graded by the name of the theorem, not by its statement
 F1	layerFn_ov	invariance	the function of a layer is unchanged by the value/output gauge (A g on the values of group g, B g on the output columns of its heads, B g A g = 1)
 F2	layerFn_qk	invariance	unchanged by the complex scalars on the rotary planes of the keys and their inverse transposes on the queries (norm nonzero, rotations complex)
 F3	layerFn_headPerm	invariance	unchanged by a permutation of the heads and of the groups compatible with the map of heads to groups
@@ -9,30 +9,24 @@ F7	layerFn_mlpNorm	invariance	unchanged by scaling the weight of the feed-forwar
 S1	layerFn_stream	equivariance	the layer of the model transformed by a dot-product-preserving matrix Q (readers times Qi, writers Q times, norm weights compatible) maps the moved stream to the moved output
 S2	logits_stream	invariance	the logits of the whole model are unchanged by that transformation (embedding carried by Q, head reads through Qi)
 S3	logits_signedPerm	invariance	H1: every permutation of the hidden coordinates with signs, norm weights permuted along: the logits of every model are unchanged
-S4	logits_orthogonal	invariance	H4 with constant norm weights: every orthogonal matrix, the logits of every model are unchanged
+S4	logits_orthogonal	invariance	H4 for models whose norm weights, including the final one, are constant: every orthogonal matrix, the logits of every such model are unchanged
 C1	layerFn_gauged	composition	any sequence of the seven invariance gauges leaves the function of a layer unchanged
 C2	logits_gauged	composition	any layer-by-layer sequence of the seven invariance gauges leaves the logits of the model unchanged
 K1	qv_stream	cache	the queries are unchanged by the stream gauge
 K2	kv_stream	cache	the keys are unchanged by the stream gauge
 K3	vv_stream	cache	the values are unchanged by the stream gauge
-K4	qv_ov	cache	the queries are unchanged by the value/output gauge
-K5	kv_ov	cache	the keys are unchanged by the value/output gauge
-K6	vv_ov	cache	the values are moved to A g times the values by the value/output gauge
-K7	qv_qk	cache	the queries are moved to (a^2+b^2)^-1 (a + b i) times the queries by the query/key gauge
-K8	kv_qk	cache	the keys are moved to (a + b i) times the keys by the query/key gauge
-K9	vv_qk	cache	the values are unchanged by the query/key gauge
-K10	qv_head	cache	the queries are permuted by sigma by the head/group permutation
-K11	kv_head	cache	the keys are permuted by tau by the head/group permutation
-K12	vv_head	cache	the values are permuted by tau by the head/group permutation
-K13	qv_attnNorm	cache	the queries are unchanged by the scaling of the attention norm weight
-K14	kv_attnNorm	cache	the keys are unchanged by the scaling of the attention norm weight
-K15	vv_attnNorm	cache	the values are unchanged by the scaling of the attention norm weight
-T1	table_stream	table	stream moved (equivariantly), cache unchanged
-T2	table_ov	table	stream unchanged, values moved, queries and keys unchanged
-T3	table_qk	table	stream unchanged, keys and queries moved, values unchanged
-T4	table_head	table	stream unchanged, cache permuted
-T5	table_mlpScale	table	stream and cache both unchanged
-T6	table_unitPerm	table	stream and cache both unchanged
-T7	table_attnNorm	table	stream and cache both unchanged
-T8	table_mlpNorm	table	stream and cache both unchanged
-T9	both_moved	table	stream gauge composed with the value/output gauge: stream moved by Q, values moved by A, keys unchanged
+K4	vv_ov	cache	the values are A g times the original values under the value/output gauge (explicit formula; also true for the identity gauge)
+K5	qv_qk	cache	the queries are (a^2+b^2)^-1 (a + b i) times the original queries under the query/key gauge (explicit formula; also true for the identity gauge)
+K6	kv_qk	cache	the keys are (a + b i) times the original keys under the query/key gauge (explicit formula; also true for the identity gauge)
+K7	qv_attnNorm	cache	the queries are unchanged by the scaling of the attention norm weight
+K8	kv_attnNorm	cache	the keys are unchanged by the scaling of the attention norm weight
+K9	vv_attnNorm	cache	the values are unchanged by the scaling of the attention norm weight
+T1	table_stream	table	stream equals Q applied to the original output (equivariance), arrays qv, kv, vv equal
+T2	table_ov	table	stream equal, values equal A g times the original values, queries and keys equal (the cache halves qv, kv are by rfl)
+T3	table_qk	table	stream equal, keys and queries equal the explicit scalar formulas applied to the original, values equal (the values half is by rfl)
+T4	table_head	table	stream equal, qv, kv, vv equal the original arrays with indices permuted (the cache parts are by rfl)
+T5	table_mlpScale	table	stream equal; qv, kv, vv equal (the cache parts are by rfl)
+T6	table_unitPerm	table	stream equal; qv, kv, vv equal (the cache parts are by rfl)
+T7	table_attnNorm	table	stream equal; qv, kv, vv equal
+T8	table_mlpNorm	table	stream equal; qv, kv, vv equal (the cache parts are by rfl)
+T9	both_moved	table	stream gauge composed with the value/output gauge: output equals Q applied to the original output, values equal A g times the original values, keys equal (an equality with explicit formulas; it holds for the identity gauge as well)
