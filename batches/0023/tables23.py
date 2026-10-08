@@ -33,10 +33,6 @@ for key, label in [("systems-smol-instruct", "SmolLM2-135M-Instruct"), ("systems
         continue
     m = d["membership"]
     rows.append([label, m["tokens"], f"{m['mean_loss_nats']:.3f}", f"{m['ln_output_vocabulary']:.3f}", f"{m['fraction_of_ln_vocabulary']:.3f}"])
-b = load("bridge-torch")
-if b:
-    m = b["membership_control"]
-    rows.append(["the finite instance (control; uniformly random sequences of its 5 symbols)", "", f"{m['mean_loss_nats']:.3f}", f"{m['ln_output_vocabulary']:.3f}", f"{m['fraction_of_ln_vocabulary']:.3f}"])
 out += lines_for("The registered test of 'is a language model' (mean loss on `membership.txt` over ln of the vocabulary; at most 0.9 passes)", ["system", "tokens", "mean loss (nats)", "ln V", "fraction"], rows)
 
 # ------------------------------------------------------------------ kinematics, Llama family

@@ -1,16 +1,17 @@
-# Batch 0023, graded (claims: 119; as predicted 118, REFUTED 1, not run 0; controls: 19 of 19 hold)
+# Batch 0023, graded (claims: 102; as predicted 101, REFUTED 1, not run 0; controls: 13 of 13 hold; inclusion test: 8 of 8 checkpoints pass)
+
+Claims about a named checkpoint: 44, of which as predicted 43, REFUTED 1, not run 0. Claims about the finite instance or the conformance harness: 58, of which as predicted 58, REFUTED 0, not run 0.
 
 | group | as predicted | REFUTED | not run |
 |---|---|---|---|
 | causal structure | 1 | 0 | 0 |
-| conformance power | 41 | 0 | 0 |
+| conformance power | 33 | 0 | 0 |
 | conversation | 3 | 0 | 0 |
 | dimension | 9 | 0 | 0 |
 | discrete symmetries | 4 | 0 | 0 |
 | kinematics | 25 | 1 | 0 |
-| language model | 8 | 0 | 0 |
 | optimizers | 12 | 0 | 0 |
-| outside the proved class | 12 | 0 | 0 |
+| outside the proved class | 11 | 0 | 0 |
 | runtimes | 3 | 0 | 0 |
 
 | id | group | severity | status | detail |
@@ -20,7 +21,7 @@
 | R2b | dimension | high | as predicted | ok: cov/rank/variants/delta/*/deficiency: [26, 26, 26, 26], 26 was predicted; ok: cov/rank/variants/delta/*: smallest gap 6.49e+09, at least 1e+06 was required |
 | R2c | dimension | high | as predicted | ok: cov/rank/variants/theta+delta/*/deficiency: [28, 28, 28, 28], 28 was predicted; ok: cov/rank/variants/theta+delta/*: smallest gap 5.75e+09, at least 1e+06 was required |
 | R3 | dimension | moderate | as predicted | ok: cov/rank/variants/posdep/*/deficiency: [62, 62, 62, 62], 62 was predicted; ok: cov/rank/variants/posdep/*: smallest gap 6.16e+09, at least 1e+06 was required |
-| R4 | dimension | moderate | as predicted | ok: cov/rank/constrained/*/function_difference: largest 1.05e-15, at most 1e-12 was predicted; ok: cov/rank/constrained/*/deficiency_covariant: [62, 62, 62, 62], 62 was predicted; ok: cov/rank/constrained/*/intersection: [26, 26, 26, 26], 26 was predicted; ok: cov/rank/constrained/*/deficiency_special: [26, 26, 26, 26], 26 was predicted |
+| R4 | dimension | moderate | as predicted | ok: cov/rank/constrained/*/function_difference: largest 1.05e-15, at most 1e-12 was predicted; ok: cov/rank/constrained/*/deficiency_covariant: [62, 62, 62, 62], 62 was predicted |
 | R5a | dimension | low | as predicted | ok: cov/vocab/V_at_most_d/*/extra: smallest 2, at least 1 was predicted |
 | R5b | dimension | low | as predicted | ok: cov/vocab/V_larger_than_d/*/extra: [0, 0, 0, 0], 0 was predicted |
 | R6 | causal structure | low | as predicted | ok: cov/causal/*/largest_dependence_on_a_later_position: largest 0, at most 1e-14 was predicted; ok: cov/causal/*/smallest_dependence_on_an_earlier_or_equal_position: smallest 0.133, at least 1e-08 was predicted |
@@ -43,7 +44,6 @@
 | MUT-M04 | conformance power | high | as predicted | ok: mutate/mutants/M04/detected: [True], True was predicted |
 | MUT-M05 | conformance power | high | as predicted | ok: mutate/mutants/M05/detected: [True], True was predicted |
 | MUT-M06 | conformance power | high | as predicted | ok: mutate/mutants/M06/detected: [True], True was predicted |
-| MUT-M07 | conformance power | moderate | as predicted | ok: mutate/mutants/M07/detected: [False], False was predicted |
 | MUT-M08 | conformance power | high | as predicted | ok: mutate/mutants/M08/detected: [True], True was predicted |
 | MUT-M09 | conformance power | high | as predicted | ok: mutate/mutants/M09/detected: [True], True was predicted |
 | MUT-M10 | conformance power | high | as predicted | ok: mutate/mutants/M10/detected: [True], True was predicted |
@@ -70,58 +70,42 @@
 | MUT-G08 | conformance power | high | as predicted | ok: mutate/mutants/G08/detected: [True], True was predicted |
 | MUT-G09 | conformance power | high | as predicted | ok: mutate/mutants/G09/detected: [True], True was predicted |
 | MUT-G10 | conformance power | high | as predicted | ok: mutate/mutants/G10/detected: [True], True was predicted |
-| MUT-G11 | conformance power | moderate | as predicted | ok: mutate/mutants/G11/detected: [False], False was predicted |
-| MUT-G12 | conformance power | moderate | as predicted | ok: mutate/mutants/G12/detected: [False], False was predicted |
 | MUT-H01 | conformance power | high | as predicted | ok: mutate/mutants/H01/detected: [True], True was predicted |
-| MUT-H02 | conformance power | moderate | as predicted | ok: mutate/mutants/H02/detected: [False], False was predicted |
-| MUT-B01 | conformance power | moderate | as predicted | ok: mutate/mutants/B01/detected: [False], False was predicted |
-| MUT-B02 | conformance power | moderate | as predicted | ok: mutate/mutants/B02/detected: [False], False was predicted |
-| MUT-B03 | conformance power | moderate | as predicted | ok: mutate/mutants/B03/detected: [False], False was predicted |
-| MUT-B04 | conformance power | moderate | as predicted | ok: mutate/mutants/B04/detected: [False], False was predicted |
 | B1 | runtimes | high | as predicted | ok: bridge-torch/float64/relative_difference: largest 2.14e-16, at most 1e-10 was predicted; ok: bridge-torch/float64/argmax_agreement: smallest 1, at least 1 was predicted |
 | B2 | runtimes | moderate | as predicted | ok: bridge-torch/float32/relative_difference: largest 1.24e-07, at most 1e-05 was predicted; ok: bridge-torch/float32/argmax_agreement: smallest 1, at least 0.999 was predicted |
 | B3 | runtimes | moderate | as predicted | ok: bridge-candle/candle_float32/relative_difference: largest 1.33e-07, at most 1e-05 was predicted; ok: bridge-candle/candle_float32/argmax_agreement: smallest 1, at least 0.999 was predicted |
-| S0-smol-instruct | language model | high | as predicted | ok: systems-smol-instruct/membership/fraction_of_ln_vocabulary: largest 0.179, at most 0.9 was predicted |
 | K1-smol-instruct | kinematics | high | as predicted | ok: systems-smol-instruct/translation/*/largest: largest 5.39e-15, at most 1e-06 was predicted |
 | K2-smol-instruct | kinematics | high | as predicted | ok: systems-smol-instruct/phase/logits/largest: largest 4.84e-15, at most 1e-06 was predicted; ok: systems-smol-instruct/phase/keys_of_the_gauged_model_against_the_original_at_the_shifted_positions/largest: largest 2.82e-15, at most 1e-06 was predicted |
 | K3-smol-instruct | kinematics | high | as predicted | ok: systems-smol-instruct/dilation/*/smallest: smallest 0.168, at least 0.001 was predicted |
 | K5-smol-instruct | kinematics | high | as predicted | ok: systems-smol-instruct/rotation/logits/largest: largest 9.13e-15, at most 1e-06 was predicted; ok: systems-smol-instruct/rotation/stream_equals_the_original_times_Q_transpose/largest: largest 1.11e-14, at most 1e-06 was predicted; ok: systems-smol-instruct/rotation/gram_matrix_of_every_layer/largest: largest 1.03e-14, at most 1e-06 was predicted; ok: systems-smol-instruct/rotation/stream_moved_ |
-| S0-smol-base | language model | high | as predicted | ok: systems-smol-base/membership/fraction_of_ln_vocabulary: largest 0.183, at most 0.9 was predicted |
 | K1-smol-base | kinematics | high | as predicted | ok: systems-smol-base/translation/*/largest: largest 3.45e-15, at most 1e-06 was predicted |
 | K2-smol-base | kinematics | high | as predicted | ok: systems-smol-base/phase/logits/largest: largest 3.32e-15, at most 1e-06 was predicted; ok: systems-smol-base/phase/keys_of_the_gauged_model_against_the_original_at_the_shifted_positions/largest: largest 2.85e-15, at most 1e-06 was predicted |
 | K3-smol-base | kinematics | high | as predicted | ok: systems-smol-base/dilation/*/smallest: smallest 0.1, at least 0.001 was predicted |
 | K5-smol-base | kinematics | high | as predicted | ok: systems-smol-base/rotation/logits/largest: largest 4.11e-14, at most 1e-06 was predicted; ok: systems-smol-base/rotation/stream_equals_the_original_times_Q_transpose/largest: largest 1.91e-14, at most 1e-06 was predicted; ok: systems-smol-base/rotation/gram_matrix_of_every_layer/largest: largest 3.3e-14, at most 1e-06 was predicted; ok: systems-smol-base/rotation/stream_moved_at_the_embedding/ |
-| S0-floatlm-99m | language model | high | as predicted | ok: systems-floatlm-99m/membership/fraction_of_ln_vocabulary: largest 0.24, at most 0.9 was predicted |
 | K1-floatlm-99m | kinematics | high | as predicted | ok: systems-floatlm-99m/translation/*/largest: largest 9.2e-16, at most 1e-06 was predicted |
 | K2-floatlm-99m | kinematics | high | as predicted | ok: systems-floatlm-99m/phase/logits/largest: largest 1.08e-15, at most 1e-06 was predicted; ok: systems-floatlm-99m/phase/keys_of_the_gauged_model_against_the_original_at_the_shifted_positions/largest: largest 2.58e-15, at most 1e-06 was predicted |
 | K3-floatlm-99m | kinematics | high | as predicted | ok: systems-floatlm-99m/dilation/*/smallest: smallest 0.0156, at least 0.001 was predicted |
 | K5-floatlm-99m | kinematics | high | as predicted | ok: systems-floatlm-99m/rotation/logits/largest: largest 1.32e-14, at most 1e-06 was predicted; ok: systems-floatlm-99m/rotation/stream_equals_the_original_times_Q_transpose/largest: largest 1.83e-14, at most 1e-06 was predicted; ok: systems-floatlm-99m/rotation/gram_matrix_of_every_layer/largest: largest 4.19e-15, at most 1e-06 was predicted; ok: systems-floatlm-99m/rotation/stream_moved_at_the_e |
-| S0-trilm-99m | language model | high | as predicted | ok: systems-trilm-99m/membership/fraction_of_ln_vocabulary: largest 0.276, at most 0.9 was predicted |
 | K1-trilm-99m | kinematics | high | as predicted | ok: systems-trilm-99m/translation/*/largest: largest 1.53e-15, at most 1e-06 was predicted |
 | K2-trilm-99m | kinematics | high | as predicted | ok: systems-trilm-99m/phase/logits/largest: largest 1.57e-15, at most 1e-06 was predicted; ok: systems-trilm-99m/phase/keys_of_the_gauged_model_against_the_original_at_the_shifted_positions/largest: largest 1.37e-15, at most 1e-06 was predicted |
 | K3-trilm-99m | kinematics | high | as predicted | ok: systems-trilm-99m/dilation/*/smallest: smallest 0.0874, at least 0.001 was predicted |
 | K5-trilm-99m | kinematics | high | as predicted | ok: systems-trilm-99m/rotation/logits/largest: largest 3.38e-15, at most 1e-06 was predicted; ok: systems-trilm-99m/rotation/stream_equals_the_original_times_Q_transpose/largest: largest 2.83e-15, at most 1e-06 was predicted; ok: systems-trilm-99m/rotation/gram_matrix_of_every_layer/largest: largest 4.5e-15, at most 1e-06 was predicted; ok: systems-trilm-99m/rotation/stream_moved_at_the_embedding/ |
-| S0-delphi-100k | language model | high | as predicted | ok: systems-delphi-100k/membership/fraction_of_ln_vocabulary: largest 0.25, at most 0.9 was predicted |
 | K1-delphi-100k | kinematics | high | as predicted | ok: systems-delphi-100k/translation/*/largest: largest 1.53e-15, at most 1e-06 was predicted |
 | K2-delphi-100k | kinematics | high | as predicted | ok: systems-delphi-100k/phase/logits/largest: largest 1.35e-15, at most 1e-06 was predicted; ok: systems-delphi-100k/phase/keys_of_the_gauged_model_against_the_original_at_the_shifted_positions/largest: largest 9.29e-16, at most 1e-06 was predicted |
 | K3-delphi-100k | kinematics | high | as predicted | ok: systems-delphi-100k/dilation/*/smallest: smallest 0.0961, at least 0.001 was predicted |
 | K5-delphi-100k | kinematics | high | as predicted | ok: systems-delphi-100k/rotation/logits/largest: largest 2.46e-15, at most 1e-06 was predicted; ok: systems-delphi-100k/rotation/stream_equals_the_original_times_Q_transpose/largest: largest 4.65e-15, at most 1e-06 was predicted; ok: systems-delphi-100k/rotation/gram_matrix_of_every_layer/largest: largest 2.69e-15, at most 1e-06 was predicted; ok: systems-delphi-100k/rotation/stream_moved_at_the_e |
-| Q0 | language model | high | as predicted | ok: outside-qwen3-0.6b/membership/fraction_of_ln_vocabulary: largest 0.175, at most 0.9 was predicted |
 | Q1 | kinematics | high | as predicted | ok: outside-qwen3-0.6b/translation/*/largest: largest 1.01e-14, at most 1e-06 was predicted |
 | Q2 | outside the proved class | high | as predicted | ok: outside-qwen3-0.6b/phase/logits/smallest: smallest 0.475, at least 0.001 was predicted |
 | Q3 | outside the proved class | high | as predicted | ok: outside-qwen3-0.6b/qk_norm_transformations/T1_scalar_pair_per_group_and_plane/smallest: smallest 0.397, at least 0.001 was predicted |
 | Q4 | outside the proved class | high | as predicted | ok: outside-qwen3-0.6b/qk_norm_transformations/T2_rotation_of_a_plane_on_keys_and_queries/smallest: smallest 0.603, at least 0.001 was predicted |
 | Q5 | outside the proved class | high | as predicted | ok: outside-qwen3-0.6b/qk_norm_transformations/T3_positive_scalar_on_one_query_head/largest: largest 7.02e-06, at most 0.0001 was predicted |
 | Q6 | outside the proved class | high | as predicted | ok: outside-qwen3-0.6b/qk_norm_transformations/T4_scalar_moved_from_the_query_gain_to_the_key_gain/largest: largest 1.09e-14, at most 1e-06 was predicted |
-| Q7 | outside the proved class | moderate | as predicted | ok: outside-qwen3-0.6b/qk_norm_transformations/T2_with_the_angles_of_a_shift_of_16_positions/smallest: smallest 0.475, at least 0.001 was predicted |
 | Q8 | kinematics | high | as predicted | ok: outside-qwen3-0.6b/dilation/*/smallest: smallest 0.179, at least 0.001 was predicted |
 | Q9 | kinematics | high | as predicted | ok: outside-qwen3-0.6b/rotation/logits/largest: largest 2.01e-14, at most 1e-06 was predicted; ok: outside-qwen3-0.6b/rotation/stream_equals_the_original_times_Q_transpose/largest: largest 3.27e-14, at most 1e-06 was predicted; ok: outside-qwen3-0.6b/rotation/gram_matrix_of_every_layer/largest: largest 4.2e-14, at most 1e-06 was predicted; ok: outside-qwen3-0.6b/rotation/stream_moved_at_the_embedd |
-| G0 | language model | high | as predicted | ok: outside-gpt2/membership/fraction_of_ln_vocabulary: largest 0.23, at most 0.9 was predicted |
 | G1 | outside the proved class | high | as predicted | ok: outside-gpt2/layernorm_transformations/L1_all_ones_added_to_the_outputs_of_the_two_output_projections/largest: largest 2.73e-15, at most 1e-06 was predicted |
 | G2 | outside the proved class | high | as predicted | ok: outside-gpt2/layernorm_transformations/L2_dual_shift_of_the_readers_of_the_two_layernorms/largest: largest 1.21e-14, at most 1e-06 was predicted |
 | G3 | outside the proved class | high | as predicted | ok: outside-gpt2/layernorm_transformations/L3_embedding_rows_of_five_tokens_shifted/unshifted_columns_largest: largest 0, at most 1e-06 was predicted; ok: outside-gpt2/layernorm_transformations/L3_embedding_rows_of_five_tokens_shifted/shifted_columns_against_prediction_largest: largest 9.35e-16, at most 1e-06 was predicted |
 | G4 | kinematics | high | as predicted | ok: outside-gpt2/absolute_positions/*/smallest: smallest 0.361, at least 0.001 was predicted |
-| P0 | language model | high | as predicted | ok: outside-pythia-160m/membership/fraction_of_ln_vocabulary: largest 0.228, at most 0.9 was predicted |
 | P1 | kinematics | high | as predicted | ok: outside-pythia-160m/translation/*/largest: largest 1.89e-15, at most 1e-06 was predicted |
 | P2 | kinematics | high | REFUTED | FAILS: outside-pythia-160m/dilation/*/smallest: smallest 0.00095, at least 0.001 was predicted |
 | P3 | outside the proved class | high | as predicted | ok: outside-pythia-160m/layernorm_transformations/writer_shift/largest: largest 1.55e-15, at most 1e-06 was predicted |
@@ -139,22 +123,29 @@
 
 | control | status |
 |---|---|
-| control smol-instruct: the same forward pass twice gives the same logits (1e-12) | holds |
 | control smol-instruct: the rotation without the fold is not a symmetry (at least 1e-3) | holds |
 | control smol-instruct: the shift of 16 positions moves the cache of keys (mean over layers at least 0.1) | holds |
-| control smol-base: the same forward pass twice gives the same logits (1e-12) | holds |
 | control smol-base: the rotation without the fold is not a symmetry (at least 1e-3) | holds |
 | control smol-base: the shift of 16 positions moves the cache of keys (mean over layers at least 0.1) | holds |
-| control floatlm-99m: the same forward pass twice gives the same logits (1e-12) | holds |
 | control floatlm-99m: the rotation without the fold is not a symmetry (at least 1e-3) | holds |
 | control floatlm-99m: the shift of 16 positions moves the cache of keys (mean over layers at least 0.1) | holds |
-| control trilm-99m: the same forward pass twice gives the same logits (1e-12) | holds |
 | control trilm-99m: the rotation without the fold is not a symmetry (at least 1e-3) | holds |
 | control trilm-99m: the shift of 16 positions moves the cache of keys (mean over layers at least 0.1) | holds |
-| control delphi-100k: the same forward pass twice gives the same logits (1e-12) | holds |
 | control delphi-100k: the rotation without the fold is not a symmetry (at least 1e-3) | holds |
 | control delphi-100k: the shift of 16 positions moves the cache of keys (mean over layers at least 0.1) | holds |
-| control the finite instance is rejected by the registered test of 'is a language model' (fraction above 0.9) | holds |
 | control chat Qwen3: the variant with the permutation applied to the layers but not to the embedding gives different tokens (tool call) | holds |
 | control chat Qwen3: the broken variant gives different tokens (conversation) | holds |
 | control chat SmolLM2: the broken variant gives different tokens | holds |
+
+## Inclusion test of the checkpoints (not claims)
+
+| checkpoint | status |
+|---|---|
+| inclusion HuggingFaceTB/SmolLM2-135M-Instruct @12fd25f: mean loss on membership.txt at most 0.9 ln(vocabulary) | holds |
+| inclusion HuggingFaceTB/SmolLM2-135M @93efa2f: mean loss on membership.txt at most 0.9 ln(vocabulary) | holds |
+| inclusion SpectraSuite/FloatLM_99M @0516fbe: mean loss on membership.txt at most 0.9 ln(vocabulary) | holds |
+| inclusion SpectraSuite/TriLM_99M_Unpacked @61cd2c7: mean loss on membership.txt at most 0.9 ln(vocabulary) | holds |
+| inclusion delphi-suite/v0-llama2-100k @c1372fb: mean loss on membership.txt at most 0.9 ln(vocabulary) | holds |
+| inclusion Qwen/Qwen3-0.6B @c1899de: mean loss on membership.txt at most 0.9 ln(vocabulary) | holds |
+| inclusion openai-community/gpt2 @607a30d: mean loss on membership.txt at most 0.9 ln(vocabulary) | holds |
+| inclusion EleutherAI/pythia-160m @50f5173: mean loss on membership.txt at most 0.9 ln(vocabulary) | holds |

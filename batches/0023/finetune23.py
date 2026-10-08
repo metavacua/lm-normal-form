@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Batch 0023, the Hole argument of training on language models. Two weight vectors that the gauge group relates are the same function. Fine-tune a language model from each of them with the standard
+# Batch 0023, the equivariance of fine-tuning under the equivalence transformations, on language models. Two weight vectors that the gauge group relates are the same function. Fine-tune a language model from each of them with the standard
 # optimizers of PyTorch (torch.optim.SGD, torch.optim.AdamW without weight decay), in float64, on the same ten steps of the same eight short texts, norm weights frozen: if the optimizer respects the
 # transformation, the two runs stay the same function; if it does not, they part. Batch 0015 (Q17) did this on a random Llama of 32 hidden units; here the checkpoints are SmolLM2-135M-Instruct and
 # delphi-suite/v0-llama2-100k. The reference is the checkpoint with its norm weights folded and its head untied (the base on which rotations of the stream are exact); the variants are a signed permutation

@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Batch 0023, first steps toward a general covariant version of the theory. Measurements only (the verdicts are in grade23.py, which was committed before the run): no number here is compared
+# Batch 0023, the dimension of the group of the finite instance and of four models that change what is absolute in its position structure. Measurements only (the verdicts are in grade23.py): no number here is compared
 # with anything.
 #   rank      the dimension of the group of the function, as the rank deficiency of the Jacobian of the function with respect to the parameters (batch 0015's method), of the finite instance
 #             (finite23.py) and of four models that change what is absolute in its position structure:
@@ -8,10 +8,10 @@
 #               theta        the frequencies of the rotary planes are parameters of each layer
 #               delta        the position of token t is the proper time tau_t = sum over i < t of exp(b + w . x_i) (x_i the normalized input of the layer), with b and w parameters; the frequencies fixed
 #               theta+delta  both are parameters: the angle of plane p at token t is theta_p tau_t
-#               posdep       the queries and the keys have their own projection at every position and there is no rotary embedding: the covariant form of the attention of which the rotary table is a
+#               posdep       the queries and the keys have their own projection at every position and there is no rotary embedding: the position-dependent form of the attention of which the rotary table is a
 #                            constraint (q_t = R_t W_q x_t is the point of this model at which W_t = R_t W)
-#   constrained  at the point of `posdep` that is the image iota(theta) of a point theta of the special model (W_t = R_t W), the dimension of the fibre of the covariant model, and the dimension of its
-#                intersection with the tangent space of the image of iota, which is the fibre of the special model: the group of the special theory as the stabilizer of the constraint
+#   constrained  at the point of `posdep` that is the image iota(theta) of a point theta of the special model (W_t = R_t W), the dimension of the fibre of the position-dependent model, and the dimension of its
+#                intersection with the tangent space of the image of iota (iota is injective and the function of the special model is the function of the position-dependent model composed with iota, so by the chain rule this intersection is the fibre of the special model: it is recorded, not a separate measurement)
 #   vocab        the same count for models whose vocabulary is at most, or larger than, the hidden size (the first layer of a model with at most d tokens has extra symmetries: found in the pilot of this
 #                batch, see docs/batches/0023.md)
 #   causal       the dependency structure of the computation: which input positions of a layer, and of the whole stack, the output at each position depends on, by the Jacobian of the stream
@@ -102,7 +102,7 @@ def rank_experiment(seeds):
         J_c = jacobian(th_c, spec_c, groups, a, ops)
         Uc, sc, Vt = np.linalg.svd(J_c, full_matrices=True)
         r = int((sc > sc[0] * TOL).sum())
-        K = Vt[r:].T                                                                     # the fibre of the covariant model at the point: an orthonormal basis (n_c, k)
+        K = Vt[r:].T                                                                     # the fibre of the position-dependent model at the point: an orthonormal basis (n_c, k)
         rd = int(np.linalg.matrix_rank(D, tol=TOL * np.linalg.norm(D, 2)))
         rk = int(np.linalg.matrix_rank(np.hstack([K, D]), tol=TOL * np.linalg.norm(np.hstack([K, D]), 2)))
         inter = K.shape[1] + rd - rk
