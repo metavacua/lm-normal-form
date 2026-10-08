@@ -26,12 +26,15 @@ def headPerm (L : Layer K d hv nu Hh Gr P) (σ : Equiv.Perm Hh) (τ : Equiv.Perm
     Wk := fun g p => L.Wk (τ g) p
     Wv := fun g => L.Wv (τ g) }
 
+/-- Definitional: unfolds `headPerm` and `qv`. -/
 theorem qv_head (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (σ : Equiv.Perm Hh) (τ : Equiv.Perm Gr)
     (h : St K T d) (t : Fin T) (hd : Hh) (p : P) : qv E (headPerm L σ τ) h t hd p = qv E L h t (σ hd) p := rfl
 
+/-- Definitional: unfolds `headPerm` and `kv`. -/
 theorem kv_head (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (σ : Equiv.Perm Hh) (τ : Equiv.Perm Gr)
     (h : St K T d) (s : Fin T) (g : Gr) (p : P) : kv E (headPerm L σ τ) h s g p = kv E L h s (τ g) p := rfl
 
+/-- Definitional: unfolds `headPerm` and `vv`. -/
 theorem vv_head (E : Env K T Hh Gr P) (L : Layer K d hv nu Hh Gr P) (σ : Equiv.Perm Hh) (τ : Equiv.Perm Gr)
     (h : St K T d) (s : Fin T) (g : Gr) : vv E (headPerm L σ τ) h s g = vv E L h s (τ g) := rfl
 

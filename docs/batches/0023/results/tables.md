@@ -10,7 +10,6 @@
 | Qwen3-0.6B | 113 | 2.084 | 11.931 | 0.175 |
 | GPT-2 (124M) | 114 | 2.495 | 10.825 | 0.230 |
 | Pythia-160M | 114 | 2.465 | 10.826 | 0.228 |
-| the finite instance (control; uniformly random sequences of its 5 symbols) |  | 1.696 | 1.609 | 1.054 |
 
 ### Kinematics of the Llama family, float64 (relative differences of the scores; ≤ 1e-6 is exact in the sense of the claims)
 

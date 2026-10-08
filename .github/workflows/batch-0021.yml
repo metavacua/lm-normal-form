@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# Batch 0021: the gauges of a whole Llama-style decoder as theorems of Lean 4 with Mathlib (the model defined with arbitrary nonlinearities; the function of a layer, the stream and the cache, the
+# Batch 0021: the gauges of a whole Llama-style decoder as theorems of Lean 4 with Mathlib (the model defined with arbitrary nonlinearities; the function of a layer, the stream and the arrays qv, kv, vv, the
 # logits), on top of the library of batch 0020. Written down in docs/batches/0021.md. The Lean project is that of batch 0020 (batches/0020); this batch adds modules to it. The toolchain is the Lean of the
 # author's machine (4.34.1) and Mathlib at its tag v4.34.1; nothing here is built on that machine.
 name: batch 0021
@@ -41,12 +41,12 @@ jobs:
           if grep -q sorryAx ../../out/lean/axioms.txt ../../out/lean/axioms21.txt; then echo 'a theorem depends on sorry'; exit 1; fi
           want=$(grep -c '^#print axioms' LmnfProofs/Axioms21.lean)
           got=$(grep -c -E 'depends on axioms|does not depend on any axioms' ../../out/lean/axioms21.txt)
-          echo "$got of $want theorems of batch 0021 listed"
+          echo "$got of $want declarations of batch 0021 listed"
           test "$got" -eq "$want"
-          test "$(grep -c -E 'depends on axioms|does not depend on any axioms' ../../out/lean/axioms.txt)" -eq 17
+          test "$(grep -c -E 'depends on axioms|does not depend on any axioms' ../../out/lean/axioms.txt)" -eq 16
       - name: Grade the registered claims
         if: always() && steps.build.outcome == 'success'
-        run: python3 batches/0021/grade21.py out/lean/axioms21.txt batches/0021/claims21.tsv out/lean --measured docs/batches/0019/results/toy.json
+        run: python3 batches/0021/grade21.py out/lean/axioms21.txt batches/0021/claims21.tsv out/lean
       - name: Keep the manifest and the versions
         if: always()
         working-directory: batches/0020

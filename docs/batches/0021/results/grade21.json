@@ -1,5 +1,5 @@
 {
- "theorems_listed": 71,
+ "declarations_listed": 71,
  "claims": [
   {
    "id": "F1",
@@ -179,28 +179,6 @@
   },
   {
    "id": "K4",
-   "theorem": "qv_ov",
-   "kind": "cache",
-   "status": "accepted",
-   "axioms": [
-    "propext",
-    "Classical.choice",
-    "Quot.sound"
-   ]
-  },
-  {
-   "id": "K5",
-   "theorem": "kv_ov",
-   "kind": "cache",
-   "status": "accepted",
-   "axioms": [
-    "propext",
-    "Classical.choice",
-    "Quot.sound"
-   ]
-  },
-  {
-   "id": "K6",
    "theorem": "vv_ov",
    "kind": "cache",
    "status": "accepted",
@@ -211,7 +189,7 @@
    ]
   },
   {
-   "id": "K7",
+   "id": "K5",
    "theorem": "qv_qk",
    "kind": "cache",
    "status": "accepted",
@@ -222,7 +200,7 @@
    ]
   },
   {
-   "id": "K8",
+   "id": "K6",
    "theorem": "kv_qk",
    "kind": "cache",
    "status": "accepted",
@@ -233,51 +211,7 @@
    ]
   },
   {
-   "id": "K9",
-   "theorem": "vv_qk",
-   "kind": "cache",
-   "status": "accepted",
-   "axioms": [
-    "propext",
-    "Classical.choice",
-    "Quot.sound"
-   ]
-  },
-  {
-   "id": "K10",
-   "theorem": "qv_head",
-   "kind": "cache",
-   "status": "accepted",
-   "axioms": [
-    "propext",
-    "Classical.choice",
-    "Quot.sound"
-   ]
-  },
-  {
-   "id": "K11",
-   "theorem": "kv_head",
-   "kind": "cache",
-   "status": "accepted",
-   "axioms": [
-    "propext",
-    "Classical.choice",
-    "Quot.sound"
-   ]
-  },
-  {
-   "id": "K12",
-   "theorem": "vv_head",
-   "kind": "cache",
-   "status": "accepted",
-   "axioms": [
-    "propext",
-    "Classical.choice",
-    "Quot.sound"
-   ]
-  },
-  {
-   "id": "K13",
+   "id": "K7",
    "theorem": "qv_attnNorm",
    "kind": "cache",
    "status": "accepted",
@@ -288,7 +222,7 @@
    ]
   },
   {
-   "id": "K14",
+   "id": "K8",
    "theorem": "kv_attnNorm",
    "kind": "cache",
    "status": "accepted",
@@ -299,7 +233,7 @@
    ]
   },
   {
-   "id": "K15",
+   "id": "K9",
    "theorem": "vv_attnNorm",
    "kind": "cache",
    "status": "accepted",
@@ -409,10 +343,5 @@
    ]
   }
  ],
- "all_claims_accepted": true,
- "crosscheck": {
-  "comparisons": 224,
-  "differences": 0,
-  "diffs": []
- }
+ "all_claims_accepted": true
 }

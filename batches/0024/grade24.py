@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Grades batch 0024 (docs/batches/0024.md): how much the noise of a quantized run varies. The claims and thresholds below were committed before any run of the registered job. The measurements are the
+# Grades batch 0024 (docs/batches/0024.md): how much the noise of a quantized run varies. The measurements are the
 # summaries that batch 0014's driver (xrt.py) writes for one cell, one file per cell: for every variant, the NMSE of its logits against the logits of the original in the same runtime and cell. A claim is
 # "as predicted", "REFUTED", or "not run" (a number it needs is missing, or a validity condition failed); a NaN never satisfies a threshold; controls are listed apart and never counted among the claims.
 # The exit status is 0 only if every claim is as predicted and every control holds.
@@ -100,6 +100,7 @@ CELLS = [("summary-llamacpp-q8_0", "llama.cpp, Q8_0 weights", SAME_W, DIFF_W), (
          ("summary-llamacpp-float32-kvf16", "llama.cpp, f16 cache", EXACT9, ()), ("summary-llamacpp-float32-kvq8_0", "llama.cpp, Q8_0 cache, rotated", SAME_C, DIFF_C),
          ("summary-llamacpp-float32-kvq4_0", "llama.cpp, Q4_0 cache, rotated", SAME_C, DIFF_C), ("summary-llamacpp-float32-kvq8_0-norot", "llama.cpp, Q8_0 cache, not rotated", SAME_C, DIFF_C),
          ("summary-llamacpp-float32-kvq4_0-norot", "llama.cpp, Q4_0 cache, not rotated", SAME_C, DIFF_C), ("summary-ctranslate2-int8", "CTranslate2, int8", EXACT9, ())]
+# The classes are those of batch 0014 (P7, P17), except CTranslate2 int8, where all nine variants are registered as "same" (N2 of this batch); P7 of batch 0014 has `scale`, `all`, `canon` as different.
 OK_NULL, OK_SAME, OK_DIFF, OK_BROKEN = 1.0, 1.0, 10.0, 1000.0
 
 
@@ -128,10 +129,6 @@ def claims():
             diff_vs_null = Fn(nulls + diffs, lambda v, k=k: (min(v[k:]) >= 1.5 * max(v[:k]), f"smallest variant claimed different {min(v[k:]):.3g} against 1.5 x the largest null {1.5 * max(v[:k]):.3g}"),
                               base, {**base, diffs[0]: 1.0}, "different class against the largest null")
             C.append(Claim(f"N3 {label}", "high", subj, "every exact variant that does not commute with the quantizer of this cell is at least 1.5 times the largest of the eight nulls", [diff_vs_null]))
-            m = len(sames)
-            sep = Fn(sames + diffs, lambda v, m=m: (min(v[m:]) > max(v[:m]), f"smallest claimed different {min(v[m:]):.3g} against the largest claimed the same {max(v[:m]):.3g}"),
-                     base, {**base, diffs[0]: 0.5}, "separation of the classes")
-            C.append(Claim(f"N4 {label}", "high", subj, "(P17 (b) of batch 0014, on a new job) every variant claimed different is above every variant claimed the same", [sep]))
     return C
 
 

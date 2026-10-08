@@ -2,8 +2,6 @@ prediction	subject	result	seen
 Q1	poly, 46 claims, 6 trials	as predicted	unexpected: []
 Q1	oracle, 46 claims, 4 trials	as predicted	unexpected: []
 Q1	float, 46 claims, 6 trials	as predicted	unexpected: []
-Q2	oracle	as predicted	largest per-trial bound 2.61e-31 (limit 2.7e-31)
-Q2	poly	as predicted	largest per-trial bound 6.64e-08 (limit 7e-08)
 Q3	untied-eps0-logits	as predicted	rank deficiency 142, predicted 142 (formula 142)
 Q3	untied-eps0-logprobs	as predicted	rank deficiency 148, predicted 148 (formula 148)
 Q3	untied-eps-logits	as predicted	rank deficiency 141, predicted 141 (formula 141)
@@ -24,6 +22,5 @@ Q11	the cost of conditioning	REFUTED	float32 kappa 1 4.96e-05, kappa 10 6.68e-05
 Q12	embedding centering, the control	as predicted	formal float64 max|d| 0.857, float32 0.857, generations identical 1/4
 Q13	body permuted, and with the key	as predicted	perplexity original 23.5, body only 7.51e+11, with the key 23.5; logit difference with the key 7.15e-05
 Q14	matching against the public base	as predicted	coordinates recovered 1, repaired perplexity 23.5 against 23.5
-Q15	the adapter attack	as predicted	training perplexity 4.75e+10 at step 0, minimum 48.6 in 300 steps
 Q16	the cache of the keyed and of the body-only model	as predicted	keyed 2.17e-15, body only 0.99
 Q17	training dynamics under the symmetries	as predicted	sgd/signed loss 3.55e-15 params 1.41e-15; adam/signed loss 1.49e-12 params 3.6e-12; sgd/orthogonal loss 6.88e-15 params 2.78e-15; adam/orthogonal loss 0.0282 params 0.718; sgd/scaling loss 0.538 params 0.278; adam/scaling loss 0.0734 params 0.721

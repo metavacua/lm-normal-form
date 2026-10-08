@@ -1,0 +1,20 @@
+{
+  "features": [],
+  "format": "lmnf-identity-record",
+  "format_version": 1,
+  "min_reader_version": 1,
+  "min_writer_version": 1,
+  "producer": {
+    "name": "conformance/identity/1/derive.sh",
+    "version": "1"
+  },
+  "scheme": {
+    "canonicalization": {
+      "id": "lmnf-tensor",
+      "version": 1
+    },
+    "hash": {
+      "alg": "sha256"
+    }
+  }
+}

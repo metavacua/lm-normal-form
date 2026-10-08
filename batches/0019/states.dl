@@ -7,7 +7,9 @@
 //   expect(Gen, State, Class)   for each test generator Gen (a group element acting on the spaces of some kind), the class of the transformation that each state undergoes
 //                    (invariant, perm, signed_perm, monomial, complex_plane, orthogonal, gl), and allowed(Gen) / bad(Gen): whether the generator is inside the derived group.
 // The library at the top (the lattice of groups, the groups that a role allows, the dimension of each group) is the mathematics that the program takes as given; everything else is
-// computed from the facts. Stratified; the only negation is over relations that are complete when it is evaluated.
+// computed from the facts. The facts are inputs too: the role assignment (ir.py), the generator specifications (derive.py) and the shift of the logits (extra) are written by hand, and
+// "state st moves under generator g" is the incidence of the generator's space with the axes of the state. The program does not show that the list of generators is complete.
+// Stratified; the only negation is over relations that are complete when it is evaluated.
 
 .decl space(s:symbol, size:number, copies:number, kind:symbol)
 .input space
@@ -52,7 +54,7 @@ glb(a,b,c) :- lb(a,b,c), !above(a,b,c).
 compat("lin","GL").          // a space that enters a linear map: any invertible change, compensated in the map
 compat("bilinear","GL").     // a pairing q . k: A on one side, A^-T on the other
 compat("rmsnorm","O").       // the root mean square (epsilon > 0)
-compat("rmsnorm0","CO").     // the root mean square with epsilon = 0: also a positive scale
+compat("rmsnorm0","CO").     // the root mean square with epsilon = 0: also a positive scale (measured by batch 0015's rank; not proved in Lean)
 compat("rope","Cplx").       // the rotary embedding: what commutes with the rotations of the planes
 compat("nl","Perm").         // an elementwise nonlinearity
 compat("mono","Mono").       // an elementwise product with a linear branch: scalings and permutations

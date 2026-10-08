@@ -1,8 +1,8 @@
 # SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# Batch 0019: which states move under the symmetries of a Transformer: the residual stream, the KV cache and the rest, derived by a Datalog program (Souffle) from the reified
-# architecture and measured on the weights. Written down in docs/batches/0019.md.
+# Batch 0019: which states move under the symmetries of a Transformer: the residual stream, the KV cache and the rest, computed by a Datalog program (Souffle) from the reified
+# architecture and a hand-written library of groups, and measured on the weights. Written down in docs/batches/0019.md.
 #
 # derive  on every push: the library checks, the dimension of the gauge group of the seven configurations of batch 0015, the toy models (derived table against measured table), and
 #         the four pinned checkpoints read from their published metadata (config and safetensors header; no weights).
@@ -88,7 +88,7 @@ jobs:
   real:
     name: "02 SmolLM2-135M-Instruct: derived table against measured table"
     needs: derive
-    if: contains(github.event.head_commit.message, '[run]')
+    if: contains(github.event.head_commit.message, '[run]') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-22.04
     timeout-minutes: 240
     env:

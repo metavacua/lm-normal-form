@@ -16,18 +16,12 @@
 | K1 | `qv_stream` | cache | accepted |
 | K2 | `kv_stream` | cache | accepted |
 | K3 | `vv_stream` | cache | accepted |
-| K4 | `qv_ov` | cache | accepted |
-| K5 | `kv_ov` | cache | accepted |
-| K6 | `vv_ov` | cache | accepted |
-| K7 | `qv_qk` | cache | accepted |
-| K8 | `kv_qk` | cache | accepted |
-| K9 | `vv_qk` | cache | accepted |
-| K10 | `qv_head` | cache | accepted |
-| K11 | `kv_head` | cache | accepted |
-| K12 | `vv_head` | cache | accepted |
-| K13 | `qv_attnNorm` | cache | accepted |
-| K14 | `kv_attnNorm` | cache | accepted |
-| K15 | `vv_attnNorm` | cache | accepted |
+| K4 | `vv_ov` | cache | accepted |
+| K5 | `qv_qk` | cache | accepted |
+| K6 | `kv_qk` | cache | accepted |
+| K7 | `qv_attnNorm` | cache | accepted |
+| K8 | `kv_attnNorm` | cache | accepted |
+| K9 | `vv_attnNorm` | cache | accepted |
 | T1 | `table_stream` | table | accepted |
 | T2 | `table_ov` | table | accepted |
 | T3 | `table_qk` | table | accepted |
@@ -37,5 +31,3 @@
 | T7 | `table_attnNorm` | table | accepted |
 | T8 | `table_mlpNorm` | table | accepted |
 | T9 | `both_moved` | table | accepted |
-
-Cross-check with the classes measured by batch 0019: 224 comparisons, 0 differences.

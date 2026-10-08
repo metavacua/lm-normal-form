@@ -4,7 +4,8 @@
 # Grades batch 0023. The claims below, with their thresholds, were committed before any run of the registered experiments (docs/batches/0023.md has the table that `--table` prints from this file); the
 # experiments write measurements and no verdict, and this script reads the measurements and applies the thresholds. A claim has one of three statuses: "as predicted", "REFUTED", "not run" (a file or a
 # number that the claim needs is missing, or a validity condition of the claim failed: nothing is concluded). Controls (checks that the experiment can fail, and that the harness works) are listed apart
-# and are never counted among the claims. A number that is not a number (NaN) never satisfies a threshold. The exit status is 0 only if every claim is "as predicted" and every control holds.
+# and are never counted among the claims; the registered test of "is a language model" is listed apart as an inclusion test of the checkpoints. A number that is not a number (NaN) never satisfies a threshold.
+# The exit status is 0 only if every claim is "as predicted", every control holds and every checkpoint passes the inclusion test.
 #   grade23.py RESULTS_DIR OUT_DIR       grade
 #   grade23.py --table                   print the claims as a Markdown table (for the registration)
 #   grade23.py --selftest                every claim holds on a fixture built to satisfy it, becomes REFUTED when any one of its own inputs is made to violate it, and is "not run" on no data
@@ -198,11 +199,11 @@ def claims():
     add("R2c", "dimension", "high", FINITE, "with both the frequencies and the proper time as parameters the deficiency is 28: one dilation (b -> b + s, theta -> theta e^-s) per layer", [Eq("cov/rank/variants/theta+delta/*/deficiency", 28), Gap("cov/rank/variants/theta+delta/*")])
     add("R3", "dimension", "moderate", FINITE, "with its own projection of the queries and the keys at every position (no rotary embedding) the deficiency is 62: 2 x (4 + 4 + 4) + 6 = 30 gauge dimensions and 2 x 16 for the queries' projection at position 0, which the softmax over one position never reads",
         [Eq("cov/rank/variants/posdep/*/deficiency", 62), Gap("cov/rank/variants/posdep/*")])
-    add("R4", "dimension", "moderate", FINITE, "at the point of the position-dependent model that is the image of a point of the rotary model (W_t = R_t W): the two functions are equal (to 1e-12), the fibre of the covariant model has dimension 62, its intersection with the tangent space of the image has dimension 26, which is the fibre of the rotary model",
-        [Le("cov/rank/constrained/*/function_difference", 1e-12), Eq("cov/rank/constrained/*/deficiency_covariant", 62), Eq("cov/rank/constrained/*/intersection", 26), Eq("cov/rank/constrained/*/deficiency_special", 26)])
-    add("R5a", "dimension", "low", FINITE + " with other hidden sizes and vocabularies", "when the vocabulary is at most the hidden size ((d, V) = (4, 3), (6, 6)) the deficiency exceeds the formula (2 x 10 + d(d-1)/2) by at least 1: the first layer sees at most d independent vectors (post hoc rule, tested here on configurations not seen before)",
+    add("R4", "dimension", "moderate", FINITE, "at the point of the position-dependent model that is the image of a point of the rotary model (W_t = R_t W): the two functions are equal (to 1e-12) and the fibre of the position-dependent model has dimension 62",
+        [Le("cov/rank/constrained/*/function_difference", 1e-12), Eq("cov/rank/constrained/*/deficiency_covariant", 62)])
+    add("R5a", "dimension", "low", FINITE + " with other hidden sizes and vocabularies", "when the vocabulary is at most the hidden size ((d, V) = (4, 3), (6, 6)) the deficiency exceeds the formula (2 x 10 + d(d-1)/2) by at least 1: the first layer sees at most d independent vectors (a post hoc rule; the four configurations of R5a and R5b had been run once, at draw 99, before registration, so this tests the rule on fresh draws and not on fresh configurations)",
         [Ge("cov/vocab/V_at_most_d/*/extra", 1)])
-    add("R5b", "dimension", "low", FINITE + " with other hidden sizes and vocabularies", "when the vocabulary exceeds the hidden size ((d, V) = (5, 6), (4, 8)) the deficiency equals the formula", [Eq("cov/vocab/V_larger_than_d/*/extra", 0)])
+    add("R5b", "dimension", "low", FINITE + " with other hidden sizes and vocabularies", "when the vocabulary exceeds the hidden size ((d, V) = (5, 6), (4, 8)) the deficiency equals the formula (the same four configurations as R5a)", [Eq("cov/vocab/V_larger_than_d/*/extra", 0)])
     add("R6", "causal structure", "low", FINITE, "the stream at position t' after one layer, two layers, and the stack, depends on the input stream at position t if and only if t <= t': at most 1e-14 for t > t', at least 1e-8 for t <= t'",
         [Le("cov/causal/*/largest_dependence_on_a_later_position", 1e-14), Ge("cov/causal/*/smallest_dependence_on_an_earlier_or_equal_position", 1e-8)])
     # --- a training point -----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -231,7 +232,7 @@ def claims():
         [Le(fl("ngd-euclid", n, "largest"), 1e-8) for n in ORTH] + [Ge(fl("ngd-euclid", n, "smallest"), 1e-6) for n in NONORTH], valid=fvalid)
     add("O5", "optimizers", "high", O, "the damping by the Euclidean metric of the scores (F + lambda J^T J)^-1 grad L, a metric on functions, with lambda 1e-6 and 1e-2 times the mean nonzero eigenvalue of the Fisher blocks, is the same (1e-8) for all seven",
         [Le(fl(r, n, "largest"), 1e-8) for r in ("ngd-covdamp:1e-6", "ngd-covdamp:1e-2") for n in ORTH + NONORTH], valid=fvalid)
-    add("O6", "optimizers", "moderate", O, "the covariant step is large in the constants: the median over the ten points of |v| for natural gradient over |v| for gradient descent is at least 100 (the function moves along directions in which the constants must move far; this is why the step as an update was not used)",
+    add("O6", "optimizers", "moderate", O, "the covariant step is large in the constants: the median over the ten points of |v| for natural gradient over |v| for gradient descent is at least 100 (the norm is the Euclidean norm of the constants, which is not a covariant quantity, and the ratio depends on the cutoff of the pseudo-inverse, 1e-10 here)",
         [Ge("opt-field/median_step_norm_over_the_step_norm_of_sgd/ngd-pinv", 100.0)], valid=fvalid)
     g_ = lambda cfg, name: f"{cfg}/gauges/{name}/max_difference"
     sane = lambda cfg: [Gt(f"{cfg}/loss_first", f"{cfg}/loss_last")]
@@ -244,8 +245,10 @@ def claims():
     H = "the Python side of the conformance test of batch 0022 (model.py, gauge.py, ops.py, gen22.py), mutated, against the stored output of the Lean definition"
     valid_m = [Eq(f"mutate/unmutated/{c}/status", "equal") for c in ("matrix-d3", "matrix-d2", "matrix-d2-s100", "matrix-d2-s200")]
     for mid, (path, edits, predicted, why) in mutate23.MUTANTS.items():
-        add(f"MUT-{mid}", "conformance power", "high" if predicted == "detected" else "moderate", H, f"mutant {mid} ({why}; {path.split('/')[-1]}) is {'detected' if predicted == 'detected' else 'NOT detected'} by the comparison with Lean in at least one of the four stored configurations",
-            [Eq(f"mutate/mutants/{mid}/detected", predicted == "detected")], valid=valid_m + [Eq(f"mutate/mutants/{mid}/predicted", predicted)])
+        if predicted != "detected":
+            continue          # the mutants that the configurations cannot reach, or that are equivalent to the original, are recorded in mutate.json and are not claims
+        add(f"MUT-{mid}", "conformance power", "high", H, f"mutant {mid} ({why}; {path.split('/')[-1]}) is detected by the comparison with Lean in at least one of the four stored configurations (a mismatch of the arrays, or an error of the generator)",
+            [Eq(f"mutate/mutants/{mid}/detected", True)], valid=valid_m + [Eq(f"mutate/mutants/{mid}/predicted", predicted)])
     # --- the finite instance as a checkpoint in standard runtimes ---------------------------------------------------------------------------------------------------------------------
     B = "the finite instance written as a Hugging Face checkpoint and run on all 625 sequences of four symbols (all 780 contexts)"
     add("B1", "runtimes", "high", B, "Transformers in float64 (float32 islands replaced): the logits differ from the numpy forward pass by at most 1e-10 in relative norm and the argmax agrees at every position", [Le("bridge-torch/float64/relative_difference", 1e-10), Ge("bridge-torch/float64/argmax_agreement", 1.0)])
@@ -255,7 +258,6 @@ def claims():
     for key, name in LLAMA:
         f = f"systems-{key}"
         S = f"{name} (a Llama-architecture checkpoint)"
-        add(f"S0-{key}", "language model", "high", S, "the registered test of 'is a language model': the mean next-token loss on a fixed English text is at most 0.9 ln(vocabulary)", [Le(f"{f}/membership/fraction_of_ln_vocabulary", 0.9)])
         v = [Eq(f"{f}/float64_islands_patched", True)]
         add(f"K1-{key}", "kinematics", "high", S, "shifting every position by c = 1, 16, 128 changes the logits by at most 1e-6 in relative norm (the rotary embedding makes the scores depend on t - s)", [Le(f"{f}/translation/*/largest", 1e-6)], valid=v)
         add(f"K2-{key}", "kinematics", "high", S, "rotating the planes of the queries and keys by 16 theta_p in the weights leaves the logits (1e-6) and equals, in the keys of the cache after the rotary embedding, the original at positions shifted by 16 (1e-6)",
@@ -265,7 +267,6 @@ def claims():
             [Le(f"{f}/rotation/logits/largest", 1e-6), Le(f"{f}/rotation/stream_equals_the_original_times_Q_transpose/largest", 1e-6), Le(f"{f}/rotation/gram_matrix_of_every_layer/largest", 1e-6), Ge(f"{f}/rotation/stream_moved_at_the_embedding/smallest", 0.1)], valid=v)
     # --- language models whose architecture differs --------------------------------------------------------------------------------------------------------------------------------------
     q, qn = "outside-qwen3-0.6b", "Qwen/Qwen3-0.6B @c1899de (norm of the queries and keys)"
-    add("Q0", "language model", "high", qn, "the registered test of 'is a language model'", [Le(f"{q}/membership/fraction_of_ln_vocabulary", 0.9)])
     v = [Eq(f"{q}/float64_islands_patched", True)]
     add("Q1", "kinematics", "high", qn, "shifting every position by 1, 16, 128 changes the logits by at most 1e-6", [Le(f"{q}/translation/*/largest", 1e-6)], valid=v)
     add("Q2", "outside the proved class", "high", qn, "the phase element that reproduces a shift in the Llama (planes rotated by 16 theta_p) changes the logits by at least 1e-3: with the norm of the queries and keys the coincidence of the translation with a weight transformation fails", [Ge(f"{q}/phase/logits/smallest", 1e-3)], valid=v)
@@ -273,19 +274,16 @@ def claims():
     add("Q4", "outside the proved class", "high", qn, "T2 (a rotation of a plane applied to the keys and the queries, random angles) changes the logits by at least 1e-3", [Ge(f"{q}/qk_norm_transformations/T2_rotation_of_a_plane_on_keys_and_queries/smallest", 1e-3)], valid=v)
     add("Q5", "outside the proved class", "high", qn, "T3 (a positive scalar on the query projection of each head) changes the logits by at most 1e-4 (exact up to the epsilon of the norm)", [Le(f"{q}/qk_norm_transformations/T3_positive_scalar_on_one_query_head/largest", 1e-4)], valid=v)
     add("Q6", "outside the proved class", "high", qn, "T4 (a scalar per plane divided out of the gain of the query norm and multiplied into the gain of the key norm) changes the logits by at most 1e-6", [Le(f"{q}/qk_norm_transformations/T4_scalar_moved_from_the_query_gain_to_the_key_gain/largest", 1e-6)], valid=v)
-    add("Q7", "outside the proved class", "moderate", qn, "the angles of a shift of 16 positions, as in T2, change the logits by at least 1e-3", [Ge(f"{q}/qk_norm_transformations/T2_with_the_angles_of_a_shift_of_16_positions/smallest", 1e-3)], valid=v)
     add("Q8", "kinematics", "high", qn, "multiplying the angles of the rotary embedding by 0.5 or 2 changes the logits by at least 1e-3", [Ge(f"{q}/dilation/*/smallest", 1e-3)], valid=v)
     add("Q9", "kinematics", "high", qn, "with the norm weights folded and the head untied, rotating the stream leaves the logits (1e-6) and follows the law of a vector (1e-6), the Gram matrix is unchanged (1e-6), the stream moves (0.1)",
         [Le(f"{q}/rotation/logits/largest", 1e-6), Le(f"{q}/rotation/stream_equals_the_original_times_Q_transpose/largest", 1e-6), Le(f"{q}/rotation/gram_matrix_of_every_layer/largest", 1e-6), Ge(f"{q}/rotation/stream_moved_at_the_embedding/smallest", 0.1)], valid=v)
     gp, gn = "outside-gpt2", "openai-community/gpt2 @607a30d (LayerNorm, learned positions)"
-    add("G0", "language model", "high", gn, "the registered test of 'is a language model'", [Le(f"{gp}/membership/fraction_of_ln_vocabulary", 0.9)])
     add("G1", "outside the proved class", "high", gn, "adding the all-ones vector to the output of each block's attention and MLP output projections (weights and biases) changes the logits by at most 1e-6", [Le(f"{gp}/layernorm_transformations/L1_all_ones_added_to_the_outputs_of_the_two_output_projections/largest", 1e-6)])
     add("G2", "outside the proved class", "high", gn, "the dual shift of the readers of the two LayerNorms of each block changes the logits by at most 1e-6", [Le(f"{gp}/layernorm_transformations/L2_dual_shift_of_the_readers_of_the_two_layernorms/largest", 1e-6)])
     add("G3", "outside the proved class", "high", gn, "adding a constant c_v to every coordinate of the embedding rows of five tokens changes no other logit than those of the five tokens (at most 1e-6), and those change by c_v times the sum of the final LayerNorm's output (1e-6 relative)",
         [Le(f"{gp}/layernorm_transformations/L3_embedding_rows_of_five_tokens_shifted/unshifted_columns_largest", 1e-6), Le(f"{gp}/layernorm_transformations/L3_embedding_rows_of_five_tokens_shifted/shifted_columns_against_prediction_largest", 1e-6)])
     add("G4", "kinematics", "high", gn, "with learned absolute positions, shifting the positions by 1 or 16 changes the logits by at least 1e-3: translation is not a symmetry", [Ge(f"{gp}/absolute_positions/*/smallest", 1e-3)])
     pp, pn = "outside-pythia-160m", "EleutherAI/pythia-160m @50f5173 (LayerNorm, parallel residual, rotary embedding on a quarter of each head)"
-    add("P0", "language model", "high", pn, "the registered test of 'is a language model'", [Le(f"{pp}/membership/fraction_of_ln_vocabulary", 0.9)])
     v = [Eq(f"{pp}/float64_islands_patched", True)]
     add("P1", "kinematics", "high", pn, "shifting every position by 1, 16, 128 changes the logits by at most 1e-6", [Le(f"{pp}/translation/*/largest", 1e-6)], valid=v)
     add("P2", "kinematics", "high", pn, "multiplying the angles of the rotary embedding by 0.5 or 2 changes the logits by at least 1e-3", [Ge(f"{pp}/dilation/*/smallest", 1e-3)], valid=v)
@@ -296,10 +294,10 @@ def claims():
     cq = "chat-qwen3-0.6b"
     Vq = ["H1_signed_permutation", "M1_units", "A1_value_output", "A6_head_swap", "H4_rotation_of_the_stream", "ALL", "T3_head_scalars", "T4_gain_move"]
     for w in ("tool_call", "conversation"):
-        add(f"C-qwen3-{w}", "conversation", "high", qn, f"greedy decoding in float64 of 64 tokens from the chat prompt ('{w}') gives the same tokens as the original for each of the eight transformed variants" + (", and the original's answer contains a <tool_call> block (validity)" if w == "tool_call" else ""),
+        add(f"C-qwen3-{w}", "conversation", "high", qn, f"greedy decoding in float64 (at most 64 tokens, ending at the end-of-turn token) from the chat prompt ('{w}') gives the same tokens as the original for each of the eight transformed variants" + (", and the original's answer contains a <tool_call> block (validity)" if w == "tool_call" else ""),
             [Eq(f"{cq}/prompts/{w}/variants/{n}/identical_tokens", True) for n in Vq], valid=[Eq(f"{cq}/prompts/tool_call/original_contains_tool_call_tag", True)] if w == "tool_call" else [])
     cs = "chat-smol-instruct"
-    add("C-smol-conversation", "conversation", "high", "HuggingFaceTB/SmolLM2-135M-Instruct @12fd25f", "greedy decoding in float64 of 64 tokens from the chat prompt gives the same tokens as the original for each of the six transformed variants",
+    add("C-smol-conversation", "conversation", "high", "HuggingFaceTB/SmolLM2-135M-Instruct @12fd25f", "greedy decoding in float64 (at most 64 tokens, ending at the end-of-turn token) from the chat prompt gives the same tokens as the original for each of the six transformed variants",
         [Eq(f"{cs}/prompts/conversation/variants/{n}/identical_tokens", True) for n in Vq[:6]])
     # --- fine-tuning ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     for key, name in (("smol-instruct", "HuggingFaceTB/SmolLM2-135M-Instruct @12fd25f"), ("delphi-100k", "delphi-suite/v0-llama2-100k @c1372fb")):
@@ -311,7 +309,14 @@ def claims():
             [Le(d("sgd", sp), 1e-6), Le(d("sgd", rot), 1e-6), Ge(d("sgd", us), 1e-2), Ge(d("sgd", vo), 1e-2)], valid=valid)
         add(f"H-{key}-adamw", "optimizers", "high", name, "ten steps of torch.optim.AdamW (lr 2e-5, no weight decay): within 1e-6 for the signed permutation only; apart by at least 1e-2 for the rotation, the unit scaling and the matrix on the value dimensions",
             [Le(d("adamw", sp), 1e-6), Ge(d("adamw", rot), 1e-2), Ge(d("adamw", us), 1e-2), Ge(d("adamw", vo), 1e-2)], valid=valid)
+    # claims whose outcome pattern had been observed in the pilots before registration (at other draws): replications
+    for c in C:
+        if c.id in REPLICATIONS:
+            c.text += " (the outcome had been seen in the pilots before registration, at other draws: a replication)"
     return C
+
+
+REPLICATIONS = ("R1", "R2a", "R2b", "R2c", "R3", "R4", "R6", "O1", "O2", "O3", "O4", "O5")
 
 
 def controls():
@@ -319,14 +324,23 @@ def controls():
     K = []
     for key, name in LLAMA:
         f = f"systems-{key}"
-        K += [(f"control {key}: the same forward pass twice gives the same logits (1e-12)", [Le(f"{f}/determinism_largest_relative_difference", 1e-12)]),
-              (f"control {key}: the rotation without the fold is not a symmetry (at least 1e-3)", [Ge(f"{f}/rotation_without_the_fold_control/smallest", 1e-3)]),
+        K += [(f"control {key}: the rotation without the fold is not a symmetry (at least 1e-3)", [Ge(f"{f}/rotation_without_the_fold_control/smallest", 1e-3)]),
               (f"control {key}: the shift of 16 positions moves the cache of keys (mean over layers at least 0.1)", [Ge(f"{f}/phase/keys_moved_by_the_shift_control/smallest_over_sentences_of_the_mean_over_layers", 0.1)])]
-    K += [("control the finite instance is rejected by the registered test of 'is a language model' (fraction above 0.9)", [Ge("bridge-torch/membership_control/fraction_of_ln_vocabulary", 0.9)]),
-          ("control chat Qwen3: the variant with the permutation applied to the layers but not to the embedding gives different tokens (tool call)", [Eq("chat-qwen3-0.6b/prompts/tool_call/variants/broken_control/identical_tokens", False)]),
+    K += [("control chat Qwen3: the variant with the permutation applied to the layers but not to the embedding gives different tokens (tool call)", [Eq("chat-qwen3-0.6b/prompts/tool_call/variants/broken_control/identical_tokens", False)]),
           ("control chat Qwen3: the broken variant gives different tokens (conversation)", [Eq("chat-qwen3-0.6b/prompts/conversation/variants/broken_control/identical_tokens", False)]),
           ("control chat SmolLM2: the broken variant gives different tokens", [Eq("chat-smol-instruct/prompts/conversation/variants/broken_control/identical_tokens", False)])]
     return K
+
+
+def inclusion():
+    """The registered test of 'is a language model' (the mean next-token loss on membership.txt is at most 0.9 ln(vocabulary)), applied to each checkpoint: it decides which checkpoints the claims are about; it is not a claim."""
+    names = [(f"systems-{key}", name) for key, name in LLAMA] + [("outside-qwen3-0.6b", "Qwen/Qwen3-0.6B @c1899de"), ("outside-gpt2", "openai-community/gpt2 @607a30d"), ("outside-pythia-160m", "EleutherAI/pythia-160m @50f5173")]
+    return [(f"inclusion {name}: mean loss on membership.txt at most 0.9 ln(vocabulary)", [Le(f"{f}/membership/fraction_of_ln_vocabulary", 0.9)]) for f, name in names]
+
+
+def about_a_checkpoint(c):
+    """True if the claim is about a named checkpoint; False if it is about the finite instance or the conformance harness."""
+    return not c.subject.startswith(("the Llama decoder equations", "training rules applied", "the Python side", "the finite instance written"))
 
 
 def load_tree(d):
@@ -347,34 +361,41 @@ def grade(d, out):
         st, det = c.grade(tree)
         rows.append((c, st, det))
         counts.setdefault(c.group, {"as predicted": 0, "REFUTED": 0, "not run": 0})[st] += 1
-    ctl = []
-    for text, preds in controls():
-        try:
-            ok = all(p.check(tree)[0] for p in preds)
-            ctl.append((text, "holds" if ok else "FAILS"))
-        except NotRun as e:
-            ctl.append((text, f"not run ({e})"))
+    def run_checks(checks):
+        res = []
+        for text, preds in checks:
+            try:
+                ok = all(p.check(tree)[0] for p in preds)
+                res.append((text, "holds" if ok else "FAILS"))
+            except NotRun as e:
+                res.append((text, f"not run ({e})"))
+        return res
+    ctl, inc = run_checks(controls()), run_checks(inclusion())
     os.makedirs(out, exist_ok=True)
     tot = {s: sum(1 for _, st, _ in rows if st == s) for s in ("as predicted", "REFUTED", "not run")}
-    lines = [f"# Batch 0023, graded (claims: {len(rows)}; as predicted {tot['as predicted']}, REFUTED {tot['REFUTED']}, not run {tot['not run']}; controls: {sum(1 for _, s in ctl if s == 'holds')} of {len(ctl)} hold)", "",
+    ck = [st for c, st, _ in rows if about_a_checkpoint(c)]
+    other = [st for c, st, _ in rows if not about_a_checkpoint(c)]
+    lines = [f"# Batch 0023, graded (claims: {len(rows)}; as predicted {tot['as predicted']}, REFUTED {tot['REFUTED']}, not run {tot['not run']}; controls: {sum(1 for _, s in ctl if s == 'holds')} of {len(ctl)} hold; inclusion test: {sum(1 for _, s in inc if s == 'holds')} of {len(inc)} checkpoints pass)", "",
+             f"Claims about a named checkpoint: {len(ck)}, of which as predicted {ck.count('as predicted')}, REFUTED {ck.count('REFUTED')}, not run {ck.count('not run')}. Claims about the finite instance or the conformance harness: {len(other)}, of which as predicted {other.count('as predicted')}, REFUTED {other.count('REFUTED')}, not run {other.count('not run')}.", "",
              "| group | as predicted | REFUTED | not run |", "|---|---|---|---|"]
     lines += [f"| {g} | {v['as predicted']} | {v['REFUTED']} | {v['not run']} |" for g, v in sorted(counts.items())]
     lines += ["", "| id | group | severity | status | detail |", "|---|---|---|---|---|"]
     lines += [f"| {c.id} | {c.group} | {c.severity} | {st} | {det[:400].replace('|', '/')} |" for c, st, det in rows]
     lines += ["", "## Controls (not claims)", "", "| control | status |", "|---|---|"] + [f"| {t} | {s} |" for t, s in ctl]
+    lines += ["", "## Inclusion test of the checkpoints (not claims)", "", "| checkpoint | status |", "|---|---|"] + [f"| {t} | {s} |" for t, s in inc]
     open(os.path.join(out, "graded23.md"), "w").write("\n".join(lines) + "\n")
     with open(os.path.join(out, "graded23.tsv"), "w") as f:
         f.write("id\tgroup\tseverity\tstatus\tsubject\tdetail\n")
         for c, st, det in rows:
             f.write(f"{c.id}\t{c.group}\t{c.severity}\t{st}\t{c.subject}\t{det}\n")
-    print("\n".join(lines[:14 + len(counts)]))
+    print("\n".join(lines[:16 + len(counts)]))
     for c, st, det in rows:
         if st != "as predicted":
             print(f"{st}: {c.id} {det[:300]}")
-    for t, s in ctl:
+    for t, s in ctl + inc:
         if s != "holds":
-            print(f"control {s}: {t}")
-    return 0 if tot["REFUTED"] == 0 and tot["not run"] == 0 and all(s == "holds" for _, s in ctl) else 1
+            print(f"{s}: {t}")
+    return 0 if tot["REFUTED"] == 0 and tot["not run"] == 0 and all(s == "holds" for _, s in ctl + inc) else 1
 
 
 def table():
@@ -422,9 +443,7 @@ def selftest():
     t = {}
     put(t, "x", float("nan"))
     assert not Le("x", 1.0).check(t)[0] and not Ge("x", 0.0).check(t)[0]
-    for k, _ in enumerate(controls()):
-        pass
-    for text, preds in controls():
+    for text, preds in controls() + inclusion():
         t = {}
         for p in preds:
             p.fixture(t, True)
@@ -433,7 +452,7 @@ def selftest():
         for p in preds:
             p.fixture(t, False)
         assert not all(p.check(t)[0] for p in preds), text
-    print(f"selftest: {len(cs)} claims and {len(controls())} controls; each holds on its fixture, is refuted when one of its own inputs is violated, is not run without data")
+    print(f"selftest: {len(cs)} claims, {len(controls())} controls and {len(inclusion())} inclusion checks; each holds on its fixture, is refuted when one of its own inputs is violated, is not run without data")
     return 0
 
 

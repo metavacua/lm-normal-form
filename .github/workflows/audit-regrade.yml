@@ -1,0 +1,28 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# The audit corrections (branch audit/0025-corrections) changed the graders of batches 0014, 0015, 0021, 0023 and 0024 and the generated result files under docs/batches/. This workflow regrades the committed raw
+# results with the graders as they are on the branch, in a temporary directory, and compares each regenerated file with the committed one (batches/0025/regrade.sh). It fails if a file differs or a command fails.
+# Standard-library Python only; nothing is installed and nothing is compiled.
+name: audit-regrade
+
+on:
+  push:
+    branches: ["audit/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regrade:
+    name: "regrade the committed raw results and compare with the committed graded files"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.12"
+      - name: "Regrade (fails if a regenerated file differs from the committed one or a command fails)"
+        run: bash batches/0025/regrade.sh

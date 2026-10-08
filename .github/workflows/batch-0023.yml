@@ -4,7 +4,7 @@
 # Batch 0023 (docs/batches/0023.md): the special theory of the transformer language model, measured on language models (public checkpoints) and on the Llama decoder equations (a finite instance with
 # random parameters, which is not a language model). Two triggers by the message of the commit: [smoke] runs the code on small random models of each architecture (no download of a checkpoint; the
 # results are not graded and are not evidence), [run] runs the registered experiments and grades them. Nothing here masks a failure: no `|| true`, no `continue-on-error`, no discarded stderr; the
-# only `if: always()`-like steps are the uploads of artifacts, which cannot change the conclusion of a job; the grading job fails if any registered claim is not "as predicted" or any control fails.
+# only `if: always()`-like steps are the uploads of artifacts, which cannot change the conclusion of a job; the grading job fails if any claim is not "as predicted", any control fails or any checkpoint fails the inclusion test.
 # The actions are pinned by the commit that their tag pointed to on 2026-10-07; the Python packages and the Rust crates (Cargo.lock) by version, and the run checks the versions it got.
 name: batch 0023
 
@@ -276,7 +276,7 @@ jobs:
           path: results
       - name: What was produced
         run: ls -l results
-      - name: "Grade (fails if a claim is refuted or not run, or a control fails)"
+      - name: "Grade (fails if a claim is refuted or not run, a control fails or a checkpoint fails the inclusion test)"
         run: python batches/0023/grade23.py results graded
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: ${{ !cancelled() }}

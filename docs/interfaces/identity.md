@@ -29,7 +29,7 @@ change in any later version.
 
 Unknown top-level keys, and `environment`, are ignored. A record that breaks `1 <= min_reader_version <=
 min_writer_version <= format_version`, or whose `features` are not a list of `{name: string, needed_by: read|write|none}`,
-is `MALFORMED`.
+is `MALFORMED`. So is a record with no `subject`, or whose `subject` has no `bag_root`.
 
 ## The verdict
 
@@ -83,11 +83,11 @@ give other bits.
 
 A fixture under `conformance/identity/1/`: `digests.tsv` (eleven tensors with the digest of each, and of the transpose
 of the matrices), `relations.tsv` (which digests must be equal and which must differ: a bf16 and an f16 copy of an f32
-tensor; the same bytes under another dtype; the same bytes under another shape), `records/` (sixteen records and one
-more with a tensor listed twice) and `expected.tsv` (the verdict of each, in read mode and, where it differs, in write
-mode). Every expected value was derived by `conformance/identity/1/derive.sh` with `printf`, `xxd`, `sha256sum` and
-`jq`, not by the code it tests. The batch workflow runs `identity_core.py conformance` before any cell and stops on
-any difference: 53 checks, including that every digest changes when the version in the preimage does.
+tensor; the same bytes under another dtype; the same bytes under another shape), `records/` (nineteen records: sixteen, one
+with a tensor listed twice, and two without a subject or without a root) and `expected.tsv` (the verdict of each, in read mode and, where it differs, in write
+mode). The digests and roots were computed by `conformance/identity/1/derive.sh` with `printf`, `xxd`, `sha256sum` and
+`jq`, not by the code it tests; the verdict rows of `expected.tsv` are written by hand as examples of the rules. The batch workflow runs `identity_core.py conformance` before any cell and stops on
+any difference: 55 checks, including that every digest changes when the version in the preimage does.
 
 ## Known limits
 

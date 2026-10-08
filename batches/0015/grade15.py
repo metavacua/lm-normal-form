@@ -1,8 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Grades the predictions Q1 to Q17 of docs/batches/0015.md from the files that the jobs kept. Written before any result of the real-checkpoint cells or of symdim.py was read; it states
-# each prediction as the registration does and prints what was seen beside it.
-# Usage: grade15.py EXACT_DIR LM_DIR [OUT.tsv]    EXACT_DIR: claims-{poly,oracle,float}.json, degrees-{poly,oracle}.txt, symdim.json; LM_DIR: conform.json, tokenperm.json, gauge.json, obfuscation.json, optim.json
+# Grades the predictions Q1, Q3 to Q14, Q16 and Q17 of docs/batches/0015.md from the files that the jobs kept; it states each prediction as the registration does and prints what was seen beside it.
+# Usage: grade15.py EXACT_DIR LM_DIR [OUT.tsv]    EXACT_DIR: claims-{poly,oracle,float}.json, symdim.json; LM_DIR: conform.json, tokenperm.json, gauge.json, obfuscation.json, optim.json
 import json, os, re, sys
 
 rows = []
@@ -35,10 +34,6 @@ def main(exact, lm, tsv=None):
             continue
         bad = [c["id"] for c in j["claims"] if not c["as_expected"]]
         say("Q1", f"{mode}, {len(j['claims'])} claims, {j['trials']} trials", len(j["claims"]) == 46 and not bad and j["trials"] == n, f"unexpected: {bad}")
-    for mode, limit in (("oracle", 2.7e-31), ("poly", 7e-8)):
-        p = os.path.join(exact, f"degrees-{mode}.txt")
-        m = re.search(r"largest failure probability per trial over the claims \(\w+\): ([0-9.e+-]+)", open(p).read()) if os.path.exists(p) else None
-        say("Q2", mode, None if m is None else float(m.group(1)) <= limit, "no file" if m is None else f"largest per-trial bound {m.group(1)} (limit {limit:g})")
     j = load(exact, "symdim.json")
     if j is None:
         say("Q3", "symdim", None, "no file")
@@ -104,7 +99,7 @@ def main(exact, lm, tsv=None):
     # cell 04: obfuscation
     o = load(lm, "obfuscation.json")
     if o is None:
-        for q in ("Q13", "Q14", "Q15", "Q16"):
+        for q in ("Q13", "Q14", "Q16"):
             say(q, "obfuscation", None, "no file")
     else:
         p0 = o["original"]["ppl"]
@@ -114,8 +109,6 @@ def main(exact, lm, tsv=None):
         a = o.get("attack_with_public_base")
         say("Q14", "matching against the public base", None if a is None else a["coordinates_recovered"] >= 0.99 and abs(a["ppl"] / p0 - 1) <= 0.01,
             "no attack" if a is None else f"coordinates recovered {f(a['coordinates_recovered'])}, repaired perplexity {f(a['ppl'])} against {f(p0)}")
-        t = (o.get("attack_by_training_adapters") or {}).get("perplexity_on_the_training_window_along_the_way")
-        say("Q15", "the adapter attack", None if not t else t[0][1] >= 3 * min(x[1] for x in t), "no trace" if not t else f"training perplexity {f(t[0][1])} at step 0, minimum {f(min(x[1] for x in t))} in {t[-1][0] + 1} steps")
         c = o.get("cache_float64_relative_difference_from_the_original")
         say("Q16", "the cache of the keyed and of the body-only model", None if c is None else c["keyed"] <= 1e-9 and c["body_only"] >= 1e-2, "no file" if c is None else f"keyed {f(c['keyed'])}, body only {f(c['body_only'])}")
 

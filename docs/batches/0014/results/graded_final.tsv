@@ -110,7 +110,6 @@ P15n	cache q4_0, rotation disabled	as predicted	e = 0.0404; NMSE against own ori
 P15n	cache q8_0, rotation disabled	REFUTED	e = 0.000204; NMSE against own original / e: heads 0.198, perm 0.272, resid 0.238, resid_blk 0.247, units 0.299, units_blk 0.235, scale 211, all 145, canon 1.77; outside: ['perm', 'resid', 'resid_blk', 'units', 'units_blk']
 P15r	cache q4_0, rotated against not rotated	as predicted	e with the rotation 0.0152, without 0.0404 (limit 0.8 x)
 P15r	cache q8_0, rotated against not rotated	as predicted	e with the rotation 5.89e-05, without 0.000204 (limit 1.0 x)
-P16	null variant, float32	as predicted	NMSE against own original 6.96e-13, bound 4 max e = 3.62e-12
 P16	null variant, float32-kvf16	as predicted	e = 2.27e-07; NMSE against own original / e = 0.516 (at least 0.1 predicted)
 P16	null variant, float32-kvq4_0	as predicted	e = 0.0152; NMSE against own original / e = 0.092 (below 0.2 predicted)
 P16	null variant, float32-kvq8_0	as predicted	e = 5.89e-05; NMSE against own original / e = 0.511 (at least 0.1 predicted)
@@ -122,18 +121,14 @@ P17	Q4_0 weights	as predicted	null NMSE 0.000786; claimed the same, in units of 
 P17	Q8_0 cache	as predicted	null NMSE 2.43e-05; claimed the same, in units of the null: units 1.14, resid_blk 1.19, units_blk 1.25, heads 1.27, perm 1.36, resid 1.41; claimed different: canon 5.76, all 254, scale 379
 P17	Q8_0 cache, not rotated	as predicted	null NMSE 5.13e-05; claimed the same, in units of the null: heads 0.906, units 0.923, units_blk 0.986, resid 1.12, resid_blk 1.2, perm 1.25; claimed different: canon 8.31, all 580, scale 846
 P17	Q8_0 weights	as predicted	null NMSE 0.00074; claimed the same, in units of the null: heads 0.578, resid_blk 0.712, units_blk 0.936; claimed different: units 2.35, resid 2.96, canon 4.19, perm 4.27, scale 73.7, all 78.6
-P17	f16 cache	as predicted	null NMSE 1.56e-07; claimed the same, in units of the null: heads 0.661, scale 0.685, units 0.779, all 0.803, units_blk 0.837, perm 0.841, resid 0.885, canon 0.954, resid_blk 0.959
-P2	floatlm-99m	as predicted	NMSE against own original, bound 4 max e: perm 7.35e-13<=3.51e-12, all 8.87e-13<=4.59e-12, canon 1.36e-12<=2.45e-12, heads 2.27e-13<=1.52e-12, units 6.84e-13<=3.62e-12, units_blk 6.32e-13<=4.01e-12, resid 4.02e-13<=2.61e-12, resid_blk 2.35e-13<=1.52e-12
-P2	smol-base	as predicted	NMSE against own original, bound 4 max e: perm 7.37e-12<=1.64e-11, all 9.42e-12<=1.5e-11, canon 1.05e-11<=2.18e-11, heads 1.97e-12<=1.5e-11, units 5.18e-12<=1.5e-11, units_blk 5.05e-12<=1.5e-11, resid 3.71e-12<=1.57e-11, resid_blk 4.77e-12<=2.64e-11
-P2	smol-instruct	as predicted	NMSE against own original, bound 4 max e: perm 3.33e-12<=8.55e-12, all 3.78e-12<=8.55e-12, canon 4.06e-12<=8.55e-12, heads 1.79e-12<=8.55e-12, units 2.79e-12<=8.55e-12, units_blk 1.75e-12<=1.03e-11, resid 2.27e-12<=8.55e-12, resid_blk 1.8e-12<=8.55e-12
-P2	trilm-99m	as predicted	NMSE against own original, bound 4 max e: perm 2.72e-13<=7.01e-13, all 2.62e-13<=7.01e-13, canon 3.32e-13<=8.58e-13, heads 1.56e-13<=7.08e-13, units 1.59e-13<=7.06e-13, units_blk 1.54e-13<=7.01e-13, resid 2.58e-13<=7.01e-13, resid_blk 2.5e-13<=7.01e-13
-P3	floatlm-99m others	as predicted	NMSE against own original, bound 4 max e: perm 7.95e-06<=0.000849, all 8.15e-06<=0.000847, canon 5.62e-06<=0.000827, heads 1.54e-06<=0.000826, units 2.7e-06<=0.000827, units_blk 2.55e-06<=0.000826, resid 8e-06<=0.000846, resid_blk 7.12e-06<=0.00083
+P17	f16 cache	as predicted	null NMSE 1.56e-07; claimed the same, in units of the null: heads 0.661, scale 0.685, units 0.779, all 0.803, units_blk 0.837, perm 0.841, resid 0.885, canon 0.954, resid_blk 0.959 [no class claimed different: (b) is not tested]
+P2	floatlm-99m	as predicted	top-1 agreement with the own original (at least 0.998 predicted): perm 1, all 1, canon 1, heads 1, units 1, units_blk 1, resid 1, resid_blk 1
+P2	smol-base	as predicted	top-1 agreement with the own original (at least 0.998 predicted): perm 1, all 1, canon 1, heads 1, units 1, units_blk 1, resid 1, resid_blk 1
+P2	smol-instruct	as predicted	top-1 agreement with the own original (at least 0.998 predicted): perm 1, all 1, canon 1, heads 1, units 1, units_blk 1, resid 1, resid_blk 1
+P2	trilm-99m	as predicted	top-1 agreement with the own original (at least 0.998 predicted): perm 1, all 1, canon 1, heads 1, units 1, units_blk 1, resid 1, resid_blk 1
 P3	floatlm-99m scale	as predicted	bit identical True, max|d| 0
-P3	smol-base others	as predicted	NMSE against own original, bound 4 max e: perm 0.000261<=0.0168, all 0.000237<=0.0168, canon 0.000257<=0.0168, heads 3.65e-05<=0.0168, units 0.000103<=0.0168, units_blk 9.32e-05<=0.0168, resid 0.000249<=0.0168, resid_blk 0.000223<=0.0169
 P3	smol-base scale	as predicted	bit identical True, max|d| 0
-P3	smol-instruct others	as predicted	NMSE against own original, bound 4 max e: perm 0.000333<=0.00465, all 0.000353<=0.00465, canon 0.000351<=0.00469, heads 0.000167<=0.00475, units 0.000299<=0.00465, units_blk 0.000295<=0.00465, resid 0.000361<=0.00465, resid_blk 0.000317<=0.00465
 P3	smol-instruct scale	as predicted	bit identical True, max|d| 0
-P3	trilm-99m others	as predicted	NMSE against own original, bound 4 max e: perm 4.35e-05<=0.000487, all 4.07e-05<=0.000471, canon 4.29e-05<=0.000476, heads 1.19e-05<=0.000473, units 2.17e-05<=0.00047, units_blk 1.65e-05<=0.00047, resid 3.98e-05<=0.0005, resid_blk 3.98e-05<=0.000477
 P3	trilm-99m scale	as predicted	bit identical True, max|d| 0
 P4	candle / floatlm-99m	as predicted	e(original) 4.66e-13, top-1 1, max|d| 0.000623
 P4	candle / smol-base	as predicted	e(original) 8.99e-12, top-1 1, max|d| 0.000346
@@ -168,22 +163,6 @@ P5a	onnxruntime / floatlm-99m	as predicted	scale: bit identical True, max|d| 0, 
 P5a	onnxruntime / smol-base	as predicted	scale: bit identical True, max|d| 0, NMSE 0
 P5a	onnxruntime / smol-instruct	as predicted	scale: bit identical True, max|d| 0, NMSE 0
 P5a	onnxruntime / trilm-99m	as predicted	scale: bit identical True, max|d| 0, NMSE 0
-P5b	candle / floatlm-99m	as predicted	NMSE against own original, bound 4 max e: perm 2.93e-12<=1.09e-11, all 4.17e-12<=1.52e-11, canon 2.16e-12<=4.76e-12, heads 5.29e-13<=3.5e-12, units 2.86e-13<=2.75e-12, units_blk 3.99e-13<=1.86e-12, resid 4.47e-12<=1.6e-11, resid_blk 2.67e-12<=6.8e-12
-P5b	candle / smol-base	as predicted	NMSE against own original, bound 4 max e: perm 6.64e-12<=4.16e-11, all 1.02e-11<=3.6e-11, canon 1.11e-11<=8.48e-11, heads 9.67e-13<=3.6e-11, units 1.96e-12<=3.6e-11, units_blk 1.41e-12<=3.6e-11, resid 1.02e-11<=3.6e-11, resid_blk 6.31e-12<=3.6e-11
-P5b	candle / smol-instruct	as predicted	NMSE against own original, bound 4 max e: perm 2.81e-12<=1.15e-11, all 2.65e-12<=9.59e-12, canon 2.13e-12<=7.26e-12, heads 6.06e-13<=7.28e-12, units 6.28e-13<=7.34e-12, units_blk 9.36e-13<=8.04e-12, resid 2.62e-12<=9.85e-12, resid_blk 1.6e-12<=6.46e-12
-P5b	candle / trilm-99m	as predicted	NMSE against own original, bound 4 max e: perm 2.36e-13<=6e-13, all 2.22e-13<=5.75e-13, canon 2.28e-13<=6.26e-13, heads 5.76e-14<=5.33e-13, units 6.19e-14<=5.32e-13, units_blk 6.03e-14<=5.5e-13, resid 2.24e-13<=5.49e-13, resid_blk 2.26e-13<=6.34e-13
-P5b	ctranslate2 / floatlm-99m	as predicted	NMSE against own original, bound 4 max e: perm 6.75e-13<=2.43e-12, all 6.96e-13<=2.84e-12, canon 1.07e-12<=2.76e-12, heads 2.21e-13<=1.41e-12, units 1.23e-12<=5.1e-12, units_blk 5.46e-13<=2.85e-12, resid 3.8e-13<=2.46e-12, resid_blk 4.28e-13<=2.07e-12
-P5b	ctranslate2 / smol-base	as predicted	NMSE against own original, bound 4 max e: perm 6.37e-12<=1.49e-11, all 6.76e-12<=1.57e-11, canon 8.13e-12<=1.66e-11, heads 1.27e-12<=1.5e-11, units 8.26e-12<=4.41e-11, units_blk 3.15e-12<=1.34e-11, resid 7.52e-12<=1.43e-11, resid_blk 4.11e-12<=1.98e-11
-P5b	ctranslate2 / smol-instruct	as predicted	NMSE against own original, bound 4 max e: perm 2.66e-12<=9.17e-12, all 3.32e-12<=1.07e-11, canon 2.22e-12<=7.25e-12, heads 1.43e-12<=6.03e-12, units 2.1e-12<=9.29e-12, units_blk 4.13e-12<=1.15e-11, resid 1.8e-12<=7.53e-12, resid_blk 2.09e-12<=6.03e-12
-P5b	ctranslate2 / trilm-99m	as predicted	NMSE against own original, bound 4 max e: perm 3.91e-13<=1.02e-12, all 3.87e-13<=1.02e-12, canon 4.72e-13<=1.16e-12, heads 2.37e-13<=1.02e-12, units 2.05e-13<=1.03e-12, units_blk 2.09e-13<=1.02e-12, resid 3.58e-13<=1.02e-12, resid_blk 3.38e-13<=1.02e-12
-P5b	llamacpp / floatlm-99m	as predicted	NMSE against own original, bound 4 max e: perm 4.31e-13<=2.04e-12, all 3.5e-13<=2.04e-12, canon 4.56e-13<=2.04e-12, heads 2.03e-13<=3.05e-12, units 8.95e-13<=2.09e-12, units_blk 4.32e-13<=2.04e-12, resid 2.97e-13<=3e-12, resid_blk 2.03e-13<=2.04e-12
-P5b	llamacpp / smol-base	as predicted	NMSE against own original, bound 4 max e: perm 2.37e-12<=5.88e-12, all 2.76e-12<=8.68e-12, canon 9.94e-12<=2.31e-11, heads 1.11e-12<=5.41e-12, units 1.43e-12<=5.41e-12, units_blk 3.19e-12<=5.41e-12, resid 1.3e-12<=5.41e-12, resid_blk 8.33e-13<=5.41e-12
-P5b	llamacpp / smol-instruct	as predicted	NMSE against own original, bound 4 max e: perm 9.88e-13<=3.1e-12, all 1.55e-12<=3.37e-12, canon 1.46e-12<=4.81e-12, heads 5.45e-13<=3.15e-12, units 8.3e-13<=4.38e-12, units_blk 1.11e-12<=3.1e-12, resid 5.92e-13<=3.22e-12, resid_blk 4.37e-13<=3.25e-12
-P5b	llamacpp / trilm-99m	as predicted	NMSE against own original, bound 4 max e: perm 1.22e-13<=3.03e-13, all 1.2e-13<=3.03e-13, canon 1.31e-13<=3.11e-13, heads 8.3e-14<=3.03e-13, units 8.95e-14<=3.03e-13, units_blk 9.1e-14<=3.03e-13, resid 1.09e-13<=3.03e-13, resid_blk 1.06e-13<=3.03e-13
-P5b	onnxruntime / floatlm-99m	as predicted	NMSE against own original, bound 4 max e: perm 1.33e-12<=4.76e-12, all 1.15e-12<=5.14e-12, canon 1.32e-12<=3.22e-12, heads 3.18e-13<=1.71e-12, units 1.11e-12<=1.89e-12, units_blk 1e-12<=1.71e-12, resid 5.82e-13<=4.16e-12, resid_blk 5.48e-13<=2.9e-12
-P5b	onnxruntime / smol-base	as predicted	NMSE against own original, bound 4 max e: perm 7.92e-12<=1.43e-11, all 6.37e-12<=1.3e-11, canon 6.05e-12<=1.67e-11, heads 1.83e-12<=9.22e-12, units 1.07e-11<=3.59e-11, units_blk 4.47e-12<=9.22e-12, resid 5.3e-12<=1.56e-11, resid_blk 3.77e-12<=1.84e-11
-P5b	onnxruntime / smol-instruct	as predicted	NMSE against own original, bound 4 max e: perm 4.64e-12<=1.14e-11, all 5.89e-12<=1.36e-11, canon 4.41e-12<=8.47e-12, heads 1.74e-12<=7.24e-12, units 3.11e-12<=8.23e-12, units_blk 3.56e-12<=1.36e-11, resid 2.59e-12<=7.24e-12, resid_blk 2.04e-12<=7.24e-12
-P5b	onnxruntime / trilm-99m	as predicted	NMSE against own original, bound 4 max e: perm 3.88e-13<=1.04e-12, all 4.05e-13<=1.04e-12, canon 4.7e-13<=1.18e-12, heads 2.22e-13<=1.04e-12, units 2.35e-13<=1.04e-12, units_blk 2.12e-13<=1.04e-12, resid 3.79e-13<=1.04e-12, resid_blk 3.57e-13<=1.04e-12
 P6	llama.cpp q4_0	REFUTED	e = 0.0869; NMSE against own original / e: heads 0.00459, units_blk 0.0105, resid_blk 0.0122, units 0.482, resid 1.41, scale 12, perm 1.74, all 16.4, canon 1.37; outside: ['units']
 P6	llama.cpp q8_0	REFUTED	e = 0.00183; NMSE against own original / e: heads 0.164, units_blk 0.355, resid_blk 0.368, units 0.996, resid 1.15, scale 29.6, perm 1.6, all 31.1, canon 1.77; outside: ['units_blk', 'resid_blk']
 P7	CTranslate2 int8	as predicted	e = 0.0255; NMSE against own original / e: heads 0, units 0, resid 0.196, perm 0.196, scale 20.8, all 15.5, canon 1.06
@@ -381,5 +360,6 @@ control	xrt-quant files	as predicted	11 distinct safetensors hashes of 11 varian
 control	xrt-quant perm stored dtype	as predicted	stored as bfloat16, 0 tensors outside the grid
 control	xrt-quant scale stored dtype	as predicted	stored as bfloat16, 0 tensors outside the grid
 control	xrt-quant significands	as predicted	every tensor of every variant has the original's multiset of significands and the original's name
+observed	null variant, float32	not graded	e = 7.76e-13; NMSE against own original 6.96e-13
 observed	null variant, float32-kvq4_0-norot	not graded	e = 0.0404; NMSE against own original / e = 0.0508
 observed	null variant, float32-kvq8_0-norot	not graded	e = 0.000204; NMSE against own original / e = 0.302

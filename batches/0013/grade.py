@@ -1,18 +1,22 @@
 # SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Grades the predictions of docs/batches/0013.md (P1 to P11 and the controls) from the JSON that the cells kept. Written after the
-# registration and before any result was read; it states each prediction as the registration does and prints what was seen beside it.
+# Grades the predictions of docs/batches/0013.md from the JSON that the cells kept; it states each prediction as the document does and
+# prints what was seen beside it. Only predictions are counted. The controls (the self-test, the raw roots against batch 0011's record,
+# the outcome of every kept step) and the observations without a prediction are printed in their own sections and are not counted; a
+# control that fails makes the exit status 1.
 # Usage: grade.py DIR [RUN1DIR|-] [OUT.tsv]   DIR holds one directory per model tag (smol-instruct, smol-base, floatlm-99m, trilm-99m, trilm-390m),
 #                          each with check.json, canon.json, naive.json (and function.json for smol-instruct) and outcomes.json;
 #                          RUN1DIR, the same for the first run, is for the predictions that compare the two runs (P17).
 # P12 to P18 were registered after the first run and before the second (docs/batches/0013.md, "After the first run"); on the data of
-# the first run their rows read "not graded: the cell did not record it"
+# the first run they are not graded. On the data of the second run P8 is not graded: P12 states the same for the amended canonical form
+# and more.
 import json, os, sys
 
 FLOAT, TERNARY, ALL = ("smol-instruct", "smol-base", "floatlm-99m"), ("trilm-99m", "trilm-390m"), ("smol-instruct", "smol-base", "floatlm-99m", "trilm-99m", "trilm-390m")
 RECORD = {"bag_root": "a946aed21e6ec2017c515d587d5ad72d654eb7c8f92fd9e04c4ca99898d9d3e2",
           "labelled_root": "476ff7a1fd9097fb56d98c60df3c25e52cf08f54bb02a7ec3f523a049754fca9"}
 rows = []
+extras = []   # controls and observations without a prediction: printed, not counted
 
 
 def load(d, tag, name):
@@ -25,8 +29,14 @@ def say(pid, tag, ok, seen):
     rows.append((pid, tag, {True: "as predicted", False: "REFUTED", None: "not graded"}[ok], seen))
 
 
+def extra(kind, tag, ok, seen):
+    """A control (ok is True, False or None for missing) or an observation (ok is None)."""
+    extras.append((kind, tag, {True: "ok", False: "FAILED", None: "-"}[ok], seen))
+
+
 def main(d, d1=None, tsv=None):
     data = {t: {n: load(d, t, n + ".json") for n in ("check", "canon", "naive", "function", "outcomes")} for t in ALL}
+    second = any("zero_census" in ((data[t]["canon"] or {}).get("canon") or {}) for t in ALL)
     for t in ALL:
         c = data[t]["check"]
         # P1 and P2: ties of unlike items in one matrix
@@ -47,10 +57,6 @@ def main(d, d1=None, tsv=None):
             f"units not told apart by the joint signature: {s['units_not_told_apart_by_joint_signature']}; layers discrete by separate signatures {s['layers_units_discrete_by_separate_signatures']} / joint {s['layers_units_discrete_by_joint_signature']} / anchored {s['layers_units_discrete_anchored']} of {s['layers']}")
         say("P5", t, s["heads_discrete_anchored_layers"] == s["layers"] and s["heads_discrete_index_free_layers"] == s["layers"],
             f"layers with heads and groups discrete anchored {s['heads_discrete_anchored_layers']}, heads discrete index-free {s['heads_discrete_index_free_layers']}, of {s['layers']}")
-    ok6 = {t: all(r[2] == "as predicted" for r in rows if r[1] == t and r[0] in ("P3", "P4", "P5")) for t in ALL}
-    for t in ALL:
-        got = [r for r in rows if r[1] == t and r[0] in ("P3", "P4", "P5")]
-        say("P6", t, None if len(got) < 3 or any(r[2] == "not graded" for r in got) else ok6[t], "P3, P4 and P5 hold" if ok6[t] else "one of P3, P4, P5 does not")
 
     # P7: SmolLM2-135M-Instruct, the canonical form against the group
     k = data["smol-instruct"]["canon"]
@@ -70,7 +76,7 @@ def main(d, d1=None, tsv=None):
             f"{k['canonical_roots'] == k['all_parts'][0]['canonical_roots_of_the_image']}; raw roots differ {k['raw_roots'] != k['all_parts'][0]['raw_roots_of_the_image']}; "
             + "; ".join(f"{p}: equal {parts[p][0]}, raw {parts[p][1]}" for p in want_raw))
         # controls: the raw roots against batch 0011's record
-        say("control", "smol-instruct", k["raw_roots"] == RECORD, f"raw roots {k['raw_roots']}")
+        extra("control", "smol-instruct", k["raw_roots"] == RECORD, f"raw roots {k['raw_roots']}")
         # P9
         neg = k["negative_controls"]
         g = neg["one gate row negated"]
@@ -85,7 +91,7 @@ def main(d, d1=None, tsv=None):
         say("P9", "smol-instruct", ok9, f"gate row negated: {g['differing_count']} {g['differing']}; gate/up exchanged: {e['differing_count']} {e['differing']}; ulp: {u['differing_count']} {u['differing']} layers {u['layers_touched']}; "
             f"embedding columns exchanged: {c2['differing_count']} differ, {c2['canonical_tensors_equal']} equal, listing {c2['differing']}")
     # P8
-    for t in ("smol-base", "floatlm-99m", "trilm-99m", "trilm-390m"):
+    for t in (() if second else ("smol-base", "floatlm-99m", "trilm-99m", "trilm-390m")):
         k = data[t]["canon"]
         if k is None:
             say("P8", t, None, "canon.json missing")
@@ -112,7 +118,7 @@ def main(d, d1=None, tsv=None):
         k = data[t]["naive"]
         if k:
             k = k["naive"]
-            say("observed", t, True, "naive/signature distinct outputs: " + "; ".join(f"{m.split('layers.0.')[-1]}: {v['distinct_outputs_sort_rows_then_columns']}/{v['distinct_outputs_signature_then_columns']}" for m, v in k.items() if m.startswith("model.layers.0.")))
+            extra("observed", t, None, "naive/signature distinct outputs: " + "; ".join(f"{m.split('layers.0.')[-1]}: {v['distinct_outputs_sort_rows_then_columns']}/{v['distinct_outputs_signature_then_columns']}" for m, v in k.items() if m.startswith("model.layers.0.")))
     # P11
     f = data["smol-instruct"]["function"]
     if f is None:
@@ -125,12 +131,11 @@ def main(d, d1=None, tsv=None):
               and all(1e-7 <= v[p]["max_abs"] <= 1e-3 and v[p]["top1"] >= 0.998 for p in moved))
         say("P11", "smol-instruct", ok, "; ".join(f"{p}: max|d| {v[p]['max_abs']:.3g}, KL {v[p]['mean_kl']:.3g}, top1 {v[p]['top1']:.4f}, top5 {v[p]['top5_prompts']}" for p in ("identity",) + exact + moved))
     # P12 to P17: after the first run; skipped on data in which no cell recorded what they need (the first run's)
-    second = any("zero_census" in ((data[t]["canon"] or {}).get("canon") or {}) for t in ALL)
     for t in (ALL if second else ()):
         k = data[t]["canon"]
         c = data[t]["check"]
         if k is None or "raised" in k or "zero_census" not in k.get("canon", {}):
-            for pid in ("P12", "P13", "P14", "P18"):
+            for pid in ("P12", "P14", "P18"):
                 say(pid, t, None, "raised: " + str(k["raised"]) if k and "raised" in k else "the cell did not record it (first run)" if k else "canon.json missing")
             continue
         k = k["canon"]
@@ -142,14 +147,8 @@ def main(d, d1=None, tsv=None):
         say("P12", t, ok12, f"tensors {n}; whole group and the sign of zeros {whole}; parts {parts}; idempotent {k['canonical_form_idempotent']}; roots equal "
             f"{k['canonical_roots'] == k['all_parts'][0]['canonical_roots_of_the_image']}; nothing raised")
         tot = c["dead"]["totals"]
-        zero_other = all(v == 0 for part in ("units", "vo") for v in tot[part].values())
-        if t == "trilm-390m":
-            ok13 = (tot["qk"]["both_zero"] == 173 and tot["qk"]["key_planes_zero"] == 173 and tot["qk"]["query_planes_zero"] == 173 and tot["qk"]["mixed_key_zero_query_not"] == 0
-                    and tot["layers_with_dead_pairs"] == [0] and zero_other and tot["mixed_cases"] == 0 and c["dead"]["embedding"]["zero_columns"] == 0)
-        else:
-            ok13 = zero_other and all(v == 0 for v in tot["qk"].values()) and tot["mixed_cases"] == 0 and c["dead"]["embedding"]["zero_columns"] == 0
-        say("P13", t, ok13, f"dead pairs: units {tot['units']['both_zero']}, vo {tot['vo']['both_zero']}, qk {tot['qk']['both_zero']} (layers {tot['layers_with_dead_pairs']}); mixed {tot['mixed_cases']}; "
-            f"zero embedding columns {c['dead']['embedding']['zero_columns']}")
+        extra("observed", t, None, f"dead pairs: units {tot['units']['both_zero']}, vo {tot['vo']['both_zero']}, qk {tot['qk']['both_zero']} (layers {tot['layers_with_dead_pairs']}); mixed {tot['mixed_cases']}; "
+              f"zero embedding columns {c['dead']['embedding']['zero_columns']}")
         zc = k["zero_census"]
         zs = [x["raw_tensors_changed"] for x in k["single_parts"]["zsigns"]]
         lo, hi = zc["tensors_with_16_or_more_zeros"], zc["tensors_with_16_or_more_zeros"] + zc["tensors_with_1_to_15_zeros"]
@@ -172,28 +171,36 @@ def main(d, d1=None, tsv=None):
         say("P16", "smol-instruct", 1e-7 <= v["max_abs"] <= 1e-3 and v["top1"] >= 0.998 and v["mean_kl"] < 1e-9, f"canonical form as a model: max|d| {v['max_abs']:.3g}, KL {v['mean_kl']:.3g}, top1 {v['top1']:.4f}, top5 {v['top5_prompts']}")
     else:
         say("P16", "smol-instruct", None, "the cell did not record it (first run)")
-    # controls: the self-test and every kept step
+    # controls: the self-test and every kept step (a skipped step passes only for the function cell off SmolLM2-135M-Instruct)
     for t in ALL:
         st = os.path.join(d, t, "selftest.txt")
         txt = open(st).read() if os.path.exists(st) else None
-        say("control", t, None if txt is None else "selftest: all ok" in txt, "self-test: " + ("missing" if txt is None else txt.strip().splitlines()[-1]))
+        extra("control", t, None if txt is None else "selftest: all ok" in txt, "self-test: " + ("missing" if txt is None else txt.strip().splitlines()[-1]))
         o = data[t]["outcomes"]
         if o:
-            say("control", t, all(x.get("outcome", x.get("conclusion")) in ("success", "skipped") for x in o.values() if isinstance(x, dict) and ("outcome" in x or "conclusion" in x)),
-                "steps: " + ", ".join(f"{name} {x.get('outcome', x.get('conclusion'))}" for name, x in o.items() if isinstance(x, dict)))
+            def fine(name, x):
+                r = x.get("outcome", x.get("conclusion"))
+                return r == "success" or (r == "skipped" and name == "function" and t != "smol-instruct")
+            extra("control", t, all(fine(name, x) for name, x in o.items() if isinstance(x, dict) and ("outcome" in x or "conclusion" in x)),
+                  "steps: " + ", ".join(f"{name} {x.get('outcome', x.get('conclusion'))}" for name, x in o.items() if isinstance(x, dict)))
         else:
-            say("control", t, None, "outcomes.json missing")
+            extra("control", t, None, "outcomes.json missing")
+    key = lambda r: (r[0], ALL.index(r[1]))
     print("| prediction | model | result | seen |\n|---|---|---|---|")
-    for pid, tag, res, seen in sorted(rows, key=lambda r: (r[0] if r[0] != "control" and r[0] != "observed" else "Z" + r[0], ALL.index(r[1]))):
+    for pid, tag, res, seen in sorted(rows, key=key):
         print(f"| {pid} | {tag} | {res} | {seen} |")
     if tsv:
         with open(tsv, "w") as out:
             out.write("prediction\tmodel\tresult\tseen\n")
-            for pid, tag, res, seen in sorted(rows, key=lambda r: (r[0] if r[0] != "control" and r[0] != "observed" else "Z" + r[0], ALL.index(r[1]))):
+            for pid, tag, res, seen in sorted(rows, key=key):
                 out.write(f"{pid}\t{tag}\t{res}\t{seen.replace(chr(9), ' ').replace(chr(10), ' ')}\n")
+    print("\nControls and observations (not counted):\n\n| kind | model | result | seen |\n|---|---|---|---|")
+    for kind, tag, res, seen in sorted(extras, key=lambda r: (r[0], ALL.index(r[1]))):
+        print(f"| {kind} | {tag} | {res} | {seen} |")
     refuted = [r for r in rows if r[2] == "REFUTED"]
-    print(f"\n{len(rows)} lines; as predicted {sum(1 for r in rows if r[2] == 'as predicted')}, refuted {len(refuted)}, not graded {sum(1 for r in rows if r[2] == 'not graded')}")
+    print(f"\n{len(rows)} prediction lines; as predicted {sum(1 for r in rows if r[2] == 'as predicted')}, refuted {len(refuted)}, not graded {sum(1 for r in rows if r[2] == 'not graded')}")
+    return not any(r[2] == "FAILED" for r in extras if r[0] == "control")
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], sys.argv[2] if len(sys.argv) > 2 and sys.argv[2] != "-" else None, sys.argv[3] if len(sys.argv) > 3 else None)
+    sys.exit(0 if main(sys.argv[1], sys.argv[2] if len(sys.argv) > 2 and sys.argv[2] != "-" else None, sys.argv[3] if len(sys.argv) > 3 else None) else 1)

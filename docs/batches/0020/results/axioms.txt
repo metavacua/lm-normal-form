@@ -1,6 +1,5 @@
 'Lmnf.preservesDot_of_transpose_mul' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Lmnf.rms_equivariant' depends on axioms: [propext, Classical.choice, Quot.sound]
-'Lmnf.rms_scale' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Lmnf.mulVec_weighted_sum' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Lmnf.ov_gauge' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Lmnf.bilinear_gauge' depends on axioms: [propext, Classical.choice, Quot.sound]

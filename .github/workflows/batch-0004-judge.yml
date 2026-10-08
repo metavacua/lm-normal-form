@@ -2,12 +2,14 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 # The judge of batch 0004, over the answers of a recorded run. It is called by
-# batch-0004.yml at the end of a run, and it runs on its own when the queries
-# or this file change, against the run named in RUN_ID, so that a question can
-# be asked again without reading the models again.
+# batch-0004.yml at the end of a run, and it can be started by hand against a
+# run named in the run_id input, so that a question can be asked again without
+# reading the models again while that run's artifacts are kept.
 #
 # The run's artifacts are the raw data: Wikidata's answer, the prompts as
-# read, and each model's answers. Countries, prompts and their RDF forms are
+# read, and each model's answers. Every cell must have read every prompt: a
+# cell whose answer file has fewer lines than the prompts fails the load step,
+# and nothing is judged. Countries, prompts and their RDF forms are
 # derived here again by the jq files in batches/0004/, so that a change to
 # them needs no new run; the prompts derived must equal the prompts read. The
 # authority, the prompts and every model's answers are loaded into Oxigraph,
@@ -22,12 +24,12 @@ on:
         description: the run whose artifacts are judged
         required: true
         type: string
-  push:
-    branches: ["batch/0004-**"]
-    paths:
-      - ".github/workflows/batch-0004-judge.yml"
-      - "queries/0004/**"
-      - "batches/0004/*.jq"
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: the run whose artifacts are judged
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -39,8 +41,7 @@ defaults:
 
 env:
   PIP_DISABLE_PIP_VERSION_CHECK: "1"
-  # The run judged when nothing calls this workflow: the first complete run.
-  RUN_ID: ${{ inputs.run_id || '37411731358' }}
+  RUN_ID: ${{ inputs.run_id }}
 
 jobs:
   judge:
@@ -79,17 +80,25 @@ jobs:
           jq -r -f batches/0004/prompts-to-nt.jq work/prompts.json > work/prompts.nt
           oxigraph load --location work/store --file work/authority.nt --graph urn:lmnf:b4:g:authority
           oxigraph load --location work/store --file work/prompts.nt --graph urn:lmnf:b4:g:prompts
+          want="$(wc -l < prepare/prompts.tsv)"
+          : > out/short-cells.txt
           for dir in answers/answers-*; do
             cell="$(basename "$dir")"
             model="$(cat "$dir/model.txt")"
+            have="$(wc -l < "$dir/answers.jsonl" 2> /dev/null || echo 0)"
+            if [ "$have" != "$want" ]; then
+              echo "$cell $model: $have answers of $want prompts" >> out/short-cells.txt
+            fi
             if [ -s "$dir/answers.jsonl" ]; then
               jq -r --arg m "$model" -f batches/0004/answers-to-nt.jq "$dir/answers.jsonl" > "work/$cell.nt"
               /usr/bin/time -f "%e s %M KiB" oxigraph load --location work/store --file "work/$cell.nt" --graph "urn:lmnf:b4:g:$cell"
-              echo "$cell $model: $(wc -l < "$dir/answers.jsonl") answers, $(wc -l < "work/$cell.nt") triples"
+              echo "$cell $model: $have answers of $want prompts, $(grep -c unparsable "$dir/answers.jsonl" || true) unparsable, $(wc -l < "work/$cell.nt") triples"
             else
               echo "$cell $model: no answers"
             fi
           done | tee out/loaded.txt
+          # Every cell must have read every prompt; otherwise nothing is judged.
+          if test -s out/short-cells.txt; then cat out/short-cells.txt; exit 1; fi
           cp prepare/counts.json prepare/fetched-at.txt out/
           du -sh work/store
       - id: graphs

@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Batch 0023, the hole argument of training, on the Llama equations (the finite instance of finite23.py: not a language model). Two constant vectors that an equivalence transformation g relates are the
+# Batch 0023, the equivariance of training rules under the equivalence transformations, on the Llama equations (the finite instance of finite23.py: not a language model). Two constant vectors that an equivalence transformation g relates are the
 # same function. A training rule is a map on constants; if it respects g, the runs from theta and from g.theta stay the same function, and the state of a run is the function; if it does not, the state is
 # (function, form), and the rule's metric on the constants is a fixed structure that the function does not have. Two ways to ask:
 #   field    the velocity that a rule gives the function. In continuous time a rule defines a dynamics on functions if and only if the velocity V(theta) = J(theta) v(theta) (J the Jacobian of the function,

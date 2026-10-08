@@ -7,7 +7,9 @@
 # token sequences, so that every parameter that matters at all appears in some output.
 # The Jacobian is computed by the complex step, d f / d theta_j = Im f(theta + i h e_j) / h, which has no subtraction and so no cancellation error
 # (h = 1e-30), in numpy complex128 with the real nonlinearities; model.py's forward pass runs unchanged on complex arrays.
-# Usage: symdim.py OUT.json CONFIG [CONFIG ...]    CONFIG is the name of an entry of CONFIGS.
+# The rank threshold (1e-8 times the largest singular value) is not derived; in the committed results it lies inside an empty gap of 9 orders of magnitude between the smallest counted and the largest
+# uncounted singular value. One random point (seed 15) per configuration.
+# Usage: symdim.py OUT.json CONFIG [CONFIG ...]    CONFIG is the name of an entry of CONFIGS. Exits non-zero if a deficiency differs from the formula.
 import json, sys, time
 import numpy as np
 from ops import FloatOps
@@ -98,3 +100,4 @@ if __name__ == "__main__":
         print(f"{r['config']:26s} parameters {r['parameters']:5d} deficiency {r['deficiency']:4d} expected {r['expected_deficiency']:4d} "
               f"{'MATCH' if r['matches'] else 'DIFFERS'}  singular values at the cut: {r['sv_at_rank']:.3g} | {r['sv_after_rank']:.3g}  ({r['seconds']}s)")
     json.dump(out, open(sys.argv[1], "w"), indent=1)
+    sys.exit(0 if all(r["matches"] for r in out) else 1)

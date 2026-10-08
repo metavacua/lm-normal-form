@@ -1,15 +1,14 @@
 # SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Batch 0023, the finite instance as a checkpoint that standard runtimes load, run on its whole input space. The finite instance (finite23.py) is the Llama equations at hidden size 4, two layers, two query
-# heads and one key/value group of head dimension 2, 5 symbols, with parameters drawn from a seeded generator: it is NOT a language model (no training, no specification beyond the equations; the test of
-# hfx23.membership below rejects it). It is written here as a Hugging Face checkpoint (config.json, model.safetensors in float64) and run in Transformers (float64 with the float32 islands removed,
+# heads and one key/value group of head dimension 2, 5 symbols, with parameters drawn from a seeded generator: it is NOT a language model (no training, no specification beyond the equations). It is written here as a Hugging Face checkpoint (config.json, model.safetensors in float64) and run in Transformers (float64 with the float32 islands removed,
 # and float32 as shipped) and in candle (float32, candle/src/main.rs) on every sequence of four symbols (625 of them; the logits at the four positions are the logits of all 780 contexts of length 1 to 4),
 # and the logits are compared with those of the numpy forward pass (float64), which is checked against model.py in finite23.selftest and which batch 0015 checked against Transformers on a real checkpoint.
 # The comparison is exhaustive: every input of the instance is run in every runtime. What it shows is conformance of the runtimes to the equations at this size; nothing about language models.
 #   bridge23.py export OUTDIR                    writes OUTDIR/ckpt (the checkpoint), OUTDIR/reference.npy (numpy logits, (625, 4, 5)), OUTDIR/candle_inputs.json
 #   bridge23.py torch OUTDIR RES.json            Transformers float64 and float32 against the reference
 #   bridge23.py candle OUTDIR OUT.logits.f32 RES.json     the candle output against the reference
-import itertools, json, math, os, shutil, sys
+import itertools, json, os, shutil, sys
 import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -75,11 +74,6 @@ def torch_run(out, res_path):
         finally:
             restore()
         print(name, res[name], flush=True)
-    # the registered membership test applied to this instance (a negative control): the mean loss of its next-symbol predictions on uniformly random sequences of its alphabet, over ln(5)
-    lp = ref - np.log(np.exp(ref - ref.max(-1, keepdims=True)).sum(-1, keepdims=True)) - ref.max(-1, keepdims=True)
-    seq = sequences()
-    loss = float(-np.mean([lp[i, t, seq[i, t + 1]] for i in range(len(seq)) for t in range(LENGTH - 1)]))
-    res["membership_control"] = {"mean_loss_nats": loss, "ln_output_vocabulary": math.log(ARCH.vocab), "fraction_of_ln_vocabulary": loss / math.log(ARCH.vocab)}
     json.dump(res, open(res_path, "w"), indent=1)
 
 
