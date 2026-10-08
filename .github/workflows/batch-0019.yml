@@ -88,7 +88,7 @@ jobs:
   real:
     name: "02 SmolLM2-135M-Instruct: derived table against measured table"
     needs: derive
-    if: contains(github.event.head_commit.message, '[run]')
+    if: contains(github.event.head_commit.message, '[run]') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-22.04
     timeout-minutes: 240
     env:

@@ -107,7 +107,7 @@ jobs:
   lm:
     name: "02 the real checkpoints: SmolLM2-135M-Instruct, SmolLM2-135M, a BERT-tiny"
     needs: exact
-    if: contains(github.event.head_commit.message, '[run]')
+    if: contains(github.event.head_commit.message, '[run]') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 300
     env:
