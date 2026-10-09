@@ -19,7 +19,13 @@ use burn::prelude::*;
 use burn::tensor::Bytes;
 use core::cell::UnsafeCell;
 
-mod model;
+// The generated file is included as it is. It calls f64::ceil (the ONNX Range operator), which is in std
+// and not in core; num_traits::float::Float, through libm, provides it, and the trait is imported here, in
+// the module that holds the generated items, because a method is looked up where it is called.
+mod model {
+    use num_traits::float::Float;
+    include!("model.rs");
+}
 
 #[global_allocator]
 static ALLOC: dlmalloc::GlobalDlmalloc = dlmalloc::GlobalDlmalloc;
