@@ -1,0 +1,30 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# The WebAssembly module around the Rust that burn-onnx generated with LoadStrategy::Bytes.
+# src/model.rs is not in the repository: batches/0026/wasm.sh copies the generated file there and
+# writes, in place of @BURN_REV@, the Burn revision that burn-onnx's own workspace names, as
+# batches/0010/burn.sh does for the native runner. On a target without pointer-sized atomics Burn
+# turns on critical-section (burn-dispatch's target-specific dependency), which needs an
+# implementation at link time; src/lib.rs provides one for one thread, on exactly those targets.
+[package]
+name = "wasmlm"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+burn = { git = "https://github.com/tracel-ai/burn", rev = "@BURN_REV@", default-features = false, features = ["flex"] }
+burn-store = { git = "https://github.com/tracel-ai/burn", rev = "@BURN_REV@", default-features = false }
+dlmalloc = { version = "0.2", features = ["global"] }
+
+[target.'cfg(not(target_has_atomic = "ptr"))'.dependencies]
+critical-section = "1.2"
+
+[profile.release]
+panic = "abort"

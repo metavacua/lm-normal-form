@@ -1,0 +1,329 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0026: the Rust that burn-onnx generates from an ONNX graph of SmolLM2-135M-Instruct, built for
+# wasm32v1-none and run. Written down in docs/batches/0026.md, whose predictions P1 to P8 each step
+# below checks; a step fails when the prediction it checks does not hold, or cannot be checked.
+#
+# onnx  as batch 0010's: two models (a tiny random Llama first, as the smoke; SmolLM2-135M-Instruct)
+#       exported by Optimum, and ONNX Runtime's logits with and without graph optimization
+# wasm  per model: onnx2burn and gen_bytes built from burn-onnx's default branch; the native Rust of
+#       batch 0010 as a reference (burn.sh); the Bytes source (P2); the module built for
+#       wasm32v1-none (P3, P4) and the File source built the same way (P1); the module validated as
+#       WebAssembly 1.0 plus mutable globals (P5); the module run in wasmtime (P6); its logits graded
+#       against ONNX Runtime's and the native Rust's (P7, P8)
+name: batch 0026
+
+on:
+  push:
+    branches: ["batch/0026-**"]
+    paths: [".github/workflows/batch-0026.yml", "batches/0026/**"]
+  workflow_dispatch:
+    inputs:
+      burn_onnx_rev:
+        description: "burn-onnx commit to build (empty: the head of its default branch)"
+        required: false
+        default: ""
+      tags:
+        description: 'models to run, a JSON array: ["tiny"], or ["tiny","smol"]'
+        required: false
+        default: '["tiny","smol"]'
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: batch-0026-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  WASM_TOOLS: v1.259.0
+  # The token ids of each prompt in batches/0010/prompts.txt, one line per prompt, comma separated.
+  TOKENS: >-
+    import sys,transformers as t;k=t.AutoTokenizer.from_pretrained(sys.argv[1]);
+    [print(','.join(map(str,k(l.rstrip('\n')).input_ids)))for l in open(sys.argv[2])]
+  # The control for compare.py: the same logits with one value moved by 0.5.
+  PERTURB: >-
+    import numpy as np,shutil,sys;shutil.copytree(sys.argv[1],sys.argv[2]);f=sys.argv[2]+'/0.f32';
+    x=np.fromfile(f,'float32');x[0]+=0.5;x.tofile(f)
+
+jobs:
+  onnx:
+    name: "01 the ONNX graph and ONNX Runtime, ${{ matrix.tag }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        tag: ${{ fromJSON(inputs.tags || '["tiny"]') }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p out work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          case "${{ matrix.tag }}" in
+            tiny) echo "MODEL=hf-internal-testing/tiny-random-LlamaForCausalLM" >> "$GITHUB_ENV" ;;
+            smol) echo "MODEL=HuggingFaceTB/SmolLM2-135M-Instruct" >> "$GITHUB_ENV" ;;
+            *) echo "no model is named for ${{ matrix.tag }}"; exit 1 ;;
+          esac
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet "optimum[onnxruntime]" numpy
+          python -m pip freeze > out/versions.txt
+      - name: The revision of the model
+        run: curl -sS "https://huggingface.co/api/models/$MODEL" | jq -r .sha | tee out/revision.txt
+      - id: export
+        name: "optimum-cli: export to ONNX, without past"
+        continue-on-error: true
+        run: |
+          /usr/bin/time -v optimum-cli export onnx --model "$MODEL" --task text-generation work/onnx 2> out/export.time | tail -n 5 | tee out/export.log
+          du -b work/onnx/* | tee out/onnx-files.txt
+          sha256sum work/onnx/model.onnx | tee out/model.sha256
+          jq -r .vocab_size work/onnx/config.json | tee out/vocab.txt
+      - id: inputs
+        name: "the graph's inputs in order, and the token ids of the prompts"
+        continue-on-error: true
+        run: |
+          python -c "import onnx,sys;print(','.join(i.name for i in onnx.load(sys.argv[1],load_external_data=False).graph.input))" work/onnx/model.onnx | tee out/input-order.txt
+          python -c "$TOKENS" "$MODEL" batches/0010/prompts.txt | tee out/ids.txt
+      - id: ort_all
+        name: "ONNX Runtime, default graph optimization: the logits of every position"
+        continue-on-error: true
+        run: |
+          mkdir -p out/ort-all
+          mapfile -t ids < out/ids.txt
+          python batches/0010/logits.py work/onnx/model.onnx out/ort-all all "${ids[@]}" | tee out/ort-all.txt
+      - id: ort_none
+        name: "ONNX Runtime, no graph optimization: every node as the graph states it"
+        continue-on-error: true
+        run: |
+          mkdir -p out/ort-none
+          mapfile -t ids < out/ids.txt
+          python batches/0010/logits.py work/onnx/model.onnx out/ort-none none "${ids[@]}" | tee out/ort-none.txt
+      - id: control
+        name: "compare.py on logits with one value moved by 0.5, which it must report"
+        continue-on-error: true
+        run: |
+          python -c "$PERTURB" out/ort-all work/perturbed
+          python batches/0010/compare.py out/ort-all work/perturbed "$(cat out/vocab.txt)" | tee out/control.txt
+          awk '{for(i=1;i<=NF;i++) if($i=="max"){if($(i+1)>0.499 && $(i+1)<0.501) ok=1; break}} END{exit !ok}' out/control.txt
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: side-${{ matrix.tag }}
+          path: out/
+          retention-days: 7
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: graph-${{ matrix.tag }}
+          path: work/onnx/model.onnx
+          retention-days: 1
+
+  wasm:
+    name: "02 the Rust Burn generates, built for wasm32v1-none and run, ${{ matrix.tag }}"
+    needs: onnx
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        tag: ${{ fromJSON(inputs.tags || '["tiny"]') }}
+    env:
+      CARGO_INCREMENTAL: "0"
+      CARGO_TERM_COLOR: never
+      TAG: ${{ matrix.tag }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p out/$TAG work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet numpy wasmtime
+          python -m pip freeze > out/$TAG/versions.txt
+          df -h / | tee out/$TAG/disk-before.txt
+          # Room for the builds of Burn and a 650 MB weights file: remove what the image carries and this job does not use.
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/share/boost
+          df -h / | tee out/$TAG/disk-cleared.txt
+          rustup toolchain install stable --profile minimal --no-self-update
+          rustup default stable
+          rustup target add wasm32v1-none
+          { rustc -V; cargo -V; rustc --print target-list | grep -x wasm32v1-none; } | tee out/$TAG/rust.version
+          rustc --print cfg --target wasm32v1-none | tee out/$TAG/target-cfg.txt
+          gh release download "$WASM_TOOLS" -R bytecodealliance/wasm-tools -p '*x86_64-linux.tar.gz' -O - | sudo tar -xz -C /usr/local/bin --strip-components=1
+          wasm-tools --version | tee out/$TAG/wasm-tools.version
+          nproc | tee out/$TAG/nproc.txt
+          grep -m1 'model name' /proc/cpuinfo | tee out/$TAG/cpu.txt
+          free -g | tee out/$TAG/memory.txt
+      - uses: actions/download-artifact@v8
+        with:
+          name: graph-${{ matrix.tag }}
+          path: work/graph/${{ matrix.tag }}
+      - uses: actions/download-artifact@v8
+        with:
+          name: side-${{ matrix.tag }}
+          path: work/side/${{ matrix.tag }}
+      - id: tool
+        name: "cargo: onnx2burn and gen_bytes, built from burn-onnx's default branch"
+        continue-on-error: true
+        env:
+          REV: ${{ inputs.burn_onnx_rev }}
+        run: |
+          git clone --quiet https://github.com/tracel-ai/burn-onnx work/burn-onnx
+          if [ -n "$REV" ]; then git -C work/burn-onnx checkout --quiet "$REV"; fi
+          git -C work/burn-onnx rev-parse HEAD | tee out/$TAG/burn-onnx.rev
+          grep -m1 -o 'rev = "[0-9a-f]\{40\}"' work/burn-onnx/Cargo.toml | grep -o '[0-9a-f]\{40\}' | tee work/burn.rev out/$TAG/burn.rev
+          mkdir -p work/burn-onnx/crates/burn-onnx/examples
+          cp batches/0026/gen_bytes.rs work/burn-onnx/crates/burn-onnx/examples/gen_bytes.rs
+          cd work/burn-onnx
+          /usr/bin/time -v cargo build --release --locked -p burn-onnx --bin onnx2burn --example gen_bytes > ../../out/$TAG/tool-build.log 2>&1 || rc=$?
+          tail -n 12 ../../out/$TAG/tool-build.log
+          exit "${rc:-0}"
+      # The reference: batch 0010's native Rust, the File source, built and run as there (burn.sh).
+      - id: native_codegen
+        name: "native: onnx2burn on the graph, the File source"
+        continue-on-error: true
+        if: steps.tool.outcome == 'success'
+        run: bash batches/0010/burn.sh codegen $TAG
+      - id: native_compile
+        name: "native: the generated Rust and batch 0010's runner, built"
+        continue-on-error: true
+        if: steps.native_codegen.outcome == 'success'
+        run: bash batches/0010/burn.sh compile $TAG
+      - id: native_run
+        name: "native: the logits from the Rust"
+        continue-on-error: true
+        if: steps.native_compile.outcome == 'success'
+        run: bash batches/0010/burn.sh run $TAG
+      - id: native_compare
+        name: "native: the logits, Rust against ONNX Runtime"
+        continue-on-error: true
+        if: steps.native_run.outcome == 'success'
+        run: bash batches/0010/burn.sh compare $TAG
+      - id: gen
+        name: "gen_bytes on the graph: the Bytes source"
+        continue-on-error: true
+        if: steps.tool.outcome == 'success'
+        run: bash batches/0026/wasm.sh gen $TAG
+      - id: p2
+        name: "P2: the Bytes source has no std"
+        continue-on-error: true
+        if: steps.gen.outcome == 'success'
+        run: bash batches/0026/wasm.sh p2 $TAG
+      - id: build_a
+        name: "P3, P4: cargo build --target wasm32v1-none, the Bytes source"
+        continue-on-error: true
+        if: steps.gen.outcome == 'success'
+        run: bash batches/0026/wasm.sh build $TAG
+      - id: validate
+        name: "P5: the module validates as WebAssembly 1.0 plus mutable globals"
+        continue-on-error: true
+        if: steps.build_a.outcome == 'success'
+        run: bash batches/0026/wasm.sh validate $TAG
+      - id: p1
+        name: "P1: the File source does not build for wasm32v1-none, and the error names std"
+        continue-on-error: true
+        if: steps.native_codegen.outcome == 'success'
+        run: bash batches/0026/wasm.sh p1 $TAG
+      - id: run
+        name: "P6: the module run in wasmtime, the weights written into its linear memory"
+        continue-on-error: true
+        if: steps.build_a.outcome == 'success'
+        run: |
+          mapfile -t ids < work/side/$TAG/ids.txt
+          m=out/$TAG/bytes.wasm
+          sha256sum "$m" work/genb/$TAG/model.bpk | tee out/$TAG/run-inputs.sha256
+          mkdir -p out/$TAG/wasm-logits
+          INPUT_ORDER=$(cat work/side/$TAG/input-order.txt)
+          export INPUT_ORDER
+          rc=0
+          /usr/bin/time -v python batches/0026/host.py "$m" work/genb/$TAG/model.bpk out/$TAG/wasm-logits 2048 "${ids[@]}" > out/$TAG/host.log 2>&1 || rc=$?
+          tail -n 40 out/$TAG/host.log
+          awk '/Maximum resident/{print "host_peak_kb="$NF} /Elapsed \(wall/{print "host_elapsed="$NF}' out/$TAG/host.log | tee -a "$GITHUB_OUTPUT"
+          exit "$rc"
+      - id: grade_ort
+        name: "P7, P8: the module's logits against ONNX Runtime's, default graph optimization"
+        continue-on-error: true
+        if: steps.run.outcome == 'success'
+        run: python batches/0026/grade.py out/$TAG/wasm-logits work/side/$TAG/ort-all "$(cat work/side/$TAG/vocab.txt)" | tee out/$TAG/grade-ort.txt
+      - id: grade_native
+        name: "P7, P8: the module's logits against batch 0010's native Rust"
+        continue-on-error: true
+        if: steps.run.outcome == 'success' && steps.native_run.outcome == 'success'
+        run: python batches/0026/grade.py out/$TAG/wasm-logits out/$TAG/logits "$(cat work/side/$TAG/vocab.txt)" | tee out/$TAG/grade-native.txt
+      - id: observe
+        name: "observed: the module against ONNX Runtime without graph optimization, as compare.py reports it"
+        if: steps.run.outcome == 'success'
+        continue-on-error: true
+        run: python batches/0010/compare.py out/$TAG/wasm-logits work/side/$TAG/ort-none "$(cat work/side/$TAG/vocab.txt)" | tee out/$TAG/compare-none.txt
+      - id: control
+        name: "compare.py on the module's logits with one value moved by 0.5, which it must report"
+        continue-on-error: true
+        if: steps.run.outcome == 'success'
+        run: |
+          python -c "$PERTURB" out/$TAG/wasm-logits work/perturbed
+          python batches/0010/compare.py out/$TAG/wasm-logits work/perturbed "$(cat work/side/$TAG/vocab.txt)" | tee out/$TAG/control.txt
+          awk '{for(i=1;i<=NF;i++) if($i=="max"){if($(i+1)>0.499 && $(i+1)<0.501) ok=1; break}} END{exit !ok}' out/$TAG/control.txt
+      - name: Disk after
+        if: always()
+        run: df -h / | tee out/$TAG/disk-after.txt
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/$TAG/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: wasm-out-${{ matrix.tag }}
+          path: out/
+          retention-days: 7
+
+  report:
+    # A commit status named after the batch, so that the pull request's checks tab shows the batch run
+    # itself and not only the lint that carries the pull request's title.
+    name: report the batch run on the commit
+    needs: [onnx, wasm]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RESULTS: ${{ toJSON(needs) }}
+    steps:
+      # The record is each job's outcomes.json (the workflow's own steps context): a step that fails is a
+      # prediction that did not hold or could not be checked, and the commit status says so.
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          path: artifacts
+      - run: |
+          state=success; echo "$RESULTS" | jq -e '[.[] | .result] | all(. == "success")' > /dev/null || state=failure
+          test -d artifacts || state=failure
+          find artifacts -name outcomes.json 2> /dev/null | sort | while read -r f; do
+            jq -r --arg f "$f" 'to_entries[] | select(.value.outcome == "failure") | "\($f): \(.key)"' "$f"
+          done | tee failed-steps.txt
+          if test -s failed-steps.txt; then state=failure; fi
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -f state="$state" -f context="batch 0026" \
+            -f description="$(echo "$(wc -l < failed-steps.txt) failed steps; $(echo "$RESULTS" | jq -r 'to_entries | map("\(.key) \(.value.result)") | join(", ")')" | cut -c1-140)" \
+            -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" > /dev/null
