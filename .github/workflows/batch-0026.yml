@@ -235,23 +235,35 @@ jobs:
         continue-on-error: true
         if: steps.gen.outcome == 'success'
         run: bash batches/0026/wasm.sh build $TAG
+      # An auxiliary change, not a prediction: the build above failed in a dependency (cubecl-environment takes
+      # every wasm-family target for a browser), so that dependency is patched and the Bytes source built again.
+      - id: patch
+        name: "auxiliary: cubecl-environment patched to take target_family wasm for a browser only when target_os is not none"
+        continue-on-error: true
+        if: steps.gen.outcome == 'success' && steps.build_a.outcome == 'failure'
+        run: bash batches/0026/wasm.sh patch $TAG
+      - id: build_p
+        name: "P3, P4: the same build with the patched dependency"
+        continue-on-error: true
+        if: steps.patch.outcome == 'success'
+        run: bash batches/0026/wasm.sh build $TAG patched
       - id: validate
         name: "P5: the module validates as WebAssembly 1.0 plus mutable globals"
         continue-on-error: true
-        if: steps.build_a.outcome == 'success'
+        if: steps.build_a.outcome == 'success' || steps.build_p.outcome == 'success'
         run: bash batches/0026/wasm.sh validate $TAG
       - id: p1
         name: "P1: the File source does not build for wasm32v1-none, and the error names std"
         continue-on-error: true
-        if: steps.native_codegen.outcome == 'success'
+        if: steps.native_codegen.outcome == 'success' && (steps.build_a.outcome == 'success' || steps.build_p.outcome == 'success')
         run: bash batches/0026/wasm.sh p1 $TAG
       - id: run
         name: "P6: the module run in wasmtime, the weights written into its linear memory"
         continue-on-error: true
-        if: steps.build_a.outcome == 'success'
+        if: steps.build_a.outcome == 'success' || steps.build_p.outcome == 'success'
         run: |
           mapfile -t ids < work/side/$TAG/ids.txt
-          m=out/$TAG/bytes.wasm
+          m=out/$TAG/patched.wasm; [ -f "$m" ] || m=out/$TAG/bytes.wasm
           sha256sum "$m" work/genb/$TAG/model.bpk | tee out/$TAG/run-inputs.sha256
           mkdir -p out/$TAG/wasm-logits
           INPUT_ORDER=$(cat work/side/$TAG/input-order.txt)
