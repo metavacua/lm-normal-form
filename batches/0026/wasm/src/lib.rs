@@ -30,8 +30,23 @@ mod model {
 #[global_allocator]
 static ALLOC: dlmalloc::GlobalDlmalloc = dlmalloc::GlobalDlmalloc;
 
+// The panic message is kept in a buffer the host reads after the trap (panic_ptr, panic_len).
+struct PanicBuf;
+impl core::fmt::Write for PanicBuf {
+    fn write_str(&mut self, s: &str) -> core::fmt::Result {
+        let (len, buf) = (PANIC_LEN.get(), PANIC.get());
+        let n = s.len().min(buf.len() - *len);
+        buf[*len..*len + n].copy_from_slice(&s.as_bytes()[..n]);
+        *len += n;
+        Ok(())
+    }
+}
+
 #[panic_handler]
-fn panic(_: &core::panic::PanicInfo) -> ! {
+fn panic(info: &core::panic::PanicInfo) -> ! {
+    use core::fmt::Write;
+    *PANIC_LEN.get() = 0;
+    let _ = write!(PanicBuf, "{info}");
     #[allow(unused_unsafe)]
     unsafe {
         core::arch::wasm32::unreachable()
@@ -51,6 +66,8 @@ impl<T> Single<T> {
     }
 }
 
+static PANIC: Single<[u8; 2048]> = Single::new([0; 2048]);
+static PANIC_LEN: Single<usize> = Single::new(0);
 static WEIGHTS: Single<Vec<u8>> = Single::new(Vec::new());
 static IDS: Single<Vec<i32>> = Single::new(Vec::new());
 static OUT: Single<Vec<f32>> = Single::new(Vec::new());
@@ -113,4 +130,14 @@ pub extern "C" fn forward(k0: i32, k1: i32, k2: i32) -> usize {
 #[unsafe(no_mangle)]
 pub extern "C" fn out_ptr() -> *const f32 {
     OUT.get().as_ptr()
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn panic_ptr() -> *const u8 {
+    PANIC.get().as_ptr()
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn panic_len() -> usize {
+    *PANIC_LEN.get()
 }

@@ -28,7 +28,8 @@ def main():
     engine = w.Engine(cfg)
     module = w.Module.from_file(engine, wasm)
     print("imports:", [(i.module, i.name) for i in module.imports])
-    print("exports:", [e.name for e in module.exports])
+    module_exports = [e.name for e in module.exports]
+    print("exports:", module_exports)
     store = w.Store(engine)
     store.set_limits(memory_size=int(limit_mib) << 20)
     inst = w.Linker(engine).instantiate(store, module)
@@ -59,7 +60,12 @@ def main():
         p = ex["ids_alloc"](store, len(ids))
         ctypes.memmove(base() + p, (ctypes.c_int32 * len(ids))(*ids), 4 * len(ids))
         t = time.perf_counter()
-        count = ex["forward"](store, *order)
+        try:
+            count = ex["forward"](store, *order)
+        except w.Trap:
+            if "panic_len" in module_exports:
+                print("panic:", ctypes.string_at(base() + ex["panic_ptr"](store), ex["panic_len"](store)).decode(errors="replace"))
+            raise
         dt = time.perf_counter() - t
         q = ex["out_ptr"](store)
         data = ctypes.string_at(base() + q, 4 * count)
