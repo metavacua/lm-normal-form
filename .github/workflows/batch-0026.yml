@@ -242,10 +242,18 @@ jobs:
         continue-on-error: true
         if: steps.gen.outcome == 'success' && steps.build_a.outcome == 'failure'
         run: bash batches/0026/wasm.sh patch $TAG
-      - id: build_p
-        name: "P3, P4: the same build with the patched dependency"
+      # A second auxiliary change: on the third and fourth runs the patched build passed and validated, and the
+      # module trapped in forward; the panic message (run 4) is a Mul of shapes [1,4,6,3] and [1,1,6,4], the
+      # rotary embedding's slice to the end, which the generator wrote as the i64 literal 9223372036854775807.
+      - id: genfix
+        name: "auxiliary: burn-onnx's slice node writes an open range for an end of i64::MAX, and the Bytes source is generated again"
         continue-on-error: true
         if: steps.patch.outcome == 'success'
+        run: bash batches/0026/wasm.sh genfix $TAG
+      - id: build_p
+        name: "P3, P4: the same build with the patched dependency and the regenerated source"
+        continue-on-error: true
+        if: steps.genfix.outcome == 'success'
         run: bash batches/0026/wasm.sh build $TAG patched
       - id: validate
         name: "P5: the module validates as WebAssembly 1.0 plus mutable globals"
