@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# The shadow stack in linear memory is 64 KiB (wasm-ld's default is 1 MiB; the target puts it first, so that an overflow
+# leaves the memory and traps) and the memory declares a maximum of 64 pages = 4 MiB, so that the bound is a property of
+# the module and not of the host that runs it. Every warning is an error.
+[target.wasm32v1-none]
+rustflags = ["-D", "warnings", "-C", "link-arg=-zstack-size=65536", "-C", "link-arg=--max-memory=4194304"]

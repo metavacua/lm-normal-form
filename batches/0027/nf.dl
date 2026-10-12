@@ -1,0 +1,107 @@
+// SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// The plan for the normal form of a model, derived from the dataflow of its forward pass (plan_facts.py makes the facts with batch 0019's ir.py) and from three
+// tables that are the mathematics the program takes as given: the lattice of groups and the groups that each role allows (batch 0019's states.dl, included whole,
+// with one role added), the canonicalization method of each group and the theorem that says the method is a canonicalization, and the theorems that are proved.
+//   grp_of(S, G)         batch 0019: the largest group of changes of basis of the index space S that no operation touching S forbids.
+//   mindepth(S, D)       the distance from the vocabulary, whose coordinates are labelled, through the parameter tensors: the order in which the spaces can be canonicalized.
+//   plan(S, D, G, M, T)  the method M for the group G of the space S, and the theorem T that M is a canonicalization of the orbits of G.
+//   noplan(S, G)         a space whose group has no method; unanchored(S): a space no chain of parameter tensors joins to the vocabulary.
+//   need(T)              the theorems the plan depends on.
+//   value(S, V)          Kleene's strong logic as the integers -1 (refuted), 0 (unknown), 1 (supported); the conjunction is the minimum, the negation is the sign.
+//                        A space is supported when its group is trivial or when its theorem is in `proved`; refuted when it is in `refuted`; otherwise unknown.
+//   model_value(V)       the minimum over the spaces and over `canon_stratified`, the theorem that canonicalizing the spaces one after another in the order of
+//                        mindepth is a canonicalization of the orbits of the product of the groups (not proved by this batch, so the plan as a whole is at most unknown).
+// What this does not say: the groups are those of batch 0019's lattice, a conservative subgroup of the true gauge group of the model (the lattice has no element
+// for the sign changes of whole rotary planes, for instance), and the scalars that BitNet keeps next to each ternary matrix are parameters and not index spaces, so the
+// continuous gauge between a scale and the norm weight beside it is not in the model. The plan is a plan for the orbits of the modelled group, which are contained
+// in the classes of functionally equal models.
+#include "groups.dl"
+
+// ---- the library: one more role ---------------------------------------------------------------------------------------------------------------------------------
+// (groups.dl is the part of batches/0019/states.dl that derives the group of each space; make_groups.py copies it.)
+// A matrix with entries in {-1, 0, 1} stays ternary under a change of basis of one of its index spaces for every ternary matrix exactly when the change is a signed
+// permutation: no scalar other than +1 and -1 keeps the alphabet, and no invertible matrix that mixes coordinates keeps it.
+compat("ternary", "SP").
+
+// ---- the library: the canonicalization methods ------------------------------------------------------------------------------------------------------------------
+// method(group, name, theorem). The theorems are in batches/0027/lean (Obligations.lean); GL has none: batch 0027's ref.py checks the reduced row echelon form
+// exhaustively on a finite model, which is evidence and not a proof.
+.decl method(g:symbol, m:symbol, thm:symbol)
+method("Triv", "fixed", "").
+method("Perm", "sort", "canon_Perm_sort").
+method("SP", "sign_sort", "canon_SP_sign_sort").
+method("Mono", "scale_sort", "canon_Mono_scale_sort").
+method("GL", "rref", "canon_GL_rref").
+.decl has_method(g:symbol)
+has_method(g) :- method(g, _, _).
+
+// ---- what is established (written by grade27.py from the output of Lean, and by ref.py) ------------------------------------------------------------------------
+.decl proved(t:symbol)
+.input proved
+.decl exhaustive(t:symbol)
+.input exhaustive
+.decl refuted(t:symbol)
+.input refuted
+
+// ---- the order of the canonicalization ------------------------------------------------------------------------------------------------------------------------
+// two spaces are coupled when a parameter tensor has both as axes, when a diagonal link (a norm weight) maps one onto the other, or when an elementwise product pairs them
+.decl coupled(a:symbol, b:symbol)
+coupled(a, b) :- tensor(t, "param", _, _), axis(t, _, a), axis(t, _, b), a != b.
+coupled(a, b) :- diag(_, a, b), a != b.
+coupled(b, a) :- diag(_, a, b), a != b.
+coupled(a, b) :- op(o, "gated_product"), cons(o, a, _), cons(o, b, _), a != b.
+.decl anchor(s:symbol)
+anchor(s) :- space(s, _, _, "vocab").
+.decl depth(s:symbol, d:number)
+depth(s, 0) :- anchor(s).
+depth(b, d + 1) :- depth(a, d), coupled(a, b), !anchor(b), d < 12.
+.decl mindepth(s:symbol, d:number)
+mindepth(s, d) :- depth(s, _), d = min x : { depth(s, x) }.
+.decl has_depth(s:symbol)
+has_depth(s) :- mindepth(s, _).
+.decl unanchored(s:symbol)
+unanchored(s) :- space(s, _, _, k), k != "tok", !has_depth(s).
+
+// ---- the plan ----------------------------------------------------------------------------------------------------------------------------------------------------
+.decl plan(s:symbol, d:number, g:symbol, m:symbol, thm:symbol)
+plan(s, d, g, m, t) :- mindepth(s, d), grp_of(s, g), method(g, m, t).
+.decl noplan(s:symbol, g:symbol)
+noplan(s, g) :- grp_of(s, g), space(s, _, _, k), k != "tok", !has_method(g).
+.decl need(t:symbol)
+need(t) :- plan(_, _, g, _, t), g != "Triv".
+
+// ---- the verdict, in Kleene's strong logic ------------------------------------------------------------------------------------------------------------------
+.decl value(s:symbol, v:number)
+value(s, 1) :- plan(s, _, "Triv", _, _).
+value(s, 1) :- plan(s, _, g, _, t), g != "Triv", proved(t), !refuted(t).
+value(s, -1) :- plan(s, _, g, _, t), g != "Triv", refuted(t).
+value(s, 0) :- plan(s, _, g, _, t), g != "Triv", !proved(t), !refuted(t).
+value(s, 0) :- noplan(s, _).
+value(s, 0) :- unanchored(s).
+.decl spaces_value(v:number)
+spaces_value(v) :- v = min x : { value(_, x) }.
+.decl compose_value(v:number)
+compose_value(1) :- proved("canon_stratified").
+compose_value(0) :- !proved("canon_stratified").
+.decl model_value(v:number)
+model_value(v) :- spaces_value(a), compose_value(b), v = min(a, b).
+
+// ---- checks (all must be empty) ----------------------------------------------------------------------------------------------------------------------------
+.decl inconsistent(t:symbol)
+inconsistent(t) :- proved(t), refuted(t).
+.decl library_checks(w:symbol)
+library_checks(w) :- no_glb(a, b), w = cat("no_glb:", cat(a, cat(",", b))).
+library_checks(w) :- many_glb(a, b), w = cat("many_glb:", cat(a, cat(",", b))).
+library_checks(w) :- ungrouped(s), w = cat("ungrouped:", s).
+library_checks(w) :- two_groups(s), w = cat("two_groups:", s).
+
+.output plan
+.output noplan
+.output unanchored
+.output need
+.output value
+.output spaces_value
+.output model_value
+.output inconsistent
+.output library_checks

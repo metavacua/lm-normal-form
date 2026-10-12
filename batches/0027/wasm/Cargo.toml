@@ -1,0 +1,25 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# A WebAssembly 1.0 module for wasm32v1-none with no dependencies: no imports, one linear memory with a declared maximum
+# (.cargo/config.toml), and the exports that batches/0027/wasm_host.py uses to check in wasmtime what closure.dl derives
+# about the module. Overflow checks are on so that an index that wraps is a trap and not a read of another cell.
+[package]
+name = "lmnf_probe"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+overflow-checks = true

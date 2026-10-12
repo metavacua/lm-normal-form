@@ -1,0 +1,2184 @@
+{
+ "claims": {
+  "f3_sum_wraps_numeral_sum_carries": true,
+  "k3_de_morgan": true,
+  "k3_double_negation": true,
+  "k3_excluded_middle_fails_at": [
+   0
+  ],
+  "k3_non_contradiction_fails_at": [
+   0
+  ],
+  "k3_polynomials_over_F3": true,
+  "k3_polynomials_over_Z": true,
+  "negation_digitwise": true,
+  "numeral_order_lex_equals_numeric": {
+   "1": true,
+   "2": true,
+   "3": true,
+   "4": true,
+   "5": true,
+   "6": true,
+   "7": true
+  },
+  "reduced_polynomial_rank": {
+   "1": {
+    "points": 3,
+    "rank": 3
+   },
+   "2": {
+    "points": 9,
+    "rank": 9
+   },
+   "3": {
+    "points": 27,
+    "rank": 27
+   }
+  },
+  "residues_complete": true,
+  "tq1_0_five_trits": {
+   "byte_order_is_lex_order": true,
+   "distinct_bytes": 243,
+   "max_byte": 255,
+   "round_trip": true,
+   "tuples": 243
+  },
+  "tq1_0_four_trits": {
+   "byte_order_is_lex_order": true,
+   "distinct_bytes": 81,
+   "round_trip": true,
+   "tuples": 81
+  },
+  "tq2_0_four_trits": {
+   "byte_order_is_lex_order": false,
+   "distinct_bytes": 81,
+   "round_trip": true,
+   "tuples": 81
+  },
+  "truncation_balanced": {
+   "cases": 4923,
+   "error_above_half": 0,
+   "truncated_value_above_true_value": 2193
+  },
+  "truncation_unbalanced_is_floor": true
+ },
+ "quantizer": {
+  "shape": [
+   4,
+   5
+  ],
+  "trials": 400,
+  "violations": {
+   "act_idempotent": 0,
+   "act_perm": 0,
+   "act_scale_3": 0,
+   "act_scale_pow2": 0,
+   "act_sign": 0,
+   "idempotent": 0,
+   "row_col_perm": 0,
+   "scale_3": 0,
+   "scale_class_collapse": 0,
+   "scale_pow2": 0,
+   "sign_col": 0,
+   "sign_row": 0
+  }
+ },
+ "tier": "small",
+ "xc": [
+  {
+   "d": 1,
+   "d1e1_function_classes_from_the_three_sums": [
+    3,
+    9,
+    9,
+    3,
+    9,
+    3,
+    3,
+    9,
+    9,
+    9,
+    3,
+    9,
+    9,
+    1,
+    9,
+    9,
+    3,
+    9,
+    9,
+    9,
+    3,
+    3,
+    9,
+    3,
+    9,
+    9,
+    3
+   ],
+   "d1e1_matches_enumeration": true,
+   "e": 1,
+   "even": {
+    "block_canonical_forms": 55,
+    "block_orbits_bfs": 55,
+    "block_orbits_formula": 55,
+    "canonical_form_decisive": true,
+    "canonical_form_idempotent": true,
+    "unit_orbits": 10,
+    "unit_orbits_burnside": 10
+   },
+   "lead_norm_is_a_normal_form_of_sign_orbits": true,
+   "multisets": 378,
+   "n": 2,
+   "neither": {
+    "block_canonical_forms": 120,
+    "block_orbits_bfs": 120,
+    "block_orbits_formula": 120,
+    "canonical_form_decisive": true,
+    "canonical_form_idempotent": true,
+    "unit_orbits": 15,
+    "unit_orbits_burnside": 15
+   },
+   "nonlinearities_with_equal_counts": 0,
+   "nonlinearities_with_fewer_function_classes_than_orbits": 26,
+   "odd": {
+    "block_canonical_forms": 45,
+    "block_orbits_bfs": 45,
+    "block_orbits_formula": 45,
+    "canonical_form_decisive": true,
+    "canonical_form_idempotent": true,
+    "unit_orbits": 9,
+    "unit_orbits_burnside": 9
+   },
+   "ordered_blocks": 729,
+   "parity_counts": {
+    "even": 8,
+    "neither": 16,
+    "odd": 2,
+    "zero": 1
+   },
+   "per_nonlinearity": [
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 55,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 25,
+     "parity": "even",
+     "s": [
+      -1,
+      -1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 120,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 48,
+     "parity": "neither",
+     "s": [
+      -1,
+      -1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 120,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 50,
+     "parity": "neither",
+     "s": [
+      -1,
+      -1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 55,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 37,
+     "parity": "even",
+     "s": [
+      -1,
+      0,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 5,
+     "function_classes": 9,
+     "gauge_orbits": 120,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 68,
+     "parity": "neither",
+     "s": [
+      -1,
+      0,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 45,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 29,
+     "parity": "odd",
+     "s": [
+      -1,
+      0,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 55,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 25,
+     "parity": "even",
+     "s": [
+      -1,
+      1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 120,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 48,
+     "parity": "neither",
+     "s": [
+      -1,
+      1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 120,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 50,
+     "parity": "neither",
+     "s": [
+      -1,
+      1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 120,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 48,
+     "parity": "neither",
+     "s": [
+      0,
+      -1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 55,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 37,
+     "parity": "even",
+     "s": [
+      0,
+      -1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 120,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 48,
+     "parity": "neither",
+     "s": [
+      0,
+      -1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 5,
+     "function_classes": 9,
+     "gauge_orbits": 120,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 68,
+     "parity": "neither",
+     "s": [
+      0,
+      0,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 1,
+     "function_classes": 1,
+     "gauge_orbits": 36,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 36,
+     "parity": "zero",
+     "s": [
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 5,
+     "function_classes": 9,
+     "gauge_orbits": 120,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 68,
+     "parity": "neither",
+     "s": [
+      0,
+      0,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 120,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 48,
+     "parity": "neither",
+     "s": [
+      0,
+      1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 55,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 37,
+     "parity": "even",
+     "s": [
+      0,
+      1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 120,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 48,
+     "parity": "neither",
+     "s": [
+      0,
+      1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 120,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 50,
+     "parity": "neither",
+     "s": [
+      1,
+      -1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 120,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 48,
+     "parity": "neither",
+     "s": [
+      1,
+      -1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 55,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 25,
+     "parity": "even",
+     "s": [
+      1,
+      -1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 45,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 29,
+     "parity": "odd",
+     "s": [
+      1,
+      0,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 5,
+     "function_classes": 9,
+     "gauge_orbits": 120,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 68,
+     "parity": "neither",
+     "s": [
+      1,
+      0,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 55,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 37,
+     "parity": "even",
+     "s": [
+      1,
+      0,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 120,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 50,
+     "parity": "neither",
+     "s": [
+      1,
+      1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 120,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 48,
+     "parity": "neither",
+     "s": [
+      1,
+      1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 55,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 25,
+     "parity": "even",
+     "s": [
+      1,
+      1,
+      1
+     ]
+    }
+   ],
+   "totals": {
+    "function_not_constant_on_orbit": 0,
+    "gauge_violations": 0
+   },
+   "unit_types": 27
+  },
+  {
+   "d": 1,
+   "d1e1_function_classes_from_the_three_sums": [
+    3,
+    9,
+    9,
+    3,
+    9,
+    3,
+    3,
+    9,
+    9,
+    9,
+    3,
+    9,
+    9,
+    1,
+    9,
+    9,
+    3,
+    9,
+    9,
+    9,
+    3,
+    3,
+    9,
+    3,
+    9,
+    9,
+    3
+   ],
+   "d1e1_matches_enumeration": true,
+   "e": 1,
+   "even": {
+    "block_canonical_forms": 220,
+    "block_orbits_bfs": 220,
+    "block_orbits_formula": 220,
+    "canonical_form_decisive": true,
+    "canonical_form_idempotent": true,
+    "unit_orbits": 10,
+    "unit_orbits_burnside": 10
+   },
+   "lead_norm_is_a_normal_form_of_sign_orbits": true,
+   "multisets": 3654,
+   "n": 3,
+   "neither": {
+    "block_canonical_forms": 680,
+    "block_orbits_bfs": 680,
+    "block_orbits_formula": 680,
+    "canonical_form_decisive": true,
+    "canonical_form_idempotent": true,
+    "unit_orbits": 15,
+    "unit_orbits_burnside": 15
+   },
+   "nonlinearities_with_equal_counts": 0,
+   "nonlinearities_with_fewer_function_classes_than_orbits": 26,
+   "odd": {
+    "block_canonical_forms": 165,
+    "block_orbits_bfs": 165,
+    "block_orbits_formula": 165,
+    "canonical_form_decisive": true,
+    "canonical_form_idempotent": true,
+    "unit_orbits": 9,
+    "unit_orbits_burnside": 9
+   },
+   "ordered_blocks": 19683,
+   "parity_counts": {
+    "even": 8,
+    "neither": 16,
+    "odd": 2,
+    "zero": 1
+   },
+   "per_nonlinearity": [
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 220,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 88,
+     "parity": "even",
+     "s": [
+      -1,
+      -1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 680,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 200,
+     "parity": "neither",
+     "s": [
+      -1,
+      -1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 680,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 220,
+     "parity": "neither",
+     "s": [
+      -1,
+      -1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 220,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 130,
+     "parity": "even",
+     "s": [
+      -1,
+      0,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 680,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 312,
+     "parity": "neither",
+     "s": [
+      -1,
+      0,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 165,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 93,
+     "parity": "odd",
+     "s": [
+      -1,
+      0,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 220,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 88,
+     "parity": "even",
+     "s": [
+      -1,
+      1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 680,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 200,
+     "parity": "neither",
+     "s": [
+      -1,
+      1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 680,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 220,
+     "parity": "neither",
+     "s": [
+      -1,
+      1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 680,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 200,
+     "parity": "neither",
+     "s": [
+      0,
+      -1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 220,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 130,
+     "parity": "even",
+     "s": [
+      0,
+      -1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 680,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 200,
+     "parity": "neither",
+     "s": [
+      0,
+      -1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 680,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 312,
+     "parity": "neither",
+     "s": [
+      0,
+      0,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 1,
+     "function_classes": 1,
+     "gauge_orbits": 120,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 120,
+     "parity": "zero",
+     "s": [
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 680,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 312,
+     "parity": "neither",
+     "s": [
+      0,
+      0,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 680,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 200,
+     "parity": "neither",
+     "s": [
+      0,
+      1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 220,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 130,
+     "parity": "even",
+     "s": [
+      0,
+      1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 680,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 200,
+     "parity": "neither",
+     "s": [
+      0,
+      1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 680,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 220,
+     "parity": "neither",
+     "s": [
+      1,
+      -1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 680,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 200,
+     "parity": "neither",
+     "s": [
+      1,
+      -1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 220,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 88,
+     "parity": "even",
+     "s": [
+      1,
+      -1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 165,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 93,
+     "parity": "odd",
+     "s": [
+      1,
+      0,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 680,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 312,
+     "parity": "neither",
+     "s": [
+      1,
+      0,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 220,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 130,
+     "parity": "even",
+     "s": [
+      1,
+      0,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 680,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 220,
+     "parity": "neither",
+     "s": [
+      1,
+      1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 680,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 200,
+     "parity": "neither",
+     "s": [
+      1,
+      1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 220,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 88,
+     "parity": "even",
+     "s": [
+      1,
+      1,
+      1
+     ]
+    }
+   ],
+   "totals": {
+    "function_not_constant_on_orbit": 0,
+    "gauge_violations": 0
+   },
+   "unit_types": 27
+  },
+  {
+   "d": 1,
+   "e": 2,
+   "even": {
+    "block_canonical_forms": 406,
+    "block_orbits_bfs": 406,
+    "block_orbits_formula": 406,
+    "canonical_form_decisive": true,
+    "canonical_form_idempotent": true,
+    "unit_orbits": 28,
+    "unit_orbits_burnside": 28
+   },
+   "lead_norm_is_a_normal_form_of_sign_orbits": true,
+   "multisets": 3321,
+   "n": 2,
+   "neither": {
+    "block_canonical_forms": 903,
+    "block_orbits_bfs": 903,
+    "block_orbits_formula": 903,
+    "canonical_form_decisive": true,
+    "canonical_form_idempotent": true,
+    "unit_orbits": 42,
+    "unit_orbits_burnside": 42
+   },
+   "nonlinearities_with_equal_counts": 0,
+   "nonlinearities_with_fewer_function_classes_than_orbits": 26,
+   "odd": {
+    "block_canonical_forms": 300,
+    "block_orbits_bfs": 300,
+    "block_orbits_formula": 300,
+    "canonical_form_decisive": true,
+    "canonical_form_idempotent": true,
+    "unit_orbits": 24,
+    "unit_orbits_burnside": 24
+   },
+   "ordered_blocks": 6561,
+   "parity_counts": {
+    "even": 8,
+    "neither": 16,
+    "odd": 2,
+    "zero": 1
+   },
+   "per_nonlinearity": [
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 406,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 94,
+     "parity": "even",
+     "s": [
+      -1,
+      -1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 81,
+     "function_classes": 81,
+     "gauge_orbits": 903,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 183,
+     "parity": "neither",
+     "s": [
+      -1,
+      -1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 81,
+     "function_classes": 81,
+     "gauge_orbits": 903,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 191,
+     "parity": "neither",
+     "s": [
+      -1,
+      -1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 406,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 214,
+     "parity": "even",
+     "s": [
+      -1,
+      0,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 17,
+     "function_classes": 81,
+     "gauge_orbits": 903,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 359,
+     "parity": "neither",
+     "s": [
+      -1,
+      0,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 300,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 140,
+     "parity": "odd",
+     "s": [
+      -1,
+      0,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 406,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 94,
+     "parity": "even",
+     "s": [
+      -1,
+      1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 81,
+     "function_classes": 81,
+     "gauge_orbits": 903,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 183,
+     "parity": "neither",
+     "s": [
+      -1,
+      1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 81,
+     "function_classes": 81,
+     "gauge_orbits": 903,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 191,
+     "parity": "neither",
+     "s": [
+      -1,
+      1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 81,
+     "function_classes": 81,
+     "gauge_orbits": 903,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 183,
+     "parity": "neither",
+     "s": [
+      0,
+      -1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 406,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 214,
+     "parity": "even",
+     "s": [
+      0,
+      -1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 81,
+     "function_classes": 81,
+     "gauge_orbits": 903,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 183,
+     "parity": "neither",
+     "s": [
+      0,
+      -1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 17,
+     "function_classes": 81,
+     "gauge_orbits": 903,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 359,
+     "parity": "neither",
+     "s": [
+      0,
+      0,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 1,
+     "function_classes": 1,
+     "gauge_orbits": 210,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 210,
+     "parity": "zero",
+     "s": [
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 17,
+     "function_classes": 81,
+     "gauge_orbits": 903,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 359,
+     "parity": "neither",
+     "s": [
+      0,
+      0,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 81,
+     "function_classes": 81,
+     "gauge_orbits": 903,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 183,
+     "parity": "neither",
+     "s": [
+      0,
+      1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 406,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 214,
+     "parity": "even",
+     "s": [
+      0,
+      1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 81,
+     "function_classes": 81,
+     "gauge_orbits": 903,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 183,
+     "parity": "neither",
+     "s": [
+      0,
+      1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 81,
+     "function_classes": 81,
+     "gauge_orbits": 903,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 191,
+     "parity": "neither",
+     "s": [
+      1,
+      -1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 81,
+     "function_classes": 81,
+     "gauge_orbits": 903,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 183,
+     "parity": "neither",
+     "s": [
+      1,
+      -1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 406,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 94,
+     "parity": "even",
+     "s": [
+      1,
+      -1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 300,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 140,
+     "parity": "odd",
+     "s": [
+      1,
+      0,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 17,
+     "function_classes": 81,
+     "gauge_orbits": 903,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 359,
+     "parity": "neither",
+     "s": [
+      1,
+      0,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 406,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 214,
+     "parity": "even",
+     "s": [
+      1,
+      0,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 81,
+     "function_classes": 81,
+     "gauge_orbits": 903,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 191,
+     "parity": "neither",
+     "s": [
+      1,
+      1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 81,
+     "function_classes": 81,
+     "gauge_orbits": 903,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 183,
+     "parity": "neither",
+     "s": [
+      1,
+      1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 406,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 94,
+     "parity": "even",
+     "s": [
+      1,
+      1,
+      1
+     ]
+    }
+   ],
+   "totals": {
+    "function_not_constant_on_orbit": 0,
+    "gauge_violations": 0
+   },
+   "unit_types": 81
+  },
+  {
+   "d": 2,
+   "e": 1,
+   "even": {
+    "block_canonical_forms": 2485,
+    "block_orbits_bfs": 2485,
+    "block_orbits_formula": 2485,
+    "canonical_form_decisive": true,
+    "canonical_form_idempotent": true,
+    "unit_orbits": 70,
+    "unit_orbits_burnside": 70
+   },
+   "lead_norm_is_a_normal_form_of_sign_orbits": true,
+   "multisets": 29646,
+   "n": 2,
+   "neither": {
+    "block_canonical_forms": 8001,
+    "block_orbits_bfs": 8001,
+    "block_orbits_formula": 8001,
+    "canonical_form_decisive": true,
+    "canonical_form_idempotent": true,
+    "unit_orbits": 126,
+    "unit_orbits_burnside": 126
+   },
+   "nonlinearities_with_equal_counts": 0,
+   "nonlinearities_with_fewer_function_classes_than_orbits": 26,
+   "odd": {
+    "block_canonical_forms": 2211,
+    "block_orbits_bfs": 2211,
+    "block_orbits_formula": 2211,
+    "canonical_form_decisive": true,
+    "canonical_form_idempotent": true,
+    "unit_orbits": 66,
+    "unit_orbits_burnside": 66
+   },
+   "ordered_blocks": 59049,
+   "parity_counts": {
+    "even": 8,
+    "neither": 16,
+    "odd": 2,
+    "zero": 1
+   },
+   "per_nonlinearity": [
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 2485,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 565,
+     "parity": "even",
+     "s": [
+      -1,
+      -1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 789,
+     "function_classes": 1605,
+     "gauge_orbits": 8001,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 1521,
+     "parity": "neither",
+     "s": [
+      -1,
+      -1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 627,
+     "function_classes": 1203,
+     "gauge_orbits": 8001,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 1529,
+     "parity": "neither",
+     "s": [
+      -1,
+      -1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 81,
+     "function_classes": 81,
+     "gauge_orbits": 2485,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 757,
+     "parity": "even",
+     "s": [
+      -1,
+      0,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 517,
+     "function_classes": 941,
+     "gauge_orbits": 8001,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 1985,
+     "parity": "neither",
+     "s": [
+      -1,
+      0,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 27,
+     "function_classes": 27,
+     "gauge_orbits": 2211,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 623,
+     "parity": "odd",
+     "s": [
+      -1,
+      0,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 81,
+     "function_classes": 81,
+     "gauge_orbits": 2485,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 493,
+     "parity": "even",
+     "s": [
+      -1,
+      1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 237,
+     "function_classes": 237,
+     "gauge_orbits": 8001,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 1521,
+     "parity": "neither",
+     "s": [
+      -1,
+      1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 627,
+     "function_classes": 1203,
+     "gauge_orbits": 8001,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 1529,
+     "parity": "neither",
+     "s": [
+      -1,
+      1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 789,
+     "function_classes": 1605,
+     "gauge_orbits": 8001,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 1521,
+     "parity": "neither",
+     "s": [
+      0,
+      -1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 81,
+     "function_classes": 81,
+     "gauge_orbits": 2485,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 781,
+     "parity": "even",
+     "s": [
+      0,
+      -1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 237,
+     "function_classes": 237,
+     "gauge_orbits": 8001,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 1521,
+     "parity": "neither",
+     "s": [
+      0,
+      -1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 517,
+     "function_classes": 941,
+     "gauge_orbits": 8001,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 1985,
+     "parity": "neither",
+     "s": [
+      0,
+      0,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 1,
+     "function_classes": 1,
+     "gauge_orbits": 1275,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 1275,
+     "parity": "zero",
+     "s": [
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 517,
+     "function_classes": 941,
+     "gauge_orbits": 8001,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 1985,
+     "parity": "neither",
+     "s": [
+      0,
+      0,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 237,
+     "function_classes": 237,
+     "gauge_orbits": 8001,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 1521,
+     "parity": "neither",
+     "s": [
+      0,
+      1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 81,
+     "function_classes": 81,
+     "gauge_orbits": 2485,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 781,
+     "parity": "even",
+     "s": [
+      0,
+      1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 789,
+     "function_classes": 1605,
+     "gauge_orbits": 8001,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 1521,
+     "parity": "neither",
+     "s": [
+      0,
+      1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 627,
+     "function_classes": 1203,
+     "gauge_orbits": 8001,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 1529,
+     "parity": "neither",
+     "s": [
+      1,
+      -1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 237,
+     "function_classes": 237,
+     "gauge_orbits": 8001,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 1521,
+     "parity": "neither",
+     "s": [
+      1,
+      -1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 81,
+     "function_classes": 81,
+     "gauge_orbits": 2485,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 493,
+     "parity": "even",
+     "s": [
+      1,
+      -1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 27,
+     "function_classes": 27,
+     "gauge_orbits": 2211,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 623,
+     "parity": "odd",
+     "s": [
+      1,
+      0,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 517,
+     "function_classes": 941,
+     "gauge_orbits": 8001,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 1985,
+     "parity": "neither",
+     "s": [
+      1,
+      0,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 81,
+     "function_classes": 81,
+     "gauge_orbits": 2485,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 757,
+     "parity": "even",
+     "s": [
+      1,
+      0,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 627,
+     "function_classes": 1203,
+     "gauge_orbits": 8001,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 1529,
+     "parity": "neither",
+     "s": [
+      1,
+      1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 789,
+     "function_classes": 1605,
+     "gauge_orbits": 8001,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 1521,
+     "parity": "neither",
+     "s": [
+      1,
+      1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 2485,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 565,
+     "parity": "even",
+     "s": [
+      1,
+      1,
+      1
+     ]
+    }
+   ],
+   "totals": {
+    "function_not_constant_on_orbit": 0,
+    "gauge_violations": 0
+   },
+   "unit_types": 243
+  },
+  {
+   "d": 1,
+   "d1e1_function_classes_from_the_three_sums": [
+    3,
+    9,
+    9,
+    3,
+    9,
+    3,
+    3,
+    9,
+    9,
+    9,
+    3,
+    9,
+    9,
+    1,
+    9,
+    9,
+    3,
+    9,
+    9,
+    9,
+    3,
+    3,
+    9,
+    3,
+    9,
+    9,
+    3
+   ],
+   "d1e1_matches_enumeration": true,
+   "e": 1,
+   "even": {
+    "block_canonical_forms": 715,
+    "block_orbits_bfs": 715,
+    "block_orbits_formula": 715,
+    "canonical_form_decisive": true,
+    "canonical_form_idempotent": true,
+    "unit_orbits": 10,
+    "unit_orbits_burnside": 10
+   },
+   "lead_norm_is_a_normal_form_of_sign_orbits": true,
+   "multisets": 27405,
+   "n": 4,
+   "neither": {
+    "block_canonical_forms": 3060,
+    "block_orbits_bfs": 3060,
+    "block_orbits_formula": 3060,
+    "canonical_form_decisive": true,
+    "canonical_form_idempotent": true,
+    "unit_orbits": 15,
+    "unit_orbits_burnside": 15
+   },
+   "nonlinearities_with_equal_counts": 0,
+   "nonlinearities_with_fewer_function_classes_than_orbits": 26,
+   "odd": {
+    "block_canonical_forms": 495,
+    "block_orbits_bfs": 495,
+    "block_orbits_formula": 495,
+    "canonical_form_decisive": true,
+    "canonical_form_idempotent": true,
+    "unit_orbits": 9,
+    "unit_orbits_burnside": 9
+   },
+   "ordered_blocks": 531441,
+   "parity_counts": {
+    "even": 8,
+    "neither": 16,
+    "odd": 2,
+    "zero": 1
+   },
+   "per_nonlinearity": [
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 715,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 267,
+     "parity": "even",
+     "s": [
+      -1,
+      -1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 3060,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 714,
+     "parity": "neither",
+     "s": [
+      -1,
+      -1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 3060,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 824,
+     "parity": "neither",
+     "s": [
+      -1,
+      -1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 715,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 383,
+     "parity": "even",
+     "s": [
+      -1,
+      0,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 3060,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 1180,
+     "parity": "neither",
+     "s": [
+      -1,
+      0,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 495,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 253,
+     "parity": "odd",
+     "s": [
+      -1,
+      0,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 715,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 267,
+     "parity": "even",
+     "s": [
+      -1,
+      1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 3060,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 714,
+     "parity": "neither",
+     "s": [
+      -1,
+      1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 3060,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 824,
+     "parity": "neither",
+     "s": [
+      -1,
+      1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 3060,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 714,
+     "parity": "neither",
+     "s": [
+      0,
+      -1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 715,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 383,
+     "parity": "even",
+     "s": [
+      0,
+      -1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 3060,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 714,
+     "parity": "neither",
+     "s": [
+      0,
+      -1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 3060,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 1180,
+     "parity": "neither",
+     "s": [
+      0,
+      0,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 1,
+     "function_classes": 1,
+     "gauge_orbits": 330,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 330,
+     "parity": "zero",
+     "s": [
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 3060,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 1180,
+     "parity": "neither",
+     "s": [
+      0,
+      0,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 3060,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 714,
+     "parity": "neither",
+     "s": [
+      0,
+      1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 715,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 383,
+     "parity": "even",
+     "s": [
+      0,
+      1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 3060,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 714,
+     "parity": "neither",
+     "s": [
+      0,
+      1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 3060,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 824,
+     "parity": "neither",
+     "s": [
+      1,
+      -1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 3060,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 714,
+     "parity": "neither",
+     "s": [
+      1,
+      -1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 715,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 267,
+     "parity": "even",
+     "s": [
+      1,
+      -1,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 495,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 253,
+     "parity": "odd",
+     "s": [
+      1,
+      0,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 3060,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 1180,
+     "parity": "neither",
+     "s": [
+      1,
+      0,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 715,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 383,
+     "parity": "even",
+     "s": [
+      1,
+      0,
+      1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 3060,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 824,
+     "parity": "neither",
+     "s": [
+      1,
+      1,
+      -1
+     ]
+    },
+    {
+     "classes_with_several_orbits": 9,
+     "function_classes": 9,
+     "gauge_orbits": 3060,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 714,
+     "parity": "neither",
+     "s": [
+      1,
+      1,
+      0
+     ]
+    },
+    {
+     "classes_with_several_orbits": 3,
+     "function_classes": 3,
+     "gauge_orbits": 715,
+     "gauge_violations": 0,
+     "max_orbits_in_a_class": 267,
+     "parity": "even",
+     "s": [
+      1,
+      1,
+      1
+     ]
+    }
+   ],
+   "totals": {
+    "function_not_constant_on_orbit": 0,
+    "gauge_violations": 0
+   },
+   "unit_types": 27
+  }
+ ]
+}

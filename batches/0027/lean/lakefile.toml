@@ -1,0 +1,20 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+name = "lmnf_normal"
+version = "0.1.0"
+defaultTargets = ["LmnfNormal"]
+
+# Lean's own linters are on. Mathlib's standard set of syntax and style linters is on too (the options carry the prefix `weak`, because they
+# are defined in Mathlib and the command line is read before the imports), except the check of Mathlib's own copyright header: the files of
+# this repository carry an SPDX header.
+[leanOptions]
+weak.linter.mathlibStandardSet = true
+weak.linter.style.header = false
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "d13f23b723b8a846827a245b89c10fc7d3f11612"   # the tag v4.34.1, as in batch 0020
+
+[[lean_lib]]
+name = "LmnfNormal"
