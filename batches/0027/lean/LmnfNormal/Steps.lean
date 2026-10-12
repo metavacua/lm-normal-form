@@ -57,7 +57,7 @@ theorem norm_comp_update {act : Γ → U → U} {norm : U → U} (hn : ItemNorma
     (f : Fin n → U) (i : Fin n) :
     norm ∘ Function.update f i (norm (f i)) = norm ∘ f := by
   funext j
-  show norm (Function.update f i (norm (f i)) j) = norm (f j)
+  change norm (Function.update f i (norm (f i)) j) = norm (f j)
   by_cases hj : j = i
   · rw [hj, Function.update_self]
     exact hn.norm_idem _

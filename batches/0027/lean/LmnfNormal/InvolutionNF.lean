@@ -28,13 +28,13 @@ def minNorm [LinearOrder β] (key : U → β) (neg : U → U) (x : U) : U :=
 theorem minNorm_of_lt [LinearOrder β] {key : U → β} {neg : U → U} {x : U}
     (h : key (neg x) < key x) : minNorm key neg x = neg x := by
   unfold minNorm
-  exact if_pos h
+  exact ite_eq_left h
 
 /-- If `neg x` does not have the smaller key, `minNorm` is `x`. -/
 theorem minNorm_of_not_lt [LinearOrder β] {key : U → β} {neg : U → U} {x : U}
     (h : ¬ key (neg x) < key x) : minNorm key neg x = x := by
   unfold minNorm
-  exact if_neg h
+  exact ite_eq_right h
 
 /-- `minNorm` is constant on `{x, neg x}`. -/
 theorem minNorm_neg [LinearOrder β] {key : U → β} {neg : U → U} (hneg : ∀ x, neg (neg x) = x)

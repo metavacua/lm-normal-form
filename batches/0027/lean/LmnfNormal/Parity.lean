@@ -34,7 +34,7 @@ theorem F_neg_gate_even (s : K → K) (hs : ∀ t, s (-t) = s t) (θ : Fin n →
   unfold F
   refine Finset.sum_congr rfl ?_
   intro i _
-  show (s ((-(θ i).g) ⬝ᵥ x) * ((θ i).u ⬝ᵥ x)) • (θ i).w
+  change (s ((-(θ i).g) ⬝ᵥ x) * ((θ i).u ⬝ᵥ x)) • (θ i).w
     = (s ((θ i).g ⬝ᵥ x) * ((θ i).u ⬝ᵥ x)) • (θ i).w
   rw [neg_dotProduct, hs]
 
@@ -46,7 +46,7 @@ theorem F_neg_gate_down_odd (s : K → K) (hs : ∀ t, s (-t) = -s t) (θ : Fin 
   unfold F
   refine Finset.sum_congr rfl ?_
   intro i _
-  show (s ((-(θ i).g) ⬝ᵥ x) * ((θ i).u ⬝ᵥ x)) • (-(θ i).w)
+  change (s ((-(θ i).g) ⬝ᵥ x) * ((θ i).u ⬝ᵥ x)) • (-(θ i).w)
     = (s ((θ i).g ⬝ᵥ x) * ((θ i).u ⬝ᵥ x)) • (θ i).w
   rw [neg_dotProduct, hs, neg_mul, neg_smul_neg]
 

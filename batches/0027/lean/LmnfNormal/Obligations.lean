@@ -63,7 +63,7 @@ theorem contrib_signAct (s : K → K) (x : Fin d → K) (b : Bool) (u : GUnit K 
       = (s (u.g ⬝ᵥ x) * (u.u ⬝ᵥ x)) • u.w := by
   cases b
   · rfl
-  · show (s (u.g ⬝ᵥ x) * ((-u.u) ⬝ᵥ x)) • (-u.w) = (s (u.g ⬝ᵥ x) * (u.u ⬝ᵥ x)) • u.w
+  · change (s (u.g ⬝ᵥ x) * ((-u.u) ⬝ᵥ x)) • (-u.w) = (s (u.g ⬝ᵥ x) * (u.u ⬝ᵥ x)) • u.w
     rw [neg_dotProduct, mul_neg, neg_smul_neg]
 
 end GUnit

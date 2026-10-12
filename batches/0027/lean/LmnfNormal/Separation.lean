@@ -98,7 +98,7 @@ theorem bagTotal_const_act (g u w : ℚ) (c : ℚˣ) :
     ((bagOf (fun _ : Fin 1 => (mk11 g u w).act c)).map Multiset.sum).sum
       = g + (c : ℚ) * u + (c : ℚ)⁻¹ * w := by
   refine (bagTotal_bagOf _).trans ?_
-  show ((mk11 g u w).act c).g 0 + ((mk11 g u w).act c).u 0 + ((mk11 g u w).act c).w 0 = _
+  change ((mk11 g u w).act c).g 0 + ((mk11 g u w).act c).u 0 + ((mk11 g u w).act c).w 0 = _
   rw [GUnit.act_g_apply, GUnit.act_u_apply, GUnit.act_w_apply, mk11_g, mk11_u, mk11_w] <;> rfl
 
 /-- The dot product on `Fin 1 → ℚ`. -/

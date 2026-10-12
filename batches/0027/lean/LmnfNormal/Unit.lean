@@ -73,32 +73,21 @@ theorem act_g (c : Kˣ) (x : GUnit K d e) : (x.act c).g = x.g := rfl
 theorem act_u (c : Kˣ) (x : GUnit K d e) : (x.act c).u = (c : K) • x.u := rfl
 
 theorem act_w (c : Kˣ) (x : GUnit K d e) : (x.act c).w = (c : K)⁻¹ • x.w := by
-  show ((c⁻¹ : Kˣ) : K) • x.w = (c : K)⁻¹ • x.w
-  first
-    | exact congrArg (fun a : K => a • x.w) (Units.val_inv_eq_inv_val c)
-    | (rw [Units.val_inv_eq_inv_val]; done)
-    | simp
+  change ((c⁻¹ : Kˣ) : K) • x.w = (c : K)⁻¹ • x.w
+  exact congrArg (fun a : K => a • x.w) (Units.val_inv_eq_inv_val c)
 
 theorem act_g_apply (c : Kˣ) (x : GUnit K d e) (i : Fin d) : (x.act c).g i = x.g i := rfl
 
-theorem act_u_apply (c : Kˣ) (x : GUnit K d e) (i : Fin d) : (x.act c).u i = (c : K) * x.u i := by
-  first
-    | rfl
-    | (rw [act_u, Pi.smul_apply, smul_eq_mul]; done)
+theorem act_u_apply (c : Kˣ) (x : GUnit K d e) (i : Fin d) : (x.act c).u i = (c : K) * x.u i :=
+  rfl
 
 theorem act_w_apply (c : Kˣ) (x : GUnit K d e) (j : Fin e) :
     (x.act c).w j = (c : K)⁻¹ * x.w j := by
-  first
-    | (rw [act_w, Pi.smul_apply, smul_eq_mul]; done)
-    | (rw [act_w]; rfl)
+  rw [act_w, Pi.smul_apply, smul_eq_mul]
 
 /-- A scalar passes out of a dot product. -/
 theorem smul_dot (c : K) (a b : Fin d → K) : (c • a) ⬝ᵥ b = c * (a ⬝ᵥ b) := by
-  first
-    | (rw [smul_dotProduct, smul_eq_mul]; done)
-    | (unfold dotProduct; rw [Finset.mul_sum];
-        refine Finset.sum_congr rfl (fun i _ => ?_);
-        simp only [Pi.smul_apply, smul_eq_mul, mul_assoc])
+  rw [smul_dotProduct, smul_eq_mul]
 
 end Action
 
@@ -135,10 +124,10 @@ theorem F_gauge (s : K → K) (θ : Fin n → GUnit K d e) (c : Fin n → Kˣ) :
   unfold F
   refine Finset.sum_congr rfl ?_
   intro i _
-  show (s (((θ i).act (c i)).g ⬝ᵥ x) * (((θ i).act (c i)).u ⬝ᵥ x)) • ((θ i).act (c i)).w
+  change (s (((θ i).act (c i)).g ⬝ᵥ x) * (((θ i).act (c i)).u ⬝ᵥ x)) • ((θ i).act (c i)).w
     = (s ((θ i).g ⬝ᵥ x) * ((θ i).u ⬝ᵥ x)) • (θ i).w
   rw [GUnit.act_g, GUnit.act_u, GUnit.act_w, GUnit.smul_dot, smul_smul,
-    GUnit.gauge_cancel _ _ _ (Units.ne_zero (c i))] <;> rfl
+    GUnit.gauge_cancel _ _ _ (Units.ne_zero (c i))]
 
 /-- One move does not change the function. -/
 theorem F_move (s : K → K) {θ θ' : Fin n → GUnit K d e} (h : Move GUnit.act θ θ') :
@@ -181,7 +170,7 @@ theorem firstNonzero_find_exists {m : ℕ} {v : Fin m → K} (hv : v ≠ 0) :
     funext i
     have h : ¬ (decide (v i ≠ 0) = true) :=
       List.find?_eq_none.mp hf (v i) (List.mem_ofFn.mpr ⟨i, rfl⟩)
-    show v i = 0
+    change v i = 0
     by_contra h'
     exact h (decide_eq_true h')
 
@@ -190,12 +179,14 @@ theorem firstNonzero_ne_zero {m : ℕ} (v : Fin m → K) : firstNonzero v ≠ 0 
   unfold firstNonzero
   cases hf : (List.ofFn v).find? (fun a => decide (a ≠ 0)) with
   | none =>
-    show (1 : K) ≠ 0
+    change (1 : K) ≠ 0
     exact one_ne_zero
   | some a =>
-    show a ≠ 0
-    exact of_decide_eq_true (List.find?_some hf)
+    change a ≠ 0
+    have h := List.find?_some hf
+    exact of_decide_eq_true h
 
+omit [DecidableEq K] in
 /-- A non-zero scalar times a non-zero vector is non-zero. -/
 theorem smul_vec_ne_zero {m : ℕ} {c : K} {v : Fin m → K} (hc : c ≠ 0) (hv : v ≠ 0) :
     c • v ≠ 0 := by
@@ -219,7 +210,8 @@ theorem firstNonzero_smul {m : ℕ} {c : K} {v : Fin m → K} (hv : v ≠ 0) (hc
   have hpf : ((fun a : K => decide (a ≠ 0)) ∘ fun a => c * a) = fun a => decide (a ≠ 0) :=
     funext hp
   unfold firstNonzero
-  rw [hlist, List.find?_map, hpf, ha] <;> rfl
+  rw [hlist, List.find?_map, hpf, ha]
+  rfl
 
 namespace GUnit
 
@@ -238,9 +230,9 @@ def scale (x : GUnit K d e) : GUnit K d e :=
 theorem factor_ne_zero (x : GUnit K d e) : x.factor ≠ 0 := by
   unfold factor
   by_cases h : x.u ≠ 0
-  · rw [if_pos h]
+  · rw [ite_eq_left h]
     exact inv_ne_zero (firstNonzero_ne_zero _)
-  · rw [if_neg h]
+  · rw [ite_eq_right h]
     exact firstNonzero_ne_zero _
 
 /-- The factor of the acted unit, when the unit is not zero.  For `u = 0` and `w = 0` the factor
@@ -254,7 +246,7 @@ theorem factor_act (c : Kˣ) (x : GUnit K d e) (h : x.u ≠ 0 ∨ x.w ≠ 0) :
       rw [act_u]
       exact smul_vec_ne_zero hc hu
     unfold factor
-    rw [if_pos hu', if_pos hu, act_u, firstNonzero_smul hu hc, mul_inv] <;> rfl
+    rw [ite_eq_left hu', ite_eq_left hu, act_u, firstNonzero_smul hu hc, mul_inv]
   · have hw : x.w ≠ 0 := h.resolve_left hu
     have hu0 : x.u = 0 := by
       by_contra h'
@@ -264,13 +256,15 @@ theorem factor_act (c : Kˣ) (x : GUnit K d e) (h : x.u ≠ 0 ∨ x.w ≠ 0) :
       apply h'
       rw [act_u, hu0, smul_zero]
     unfold factor
-    rw [if_neg hu', if_neg hu, act_w, firstNonzero_smul hw hci] <;> rfl
+    rw [ite_eq_right hu', ite_eq_right hu, act_w, firstNonzero_smul hw hci]
 
+omit [DecidableEq K] in
 /-- `a⁻¹ * f * a = f` for `a ≠ 0`. -/
 theorem cancel_up (a f : K) (ha : a ≠ 0) : a⁻¹ * f * a = f := by
   calc a⁻¹ * f * a = f * (a⁻¹ * a) := by ring
     _ = f := by rw [inv_mul_cancel₀ ha, mul_one]
 
+omit [DecidableEq K] in
 /-- `(a⁻¹ * f)⁻¹ * a⁻¹ = f⁻¹` for `a ≠ 0`. -/
 theorem cancel_down (a f : K) (ha : a ≠ 0) : (a⁻¹ * f)⁻¹ * a⁻¹ = f⁻¹ := by
   rw [mul_inv, inv_inv]
@@ -283,10 +277,10 @@ theorem scale_act (c : Kˣ) (x : GUnit K d e) : (x.act c).scale = x.scale := by
   by_cases h : x.u ≠ 0 ∨ x.w ≠ 0
   · have hf := factor_act c x h
     refine GUnit.ext rfl ?_ ?_
-    · show (x.act c).factor • (x.act c).u = x.factor • x.u
-      rw [hf, act_u, smul_smul, cancel_up _ _ hc] <;> rfl
-    · show (x.act c).factor⁻¹ • (x.act c).w = x.factor⁻¹ • x.w
-      rw [hf, act_w, smul_smul, cancel_down _ _ hc] <;> rfl
+    · change (x.act c).factor • (x.act c).u = x.factor • x.u
+      rw [hf, act_u, smul_smul, cancel_up _ _ hc]
+    · change (x.act c).factor⁻¹ • (x.act c).w = x.factor⁻¹ • x.w
+      rw [hf, act_w, smul_smul, cancel_down _ _ hc]
   · have hu0 : x.u = 0 := by
       by_contra h'
       exact h (Or.inl h')
@@ -294,9 +288,9 @@ theorem scale_act (c : Kˣ) (x : GUnit K d e) : (x.act c).scale = x.scale := by
       by_contra h'
       exact h (Or.inr h')
     refine GUnit.ext rfl ?_ ?_
-    · show (x.act c).factor • (x.act c).u = x.factor • x.u
+    · change (x.act c).factor • (x.act c).u = x.factor • x.u
       simp only [act_u, hu0, smul_zero]
-    · show (x.act c).factor⁻¹ • (x.act c).w = x.factor⁻¹ • x.w
+    · change (x.act c).factor⁻¹ • (x.act c).w = x.factor⁻¹ • x.w
       simp only [act_w, hw0, smul_zero]
 
 /-- The normal form of a unit is a point of its orbit. -/
@@ -350,19 +344,14 @@ theorem canon_Mono_scale_sort [LinearOrder K] :
       (TEquiv (GUnit.act (K := K) (d := d) (e := e)) :
         (Fin n → GUnit K d e) → (Fin n → GUnit K d e) → Prop)
       (NF GUnit.key GUnit.scale) := by
-  first
-    | exact canonicalization GUnit.key_injective GUnit.itemNormalizer
-    | exact canonicalization (hkey := GUnit.key_injective) (hn := GUnit.itemNormalizer)
-    | exact canonicalization GUnit.itemNormalizer GUnit.key_injective
+  exact canonicalization GUnit.key_injective GUnit.itemNormalizer
 
 /-- The normal form of a block has the same function as the block, for every nonlinearity `s`. -/
 theorem GBlock.F_NF [LinearOrder K] (s : K → K) (θ : Fin n → GUnit K d e) :
     GBlock.F s (NF GUnit.key GUnit.scale θ) = GBlock.F s θ := by
   have hc := canon_Mono_scale_sort (K := K) (d := d) (e := e) (n := n)
   have h := hc.representative θ
-  first
-    | exact (GBlock.F_tequiv s h).symm
-    | exact GBlock.F_tequiv s h
+  exact (GBlock.F_tequiv s h).symm
 
 end Canon
 
