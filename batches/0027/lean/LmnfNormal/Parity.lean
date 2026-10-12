@@ -17,9 +17,9 @@ nonlinearity `s`.  A symmetry of `s` gives more:
 
 `ternary.py` checks, for the 27 nonlinearities of `F_3` (8 even, 2 odd, 16 neither, and the zero
 function, which is both), that the table of every unit is unchanged by these symmetries; it does not
-search for others.  SiLU and the squared ReLU of BitNet are neither even nor odd, so these symmetries
-do not apply to them and the gauge of their units that this batch uses is the sign pair and the
-permutations.
+search for others.  SiLU and the squared ReLU of BitNet are neither even nor odd, so these
+symmetries do not apply to them and the gauge of their units that this batch uses is the sign
+pair and the permutations.
 -/
 
 namespace LmnfNormal

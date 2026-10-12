@@ -11,9 +11,9 @@ Three programs over the dataflow of batch 0015's model, reified by batch 0019's 
   bitnet_ternary  bitnet with the role `ternary` on every space that a ternary matrix touches: the seven projections of every layer
                   (q, k, v, o, gate, up, down). The embedding and the head stay real, as in BitNet and TriLM.
 Nothing here says which transformations are symmetries; only what exists and what each operation requires. nf.dl derives the group of each space
-(batch 0019's lattice), the order in which the spaces can be canonicalized (the distance from the vocabulary through the parameter tensors, the diagonal links of
-the norm weights and the elementwise products), the method and the theorem that each space needs, and the verdict of the whole plan in Kleene's strong logic (supported 1, unknown 0, refuted -1; the conjunction
-is the minimum).
+(batch 0019's lattice), the order in which the spaces can be canonicalized (the distance from the vocabulary through the parameter tensors, the
+diagonal links of the norm weights and the elementwise products), the method and the theorem that each space needs, and the verdict of the whole
+plan in Kleene's strong logic (supported 1, unknown 0, refuted -1; the conjunction is the minimum).
 
 Usage: plan_facts.py OUTDIR [--proved FILE] [--exhaustive FILE]    OUTDIR/<config>/{facts,out}, OUTDIR/plan.json
 """
