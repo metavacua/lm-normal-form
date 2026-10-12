@@ -4,7 +4,9 @@
 """Batch 0027: the reference implementation (Python 3, standard library only) of the exhaustive checks.
 
 Two finite models, every state enumerated, every number computed by a procedure that does not use the
-canonical forms it checks (orbits by breadth-first search over generators, functions by tables).
+canonical forms it checks (orbits by enumerating the whole group in X-A and by a flood fill over generators
+in X-B, functions by tables). Sanity conditions that hold by construction (the signature procedure answers
+exactly when its certificate holds; the rewriting search returns a non-empty set) are assertions, not results.
 
 X-A  one matrix over F_p with r rows and c columns under independent permutations of rows and columns
      (a tensor under the relabelling of its own indices). Procedures compared: the naive "sort the rows,
@@ -134,8 +136,6 @@ def xa(p, r, c):
         "sig_noncanonical_cert_orbits": 0,
         "sig_not_in_orbit": 0,
         "sig_collisions": 0,
-        "sig_unknown_on_cert": 0,
-        "sig_known_on_uncert": 0,
         "sigtie_noncanonical_uncert_orbits": 0,
         "sigtie_canonical_uncert_orbits": 0,
     }
@@ -153,8 +153,7 @@ def xa(p, r, c):
             out["cert_orbits"] += 1
             out["cert_matrices"] += len(members)
             vals = {xa_sig(m, r, c) for m in members}
-            if None in vals:
-                out["sig_unknown_on_cert"] += 1
+            assert None not in vals, "the signature procedure answers exactly when its certificate holds"
             if len(vals) > 1:
                 out["sig_noncanonical_cert_orbits"] += 1
             v = next(iter(vals))
@@ -166,8 +165,7 @@ def xa(p, r, c):
                 sig_owner[v] = oid
         else:
             out["uncert_orbits"] += 1
-            if any(xa_sig(m, r, c) is not None for m in members):
-                out["sig_known_on_uncert"] += 1
+            assert all(xa_sig(m, r, c) is None for m in members), "the signature procedure answers exactly when its certificate holds"
             vals = {xa_sigtie(m, r, c) for m in members}
             if len(vals) > 1:
                 out["sigtie_noncanonical_uncert_orbits"] += 1
@@ -503,16 +501,15 @@ def xb(p, r, K, s):
         memo[S] = res
         return res
 
-    meas_viol = wn_fail = un_fail = irr_not_nf = 0
+    meas_viol = un_fail = irr_not_nf = 0
     for st in states:
         S = G.slices(st)
         for T in G.good_steps(S):
             if not G.measure(T) < G.measure(S):
                 meas_viol += 1
         res = irr(S, G.good_steps, memo_good)
-        if len(res) == 0:
-            wn_fail += 1
-        elif len(res) > 1 or next(iter(res)) != G.slices(G.n_mono(st)):
+        assert res, "the search for irreducible terms returns a non-empty set"
+        if len(res) > 1 or next(iter(res)) != G.slices(G.n_mono(st)):
             un_fail += 1
     for S in memo_good:
         if not G.good_steps(S):
@@ -524,7 +521,6 @@ def xb(p, r, K, s):
         {
             "ars_states": len(states),
             "ars_measure_violations": meas_viol,
-            "ars_wn_failures": wn_fail,
             "ars_un_failures": un_fail,
             "ars_irreducible_not_normal": irr_not_nf,
         }

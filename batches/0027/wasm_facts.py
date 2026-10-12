@@ -15,16 +15,19 @@ and writes one tab-separated file per relation, for Souffle (closure.dl):
   wfunc(idx, typeidx, imported)          every function (imports first)
   wmemory(idx, min_pages, max_pages)     max_pages is -1 when the module declares none
   wtable(idx, min, max)                  max is -1 when the module declares none
-  wglobal(idx, valtype, mutable, imported, init)   init is the i32.const value of a defined global, -1 for any other initializer
+  wglobal(idx, valtype, mutable, imported, init)   init is the (signed) i32.const value of a defined global, -1 for any other initializer
   welem(offset, funcidx)                 the functions that the active element segments put into table 0, at offset + position
   wcallind(caller, typeidx)              call_indirect with the type typeidx
-  wdata(idx, offset, bytes)              active data segments; offset is -1 when not an i32.const
+  wdata(idx, offset, bytes)              active data segments
   wstart(funcidx)                        the start function, if any
   wcall(caller, callee)                  direct calls
   wuses(func, what)                      what in {memory_grow, memory_size, call_indirect, loop, br_table, unreachable, load, store}
-  wnote(what, n)                         what the extractor could not read (element segments in another encoding)
   wcode(func, bytes)                     size of each function body in bytes
   wframe(func, bytes)                    the shadow-stack frame of a function whose body begins `global.get 0; i32.const N; i32.sub`
+
+The extractor refuses (exits non-zero, and writes nothing) what it cannot read, so that no derived fact rests on an input that was dropped
+without a sign: an element segment in an encoding other than the one of WebAssembly 1.0, and the offset of an active segment that is not an
+i32.const (the module imports a global) or that is 2^31 or more (Souffle's numbers are 32-bit signed).
 
 Usage: wasm_facts.py MODULE.wasm OUTDIR
 """
@@ -34,6 +37,10 @@ import sys
 
 VALTYPE = {0x7F: "i32", 0x7E: "i64", 0x7D: "f32", 0x7C: "f64"}
 KIND = {0: "func", 1: "table", 2: "mem", 3: "global"}
+
+
+class ExtractError(Exception):
+    """The module has something that this extractor does not read; nothing is derived from it."""
 
 
 class Reader:
@@ -94,23 +101,24 @@ class Reader:
         assert self.byte() == 0x0B
 
     def const_i32(self):
-        """A constant expression `i32.const k; end` -> k, or None for any other expression."""
+        """A constant expression `i32.const k; end` -> k (signed, as the instruction has it), or None for any other constant expression."""
         save = self.p
-        op = self.byte()
-        val = None
-        if op == 0x41:
-            val = self.sleb() & 0xFFFFFFFF
-        elif op in (0x23,):
-            self.u32()
-        else:
-            # skip an unknown constant expression up to its end opcode
-            while self.d[self.p - 1] != 0x0B and self.p < self.end:
-                self.p += 1
-            return None
-        if self.byte() != 0x0B:
-            self.p = save
-            return None
-        return val
+        if self.byte() == 0x41:
+            val = self.sleb()
+            if self.byte() == 0x0B:
+                return val
+        self.p = save
+        self.skip_const()
+        return None
+
+    def offset(self, what):
+        """The offset of an active segment: an i32.const below 2^31, or an ExtractError."""
+        k = self.const_i32()
+        if k is None:
+            raise ExtractError(f"{what}: the offset is not an i32.const (the module imports a global), so the closure cannot be derived")
+        if k < 0:
+            raise ExtractError(f"{what}: the offset {k & 0xFFFFFFFF} is 2^31 or more, outside the 32-bit signed numbers of Souffle")
+        return k
 
 
 def decode_body(r, end, facts, fidx):
@@ -207,7 +215,6 @@ def parse(path):
             "wcode",
             "wframe",
             "wversion",
-            "wnote",
         )
     }
     f["wmodule"].append((os.path.splitext(os.path.basename(path))[0],))
@@ -291,13 +298,10 @@ def parse(path):
             for _ in range(count):
                 flag = sub.u32()
                 if flag != 0:
-                    f["wnote"].append(("element_segment_flag", flag))
-                    break
-                off = sub.const_i32()
+                    raise ExtractError(f"an element segment with the flag {flag}: not the encoding of WebAssembly 1.0")
+                off = sub.offset("an element segment")
                 for k in range(sub.u32()):
-                    fi = sub.u32()
-                    if off is not None:
-                        f["welem"].append((off + k, fi))
+                    f["welem"].append((off + k, sub.u32()))
         elif sid == 10:
             count = sub.u32()
             for i in range(count):
@@ -309,10 +313,10 @@ def parse(path):
             count = sub.u32()
             for i in range(count):
                 sub.u32()
-                off = sub.const_i32()
+                off = sub.offset("a data segment")
                 n = sub.u32()
                 sub.p += n
-                f["wdata"].append((i, -1 if off is None else off, n))
+                f["wdata"].append((i, off, n))
         f["wsection"].append((sid, count, size))
         r.p = end
     for fidx, a, b in bodies:
@@ -330,7 +334,10 @@ def write(f, out):
 
 if __name__ == "__main__":
     path, out = sys.argv[1:3]
-    facts = parse(path)
+    try:
+        facts = parse(path)
+    except ExtractError as e:
+        sys.exit(f"wasm_facts.py: {path}: {e}")
     write(facts, out)
     for k, v in facts.items():
         print(f"{k:10s} {len(v):8d}")

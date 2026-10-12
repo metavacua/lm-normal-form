@@ -37,7 +37,7 @@ import LmnfNormal
 #print axioms LmnfNormal.GBlock.F_neg_gate_down_odd
 #print axioms LmnfNormal.sep_bag_not_function
 #print axioms LmnfNormal.sep_function_not_bag
-#print axioms LmnfNormal.sep_orbit_not_function
+#print axioms LmnfNormal.sep_function_not_orbit
 #print axioms LmnfNormal.Verdict.val_injective
 #print axioms LmnfNormal.Verdict.val_neg
 #print axioms LmnfNormal.Verdict.val_conj
@@ -54,4 +54,4 @@ import LmnfNormal
 #print axioms LmnfNormal.reduced_polynomial_canonical_F3
 #print axioms LmnfNormal.ternary_dot_bound
 #print axioms LmnfNormal.ternary_dot_fits_i32
-#print axioms LmnfNormal.bitnet_2b4t_down_projection_fits_i32
+#print axioms LmnfNormal.ternary_dot_2b4t_down_fits_i32

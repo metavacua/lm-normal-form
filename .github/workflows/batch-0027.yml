@@ -15,7 +15,7 @@ name: batch 0027
 on:
   push:
     branches: ["batch/0027-**"]
-    paths: [".github/workflows/batch-0027.yml", "batches/0019/states.dl", "batches/0015/**", "batches/0027/**", "docs/batches/0027.md"]
+    paths: [".github/workflows/batch-0027.yml", "batches/0019/states.dl", "batches/0019/ir.py", "batches/0015/**", "batches/0027/**", "docs/batches/0027.md"]
   workflow_dispatch:
 
 permissions:
@@ -157,8 +157,8 @@ jobs:
       - name: Tools
         run: |
           mkdir -p out/wasm
-          python -m pip install --quiet wasmtime
-          python -m pip freeze > out/wasm/versions.txt
+          python -m pip install --quiet wasmtime==49.0.0
+          python -m pip freeze > out/wasm/pip-freeze.txt
           rustup toolchain install stable --profile minimal --no-self-update
           rustup default stable
           rustup target add wasm32v1-none
@@ -177,7 +177,7 @@ jobs:
         name: "the module builds for wasm32v1-none, and every warning is an error"
         continue-on-error: true
         working-directory: batches/0027/wasm
-        run: cargo build --release --target wasm32v1-none 2>&1 | tee ../../../out/wasm/build.log; test "${PIPESTATUS[0]}" -eq 0
+        run: cargo build --release --target wasm32v1-none 2>&1 | tee ../../../out/wasm/cargo-build.log; test "${PIPESTATUS[0]}" -eq 0
       - id: validate
         name: "the module validates as WebAssembly 1.0 plus mutable globals"
         continue-on-error: true
@@ -267,9 +267,9 @@ jobs:
         working-directory: batches/0027/lean
         run: |
           mkdir -p ../../../out/lean
-          lake build 2>&1 | tee ../../../out/lean/build.log
+          lake build 2>&1 | tee ../../../out/lean/lake-build.log
           test "${PIPESTATUS[0]}" -eq 0
-          ! grep -nE '(^|[ :])(warning|error)[: ]' ../../../out/lean/build.log
+          ! grep -nE '(^|[ :])(warning|error)[: ]' ../../../out/lean/lake-build.log
       - id: axioms
         name: "the axioms that each registered theorem depends on"
         continue-on-error: true
@@ -297,7 +297,7 @@ jobs:
           mkdir -p ../../../out/lean
           touch ../../../out/lean/proved.facts
           cp lake-manifest.json ../../../out/lean/ || true
-          { lean --version; lake --version; } 2>&1 | tee ../../../out/lean/versions.txt || true
+          { lean --version; lake --version; } 2>&1 | tee ../../../out/lean/lean-versions.txt || true
       - name: Outcomes of the checks
         if: always()
         env:
@@ -331,6 +331,7 @@ jobs:
           mkdir -p out/plan lean-out/lean
           touch lean-out/lean/proved.facts
           python -m pip install --quiet numpy
+          python -m pip freeze > out/plan/pip-freeze.txt
           f="x86_64-ubuntu-2204-souffle-$SOUFFLE_VERSION-Linux.deb"
           curl -sSL -o "$f" "https://github.com/souffle-lang/souffle/releases/download/$SOUFFLE_VERSION/$f"
           curl -sSL -o sha512sum.txt "https://github.com/souffle-lang/souffle/releases/download/$SOUFFLE_VERSION/sha512sum.txt"
@@ -398,6 +399,8 @@ jobs:
           gh api "repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -f state="$state" -f context="batch 0027" \
             -f description="$nfail failed steps, $nbad checks not supported" \
             -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" > /dev/null
+          # the run is red when the batch is: a refuted or unknown check, or a failed step, is not a green run
+          [ "$state" = success ]
       - uses: actions/upload-artifact@v7
         if: always()
         with:

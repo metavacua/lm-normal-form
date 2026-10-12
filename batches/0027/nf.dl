@@ -7,9 +7,10 @@
 //   mindepth(S, D)       the distance from the vocabulary, whose coordinates are labelled, through the parameter tensors, the diagonal links of the norm weights and the
 //                        elementwise products: the order in which the spaces can be canonicalized.
 //   plan(S, D, G, M, T)  the method M for the group G of the space S, and the theorem T that M is a canonicalization of the orbits of G.
-//   noplan(S, G)         a space whose group has no method; unanchored(S): a space no chain of parameter tensors joins to the vocabulary.
+//   noplan(S, G)         a space whose group has no method; unanchored(S): a space (other than the tokens) that no chain of at most 12 links, each a parameter
+//                        tensor, a norm weight or an elementwise product, joins to the vocabulary.
 //   need(T)              the theorems the plan depends on.
-//   value(S, V)          Kleene's strong logic as the integers -1 (refuted), 0 (unknown), 1 (supported); the conjunction is the minimum, the negation is the sign.
+//   value(S, V)          Kleene's strong logic as the integers -1 (refuted), 0 (unknown), 1 (supported); the conjunction is the minimum, the negation is the change of sign.
 //                        A space is supported when its group is trivial or when its theorem is in `proved`; refuted when it is in `refuted`; otherwise unknown.
 //   model_value(V)       the minimum over the spaces and over `canon_stratified`, the theorem that canonicalizing the spaces one after another in the order of
 //                        mindepth is a canonicalization of the orbits of the product of the groups (not proved by this batch, so the plan as a whole is at most unknown).
@@ -26,7 +27,7 @@
 compat("ternary", "SP").
 
 // ---- the library: the canonicalization methods ------------------------------------------------------------------------------------------------------------------
-// method(group, name, theorem). The theorems are in batches/0027/lean (Obligations.lean); GL has none: batch 0027's ref.py checks the reduced row echelon form
+// method(group, name, theorem). The theorems are in batches/0027/lean (Obligations.lean and Unit.lean); GL has none: batch 0027's ref.py checks the reduced row echelon form
 // exhaustively on a finite model, which is evidence and not a proof.
 .decl method(g:symbol, m:symbol, thm:symbol)
 method("Triv", "fixed", "").
@@ -37,11 +38,9 @@ method("GL", "rref", "canon_GL_rref").
 .decl has_method(g:symbol)
 has_method(g) :- method(g, _, _).
 
-// ---- what is established (written by grade27.py from the output of Lean, and by ref.py) ------------------------------------------------------------------------
+// ---- what is established (`proved` is written by grade27.py from the output of Lean; `refuted` is an input that no step of this batch fills) ----------------
 .decl proved(t:symbol)
 .input proved
-.decl exhaustive(t:symbol)
-.input exhaustive
 .decl refuted(t:symbol)
 .input refuted
 

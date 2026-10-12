@@ -12,7 +12,8 @@ bytes and sums the products.  Each product has absolute value at most 128, so th
 has absolute value at most `128 n`; below `2^31` as long as `n ≤ 2^24 - 1`.  WebAssembly's `i32.add`
 wraps modulo `2^32`, so within this bound the wrapped sum is the integer sum, and the sum does not
 depend on the order of the terms: a permutation of the columns does not change a bit of the output
-(batches/0027/wasm checks this in wasmtime; the sum of floats, which is not exact, does change).
+(`batches/0027/wasm_host.py` checks this in wasmtime on the module built from `batches/0027/wasm`;
+the sum of floats, which is not exact, does change).
 -/
 
 namespace LmnfNormal
@@ -38,8 +39,13 @@ theorem ternary_dot_fits_i32 (n : ℕ) (hn : n ≤ 16777215) : 128 * (n : ℤ) <
   norm_num
   linarith
 
-/-- The widest input of BitNet b1.58 2B4T, the intermediate size 6912 of the down projection. -/
-theorem bitnet_2b4t_down_projection_fits_i32 : 128 * (6912 : ℤ) < 2 ^ 31 := by
-  norm_num
+/-- The accumulator for a row of width 6912, the `intermediate_size` of BitNet b1.58 2B4T (the width
+is taken from the model's configuration, not proved here): a ternary row times int8 activations
+sums to less than `2^31` in absolute value. -/
+theorem ternary_dot_2b4t_down_fits_i32 (w x : Fin 6912 → ℤ) (hw : ∀ i, |w i| ≤ 1)
+    (hx : ∀ i, |x i| ≤ 128) : |∑ i, w i * x i| < 2 ^ 31 := by
+  have h := ternary_dot_bound w x hw hx
+  have h2 : (128 : ℤ) * (6912 : ℕ) < 2 ^ 31 := by norm_num
+  exact lt_of_le_of_lt h h2
 
 end LmnfNormal

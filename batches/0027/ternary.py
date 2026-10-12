@@ -15,12 +15,17 @@ T-2  the absmean quantizer of BitNet b1.58, RoundClip(W / mean|W|, -1, 1), again
      weights: positive scalars, signs, permutations of rows and columns, and its own idempotence.
 T-3  a block of n gated units over F_3: the unit (g, u, w) contributes s(g.x) (u.x) w to the output for the
      nonlinearity s (all 27 functions F_3 -> F_3). The orbits of the sign gauge (u, w) -> (-u, -w) with the
-     permutations of the units are found by union-find over every ordered block; the canonical form (normalize
-     each unit by the leading non-zero trit, then sort) is compared with them; the function classes are counted
-     from the tables; and for s even or odd the gauge that the parity of s adds is found and checked.
+     permutations of the units are found by union-find over every ordered block; the canonical form is compared
+     with them: for the sign gauge alone (the class "neither") the canonical form normalizes each unit by the
+     leading non-zero trit and then sorts; for the classes "even" and "odd" the unit is normalized to the
+     smallest member of its orbit under the generators, so those rows check the sorting and the count of the
+     orbits (Burnside) and not the leading-trit rule. The function classes are counted from the tables, and for
+     every s the generators of its class are checked to leave every unit's table unchanged; no other symmetry
+     is searched for.
 T-4  the same unit block for d = e = 1, whose function depends on the units only through three sums
-     (P_-, P_0, P_+), so that the number of function classes is the size of the image of a 3 x 2 matrix over F_3:
-     a prediction that does not enumerate blocks.
+     (P_-, P_0, P_+), so that the function classes are the image of the 2 x 3 matrix (P_-, P_0, P_+) ->
+     (F(1), F(-1)) over F_3, restricted to the sums that n units can make (at most n non-zero entries; for
+     n >= 2 that is the whole image): a prediction that does not enumerate blocks.
 
 Usage: ternary.py TIER OUT.json     with TIER one of tiny, small.
 """
@@ -39,7 +44,7 @@ TIERS = {
     "tiny": {"xc": [(1, 1, 2), (1, 1, 3), (1, 2, 2)]},
     "small": {"xc": [(1, 1, 2), (1, 1, 3), (1, 2, 2), (2, 1, 2), (1, 1, 4)]},
 }
-BFS_MAX_STATES = 600000
+UNIONFIND_MAX_STATES = 600000
 
 
 def m3(x):
@@ -225,8 +230,10 @@ def absmean_quant(W, eps=0.0):
 
 
 def absmax_int8(x):
-    """BitNet's activation quantizer for one token: round(x * 127 / max|x|) clipped to [-128, 127]; the scale is the max-norm,
-    so the result is a function of the positive-scale class of x (b1.58 paper: 'scaled to [-Qb, Qb] per token')."""
+    """An int8 absmax quantizer for one token in the style of BitNet's: round(x * 127 / max|x|) clipped to [-128, 127]. The papers say the
+    activations are scaled per token to [-Qb, Qb] by the maximum absolute value (BitNet v1 writes Qb = 2^(b-1) = 128); the constant 127 and the
+    rounding are the common implementations' choice and this script's, not the papers'. The scale is the max-norm, so the result is a function
+    of the positive-scale class of x."""
     m = max(abs(v) for v in x)
     return [max(-128, min(127, round(v * 127.0 / m))) for v in x] if m > 0 else [0] * len(x)
 
@@ -417,7 +424,7 @@ def xc(d, e, n):
         orbits_u = len(set(norm_cls[cls]))
         row = {"unit_orbits": orbits_u, "unit_orbits_burnside": pred_u, "block_orbits_formula": comb(pred_u + n - 1, n)}
         nm = norm_mono if cls == "neither" else norm_cls[cls]
-        if N <= BFS_MAX_STATES:
+        if N <= UNIONFIND_MAX_STATES:
             roots, pw = orbit_roots(U, n, GENS[cls])
             nf_of_root, root_of_nf = {}, {}
             inv_ok = idem_ok = True
@@ -431,7 +438,7 @@ def xc(d, e, n):
                 idem_ok &= tuple(sorted(nm[x] for x in key)) == key
             row.update(
                 {
-                    "block_orbits_bfs": len(set(roots)),
+                    "block_orbits_unionfind": len(set(roots)),
                     "block_canonical_forms": len(root_of_nf),
                     "canonical_form_decisive": inv_ok,
                     "canonical_form_idempotent": idem_ok,

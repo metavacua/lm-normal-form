@@ -120,8 +120,8 @@
    "e": 1,
    "even": {
     "block_canonical_forms": 55,
-    "block_orbits_bfs": 55,
     "block_orbits_formula": 55,
+    "block_orbits_unionfind": 55,
     "canonical_form_decisive": true,
     "canonical_form_idempotent": true,
     "unit_orbits": 10,
@@ -132,8 +132,8 @@
    "n": 2,
    "neither": {
     "block_canonical_forms": 120,
-    "block_orbits_bfs": 120,
     "block_orbits_formula": 120,
+    "block_orbits_unionfind": 120,
     "canonical_form_decisive": true,
     "canonical_form_idempotent": true,
     "unit_orbits": 15,
@@ -143,8 +143,8 @@
    "nonlinearities_with_fewer_function_classes_than_orbits": 26,
    "odd": {
     "block_canonical_forms": 45,
-    "block_orbits_bfs": 45,
     "block_orbits_formula": 45,
+    "block_orbits_unionfind": 45,
     "canonical_form_decisive": true,
     "canonical_form_idempotent": true,
     "unit_orbits": 9,
@@ -551,8 +551,8 @@
    "e": 1,
    "even": {
     "block_canonical_forms": 220,
-    "block_orbits_bfs": 220,
     "block_orbits_formula": 220,
+    "block_orbits_unionfind": 220,
     "canonical_form_decisive": true,
     "canonical_form_idempotent": true,
     "unit_orbits": 10,
@@ -563,8 +563,8 @@
    "n": 3,
    "neither": {
     "block_canonical_forms": 680,
-    "block_orbits_bfs": 680,
     "block_orbits_formula": 680,
+    "block_orbits_unionfind": 680,
     "canonical_form_decisive": true,
     "canonical_form_idempotent": true,
     "unit_orbits": 15,
@@ -574,8 +574,8 @@
    "nonlinearities_with_fewer_function_classes_than_orbits": 26,
    "odd": {
     "block_canonical_forms": 165,
-    "block_orbits_bfs": 165,
     "block_orbits_formula": 165,
+    "block_orbits_unionfind": 165,
     "canonical_form_decisive": true,
     "canonical_form_idempotent": true,
     "unit_orbits": 9,
@@ -952,8 +952,8 @@
    "e": 2,
    "even": {
     "block_canonical_forms": 406,
-    "block_orbits_bfs": 406,
     "block_orbits_formula": 406,
+    "block_orbits_unionfind": 406,
     "canonical_form_decisive": true,
     "canonical_form_idempotent": true,
     "unit_orbits": 28,
@@ -964,8 +964,8 @@
    "n": 2,
    "neither": {
     "block_canonical_forms": 903,
-    "block_orbits_bfs": 903,
     "block_orbits_formula": 903,
+    "block_orbits_unionfind": 903,
     "canonical_form_decisive": true,
     "canonical_form_idempotent": true,
     "unit_orbits": 42,
@@ -975,8 +975,8 @@
    "nonlinearities_with_fewer_function_classes_than_orbits": 26,
    "odd": {
     "block_canonical_forms": 300,
-    "block_orbits_bfs": 300,
     "block_orbits_formula": 300,
+    "block_orbits_unionfind": 300,
     "canonical_form_decisive": true,
     "canonical_form_idempotent": true,
     "unit_orbits": 24,
@@ -1353,8 +1353,8 @@
    "e": 1,
    "even": {
     "block_canonical_forms": 2485,
-    "block_orbits_bfs": 2485,
     "block_orbits_formula": 2485,
+    "block_orbits_unionfind": 2485,
     "canonical_form_decisive": true,
     "canonical_form_idempotent": true,
     "unit_orbits": 70,
@@ -1365,8 +1365,8 @@
    "n": 2,
    "neither": {
     "block_canonical_forms": 8001,
-    "block_orbits_bfs": 8001,
     "block_orbits_formula": 8001,
+    "block_orbits_unionfind": 8001,
     "canonical_form_decisive": true,
     "canonical_form_idempotent": true,
     "unit_orbits": 126,
@@ -1376,8 +1376,8 @@
    "nonlinearities_with_fewer_function_classes_than_orbits": 26,
    "odd": {
     "block_canonical_forms": 2211,
-    "block_orbits_bfs": 2211,
     "block_orbits_formula": 2211,
+    "block_orbits_unionfind": 2211,
     "canonical_form_decisive": true,
     "canonical_form_idempotent": true,
     "unit_orbits": 66,
@@ -1784,8 +1784,8 @@
    "e": 1,
    "even": {
     "block_canonical_forms": 715,
-    "block_orbits_bfs": 715,
     "block_orbits_formula": 715,
+    "block_orbits_unionfind": 715,
     "canonical_form_decisive": true,
     "canonical_form_idempotent": true,
     "unit_orbits": 10,
@@ -1796,8 +1796,8 @@
    "n": 4,
    "neither": {
     "block_canonical_forms": 3060,
-    "block_orbits_bfs": 3060,
     "block_orbits_formula": 3060,
+    "block_orbits_unionfind": 3060,
     "canonical_form_decisive": true,
     "canonical_form_idempotent": true,
     "unit_orbits": 15,
@@ -1807,8 +1807,8 @@
    "nonlinearities_with_fewer_function_classes_than_orbits": 26,
    "odd": {
     "block_canonical_forms": 495,
-    "block_orbits_bfs": 495,
     "block_orbits_formula": 495,
+    "block_orbits_unionfind": 495,
     "canonical_form_decisive": true,
     "canonical_form_idempotent": true,
     "unit_orbits": 9,

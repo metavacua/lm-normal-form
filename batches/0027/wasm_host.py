@@ -7,20 +7,24 @@ Three groups of checks, each against something that was fixed before the run:
   closure   the numbers that closure.dl derives from the module's structure (imports, exports, memory, table, stack) against what wasmtime does:
             the memory grows page by page to the least of the specification's, the module's and the host's bound and then fails with -1; a load or store
             at or beyond the end of the memory traps; an index outside the table, or of another signature, traps; a recursion and a loop end in a trap
-            (the stack, the fuel); the instantiation with an empty linker succeeds exactly when the module has no imports; two instances share nothing.
+            (the stack, the fuel); the instantiation with an empty linker succeeds exactly when the module has no imports, and a module without a start
+            function uses no fuel when it is instantiated; two instances share nothing.
   kernel    tern_i8 against exact Python integers and under permutations of the columns (bit-exact, a theorem about integer addition), tern_f32 under the
             same permutations (not a theorem: the count of outputs that change is recorded), and the extreme sums against the bound that fits an i32.
   canon     nf_units, the compiled canonical form of a block of gated units, against ternary.py's leading-trit normalizer and sort on every ordered block of
             the configurations, against the orbits found by union-find over the same blocks (the same partition), and its own idempotence.
 Each check has an id, the prediction, the observation and a verdict: supported (they agree), refuted (they differ), unknown (not observable here).
 
-Usage: wasm_host.py MODULE.wasm OUT.json --facts DIR --predict DIR [--backend wasm|python] [--only closure,kernel,canon]
-  --facts DIR    the directory that wasm_facts.py wrote; scenario.facts in it names the memory limits of the runs (name, KiB)
-  --predict DIR  the output of closure.dl (predict.csv, may_grow.csv, fixed_memory.csv, closed.csv)
+Usage: wasm_host.py MODULE.wasm OUT.json --facts DIR --predict DIR [--controls DIR] [--backend wasm|python] [--only closure,kernel,canon]
+  --facts DIR    the directory that wasm_facts.py wrote; scenario.facts in it (written by the workflow) names the memory limits of the runs (name, KiB)
+  --predict DIR  the output of closure.dl (predict.csv, may_grow.csv, fixed_memory.csv)
+  --controls DIR the directory with the compiled control modules bulk.wasm and simd.wasm: adds the checks that the engine with the switchable post-1.0
+                 proposals off (LOCKDOWN) refuses what the default engine compiles
   --backend python  run the kernel and canon groups against a Python model of the exports, to test this script without the module
 """
 
 import csv
+import importlib.metadata
 import json
 import os
 import random
@@ -35,6 +39,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import ternary
 
 PAGE = 65536
+FULL_FUEL = 1 << 60  # a store with fuel metering starts with none: every instance is given this much unless a check says otherwise
 T = (-1, 0, 1)
 CANON_CONFIGS = [(1, 1, 3), (1, 2, 2), (2, 1, 2)]
 W_OFF, X_OFF, Y_OFF = 0, 8192, 32768
@@ -174,7 +179,7 @@ class Runner:
         if limit_kib is not None:
             store.set_limits(memory_size=limit_kib * 1024)
         if self.fuel:
-            store.set_fuel(fuel if fuel is not None else 1 << 60)  # a store with fuel metering starts with none
+            store.set_fuel(fuel if fuel is not None else FULL_FUEL)
         inst = w.Linker(self.engine).instantiate(store, self.module)
         return Inst(self, store, inst)
 
@@ -213,7 +218,7 @@ class Inst:
     def fuel_left(self):
         if hasattr(self.store, "get_fuel"):
             return self.store.get_fuel()
-        return (1 << 60) - self.store.fuel_consumed()
+        return FULL_FUEL - self.store.fuel_consumed()
 
 
 # ---------------------------------------------------------------------------------------------------------------------------- closure
@@ -234,18 +239,34 @@ def group_closure(run, checks, pred, sets, scen):
     checks.add("exports_func", "the number of exported functions", P("exports_func"), len(funcs))
     checks.add("exports_mem", "the number of exported memories", P("exports_mem"), len(mems))
 
-    # closed: the instantiation with a linker that defines nothing succeeds exactly when there is no import
+    # the instantiation with a linker that defines nothing succeeds exactly when there is no import
     try:
-        inst = run.instantiate()
-        closed_obs = 1
+        base = run.instantiate()
+        instantiates = 1
     except Exception as e:
-        closed_obs = 0
+        instantiates = 0
         print("instantiation with an empty linker failed:", str(e)[:120])
-    checks.add("closed", "the module instantiates with a linker that defines nothing", P("closed"), closed_obs)
-    if closed_obs == 0:
+    checks.add(
+        "instantiates_with_an_empty_linker",
+        "the module instantiates with a linker that defines nothing exactly when it has no imports",
+        None if P("imports") is None else int(P("imports") == 0),
+        instantiates,
+    )
+    if not instantiates:
         return {"note": "the module needs imports; the remaining closure checks do not apply"}
-
-    base = run.instantiate()
+    if run.fuel and P("start_function") == 0:
+        checks.add(
+            "no_start_function_nothing_runs_at_instantiation",
+            "the module has no start function (closure.dl) and instantiating it uses no fuel: no instruction of the guest runs before the host calls",
+            0,
+            FULL_FUEL - base.fuel_left(),
+        )
+    checks.add(
+        "data_segments_fit_the_initial_memory",
+        "closure.dl derives that the active data segments end inside the initial memory, and the instantiation, which checks them, succeeded",
+        P("static_fits"),
+        1,
+    )
     mt = base.mem.type(base.store)
     lim = mt.limits
     max_pages = getattr(lim, "max", None)
@@ -296,13 +317,15 @@ def group_closure(run, checks, pred, sets, scen):
         )
         if rejected_obs:
             continue
+        start_pages = inst.pages()
         seq = []
         for _ in range(70000):
             r = u32(inst.call("probe_mem_grow", 1))
             if r == 0xFFFFFFFF:
                 break
             seq.append(r)
-        final_kib = inst.pages() * 64
+        end_pages = inst.pages()
+        final_kib = end_pages * 64
         r_after = u32(inst.call("probe_mem_grow", 1))
         r_big = u32(inst.call("probe_mem_grow", 100000))
         detail[f"scenario_{name}"] = {"growths": len(seq), "final_pages": inst.pages(), "monotone": seq == sorted(seq)}
@@ -319,10 +342,10 @@ def group_closure(run, checks, pred, sets, scen):
             [r_after, r_big],
         )
         checks.add(
-            f"memory_never_shrinks_{name}",
-            f"scenario {name}: the growths return the sizes in order and the size is the last one plus one",
+            f"growths_are_consecutive_{name}",
+            f"scenario {name}: the successful growths return start, start + 1, ... in order, and the size at the end is start plus their number",
             True,
-            seq == list(range(seq[0], seq[0] + len(seq))) if seq else True,
+            seq == list(range(start_pages, start_pages + len(seq))) and end_pages == start_pages + len(seq),
         )
 
     # the table: the smallest index that is out of bounds is the declared minimum
@@ -371,6 +394,13 @@ def group_closure(run, checks, pred, sets, scen):
             stack is not None and bp >= stack * 1024,
         )
         checks.add("static_inside_memory", "the scratch buffer lies inside the initial memory", True, bp + bl <= before * PAGE)
+        if P("stack_clear") == 1 and stack is not None:
+            checks.add(
+                "stack_area_is_zero_after_instantiation",
+                "closure.dl derives that no data segment lies below the initial stack pointer, and the bytes below it are zero in a new instance",
+                True,
+                not any(run.instantiate().read(0, stack * 1024)),
+            )
         detail["buf"] = [bp, bl]
 
     # recursion ends in a trap: the shadow stack (below address 0 is out of bounds) or the stack of the engine
@@ -506,8 +536,14 @@ def group_closure(run, checks, pred, sets, scen):
     checks.add(
         "exports_that_may_grow_are_the_ones_that_grew",
         "the exports from which closure.dl reaches memory.grow are exactly the ones that changed the memory here",
-        sorted(may),
+        sorted(n for n in may if n != "<start>"),
         sorted(changed),
+    )
+    checks.add(
+        "module_may_grow",
+        "closure.dl derives that the memory of the module may grow (some entry reaches memory.grow), and some export changed the size here",
+        P("module_may_grow"),
+        int(bool(changed)),
     )
     detail["changed_memory"] = sorted(changed)
     return detail
@@ -522,7 +558,9 @@ def compiles(w, cfg, path):
 
 
 def group_features(w, checks, controls):
-    """The engine configured for WebAssembly 1.0 refuses what the default engine takes: a module with a bulk-memory instruction and one with a SIMD value."""
+    """The engine with the switchable post-1.0 proposals off (LOCKDOWN) refuses what the default engine takes: a module with a bulk-memory
+    instruction and one with a SIMD value. Only these two proposals are exercised; reference types, sign extension and the non-trapping conversions
+    stay accepted by every configuration of the binding."""
     for name, what in (("bulk", "memory.copy (bulk memory)"), ("simd", "i32x4.add (SIMD)")):
         path = os.path.join(controls, f"{name}.wasm")
         if not os.path.exists(path):
@@ -530,7 +568,7 @@ def group_features(w, checks, controls):
         locked = w.Config()
         lock_down(locked)
         checks.add(f"default_engine_accepts_{name}", f"the default engine compiles a module that uses {what}", True, compiles(w, w.Config(), path))
-        checks.add(f"locked_engine_rejects_{name}", "the engine configured for WebAssembly 1.0 refuses it", False, compiles(w, locked, path))
+        checks.add(f"locked_engine_rejects_{name}", "the engine with the switchable post-1.0 proposals off refuses it", False, compiles(w, locked, path))
 
 
 # ---------------------------------------------------------------------------------------------------------------------------- backends
@@ -631,7 +669,7 @@ def group_kernel(be, checks, *, seed=27, rows=8, cols=48, perms=20):
         True,
         changed_rows > 0,
     )
-    # the extremes: the largest sums that the buffer allows
+    # large sums: 2^14 columns, a quarter of the bytes of the buffer
     n = 16384
     ones = [[1] * n]
     top = be.tern_i8(ones, [127] * n)[0]
@@ -711,7 +749,7 @@ def main(argv):
     run = Runner(w, wasm_path, fuel=True, stack_kib=256, lockdown=True)
     res = {
         "module": os.path.basename(wasm_path),
-        "wasmtime": getattr(w, "__version__", "?"),
+        "wasmtime": importlib.metadata.version("wasmtime"),
         "backend": backend,
         "scenarios": scen,
         "engine": {"switched_off": run.lockdown[0], "not_switched_off": run.lockdown[1], "fuel": True, "max_wasm_stack_kib": 256},

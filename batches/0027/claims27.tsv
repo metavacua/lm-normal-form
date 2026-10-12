@@ -10,7 +10,7 @@ C08	LmnfNormal.tequiv_NF	abstract	every tuple is equivalent to its normal form
 C09	LmnfNormal.canonicalization	abstract	the normal form (normalize each item, sort by an injective key) is a canonicalization of the relation
 C10	LmnfNormal.isNF_iff	abstract	the irreducible tuples of the oriented system are the normalized, sorted ones
 C11	LmnfNormal.NF_step	abstract	a step of the oriented system does not change the normal form
-C12	LmnfNormal.unique_normal_form	abstract	a tuple reaches exactly one irreducible tuple, its normal form
+C12	LmnfNormal.unique_normal_form	abstract	an irreducible tuple reached from a tuple is its normal form (at most one; that one is reached is not proved)
 C13	LmnfNormal.step_unr	abstract	the oriented system has unique normal forms
 C14	LmnfNormal.minNorm_itemNormalizer	abstract	the smaller of an item and its negative is an item normalizer for the sign gauge
 O01	LmnfNormal.canon_Perm_sort	obligation	group Perm: sorting by an injective key is a canonicalization
@@ -30,7 +30,7 @@ P01	LmnfNormal.GBlock.F_neg_gate_even	parity	for an even nonlinearity, negating 
 P02	LmnfNormal.GBlock.F_neg_gate_down_odd	parity	for an odd nonlinearity, negating the gate rows and the down columns does not change it
 S01	LmnfNormal.sep_bag_not_function	separation	two blocks with the same bag of tensors and different functions
 S02	LmnfNormal.sep_function_not_bag	separation	two blocks with the same function and different bags of tensors
-S03	LmnfNormal.sep_orbit_not_function	separation	two blocks with the same function that are not in one orbit of the gauge
+S03	LmnfNormal.sep_function_not_orbit	separation	two blocks with the same function that are not in one orbit of the gauge
 K01	LmnfNormal.Verdict.val_injective	k3	the verdicts are distinct balanced ternary digits
 K02	LmnfNormal.Verdict.val_neg	k3	negation is the change of sign
 K03	LmnfNormal.Verdict.val_conj	k3	conjunction is the minimum
@@ -43,8 +43,8 @@ K09	LmnfNormal.Verdict.non_contradiction_fails	k3	non-contradiction fails at unk
 K10	LmnfNormal.Verdict.neg_mono	k3	negation is monotone for the order of information
 K11	LmnfNormal.Verdict.conj_mono	k3	conjunction is monotone for the order of information
 K12	LmnfNormal.Verdict.disj_mono	k3	disjunction is monotone for the order of information
-R01	LmnfNormal.reduced_polynomial_canonical	survivor	the reduced polynomials of a finite field are in bijection with its functions
+R01	LmnfNormal.reduced_polynomial_canonical	survivor	the reduced polynomials of a finite field are in bijection with the functions of their variables
 R02	LmnfNormal.reduced_polynomial_canonical_F3	survivor	the same for the three symmetric residues
 B01	LmnfNormal.ternary_dot_bound	closure	a ternary row times int8 activations has absolute value at most 128 n
 B02	LmnfNormal.ternary_dot_fits_i32	closure	that bound is below 2^31 for every length below 2^24
-B03	LmnfNormal.bitnet_2b4t_down_projection_fits_i32	closure	the widest input of BitNet b1.58 2B4T fits an i32
+B03	LmnfNormal.ternary_dot_2b4t_down_fits_i32	closure	a ternary row of width 6912 (the intermediate size of BitNet b1.58 2B4T, from its configuration) times int8 activations sums below 2^31

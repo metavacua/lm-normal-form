@@ -6,9 +6,10 @@
 //!  * `probe_*`: one instruction or one resource each (a load or store at an address, `memory.grow`, `unreachable`, a
 //!    recursion, a loop, an indirect call), so that the host can check that each bound which `closure.dl` derives from the
 //!    module's structure is the bound that wasmtime enforces, and what the failure is (a trap or `-1`).
-//!  * `tern_i8`, `tern_f32`: a row of a ternary matrix (two bits per trit, as ggml's TQ2_0 codes them) times a vector, with
-//!    int8 activations accumulated in i32 (exact: the sum of at most 65536 terms of absolute value 128 is below 2^31) and
-//!    with f32 activations accumulated in f32 (not exact: the sum depends on the order of the terms).
+//!  * `tern_i8`, `tern_f32`: a row of a ternary matrix (two bits per trit, the code of ggml's TQ2_0 in the byte layout of this
+//!    module) times a vector, with int8 activations accumulated in i32 (exact: the sum of at most 65536 terms of absolute
+//!    value 128 is below 2^31) and with f32 activations accumulated in f32 (not exact: the sum depends on the order of the
+//!    terms).
 //!  * `nf_units`: the canonical form of a block of gated units over {-1, 0, 1} under the sign gauge (u, w) -> (-u, -w) and the
 //!    permutations of the units: the leading non-zero trit of u (of w when u = 0) is made +1, then the units are sorted.
 #![no_std]
@@ -140,7 +141,8 @@ pub extern "C" fn probe_call(idx: usize, x: i32) -> i32 {
 
 // ---------------------------------------------------------------------------------------------- the ternary kernels
 
-/// ggml's TQ2_0 codes a trit in two bits as q = trit + 1; the code 3 is unused and is read as 0.
+/// The two-bit code of ggml's TQ2_0, q = trit + 1, with four consecutive trits to a byte (the byte layout of this module, not ggml's block layout);
+/// the code 3, which ggml would read as +2, is read as 0 here.
 fn trit(code: u8) -> i32 {
     match code & 3 {
         0 => -1,

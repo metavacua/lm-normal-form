@@ -1,26 +1,35 @@
 // SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // The closure of a WebAssembly 1.0 module, derived from its structure (wasm_facts.py reads the binary into the relations below) and
-// from three small tables of constants: the specification, the target, and the host that runs it. A rule fires only for constants that the
-// tables or the module name, no rule makes a constant, and every relation is finite, so the least model is a closure: whatever a
-// guest can reach is a derived fact and `escape` is a derived relation that is empty for a closed module.
+// from three small tables of constants: the specification, the target, and the host that runs it. The recursive rules (reach, calls_plus) only
+// combine the facts of the module, and the arithmetic and the aggregates are in rules outside any recursion, so every relation is finite and the
+// least model is computed in finitely many steps. What is derived is the list below and nothing else: nothing about traps, or about the contents of
+// an exported table or global. The extractor refuses a module that it cannot read in full (wasm_facts.py), so that no fact rests on an input that was
+// dropped; `escape` is empty for a closed module.
 //
 // What the derivations say, all of it about the module and not about any run:
 //   escape(kind, what)       the channels through which the guest could reach beyond its own memory: every import, and a start function
 //                            (it runs before the host calls anything). Empty: the module's only inputs and outputs are the calls that the host
 //                            makes on its exports and the bytes that the host writes into and reads from its memory.
-//   boundary(kind, name)     what the host can touch: the exported functions and the exported memory.
+//   boundary(kind, name)     what the host can touch by name: the exports of every kind (func, table, mem, global); for the module of this batch, the exported
+//                            functions and the exported memory.
 //   reach(e, f)              the functions that an entry (an exported function or the start function) can run: direct calls, and call_indirect
 //                            to the table functions of the signature that the call names (the engine checks the signature at run time).
-//   may_grow / fixed_memory  the exports from which a memory.grow instruction is reachable, and the others, whose memory is fixed in size.
+//   may_grow / fixed_memory  the entries (the exports, and the start function under the name <start>) from which a memory.grow instruction is reachable,
+//                            and the others, whose memory is fixed in size.
 //   mem_bound_kib            the least of the specification's bound (2^16 pages), the module's declared maximum and the host's limit: the memory of a
 //                            run never exceeds it (memory.grow fails with -1, and does not trap), and it never shrinks.
 //   recursive(f)             a live function on a cycle of the call graph: only such a function can exhaust the stack by depth.
 //   depth_bound(f, d)        for a recursive function whose prologue takes a frame of b bytes of the shadow stack, no more than d = (the stack) / b of its frames
 //                            are active at once: the stack bound as a number read from the binary.
-//   predict(key, value)      the numbers that wasm_host.py checks against what wasmtime does.
-// Sizes are in KiB, so that 4 GiB (2^22 KiB) fits the 32-bit numbers of Souffle. The module's own constants (page size 64 KiB, limits within
-// 2^16 pages for a memory, one memory, one table, at most one result) are from the W3C Recommendation of 5 December 2019, chapters 2.5, 3.2 and 7.
+//   predict(key, value)      the derived numbers as a table. wasm_host.py compares with wasmtime: imports, exports_func, exports_mem, start_function,
+//                            mem_initial_kib, mem_declared_max_kib, table_size, stack_kib, static_fits, stack_clear, module_may_grow, recursion_frames_bound,
+//                            rejected_* and final_kib_*; grade27.py compares closed, escapes, mem_declared_max_kib and mem_bound_kib of the two control modules.
+//                            The others (mem_bound_kib of the main module, stack_fits, entries_that_may_grow, entries_with_fixed_memory, live_functions,
+//                            recursive_functions) are derived and not compared with an observation.
+// Sizes are in KiB, so that 4 GiB (2^22 KiB) fits the 32-bit signed numbers of Souffle; a byte offset of 2^31 or more is refused by wasm_facts.py. The
+// module's own constants (page size 64 KiB, limits within 2^16 pages for a memory, one memory, one table, at most one result) are from the W3C
+// Recommendation of 5 December 2019: sections 2.3.3, 2.5.4, 2.5.5, 3.2.2, 3.2.4, 3.4.10 and 4.2.8.
 
 // ---- the module (wasm_facts.py) -------------------------------------------------------------------------------------------------------------
 .decl wmodule(name:symbol)
@@ -61,20 +70,18 @@
 .input wframe
 .decl wversion(v:number)
 .input wversion
-.decl wnote(what:symbol, n:number)
-.input wnote
 
-// ---- the host: the limits that were configured for the runs, written by wasm_host.py -----------------------------------------------------------
+// ---- the host: the memory limits of the scenarios, written by the workflow into scenario.facts and read by wasm_host.py to configure its runs ----
 .decl scenario(name:symbol, limit_kib:number)
 .input scenario
 
 // ---- the specification and the target ----------------------------------------------------------------------------------------------------------
 .decl spec(k:symbol, v:number)
-spec("page_kib", 64).                 // WebAssembly 1.0, 2.5.5: a page is 65536 bytes
-spec("memory_max_pages", 65536).      // 3.2.3: memory limits are valid within 2^16 pages
-spec("memories", 1).                  // 3.4.10: at most one memory (and, 2.5.4, at most one table)
+spec("page_kib", 64).                 // WebAssembly 1.0, 4.2.8: a page is 65536 bytes
+spec("memory_max_pages", 65536).      // 3.2.4: memory limits are valid within 2^16 pages
+spec("memories", 1).                  // 3.4.10: at most one memory and at most one table (2.5.5, 2.5.4)
 spec("tables", 1).
-spec("results", 1).                   // 2.3.3: at most one result
+spec("results", 1).                   // 3.2.2: a function type has at most one result (2.3.3)
 .decl target(k:symbol, v:number)      // rustc, wasm32v1_none.rs and base/wasm.rs
 target("pointer_bits", 32).
 target("stack_first", 1).             // --stack-first: the shadow stack is below the static data, so that an overflow leaves the memory and traps
@@ -154,18 +161,18 @@ stack_pointer0(v) :- wglobal(0, "i32", 1, 0, v), v >= 0.
 .decl depth_bound(f:number, d:number)
 depth_bound(f, d) :- recursive(f), wframe(f, b), b > 0, stack_pointer0(sp), d = sp / b.
 .decl data_below_stack()
-data_below_stack() :- stack_pointer0(sp), wdata(_, o, _), o >= 0, o < sp.
+data_below_stack() :- stack_pointer0(sp), wdata(_, o, _), o < sp.
 .decl stack_clear()
 stack_clear() :- stack_pointer0(_), !data_below_stack().
 .decl data_end(b:number)
-data_end(e) :- e = max x : { wdata(_, o, l), o >= 0, x = o + l }.
+data_end(e) :- e = max x : { wdata(_, o, l), x = o + l }.
 .decl static_fits()
 static_fits() :- data_end(e), mem_initial_kib(k), (e + 1023) / 1024 <= k.
 static_fits() :- !has_data(), mem_initial_kib(_).
 .decl has_data()
 has_data() :- wdata(_, _, _).
 .decl stack_fits()
-stack_fits() :- stack_pointer0(sp), mem_initial_kib(k), sp / 1024 <= k.
+stack_fits() :- stack_pointer0(sp), mem_initial_kib(k), (sp + 1023) / 1024 <= k.
 
 // ---- the table ------------------------------------------------------------------------------------------------------------------------------------------
 // WebAssembly 1.0 has no instruction that grows a table, so the index of a call_indirect is checked against the declared minimum.
@@ -195,8 +202,8 @@ predict("stack_fits", 1) :- stack_fits().
 predict("stack_fits", 0) :- !stack_fits().
 predict("module_may_grow", 1) :- any_grow().
 predict("module_may_grow", 0) :- !any_grow().
-predict("exports_that_may_grow", n) :- n = count : { may_grow(_) }.
-predict("exports_with_fixed_memory", n) :- n = count : { fixed_memory(_) }.
+predict("entries_that_may_grow", n) :- n = count : { may_grow(_) }.
+predict("entries_with_fixed_memory", n) :- n = count : { fixed_memory(_) }.
 predict("live_functions", n) :- n = count : { live(_) }.
 predict("recursive_functions", n) :- n = count : { recursive(_) }.
 predict("recursion_frames_bound", d) :- d = min x : { depth_bound(_, x) }.

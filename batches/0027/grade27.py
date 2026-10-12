@@ -14,7 +14,7 @@
   plan PLAN.json CHECKS.json
       the plan that nf.dl derived for each configuration against the registered predictions
   report DIR OUT_MD OUT_JSON
-      every *checks.json under DIR, counted, with the failed steps of every outcomes.json
+      every *checks.json, lean-claims.json and observed*.json under DIR, counted, with the failed steps of every outcomes.json
 """
 
 import csv

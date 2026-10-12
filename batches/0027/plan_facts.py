@@ -8,14 +8,14 @@ Three programs over the dataflow of batch 0015's model, reified by batch 0019's 
   bitnet          llama plus the sub-layer norms of BitNet b1.58 2B4T (Hugging Face modeling_bitnet.py): an RMSNorm with a weight over the units before the down
                   projection, and one over the concatenated head outputs before the output projection. The weights are new spaces (the output of the weight), as
                   batch 0019 models the norm weights of the stream.
-  bitnet_ternary  bitnet with the role `ternary` on every space that a ternary matrix touches: the seven projections of every layer
-                  (q, k, v, o, gate, up, down). The embedding and the head stay real, as in BitNet and TriLM.
+  bitnet_ternary  bitnet with the role `ternary` on every space on which a ternary projection has the role `lin` (its input and output coordinates): the
+                  seven projections of every layer (q, k, v, o, gate, up, down). The embedding and the head stay real, as in BitNet and TriLM.
 Nothing here says which transformations are symmetries; only what exists and what each operation requires. nf.dl derives the group of each space
 (batch 0019's lattice), the order in which the spaces can be canonicalized (the distance from the vocabulary through the parameter tensors, the
 diagonal links of the norm weights and the elementwise products), the method and the theorem that each space needs, and the verdict of the whole
 plan in Kleene's strong logic (supported 1, unknown 0, refuted -1; the conjunction is the minimum).
 
-Usage: plan_facts.py OUTDIR [--proved FILE] [--exhaustive FILE]    OUTDIR/<config>/{facts,out}, OUTDIR/plan.json
+Usage: plan_facts.py OUTDIR [--proved FILE]    OUTDIR/<config>/{facts,out}, OUTDIR/plan.json
 """
 
 import csv
@@ -82,7 +82,7 @@ def add_sublayer_norms(p):
 
 
 def add_ternary(p):
-    """Every space that a ternary projection touches also carries the role `ternary`."""
+    """Every space on which a ternary projection has the role `lin` (its input and output coordinates) also carries the role `ternary`."""
     extra = []
     for o, s, r in p.cons:
         if r == "lin" and any(o.startswith(x) and o[len(x) :].isdigit() for x in PROJ):
@@ -100,18 +100,15 @@ def build(name):
     return p
 
 
-def run_souffle(name, workdir, proved, exhaustive):
+def run_souffle(name, workdir, proved):
     p = build(name)
     facts, out = os.path.join(workdir, "facts"), os.path.join(workdir, "out")
     os.makedirs(out, exist_ok=True)
     ir.write_facts(p, facts)
-    for fname, items in (("proved", proved), ("exhaustive", exhaustive), ("refuted", [])):
+    for fname, items in (("proved", proved), ("refuted", [])):  # nothing in this batch refutes a theorem
         with open(os.path.join(facts, fname + ".facts"), "w") as f:
             for t in items:
                 f.write(t + "\n")
-    # batch 0019's states.dl reads gen_space and gen_induced; none are needed for the plan
-    for fname in ("gen_space", "gen_induced"):
-        open(os.path.join(facts, fname + ".facts"), "w").close()
     run = subprocess.run(["souffle", "-F", facts, "-D", out, os.path.join(HERE, "nf.dl")], check=True, capture_output=True, text=True)
     if run.stderr.strip() or run.stdout.strip():
         sys.stderr.write(run.stderr + run.stdout)
@@ -172,10 +169,10 @@ def main(argv):
     def lines(path):
         return [l.strip() for l in open(path) if l.strip()] if path else []
 
-    proved, exhaustive = lines(opt.get("--proved")), lines(opt.get("--exhaustive"))
+    proved = lines(opt.get("--proved"))
     result = []
     for name in CONFIGS:
-        p, r = run_souffle(name, os.path.join(out, name), proved, exhaustive)
+        p, r = run_souffle(name, os.path.join(out, name), proved)
         result.append(summarize(name, p, r))
         s = result[-1]
         print(

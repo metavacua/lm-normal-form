@@ -19,19 +19,23 @@ The sources keep three notions apart for a block of gated units `(g, u, w)` over
   the up row with `c⁻¹` on the down column;
 * the *equality of the function* (`GBlock.F s`).
 
-None of the three implies another.  The theorems of this file are examples over `ℚ`:
+The orbit is finer than the equality of the function: equivalent blocks have the same function
+(`sound_Mono`).  The theorems of this file are examples over `ℚ` that the other directions fail:
 
 * `sep_bag_not_function`: the same bag of tensors, two different functions (for `s t = t ^ 2`:
   exchange the gate and the up tensor);
 * `sep_function_not_bag`: the same function, for every `s`, two different bags (a unit and its image
   under the gauge);
-* `sep_orbit_not_function`: the same function, two blocks that are not in one orbit (for `s t = max
+* `sep_function_not_orbit`: the same function, two blocks that are not in one orbit (for `s t = max
   t 0`, because `max t 0 - max (-t) 0 = t`, a pair `(g, u, w), (-g, u, -w)` is symmetric in the gate
   and the up row, but the gates are an invariant of the orbit and they differ).
 
 The bag `bagOf` is *coarser* than a real digest of the tensors: it keeps for each of the three
-tensors only the multiset of its entries and ignores the positions inside a tensor.  A coarser bag
-identifies more blocks, so the separation `sep_bag_not_function` is only stronger for it.
+tensors only the multiset of its entries, ignores the positions inside a tensor, and does not say
+which of the three is the gate, the up row or the down column (names are not part of the identity).
+A coarser bag identifies more blocks, so `sep_bag_not_function`, which needs two blocks with the
+same bag, is weaker for it than for a finer digest, and `sep_function_not_bag`, which needs two
+blocks with different bags, is stronger.
 -/
 
 namespace LmnfNormal
@@ -212,7 +216,7 @@ theorem sep_function_not_bag (s : ℚ → ℚ) :
 (-1, 2, -1)` and `(2, 1, 1), (-2, 1, -1)` have the same function, and they are not in one orbit
 of the moves, because the multiset of the gates, `{1, -1}` against `{2, -2}`, is invariant under
 the moves (here through its sum of squares, `2` against `8`). -/
-theorem sep_orbit_not_function :
+theorem sep_function_not_orbit :
     ∃ θ θ' : Fin 2 → GUnit ℚ 1 1,
       GBlock.F (fun t : ℚ => max t 0) θ = GBlock.F (fun t : ℚ => max t 0) θ' ∧
         ¬ TEquiv GUnit.act θ θ' := by
