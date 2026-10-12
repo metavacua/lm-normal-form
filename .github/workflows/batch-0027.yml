@@ -48,11 +48,11 @@ jobs:
       - name: Tools
         run: |
           mkdir -p out/lint
-          python -m pip install --quiet ruff==0.16.9
+          python -m pip install --quiet ruff==0.16.9 taplo==0.9.3 yamllint==1.38.0
           rustup toolchain install stable --profile minimal --component rustfmt --component clippy --no-self-update
           rustup default stable
           rustup target add wasm32v1-none
-          { ruff --version; rustc -V; cargo -V; cargo clippy -V; rustfmt --version; } | tee out/lint/versions.txt
+          { ruff --version; taplo --version; yamllint --version; rustc -V; cargo -V; cargo clippy -V; rustfmt --version; } | tee out/lint/versions.txt
       - id: ruff_format
         name: "ruff format --check: the Python of the batch is formatted"
         continue-on-error: true
@@ -61,6 +61,18 @@ jobs:
         name: "ruff check: the Python of the batch has no finding"
         continue-on-error: true
         run: ruff check batches/0027 2>&1 | tee out/lint/ruff-check.txt; test "${PIPESTATUS[0]}" -eq 0
+      - id: taplo
+        name: "taplo fmt --check: the TOML of the batch is formatted"
+        continue-on-error: true
+        run: |
+          taplo fmt --check batches/0027/lean/lakefile.toml batches/0027/wasm/Cargo.toml batches/0027/wasm/.cargo/config.toml batches/0027/ruff.toml 2>&1 | tee out/lint/taplo.txt
+          test "${PIPESTATUS[0]}" -eq 0
+      - id: yamllint
+        name: "yamllint: the workflow of the batch"
+        continue-on-error: true
+        run: |
+          yamllint -d '{extends: default, rules: {line-length: disable, document-start: disable, truthy: disable, comments-indentation: disable}}' .github/workflows/batch-0027.yml 2>&1 | tee out/lint/yamllint.txt
+          test "${PIPESTATUS[0]}" -eq 0
       - id: rustfmt
         name: "cargo fmt --check: the Rust of the module is formatted"
         continue-on-error: true

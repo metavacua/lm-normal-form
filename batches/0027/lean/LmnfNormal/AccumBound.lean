@@ -7,11 +7,12 @@ import Mathlib
 /-!
 # The accumulator of a ternary matrix times an int8 vector stays in an i32
 
-A BitNet-style linear layer multiplies a matrix with entries in `{-1, 0, 1}` by a vector of signed bytes and sums the products.  Each product
-has absolute value at most 128, so the sum of `n` of them has absolute value at most `128 n`; below `2^31` as long as `n ≤ 2^24 - 1`.  WebAssembly's
-`i32.add` wraps modulo `2^32`, so within this bound the wrapped sum is the integer sum, and the sum does not depend on the order of the terms: a
-permutation of the columns does not change a bit of the output (batches/0027/wasm checks this in wasmtime; the sum of floats, which is not exact,
-does change).
+A BitNet-style linear layer multiplies a matrix with entries in `{-1, 0, 1}` by a vector of signed
+bytes and sums the products.  Each product has absolute value at most 128, so the sum of `n` of them
+has absolute value at most `128 n`; below `2^31` as long as `n ≤ 2^24 - 1`.  WebAssembly's `i32.add`
+wraps modulo `2^32`, so within this bound the wrapped sum is the integer sum, and the sum does not
+depend on the order of the terms: a permutation of the columns does not change a bit of the output
+(batches/0027/wasm checks this in wasmtime; the sum of floats, which is not exact, does change).
 -/
 
 namespace LmnfNormal
@@ -27,10 +28,8 @@ theorem ternary_dot_bound {n : ℕ} (w x : Fin n → ℤ) (hw : ∀ i, |w i| ≤
     linarith
   have h3 : ∑ i, |w i * x i| ≤ ∑ _i : Fin n, (128 : ℤ) := Finset.sum_le_sum (fun i _ => h2 i)
   have h4 : ∑ _i : Fin n, (128 : ℤ) = 128 * n := by
-    first
-      | (simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]; ring)
-      | (simp; ring)
-      | simp [mul_comm]
+    simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+    ring
   linarith
 
 /-- The bound fits an `i32` for every length below `2^24`. -/

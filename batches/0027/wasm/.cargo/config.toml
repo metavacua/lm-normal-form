@@ -5,4 +5,11 @@
 # leaves the memory and traps) and the memory declares a maximum of 64 pages = 4 MiB, so that the bound is a property of
 # the module and not of the host that runs it. Every warning is an error.
 [target.wasm32v1-none]
-rustflags = ["-D", "warnings", "-C", "link-arg=-zstack-size=65536", "-C", "link-arg=--max-memory=4194304"]
+rustflags = [
+  "-D",
+  "warnings",
+  "-C",
+  "link-arg=-zstack-size=65536",
+  "-C",
+  "link-arg=--max-memory=4194304",
+]

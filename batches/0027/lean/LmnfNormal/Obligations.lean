@@ -10,16 +10,22 @@ import LmnfNormal.Unit
 /-!
 # The theorems that the plan of `nf.dl` depends on
 
-`nf.dl` derives, for each index space of a model, the group of changes of basis that act on it and the method that canonicalizes the orbits of that group.
-The method names a theorem; the theorem is in this file or in `Unit.lean`:
+`nf.dl` derives, for each index space of a model, the group of changes of basis that act on it and
+the method that canonicalizes the orbits of that group. The method names a theorem; the theorem is
+in this file or in `Unit.lean`:
 
-* `canon_Perm_sort`: the group `Perm`; the items are not changed, only their order; the normal form is the sort by an injective key.
-* `canon_SP_sign_sort`: the group `SP` of signed permutations; the item is mapped to the one of the item and its negative that has the smaller key, then the items are sorted.
-  The unit of a ternary block is the instance (`canon_SP_units`), with the sign gauge `(g, u, w) ↦ (g, -u, -w)` and its soundness (`sound_SP`).
-* `canon_Mono_scale_sort` (in `Unit.lean`): the group `Mono`; the item is scaled to its pivot, then the items are sorted.
+* `canon_Perm_sort`: the group `Perm`; the items are not changed, only their order; the normal form
+  is the sort by an injective key.
+* `canon_SP_sign_sort`: the group `SP` of signed permutations; the item is mapped to the one of the
+  item and its negative that has the smaller key, then the items are sorted. The unit of a ternary
+  block is the instance (`canon_SP_units`), with the sign gauge `(g, u, w) ↦ (g, -u, -w)` and its
+  soundness (`sound_SP`).
+* `canon_Mono_scale_sort` (in `Unit.lean`): the group `Mono`; the item is scaled to its pivot, then
+  the items are sorted.
 
-Not here, and so unknown to the plan: `canon_GL_rref` (the reduced row echelon form, checked exhaustively on a finite model by `ref.py` and not proved), and
-`canon_stratified` (canonicalizing the spaces one after another in the order of their distance from the vocabulary).
+Not here, and so unknown to the plan: `canon_GL_rref` (the reduced row echelon form, checked
+exhaustively on a finite model by `ref.py` and not proved), and `canon_stratified` (canonicalizing
+the spaces one after another in the order of their distance from the vocabulary).
 -/
 
 namespace LmnfNormal
@@ -30,7 +36,8 @@ theorem canon_Perm_sort {U β : Type*} {n : ℕ} [LinearOrder β] {key : U → �
     Canonicalization (TEquiv (n := n) (fun (_ : Unit) (x : U) => x)) (NF (n := n) key id) :=
   canonicalization hkey ⟨fun _ _ => rfl, fun x => ⟨(), rfl⟩⟩
 
-/-- `SP`: the gauge is an involution of the items (a sign change); the normal form takes the smaller of an item and its negative, then sorts. -/
+/-- `SP`: the gauge is an involution of the items (a sign change); the normal form takes the
+smaller of an item and its negative, then sorts. -/
 theorem canon_SP_sign_sort {U β : Type*} {n : ℕ} [LinearOrder β] {key : U → β} {neg : U → U}
     (hneg : ∀ x, neg (neg x) = x) (hkey : Function.Injective key) :
     Canonicalization (TEquiv (n := n) (fun (b : Bool) (x : U) => if b then neg x else x))
@@ -68,15 +75,16 @@ variable {K : Type*} [Field K] {d e n : ℕ}
 theorem GBlock.F_signMove (s : K → K) {θ θ' : Fin n → GUnit K d e}
     (h : Move (GUnit.signAct (K := K) (d := d) (e := e)) θ θ') : GBlock.F s θ = GBlock.F s θ' := by
   cases h with
-  | perm f σ => exact (GBlock.F_perm s f σ).symm
-  | gauge f c =>
+  | perm σ => exact (GBlock.F_perm s θ σ).symm
+  | gauge c =>
     funext x
     unfold GBlock.F
     refine Finset.sum_congr rfl ?_
     intro i _
-    exact (GUnit.contrib_signAct s x (c i) (f i)).symm
+    exact (GUnit.contrib_signAct s x (c i) (θ i)).symm
 
-/-- Soundness of the sign gauge with the permutations: equivalent blocks have the same function, whatever `s` is. -/
+/-- Soundness of the sign gauge with the permutations: equivalent blocks have the same function,
+whatever `s` is. -/
 theorem sound_SP (s : K → K) {θ θ' : Fin n → GUnit K d e}
     (h : TEquiv (GUnit.signAct (K := K) (d := d) (e := e)) θ θ') : GBlock.F s θ = GBlock.F s θ' :=
   GUnit.tequiv_invariant (GBlock.F s) (fun _ _ hm => GBlock.F_signMove s hm) h

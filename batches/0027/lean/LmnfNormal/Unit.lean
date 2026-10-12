@@ -9,18 +9,23 @@ import LmnfNormal.InvolutionNF
 /-!
 # The gated unit block: the nonlinear instance of the tuple pattern
 
-A *gated unit* is a triple `(g, u, w)`: a gate row `g`, an up row `u` and a down column `w`.  A block is a family of `n` units, and its function is
-`x ↦ ∑ i, (s (g_i ⬝ᵥ x) * (u_i ⬝ᵥ x)) • w_i` for an *arbitrary* nonlinearity `s` (the gated MLP of `batches/0015/model.py`).
+A *gated unit* is a triple `(g, u, w)`: a gate row `g`, an up row `u` and a down column `w`.  A
+block is a family of `n` units, and its function is `x ↦ ∑ i, (s (g_i ⬝ᵥ x) * (u_i ⬝ᵥ x)) • w_i` for
+an *arbitrary* nonlinearity `s` (the gated MLP of `batches/0015/model.py`).
 
 Two things leave the function unchanged whatever `s` is:
 
 * a permutation of the units (the sum is over a shared index);
-* a scalar `c ≠ 0` on the up row together with `c⁻¹` on the down column (the gate is not touched, because `s` is not homogeneous).
+* a scalar `c ≠ 0` on the up row together with `c⁻¹` on the down column (the gate is not touched,
+  because `s` is not homogeneous).
 
-These are the moves `Move.perm` and `Move.gauge` of the tuple pattern, with the group `Kˣ` acting on a unit by `GUnit.act`.  This file
+These are the moves `Move.perm` and `Move.gauge` of the tuple pattern, with the group `Kˣ` acting on
+a unit by `GUnit.act`.  This file
 
-* defines the action, the normalizing scalar `GUnit.factor` and the normal form of one unit `GUnit.scale`, and proves that `GUnit.scale` is an `ItemNormalizer`;
-* gives an injective key `GUnit.key` into `List K`, ordered lexicographically, so that `NF GUnit.key GUnit.scale` is a canonicalization of `TEquiv GUnit.act`;
+* defines the action, the normalizing scalar `GUnit.factor` and the normal form of one unit
+  `GUnit.scale`, and proves that `GUnit.scale` is an `ItemNormalizer`;
+* gives an injective key `GUnit.key` into `List K`, ordered lexicographically, so that `NF GUnit.key
+  GUnit.scale` is a canonicalization of `TEquiv GUnit.act`;
 * proves that the function of a block is invariant under `TEquiv` and under the normal form.
 
 Nothing here is a statement about a particular `s`.
@@ -28,7 +33,8 @@ Nothing here is a statement about a particular `s`.
 
 namespace LmnfNormal
 
-/-- A gated unit with `d` input coordinates and `e` output coordinates: the gate row `g`, the up row `u` and the down column `w`. -/
+/-- A gated unit with `d` input coordinates and `e` output coordinates: the gate row `g`, the up
+row `u` and the down column `w`. -/
 @[ext]
 structure GUnit (K : Type*) (d e : ℕ) where
   /-- the gate row -/
@@ -40,7 +46,8 @@ structure GUnit (K : Type*) (d e : ℕ) where
 
 namespace GUnit
 
-/-- Invariance under `TEquiv`, from invariance under one `Move`: if `P` does not change along a single move, it does not change along the equivalence closure. -/
+/-- Invariance under `TEquiv`, from invariance under one `Move`: if `P` does not change along a
+single move, it does not change along the equivalence closure. -/
 theorem tequiv_invariant {Γ U : Type*} {V : Sort*} {n : ℕ} {act : Γ → U → U}
     (P : (Fin n → U) → V) (hP : ∀ f g, Move act f g → P f = P g)
     {f g : Fin n → U} (h : TEquiv act f g) : P f = P g := by
@@ -56,7 +63,8 @@ section Action
 
 variable {K : Type*} [Field K] {d e : ℕ}
 
-/-- The action of a unit of `K` on a gated unit: `c` multiplies the up row and `c⁻¹` multiplies the down column; the gate is not touched. -/
+/-- The action of a unit of `K` on a gated unit: `c` multiplies the up row and `c⁻¹` multiplies
+the down column; the gate is not touched. -/
 def act (c : Kˣ) (x : GUnit K d e) : GUnit K d e :=
   ⟨x.g, (c : K) • x.u, ((c⁻¹ : Kˣ) : K) • x.w⟩
 
@@ -88,7 +96,9 @@ theorem act_w_apply (c : Kˣ) (x : GUnit K d e) (j : Fin e) :
 theorem smul_dot (c : K) (a b : Fin d → K) : (c • a) ⬝ᵥ b = c * (a ⬝ᵥ b) := by
   first
     | (rw [smul_dotProduct, smul_eq_mul]; done)
-    | (unfold dotProduct; rw [Finset.mul_sum]; refine Finset.sum_congr rfl (fun i _ => ?_); simp only [Pi.smul_apply, smul_eq_mul, mul_assoc])
+    | (unfold dotProduct; rw [Finset.mul_sum];
+        refine Finset.sum_congr rfl (fun i _ => ?_);
+        simp only [Pi.smul_apply, smul_eq_mul, mul_assoc])
 
 end Action
 
@@ -105,7 +115,8 @@ theorem GUnit.gauge_cancel (a b c : K) (hc : c ≠ 0) : a * (c * b) * c⁻¹ = a
 
 namespace GBlock
 
-/-- The function of a block of gated units, for an arbitrary nonlinearity `s`: `x ↦ ∑ i, (s (g_i ⬝ᵥ x) * (u_i ⬝ᵥ x)) • w_i`. -/
+/-- The function of a block of gated units, for an arbitrary nonlinearity `s`: `x ↦ ∑ i, (s (g_i
+⬝ᵥ x) * (u_i ⬝ᵥ x)) • w_i`. -/
 def F (s : K → K) (θ : Fin n → GUnit K d e) (x : Fin d → K) : Fin e → K :=
   ∑ i, (s ((θ i).g ⬝ᵥ x) * ((θ i).u ⬝ᵥ x)) • (θ i).w
 
@@ -116,7 +127,8 @@ theorem F_perm (s : K → K) (θ : Fin n → GUnit K d e) (σ : Equiv.Perm (Fin 
   unfold F
   exact Equiv.sum_comp σ (fun i => (s ((θ i).g ⬝ᵥ x) * ((θ i).u ⬝ᵥ x)) • (θ i).w)
 
-/-- A scalar on the up row with its inverse on the down column does not change the function, whatever `s` is. -/
+/-- A scalar on the up row with its inverse on the down column does not change the function,
+whatever `s` is. -/
 theorem F_gauge (s : K → K) (θ : Fin n → GUnit K d e) (c : Fin n → Kˣ) :
     F s (fun i => (θ i).act (c i)) = F s θ := by
   funext x
@@ -132,8 +144,8 @@ theorem F_gauge (s : K → K) (θ : Fin n → GUnit K d e) (c : Fin n → Kˣ) :
 theorem F_move (s : K → K) {θ θ' : Fin n → GUnit K d e} (h : Move GUnit.act θ θ') :
     F s θ = F s θ' := by
   cases h with
-  | perm f σ => exact (F_perm s f σ).symm
-  | gauge f c => exact (F_gauge s f c).symm
+  | perm σ => exact (F_perm s θ σ).symm
+  | gauge c => exact (F_gauge s θ c).symm
 
 /-- The equivalence closure of the moves does not change the function. -/
 theorem F_tequiv (s : K → K) {θ θ' : Fin n → GUnit K d e} (h : TEquiv GUnit.act θ θ') :
@@ -142,7 +154,8 @@ theorem F_tequiv (s : K → K) {θ θ' : Fin n → GUnit K d e} (h : TEquiv GUni
 
 end GBlock
 
-/-- Soundness of the equivalence of gated blocks: equivalent blocks have the same function, for every nonlinearity `s`. -/
+/-- Soundness of the equivalence of gated blocks: equivalent blocks have the same function, for
+every nonlinearity `s`. -/
 theorem sound_Mono (s : K → K) {θ θ' : Fin n → GUnit K d e} (h : TEquiv GUnit.act θ θ') :
     GBlock.F s θ = GBlock.F s θ' :=
   GBlock.F_tequiv s h
@@ -193,7 +206,8 @@ theorem smul_vec_ne_zero {m : ℕ} {c : K} {v : Fin m → K} (hc : c ≠ 0) (hv 
   simp only [Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at h'
   exact (mul_eq_zero.mp h').resolve_left hc
 
-/-- The first non-zero coordinate scales with the vector.  The hypothesis `v ≠ 0` is needed: `firstNonzero 0 = 1`, and `1 ≠ c * 1` unless `c = 1`. -/
+/-- The first non-zero coordinate scales with the vector.  The hypothesis `v ≠ 0` is needed:
+`firstNonzero 0 = 1`, and `1 ≠ c * 1` unless `c = 1`. -/
 theorem firstNonzero_smul {m : ℕ} {c : K} {v : Fin m → K} (hv : v ≠ 0) (hc : c ≠ 0) :
     firstNonzero (c • v) = c * firstNonzero v := by
   obtain ⟨a, ha⟩ := firstNonzero_find_exists hv
@@ -209,11 +223,15 @@ theorem firstNonzero_smul {m : ℕ} {c : K} {v : Fin m → K} (hv : v ≠ 0) (hc
 
 namespace GUnit
 
-/-- The normalizing scalar of a unit: if `u ≠ 0`, the scalar `(firstNonzero u)⁻¹` that makes the first non-zero coordinate of `c • u` equal to `1`; if `u = 0`, the scalar `firstNonzero w` that makes the first non-zero coordinate of `c⁻¹ • w` equal to `1`; it is `1` when `u = 0` and `w = 0`. -/
+/-- The normalizing scalar of a unit: if `u ≠ 0`, the scalar `(firstNonzero u)⁻¹` that makes the
+first non-zero coordinate of `c • u` equal to `1`; if `u = 0`, the scalar `firstNonzero w` that
+makes the first non-zero coordinate of `c⁻¹ • w` equal to `1`; it is `1` when `u = 0` and `w =
+0`. -/
 def factor (x : GUnit K d e) : K :=
   if x.u ≠ 0 then (firstNonzero x.u)⁻¹ else firstNonzero x.w
 
-/-- The normal form of one unit: the representative of its orbit under `Kˣ` obtained by the scalar `factor`. -/
+/-- The normal form of one unit: the representative of its orbit under `Kˣ` obtained by the
+scalar `factor`. -/
 def scale (x : GUnit K d e) : GUnit K d e :=
   ⟨x.g, x.factor • x.u, x.factor⁻¹ • x.w⟩
 
@@ -225,7 +243,8 @@ theorem factor_ne_zero (x : GUnit K d e) : x.factor ≠ 0 := by
   · rw [if_neg h]
     exact firstNonzero_ne_zero _
 
-/-- The factor of the acted unit, when the unit is not zero.  For `u = 0` and `w = 0` the factor is `1` on both sides, so the hypothesis cannot be dropped. -/
+/-- The factor of the acted unit, when the unit is not zero.  For `u = 0` and `w = 0` the factor
+is `1` on both sides, so the hypothesis cannot be dropped. -/
 theorem factor_act (c : Kˣ) (x : GUnit K d e) (h : x.u ≠ 0 ∨ x.w ≠ 0) :
     (x.act c).factor = (c : K)⁻¹ * x.factor := by
   have hc : (c : K) ≠ 0 := Units.ne_zero c
@@ -286,7 +305,8 @@ theorem scale_representative (x : GUnit K d e) : ∃ c : Kˣ, x.scale = x.act c 
   · exact (act_u (Units.mk0 x.factor (factor_ne_zero x)) x).symm
   · exact (act_w (Units.mk0 x.factor (factor_ne_zero x)) x).symm
 
-/-- `GUnit.scale` normalizes a unit under the action of `Kˣ`: it is invariant and it is a point of the orbit. -/
+/-- `GUnit.scale` normalizes a unit under the action of `Kˣ`: it is invariant and it is a point
+of the orbit. -/
 theorem itemNormalizer :
     ItemNormalizer (GUnit.act (K := K) (d := d) (e := e)) GUnit.scale :=
   ⟨fun c x => scale_act c x, fun x => scale_representative x⟩
@@ -299,11 +319,13 @@ section Key
 
 variable {K : Type*} {d e : ℕ}
 
-/-- An injective key of a unit: the three vectors, one after the other, as a list.  `List K` is linearly ordered, lexicographically, when `K` is. -/
+/-- An injective key of a unit: the three vectors, one after the other, as a list.  `List K` is
+linearly ordered, lexicographically, when `K` is. -/
 def GUnit.key (x : GUnit K d e) : List K :=
   List.ofFn x.g ++ List.ofFn x.u ++ List.ofFn x.w
 
-/-- The key determines the unit: the lengths `d`, `d` and `e` of the three vectors are fixed by the type. -/
+/-- The key determines the unit: the lengths `d`, `d` and `e` of the three vectors are fixed by
+the type. -/
 theorem GUnit.key_injective : Function.Injective (GUnit.key (K := K) (d := d) (e := e)) := by
   intro x y h
   have h' : List.ofFn x.g ++ List.ofFn x.u ++ List.ofFn x.w
@@ -321,7 +343,8 @@ section Canon
 
 variable {K : Type*} [Field K] [DecidableEq K] {d e n : ℕ}
 
-/-- The packaged canonicalization of gated blocks: sorting the units, each in its normal form `GUnit.scale`, by the key `GUnit.key`, is a canonicalization of `TEquiv GUnit.act`. -/
+/-- The packaged canonicalization of gated blocks: sorting the units, each in its normal form
+`GUnit.scale`, by the key `GUnit.key`, is a canonicalization of `TEquiv GUnit.act`. -/
 theorem canon_Mono_scale_sort [LinearOrder K] :
     Canonicalization
       (TEquiv (GUnit.act (K := K) (d := d) (e := e)) :

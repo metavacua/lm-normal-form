@@ -10,24 +10,36 @@ import LmnfNormal.Unit
 /-!
 # Three equivalences that are not one
 
-The sources keep three notions apart for a block of gated units `(g, u, w)` over `ℚ` with `d = e = 1`:
+The sources keep three notions apart for a block of gated units `(g, u, w)` over `ℚ` with `d = e =
+1`:
 
-* the *tensor-level identity* (`bagOf`): the three tensors `G`, `U`, `W` of the block, as a bag; names and the order of the units are not part of it;
-* the *orbit of the gauge group* (`TEquiv GUnit.act`): permutations of the units and a scalar `c` on the up row with `c⁻¹` on the down column;
+* the *tensor-level identity* (`bagOf`): the three tensors `G`, `U`, `W` of the block, as a bag;
+  names and the order of the units are not part of it;
+* the *orbit of the gauge group* (`TEquiv GUnit.act`): permutations of the units and a scalar `c` on
+  the up row with `c⁻¹` on the down column;
 * the *equality of the function* (`GBlock.F s`).
 
 None of the three implies another.  The theorems of this file are examples over `ℚ`:
 
-* `sep_bag_not_function`: the same bag of tensors, two different functions (for `s t = t ^ 2`: exchange the gate and the up tensor);
-* `sep_function_not_bag`: the same function, for every `s`, two different bags (a unit and its image under the gauge);
-* `sep_orbit_not_function`: the same function, two blocks that are not in one orbit (for `s t = max t 0`, because `max t 0 - max (-t) 0 = t`, a pair `(g, u, w), (-g, u, -w)` is symmetric in the gate and the up row, but the gates are an invariant of the orbit and they differ).
+* `sep_bag_not_function`: the same bag of tensors, two different functions (for `s t = t ^ 2`:
+  exchange the gate and the up tensor);
+* `sep_function_not_bag`: the same function, for every `s`, two different bags (a unit and its image
+  under the gauge);
+* `sep_orbit_not_function`: the same function, two blocks that are not in one orbit (for `s t = max
+  t 0`, because `max t 0 - max (-t) 0 = t`, a pair `(g, u, w), (-g, u, -w)` is symmetric in the gate
+  and the up row, but the gates are an invariant of the orbit and they differ).
 
-The bag `bagOf` is *coarser* than a real digest of the tensors: it keeps for each of the three tensors only the multiset of its entries and ignores the positions inside a tensor.  A coarser bag identifies more blocks, so the separation `sep_bag_not_function` is only stronger for it.
+The bag `bagOf` is *coarser* than a real digest of the tensors: it keeps for each of the three
+tensors only the multiset of its entries and ignores the positions inside a tensor.  A coarser bag
+identifies more blocks, so the separation `sep_bag_not_function` is only stronger for it.
 -/
 
 namespace LmnfNormal
 
-/-- The bag of the three tensors of a block of units with `d = e = 1`: the multiset of the three multisets of entries of `G` (the gates), `U` (the up rows) and `W` (the down columns).  It is coarser than the real digest: it ignores the positions inside a tensor, so it identifies more blocks. -/
+/-- The bag of the three tensors of a block of units with `d = e = 1`: the multiset of the three
+multisets of entries of `G` (the gates), `U` (the up rows) and `W` (the down columns).  It is
+coarser than the real digest: it ignores the positions inside a tensor, so it identifies more
+blocks. -/
 def bagOf {n : ℕ} (θ : Fin n → GUnit ℚ 1 1) : Multiset (Multiset ℚ) :=
   {Multiset.map (fun i => (θ i).g 0) (Finset.univ : Finset (Fin n)).val,
     Multiset.map (fun i => (θ i).u 0) (Finset.univ : Finset (Fin n)).val,
@@ -126,16 +138,18 @@ theorem F_pair (s : ℚ → ℚ) (g u w : ℚ) (x : Fin 1 → ℚ) :
       = s (g * x 0) * (u * x 0) * w + s ((-g) * x 0) * (u * x 0) * (-w) := by
   rw [F_apply11, Fin.sum_univ_two] <;> first | rfl | simp [pairBlock, mk11]
 
-/-- The sum of the squares of the gates of a block with `d = 1`: a function of the multiset of the gates. -/
+/-- The sum of the squares of the gates of a block with `d = 1`: a function of the multiset of
+the gates. -/
 def gateSq {n : ℕ} (θ : Fin n → GUnit ℚ 1 1) : ℚ :=
   ∑ i, ((θ i).g 0) ^ 2
 
-/-- One move does not change the multiset of the gates, hence not `gateSq`: a permutation reindexes the sum and a gauge does not touch the gates. -/
+/-- One move does not change the multiset of the gates, hence not `gateSq`: a permutation
+reindexes the sum and a gauge does not touch the gates. -/
 theorem gateSq_move {n : ℕ} {θ θ' : Fin n → GUnit ℚ 1 1} (h : Move GUnit.act θ θ') :
     gateSq θ = gateSq θ' := by
   cases h with
-  | perm f σ => exact (Equiv.sum_comp σ (fun i => ((f i).g 0) ^ 2)).symm
-  | gauge f c => rfl
+  | perm σ => exact (Equiv.sum_comp σ (fun i => ((θ i).g 0) ^ 2)).symm
+  | gauge c => rfl
 
 /-- The equivalence closure of the moves does not change `gateSq`. -/
 theorem gateSq_tequiv {n : ℕ} {θ θ' : Fin n → GUnit ℚ 1 1} (h : TEquiv GUnit.act θ θ') :
@@ -146,7 +160,8 @@ theorem gateSq_pair (g u w : ℚ) : gateSq (pairBlock g u w) = g ^ 2 + (-g) ^ 2 
   unfold gateSq
   rw [Fin.sum_univ_two] <;> first | rfl | simp [pairBlock, mk11]
 
-/-- The symmetry that `max t 0 - max (-t) 0 = t` gives the pair of units, in the form of an equation between reals. -/
+/-- The symmetry that `max t 0 - max (-t) 0 = t` gives the pair of units, in the form of an
+equation between reals. -/
 theorem relu_pair (t : ℚ) :
     max (1 * t) 0 * (2 * t) * 1 + max ((-1) * t) 0 * (2 * t) * (-1)
       = max (2 * t) 0 * (1 * t) * 1 + max ((-2) * t) 0 * (1 * t) * (-1) := by
@@ -166,7 +181,9 @@ end Separ
 
 open Separ
 
-/-- The same bag of tensors does not give the same function: exchanging the gate and the up tensor keeps the bag, and for `s t = t ^ 2` it changes the function (at `x = 1` the values are `2` and `4`). -/
+/-- The same bag of tensors does not give the same function: exchanging the gate and the up
+tensor keeps the bag, and for `s t = t ^ 2` it changes the function (at `x = 1` the values are
+`2` and `4`). -/
 theorem sep_bag_not_function :
     ∃ θ θ' : Fin 1 → GUnit ℚ 1 1, bagOf θ = bagOf θ' ∧
       GBlock.F (fun t : ℚ => t ^ 2) θ ≠ GBlock.F (fun t : ℚ => t ^ 2) θ' := by
@@ -178,7 +195,9 @@ theorem sep_bag_not_function :
     rw [F_const11, F_const11] at h0
     norm_num at h0
 
-/-- The same function does not give the same bag of tensors, for every `s`: a unit and its image under the gauge `c = 2` have the same function and the bags `{{1}, {1}, {1}}` and `{{1}, {2}, {1/2}}`. -/
+/-- The same function does not give the same bag of tensors, for every `s`: a unit and its image
+under the gauge `c = 2` have the same function and the bags `{{1}, {1}, {1}}` and `{{1}, {2},
+{1/2}}`. -/
 theorem sep_function_not_bag (s : ℚ → ℚ) :
     ∃ θ θ' : Fin 1 → GUnit ℚ 1 1, GBlock.F s θ = GBlock.F s θ' ∧ bagOf θ ≠ bagOf θ' := by
   refine ⟨fun _ => mk11 1 1 1, fun _ => (mk11 1 1 1).act twoU, ?_, ?_⟩
@@ -194,7 +213,10 @@ theorem sep_function_not_bag (s : ℚ → ℚ) :
     rw [e1, e2] at h1
     norm_num at h1
 
-/-- The same function does not give the same orbit: for `s t = max t 0` the blocks `(1, 2, 1), (-1, 2, -1)` and `(2, 1, 1), (-2, 1, -1)` have the same function, and they are not in one orbit of the moves, because the multiset of the gates, `{1, -1}` against `{2, -2}`, is invariant under the moves (here through its sum of squares, `2` against `8`). -/
+/-- The same function does not give the same orbit: for `s t = max t 0` the blocks `(1, 2, 1),
+(-1, 2, -1)` and `(2, 1, 1), (-2, 1, -1)` have the same function, and they are not in one orbit
+of the moves, because the multiset of the gates, `{1, -1}` against `{2, -2}`, is invariant under
+the moves (here through its sum of squares, `2` against `8`). -/
 theorem sep_orbit_not_function :
     ∃ θ θ' : Fin 2 → GUnit ℚ 1 1,
       GBlock.F (fun t : ℚ => max t 0) θ = GBlock.F (fun t : ℚ => max t 0) θ' ∧

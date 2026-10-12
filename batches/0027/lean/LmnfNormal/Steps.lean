@@ -49,8 +49,8 @@ theorem isNF_iff [LinearOrder β] {key : U → β} {norm : U → U} (f : Fin n �
       exact h ⟨_, Step.swap f i j hij (not_le.mp hlt)⟩
   · rintro ⟨h1, h2⟩ ⟨g, hg⟩
     cases hg with
-    | scale _ i hi => exact hi (h1 i)
-    | swap _ i j hij hlt => exact (not_le.mpr hlt) (h2 hij.le)
+    | scale i hi => exact hi (h1 i)
+    | swap i j hij hlt => exact (not_le.mpr hlt) (h2 hij.le)
 
 /-- Normalizing one item does not change the normalized items of the tuple. -/
 theorem norm_comp_update {act : Γ → U → U} {norm : U → U} (hn : ItemNormalizer act norm)
@@ -68,9 +68,9 @@ theorem NF_step [LinearOrder β] {key : U → β} (hkey : Function.Injective key
     {act : Γ → U → U} {norm : U → U} (hn : ItemNormalizer act norm)
     {f g : Fin n → U} (h : Step key norm f g) : NF key norm f = NF key norm g := by
   cases h with
-  | scale _ i _ =>
+  | scale i _ =>
     exact Eq.symm (NF_eq_of_norm_comp_eq key norm (norm_comp_update hn _ i))
-  | swap _ i j _ _ => exact Eq.symm (NF_perm hkey _ (Equiv.swap i j))
+  | swap i j _ _ => exact Eq.symm (NF_perm hkey _ (Equiv.swap i j))
 
 /-- An irreducible tuple is its own normal form. -/
 theorem NF_of_isNF [LinearOrder β] {key : U → β} (_hkey : Function.Injective key)

@@ -50,6 +50,7 @@ theorem Canonicalization.of_invariant_representative (hR : Equivalence R)
     hrep⟩
 
 /-- A canonicalization decides its relation when the carrier has decidable equality. -/
+@[instance_reducible]
 def Canonicalization.decidable [DecidableEq S] (h : Canonicalization R c) : DecidableRel R :=
   fun a b => decidable_of_iff' (c a = c b) (h.decisive a b)
 

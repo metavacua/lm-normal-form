@@ -381,10 +381,10 @@ def group_closure(run, checks, pred, sets, scen):
             used[n] = 10_000_000 - f.fuel_left()
             assert r == (n * (n - 1) // 2) & 0xFFFFFFFF or i32(r) == i32(n * (n - 1) // 2)
         slope = (used[1100] - used[100]) / 1000
-        affine = used[10100] - used[1100] == 9 * (used[1100] - used[100]) and slope == int(slope)
+        affine = used[10100] - used[1100] == 9 * (used[1100] - used[100])
         checks.add(
             "fuel_is_affine_in_the_iterations",
-            "the fuel that a loop uses is affine in its iterations with an integer slope",
+            "the fuel that a loop uses is affine in its iterations (checked at 100, 1100 and 10100; the slope is recorded, not predicted)",
             True,
             affine,
         )

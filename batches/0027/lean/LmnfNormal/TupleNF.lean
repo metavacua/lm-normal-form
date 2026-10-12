@@ -88,8 +88,8 @@ theorem NF_move [LinearOrder β] {key : U → β} (hkey : Function.Injective key
     {act : Γ → U → U} {norm : U → U} (hn : ItemNormalizer act norm)
     {f g : Fin n → U} (h : Move act f g) : NF key norm f = NF key norm g := by
   cases h with
-  | perm _ σ => exact Eq.symm (NF_perm hkey _ σ)
-  | gauge _ c => exact Eq.symm (NF_gauge hn _ c)
+  | perm σ => exact Eq.symm (NF_perm hkey _ σ)
+  | gauge c => exact Eq.symm (NF_gauge hn _ c)
 
 /-- The normal form is constant on the classes of `TEquiv act`. -/
 theorem NF_tequiv [LinearOrder β] {key : U → β} (hkey : Function.Injective key)
