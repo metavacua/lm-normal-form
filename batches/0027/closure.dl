@@ -21,10 +21,11 @@
 //                            run never exceeds it (memory.grow fails with -1, and does not trap), and it never shrinks.
 //   recursive(f)             a live function on a cycle of the call graph: only such a function can exhaust the stack by depth.
 //   depth_bound(f, d)        for a recursive function whose prologue takes a frame of b bytes of the shadow stack, no more than d = (the stack) / b of its frames
-//                            are active at once: the stack bound as a number read from the binary.
-//   predict(key, value)      the derived numbers as a table. wasm_host.py compares with wasmtime: imports, exports_func, exports_mem, start_function,
-//                            mem_initial_kib, mem_declared_max_kib, table_size, stack_kib, static_fits, stack_clear, module_may_grow, recursion_frames_bound,
-//                            rejected_* and final_kib_*; grade27.py compares closed, escapes, mem_declared_max_kib and mem_bound_kib of the two control modules.
+//                            are active at once: the stack bound as a number read from the binary. The prediction recursion_frames_bound is the largest of these,
+//                            the bound for the frames of all the recursive functions together, and it is derived only when every recursive function has a frame.
+//   predict(key, value)      the derived numbers as a table. wasm_host.py compares with wasmtime: imports, exports_func, exports_mem, exports_table,
+//                            exports_global, start_function, mem_initial_kib, mem_declared_max_kib, table_size, stack_kib, static_fits, stack_clear,
+//                            module_may_grow, recursion_frames_bound, rejected_* and final_kib_*; grade27.py compares closed, escapes, mem_declared_max_kib and mem_bound_kib of the two control modules.
 //                            The others (mem_bound_kib of the main module, stack_fits, entries_that_may_grow, entries_with_fixed_memory, live_functions,
 //                            recursive_functions) are derived and not compared with an observation.
 // Sizes are in KiB, so that 4 GiB (2^22 KiB) fits the 32-bit signed numbers of Souffle; a byte offset of 2^31 or more is refused by wasm_facts.py. The
@@ -160,6 +161,10 @@ final_kib(n, i) :- scenario(n, _), !rejected(n), !any_grow(), mem_initial_kib(i)
 stack_pointer0(v) :- wglobal(0, "i32", 1, 0, v), v >= 0.
 .decl depth_bound(f:number, d:number)
 depth_bound(f, d) :- recursive(f), wframe(f, b), b > 0, stack_pointer0(sp), d = sp / b.
+.decl has_frame(f:number)
+has_frame(f) :- wframe(f, b), b > 0.
+.decl frameless_recursion()
+frameless_recursion() :- recursive(f), !has_frame(f).
 .decl data_below_stack()
 data_below_stack() :- stack_pointer0(sp), wdata(_, o, _), o < sp.
 .decl stack_clear()
@@ -184,6 +189,8 @@ table_size(mn) :- wtable(0, mn, _).
 predict("imports", n) :- n = count : { wimport(_, _, _, _) }.
 predict("exports_func", n) :- n = count : { wexport(_, "func", _) }.
 predict("exports_mem", n) :- n = count : { wexport(_, "mem", _) }.
+predict("exports_table", n) :- n = count : { wexport(_, "table", _) }.
+predict("exports_global", n) :- n = count : { wexport(_, "global", _) }.
 predict("start_function", n) :- n = count : { wstart(_) }.
 predict("escapes", n) :- n = count : { escape(_, _) }.
 predict("closed", 1) :- closed().
@@ -206,7 +213,7 @@ predict("entries_that_may_grow", n) :- n = count : { may_grow(_) }.
 predict("entries_with_fixed_memory", n) :- n = count : { fixed_memory(_) }.
 predict("live_functions", n) :- n = count : { live(_) }.
 predict("recursive_functions", n) :- n = count : { recursive(_) }.
-predict("recursion_frames_bound", d) :- d = min x : { depth_bound(_, x) }.
+predict("recursion_frames_bound", d) :- d = max x : { depth_bound(_, x) }, !frameless_recursion().
 predict(cat("final_kib_", n), k) :- final_kib(n, k).
 predict(cat("rejected_", n), 1) :- rejected(n).
 predict(cat("rejected_", n), 0) :- scenario(n, _), !rejected(n).

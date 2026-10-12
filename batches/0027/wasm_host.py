@@ -238,6 +238,13 @@ def group_closure(run, checks, pred, sets, scen):
     mems = [e for e in mod.exports if isinstance(e.type, w.MemoryType)]
     checks.add("exports_func", "the number of exported functions", P("exports_func"), len(funcs))
     checks.add("exports_mem", "the number of exported memories", P("exports_mem"), len(mems))
+    checks.add(
+        "exports_table",
+        "the number of exported tables (reach assumes the host cannot write the table)",
+        P("exports_table"),
+        sum(isinstance(e.type, w.TableType) for e in mod.exports),
+    )
+    checks.add("exports_global", "the number of exported globals", P("exports_global"), sum(isinstance(e.type, w.GlobalType) for e in mod.exports))
 
     # the instantiation with a linker that defines nothing succeeds exactly when there is no import
     try:
