@@ -1,0 +1,599 @@
+[
+ {
+  "config": "llama",
+  "groups_by_kind": {
+   "grp": [
+    "Perm"
+   ],
+   "hin": [
+    "Perm"
+   ],
+   "na": [
+    "Mono"
+   ],
+   "nf": [
+    "Mono"
+   ],
+   "nm": [
+    "Mono"
+   ],
+   "ov": [
+    "GL"
+   ],
+   "qk": [
+    "Cplx"
+   ],
+   "res": [
+    "O"
+   ],
+   "tok": [
+    "Triv"
+   ],
+   "ugate": [
+    "Perm"
+   ],
+   "unit": [
+    "Mono"
+   ],
+   "vocab": [
+    "Triv"
+   ]
+  },
+  "inconsistent": [],
+  "library_checks": [],
+  "model_value": [
+   0
+  ],
+  "plan_by_kind": {
+   "grp": [
+    [
+     2,
+     "Perm",
+     "sort",
+     "canon_Perm_sort"
+    ]
+   ],
+   "hin": [
+    [
+     2,
+     "Perm",
+     "sort",
+     "canon_Perm_sort"
+    ]
+   ],
+   "na": [
+    [
+     2,
+     "Mono",
+     "scale_sort",
+     "canon_Mono_scale_sort"
+    ]
+   ],
+   "nf": [
+    [
+     1,
+     "Mono",
+     "scale_sort",
+     "canon_Mono_scale_sort"
+    ]
+   ],
+   "nm": [
+    [
+     2,
+     "Mono",
+     "scale_sort",
+     "canon_Mono_scale_sort"
+    ]
+   ],
+   "ov": [
+    [
+     2,
+     "GL",
+     "rref",
+     "canon_GL_rref"
+    ]
+   ],
+   "ugate": [
+    [
+     3,
+     "Perm",
+     "sort",
+     "canon_Perm_sort"
+    ]
+   ],
+   "unit": [
+    [
+     2,
+     "Mono",
+     "scale_sort",
+     "canon_Mono_scale_sort"
+    ]
+   ],
+   "vocab": [
+    [
+     0,
+     "Triv",
+     "fixed",
+     ""
+    ]
+   ]
+  },
+  "spaces": 21,
+  "spaces_value": [
+   0
+  ],
+  "spaces_without_method": [
+   "qk:Cplx",
+   "res:O"
+  ],
+  "theorems_needed": [
+   "canon_GL_rref",
+   "canon_Mono_scale_sort",
+   "canon_Perm_sort"
+  ],
+  "unanchored": [],
+  "variant": "llama"
+ },
+ {
+  "config": "bitnet",
+  "groups_by_kind": {
+   "grp": [
+    "Perm"
+   ],
+   "hin": [
+    "Perm"
+   ],
+   "na": [
+    "Mono"
+   ],
+   "nm": [
+    "Mono"
+   ],
+   "ov": [
+    "O"
+   ],
+   "ovn": [
+    "Mono"
+   ],
+   "qk": [
+    "Cplx"
+   ],
+   "res": [
+    "SP"
+   ],
+   "tok": [
+    "Triv"
+   ],
+   "ugate": [
+    "Perm"
+   ],
+   "unit": [
+    "SP"
+   ],
+   "unitn": [
+    "Mono"
+   ],
+   "vocab": [
+    "Triv"
+   ]
+  },
+  "inconsistent": [],
+  "library_checks": [],
+  "model_value": [
+   0
+  ],
+  "plan_by_kind": {
+   "grp": [
+    [
+     2,
+     "Perm",
+     "sort",
+     "canon_Perm_sort"
+    ]
+   ],
+   "hin": [
+    [
+     2,
+     "Perm",
+     "sort",
+     "canon_Perm_sort"
+    ]
+   ],
+   "na": [
+    [
+     2,
+     "Mono",
+     "scale_sort",
+     "canon_Mono_scale_sort"
+    ]
+   ],
+   "nm": [
+    [
+     2,
+     "Mono",
+     "scale_sort",
+     "canon_Mono_scale_sort"
+    ]
+   ],
+   "ovn": [
+    [
+     2,
+     "Mono",
+     "scale_sort",
+     "canon_Mono_scale_sort"
+    ]
+   ],
+   "res": [
+    [
+     1,
+     "SP",
+     "sign_sort",
+     "canon_SP_sign_sort"
+    ]
+   ],
+   "ugate": [
+    [
+     3,
+     "Perm",
+     "sort",
+     "canon_Perm_sort"
+    ]
+   ],
+   "unit": [
+    [
+     3,
+     "SP",
+     "sign_sort",
+     "canon_SP_sign_sort"
+    ]
+   ],
+   "unitn": [
+    [
+     2,
+     "Mono",
+     "scale_sort",
+     "canon_Mono_scale_sort"
+    ]
+   ],
+   "vocab": [
+    [
+     0,
+     "Triv",
+     "fixed",
+     ""
+    ]
+   ]
+  },
+  "spaces": 24,
+  "spaces_value": [
+   0
+  ],
+  "spaces_without_method": [
+   "ov:O",
+   "qk:Cplx"
+  ],
+  "theorems_needed": [
+   "canon_Mono_scale_sort",
+   "canon_Perm_sort",
+   "canon_SP_sign_sort"
+  ],
+  "unanchored": [],
+  "variant": "bitnet"
+ },
+ {
+  "config": "bitnet_ternary",
+  "groups_by_kind": {
+   "grp": [
+    "Perm"
+   ],
+   "hin": [
+    "Perm"
+   ],
+   "na": [
+    "SP"
+   ],
+   "nm": [
+    "SP"
+   ],
+   "ov": [
+    "SP"
+   ],
+   "ovn": [
+    "SP"
+   ],
+   "qk": [
+    "Triv"
+   ],
+   "res": [
+    "SP"
+   ],
+   "tok": [
+    "Triv"
+   ],
+   "ugate": [
+    "Perm"
+   ],
+   "unit": [
+    "SP"
+   ],
+   "unitn": [
+    "SP"
+   ],
+   "vocab": [
+    "Triv"
+   ]
+  },
+  "inconsistent": [],
+  "library_checks": [],
+  "model_value": [
+   0
+  ],
+  "plan_by_kind": {
+   "grp": [
+    [
+     2,
+     "Perm",
+     "sort",
+     "canon_Perm_sort"
+    ]
+   ],
+   "hin": [
+    [
+     2,
+     "Perm",
+     "sort",
+     "canon_Perm_sort"
+    ]
+   ],
+   "na": [
+    [
+     2,
+     "SP",
+     "sign_sort",
+     "canon_SP_sign_sort"
+    ]
+   ],
+   "nm": [
+    [
+     2,
+     "SP",
+     "sign_sort",
+     "canon_SP_sign_sort"
+    ]
+   ],
+   "ov": [
+    [
+     3,
+     "SP",
+     "sign_sort",
+     "canon_SP_sign_sort"
+    ]
+   ],
+   "ovn": [
+    [
+     2,
+     "SP",
+     "sign_sort",
+     "canon_SP_sign_sort"
+    ]
+   ],
+   "qk": [
+    [
+     3,
+     "Triv",
+     "fixed",
+     ""
+    ]
+   ],
+   "res": [
+    [
+     1,
+     "SP",
+     "sign_sort",
+     "canon_SP_sign_sort"
+    ]
+   ],
+   "ugate": [
+    [
+     3,
+     "Perm",
+     "sort",
+     "canon_Perm_sort"
+    ]
+   ],
+   "unit": [
+    [
+     3,
+     "SP",
+     "sign_sort",
+     "canon_SP_sign_sort"
+    ]
+   ],
+   "unitn": [
+    [
+     2,
+     "SP",
+     "sign_sort",
+     "canon_SP_sign_sort"
+    ]
+   ],
+   "vocab": [
+    [
+     0,
+     "Triv",
+     "fixed",
+     ""
+    ]
+   ]
+  },
+  "spaces": 24,
+  "spaces_value": [
+   1
+  ],
+  "spaces_without_method": [],
+  "theorems_needed": [
+   "canon_Perm_sort",
+   "canon_SP_sign_sort"
+  ],
+  "unanchored": [],
+  "variant": "bitnet_ternary"
+ },
+ {
+  "config": "bitnet_2b4t",
+  "groups_by_kind": {
+   "grp": [
+    "Perm"
+   ],
+   "hin": [
+    "Perm"
+   ],
+   "na": [
+    "SP"
+   ],
+   "nm": [
+    "SP"
+   ],
+   "ov": [
+    "SP"
+   ],
+   "ovn": [
+    "SP"
+   ],
+   "qk": [
+    "Triv"
+   ],
+   "res": [
+    "SP"
+   ],
+   "tok": [
+    "Triv"
+   ],
+   "ugate": [
+    "Perm"
+   ],
+   "unit": [
+    "SP"
+   ],
+   "unitn": [
+    "SP"
+   ],
+   "vocab": [
+    "Triv"
+   ]
+  },
+  "inconsistent": [],
+  "library_checks": [],
+  "model_value": [
+   0
+  ],
+  "plan_by_kind": {
+   "grp": [
+    [
+     2,
+     "Perm",
+     "sort",
+     "canon_Perm_sort"
+    ]
+   ],
+   "hin": [
+    [
+     2,
+     "Perm",
+     "sort",
+     "canon_Perm_sort"
+    ]
+   ],
+   "na": [
+    [
+     2,
+     "SP",
+     "sign_sort",
+     "canon_SP_sign_sort"
+    ]
+   ],
+   "nm": [
+    [
+     2,
+     "SP",
+     "sign_sort",
+     "canon_SP_sign_sort"
+    ]
+   ],
+   "ov": [
+    [
+     3,
+     "SP",
+     "sign_sort",
+     "canon_SP_sign_sort"
+    ]
+   ],
+   "ovn": [
+    [
+     2,
+     "SP",
+     "sign_sort",
+     "canon_SP_sign_sort"
+    ]
+   ],
+   "qk": [
+    [
+     3,
+     "Triv",
+     "fixed",
+     ""
+    ]
+   ],
+   "res": [
+    [
+     1,
+     "SP",
+     "sign_sort",
+     "canon_SP_sign_sort"
+    ]
+   ],
+   "ugate": [
+    [
+     3,
+     "Perm",
+     "sort",
+     "canon_Perm_sort"
+    ]
+   ],
+   "unit": [
+    [
+     3,
+     "SP",
+     "sign_sort",
+     "canon_SP_sign_sort"
+    ]
+   ],
+   "unitn": [
+    [
+     2,
+     "SP",
+     "sign_sort",
+     "canon_SP_sign_sort"
+    ]
+   ],
+   "vocab": [
+    [
+     0,
+     "Triv",
+     "fixed",
+     ""
+    ]
+   ]
+  },
+  "spaces": 304,
+  "spaces_value": [
+   1
+  ],
+  "spaces_without_method": [],
+  "theorems_needed": [
+   "canon_Perm_sort",
+   "canon_SP_sign_sort"
+  ],
+  "unanchored": [],
+  "variant": "bitnet_ternary"
+ }
+]

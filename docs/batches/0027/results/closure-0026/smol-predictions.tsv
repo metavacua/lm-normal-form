@@ -1,0 +1,28 @@
+# closure.dl on batch 0026's smol module (run 37987352103, artifact smol.zip, patched.wasm), host limits of batch 0026's host: A = 2 GiB, B = 1 GiB, C = 16 MiB
+# sha256 6a93e0bbcd7eca7975db3374b8f8611ceeb610813753b5f75bcd0fa14e0702ae
+closed	1
+entries_that_may_grow	4
+entries_with_fixed_memory	3
+escapes	0
+exports_func	7
+exports_global	0
+exports_mem	1
+exports_table	0
+final_kib_A	2097152
+final_kib_B	1048576
+imports	0
+live_functions	2668
+mem_bound_kib	2097152
+mem_declared_max_kib	-1
+mem_initial_kib	16576
+module_may_grow	1
+recursive_functions	946
+rejected_A	0
+rejected_B	0
+rejected_C	1
+stack_clear	1
+stack_fits	1
+stack_kib	16384
+start_function	0
+static_fits	1
+table_size	531

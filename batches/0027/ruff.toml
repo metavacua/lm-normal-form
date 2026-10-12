@@ -1,0 +1,32 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# The formatter and linter of the Python of batch 0027 (CI: ruff format --check, ruff check).
+line-length = 160
+target-version = "py311"
+
+[lint]
+select = [
+  "E",
+  "F",
+  "W",
+  "I",
+  "B",
+  "UP",
+  "C4",
+  "SIM",
+  "RUF",
+  "PL",
+  "PERF",
+  "PIE",
+  "RET",
+  "ARG",
+]
+ignore = [
+  "PLR0911",
+  "PLR0912",
+  "PLR0913",
+  "PLR0915",
+  "PLR2004", # the size of a function and magic values: the checks are long tables of cases
+  "E741",    # l, O, I as names: the single-letter names of the mathematics
+]

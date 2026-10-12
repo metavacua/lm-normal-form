@@ -1,0 +1,411 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0027: normal forms of models from Datalog to Lean, and the closure of a wasm32v1-none module. Written down in docs/batches/0027.md.
+#
+# lint  fmt, clippy and the linters of each language: rustfmt and clippy on the module, ruff on the Python, the generated Datalog library.
+# ref   the exhaustive reference programs (Python, standard library only) against the committed results.
+# wasm  the module built for wasm32v1-none (every warning an error), validated as WebAssembly 1.0 plus mutable globals; its structure read into
+#       facts; closure.dl on the module and on two controls; the module run in wasmtime against what closure.dl derived.
+# lean  the Lean project (Mathlib at the tag v4.34.1): no warning, the linters of Batteries, the axioms of every registered theorem.
+# plan  nf.dl on four programs, with the theorems that Lean accepted.
+# report  the verdicts, counted, and the commit status.
+name: batch 0027
+
+on:
+  push:
+    branches: ["batch/0027-**"]
+    paths: [".github/workflows/batch-0027.yml", "batches/0019/states.dl", "batches/0019/ir.py", "batches/0015/**", "batches/0027/**", "docs/batches/0027.md"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: batch-0027-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  SOUFFLE_VERSION: "2.5"
+  WASM_TOOLS: v1.259.0
+
+jobs:
+  lint:
+    name: "01 fmt, clippy and the linters of each language"
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Tools
+        run: |
+          mkdir -p out/lint
+          python -m pip install --quiet ruff==0.16.9 taplo==0.9.3 yamllint==1.38.0
+          rustup toolchain install stable --profile minimal --component rustfmt --component clippy --no-self-update
+          rustup default stable
+          rustup target add wasm32v1-none
+          { ruff --version; taplo --version; yamllint --version; rustc -V; cargo -V; cargo clippy -V; rustfmt --version; } | tee out/lint/versions.txt
+      - id: ruff_format
+        name: "ruff format --check: the Python of the batch is formatted"
+        continue-on-error: true
+        run: ruff format --check batches/0027 2>&1 | tee out/lint/ruff-format.txt; test "${PIPESTATUS[0]}" -eq 0
+      - id: ruff_check
+        name: "ruff check: the Python of the batch has no finding"
+        continue-on-error: true
+        run: ruff check batches/0027 2>&1 | tee out/lint/ruff-check.txt; test "${PIPESTATUS[0]}" -eq 0
+      - id: taplo
+        name: "taplo fmt --check: the TOML of the batch is formatted"
+        continue-on-error: true
+        run: |
+          taplo fmt --check batches/0027/lean/lakefile.toml batches/0027/wasm/Cargo.toml batches/0027/wasm/.cargo/config.toml batches/0027/ruff.toml 2>&1 | tee out/lint/taplo.txt
+          test "${PIPESTATUS[0]}" -eq 0
+      - id: yamllint
+        name: "yamllint: the workflow of the batch"
+        continue-on-error: true
+        run: |
+          yamllint -d '{extends: default, rules: {line-length: disable, document-start: disable, truthy: disable, comments-indentation: disable}}' .github/workflows/batch-0027.yml 2>&1 | tee out/lint/yamllint.txt
+          test "${PIPESTATUS[0]}" -eq 0
+      - id: rustfmt
+        name: "cargo fmt --check: the Rust of the module is formatted"
+        continue-on-error: true
+        working-directory: batches/0027/wasm
+        run: cargo fmt --check 2>&1 | tee ../../../out/lint/rustfmt.txt; test "${PIPESTATUS[0]}" -eq 0
+      - id: clippy
+        name: "cargo clippy -D warnings: the Rust of the module for wasm32v1-none has no finding"
+        continue-on-error: true
+        working-directory: batches/0027/wasm
+        run: cargo clippy --release --target wasm32v1-none -- -D warnings 2>&1 | tee ../../../out/lint/clippy.txt; test "${PIPESTATUS[0]}" -eq 0
+      - id: groups
+        name: "groups.dl is what make_groups.py writes from batches/0019/states.dl"
+        continue-on-error: true
+        run: |
+          python batches/0027/make_groups.py out/lint/groups.dl
+          diff -u batches/0027/groups.dl out/lint/groups.dl | tee out/lint/groups.diff
+          test "${PIPESTATUS[0]}" -eq 0
+      - name: Outcomes of the checks
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/lint/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: lint-out
+          path: out/
+          retention-days: 14
+
+  ref:
+    name: "02 the exhaustive reference programs against the committed results"
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - id: ref
+        name: "ref.py, tier small"
+        continue-on-error: true
+        run: |
+          mkdir -p out/ref
+          python batches/0027/ref.py small out/ref/ref_small.json | tee out/ref/ref.log
+      - id: ternary
+        name: "ternary.py, tier small"
+        continue-on-error: true
+        run: python batches/0027/ternary.py small out/ref/ternary_small.json | tee out/ref/ternary.log
+      - id: compare_ref
+        name: "ref.py against the committed results"
+        continue-on-error: true
+        if: steps.ref.outcome == 'success'
+        run: python batches/0027/grade27.py compare out/ref/ref_small.json batches/0027/expected/ref_small.json out/ref/ref-checks.json
+      - id: compare_ternary
+        name: "ternary.py against the committed results"
+        continue-on-error: true
+        if: steps.ternary.outcome == 'success'
+        run: python batches/0027/grade27.py compare out/ref/ternary_small.json batches/0027/expected/ternary_small.json out/ref/ternary-checks.json
+      - name: Outcomes of the checks
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/ref/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ref-out
+          path: out/
+          retention-days: 14
+
+  wasm:
+    name: "03 the module for wasm32v1-none, its closure derived and its limits observed"
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Tools
+        run: |
+          mkdir -p out/wasm
+          python -m pip install --quiet wasmtime==49.0.0
+          python -m pip freeze > out/wasm/pip-freeze.txt
+          rustup toolchain install stable --profile minimal --no-self-update
+          rustup default stable
+          rustup target add wasm32v1-none
+          { rustc -V; cargo -V; } | tee out/wasm/rust.version
+          rustc --print cfg --target wasm32v1-none | tee out/wasm/target-cfg.txt
+          gh release download "$WASM_TOOLS" -R bytecodealliance/wasm-tools -p '*x86_64-linux.tar.gz' -O - | sudo tar -xz -C /usr/local/bin --strip-components=1
+          wasm-tools --version | tee out/wasm/wasm-tools.version
+          f="x86_64-ubuntu-2204-souffle-$SOUFFLE_VERSION-Linux.deb"
+          curl -sSL -o "$f" "https://github.com/souffle-lang/souffle/releases/download/$SOUFFLE_VERSION/$f"
+          curl -sSL -o sha512sum.txt "https://github.com/souffle-lang/souffle/releases/download/$SOUFFLE_VERSION/sha512sum.txt"
+          grep -F "$f" sha512sum.txt | sha512sum -c -
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq "./$f"
+          souffle --version | tee out/wasm/souffle.version
+      - id: build
+        name: "the module builds for wasm32v1-none, and every warning is an error"
+        continue-on-error: true
+        working-directory: batches/0027/wasm
+        run: cargo build --release --target wasm32v1-none 2>&1 | tee ../../../out/wasm/cargo-build.log; test "${PIPESTATUS[0]}" -eq 0
+      - id: validate
+        name: "the module validates as WebAssembly 1.0 plus mutable globals"
+        continue-on-error: true
+        if: steps.build.outcome == 'success'
+        run: |
+          cp batches/0027/wasm/target/wasm32v1-none/release/lmnf_probe.wasm out/wasm/probe.wasm
+          stat -c '%n %s bytes' out/wasm/probe.wasm | tee out/wasm/probe.size
+          sha256sum out/wasm/probe.wasm | tee out/wasm/probe.sha256
+          wasm-tools validate --features=wasm1,mutable-global out/wasm/probe.wasm 2>&1 | tee out/wasm/validate.log
+          test "${PIPESTATUS[0]}" -eq 0
+          wasm-tools print out/wasm/probe.wasm | grep -E '^\s*\((import|export|memory|table|global|start) ' | tee out/wasm/interface.txt
+      - id: fixtures
+        name: "the controls parse; three validate as WebAssembly 1.0 and the two with a later proposal do not"
+        continue-on-error: true
+        run: |
+          for f in mock escape open; do
+            wasm-tools parse "batches/0027/fixtures/$f.wat" -o "out/wasm/$f.wasm"
+            wasm-tools validate --features=wasm1,mutable-global "out/wasm/$f.wasm"
+          done
+          for f in bulk simd; do
+            wasm-tools parse "batches/0027/fixtures/$f.wat" -o "out/wasm/$f.wasm"
+            if wasm-tools validate --features=wasm1,mutable-global "out/wasm/$f.wasm" 2> "out/wasm/$f.validate.err"; then
+              echo "$f validated as WebAssembly 1.0 and must not"
+              exit 1
+            fi
+            head -n 2 "out/wasm/$f.validate.err"
+          done
+      - id: facts
+        name: "the facts of each module, and closure.dl on each without a warning"
+        continue-on-error: true
+        run: |
+          for m in probe mock escape open; do
+            [ -f "out/wasm/$m.wasm" ] || continue
+            mkdir -p "out/wasm/$m/facts" "out/wasm/$m/dl"
+            python batches/0027/wasm_facts.py "out/wasm/$m.wasm" "out/wasm/$m/facts" > "out/wasm/$m/facts.txt"
+            printf 'A\t16384\nB\t2048\nC\t64\n' > "out/wasm/$m/facts/scenario.facts"
+            souffle -F "out/wasm/$m/facts" -D "out/wasm/$m/dl" batches/0027/closure.dl 2> "out/wasm/$m/souffle.err"
+            if [ -s "out/wasm/$m/souffle.err" ]; then cat "out/wasm/$m/souffle.err"; exit 1; fi
+          done
+          sort out/wasm/probe/dl/predict.csv | tee out/wasm/probe-predictions.txt
+      - id: controls
+        name: "closure.dl on the two controls: an escape, and a memory without a maximum"
+        continue-on-error: true
+        if: steps.facts.outcome == 'success'
+        run: python batches/0027/grade27.py controls out/wasm/escape/dl out/wasm/open/dl out/wasm/controls-checks.json
+      - id: host_mock
+        name: "wasm_host.py on the hand-written module (the control of the host)"
+        continue-on-error: true
+        if: steps.facts.outcome == 'success'
+        run: python batches/0027/wasm_host.py out/wasm/mock.wasm out/wasm/observed-mock.json --facts out/wasm/mock/facts --predict out/wasm/mock/dl --controls out/wasm --backend python
+      - id: host
+        name: "wasm_host.py on the module: what closure.dl derived against what wasmtime does"
+        continue-on-error: true
+        if: steps.facts.outcome == 'success' && steps.validate.outcome == 'success'
+        run: python batches/0027/wasm_host.py out/wasm/probe.wasm out/wasm/observed.json --facts out/wasm/probe/facts --predict out/wasm/probe/dl --controls out/wasm
+      - name: Outcomes of the checks
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/wasm/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: wasm-out
+          path: out/
+          retention-days: 14
+
+  lean:
+    name: "04 the theorems, checked by Lean"
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: batches/0027/lean
+          build: false
+          test: false
+          lint: false
+          use-mathlib-cache: true
+      - id: build
+        name: "lake build: no warning, no error"
+        continue-on-error: true
+        working-directory: batches/0027/lean
+        run: |
+          mkdir -p ../../../out/lean
+          lake build 2>&1 | tee ../../../out/lean/lake-build.log
+          test "${PIPESTATUS[0]}" -eq 0
+          ! grep -nE '(^|[ :])(warning|error)[: ]' ../../../out/lean/lake-build.log
+      - id: axioms
+        name: "the axioms that each registered theorem depends on"
+        continue-on-error: true
+        working-directory: batches/0027/lean
+        run: |
+          lake env lean LmnfNormal/Axioms.lean 2>&1 | tee ../../../out/lean/axioms.txt
+          test "${PIPESTATUS[0]}" -eq 0
+          test "$(grep -c -E 'depends on axioms|does not depend on any axioms' ../../../out/lean/axioms.txt)" -eq "$(grep -c '^#print axioms' LmnfNormal/Axioms.lean)"
+      - id: grade
+        name: "grade the registered claims"
+        continue-on-error: true
+        if: steps.axioms.outcome == 'success'
+        run: python batches/0027/grade27.py axioms out/lean/axioms.txt batches/0027/claims27.tsv out/lean
+      - id: runlinter
+        name: "lake exe runLinter: the linters of Batteries on every declaration"
+        continue-on-error: true
+        working-directory: batches/0027/lean
+        run: |
+          lake exe runLinter LmnfNormal 2>&1 | tee ../../../out/lean/runlinter.log
+          test "${PIPESTATUS[0]}" -eq 0
+      - name: Keep the manifest and the versions
+        if: always()
+        working-directory: batches/0027/lean
+        run: |
+          mkdir -p ../../../out/lean
+          touch ../../../out/lean/proved.facts
+          cp lake-manifest.json ../../../out/lean/ || true
+          { lean --version; lake --version; } 2>&1 | tee ../../../out/lean/lean-versions.txt || true
+      - name: Outcomes of the checks
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/lean/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: lean-out
+          path: out/
+          retention-days: 14
+
+  plan:
+    name: "05 the plan of the normal form, derived by Datalog"
+    needs: [lean]
+    if: always()
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: lean-out
+          path: lean-out
+      - name: Tools
+        run: |
+          mkdir -p out/plan lean-out/lean
+          touch lean-out/lean/proved.facts
+          python -m pip install --quiet numpy
+          python -m pip freeze > out/plan/pip-freeze.txt
+          f="x86_64-ubuntu-2204-souffle-$SOUFFLE_VERSION-Linux.deb"
+          curl -sSL -o "$f" "https://github.com/souffle-lang/souffle/releases/download/$SOUFFLE_VERSION/$f"
+          curl -sSL -o sha512sum.txt "https://github.com/souffle-lang/souffle/releases/download/$SOUFFLE_VERSION/sha512sum.txt"
+          grep -F "$f" sha512sum.txt | sha512sum -c -
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq "./$f"
+          souffle --version | tee out/plan/souffle.version
+          cp lean-out/lean/proved.facts out/plan/proved.facts
+          cat out/plan/proved.facts
+      - id: plan
+        name: "nf.dl on the four programs, without a warning"
+        continue-on-error: true
+        run: python batches/0027/plan_facts.py out/plan --proved out/plan/proved.facts | tee out/plan/plan.log
+      - id: grade
+        name: "the plans against the registered predictions"
+        continue-on-error: true
+        if: steps.plan.outcome == 'success'
+        run: python batches/0027/grade27.py plan out/plan/plan.json out/plan/plan-checks.json
+      - name: Outcomes of the checks
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/plan/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: plan-out
+          path: out/
+          retention-days: 14
+
+  report:
+    # A commit status named after the batch, so that the pull request's checks tab shows the batch run itself and not only the lint that carries
+    # the pull request's title.
+    name: report the batch run on the commit
+    needs: [lint, ref, wasm, lean, plan]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RESULTS: ${{ toJSON(needs) }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          path: artifacts
+      - id: grade
+        name: "the verdicts, counted"
+        continue-on-error: true
+        run: python3 batches/0027/grade27.py report artifacts report.md report.json
+      - name: Summary
+        if: always()
+        run: |
+          [ -f report.md ] && cat report.md >> "$GITHUB_STEP_SUMMARY"
+          true
+      - name: Status of the commit
+        if: always()
+        run: |
+          state=success
+          echo "$RESULTS" | jq -e '[.[] | .result] | all(. == "success")' > /dev/null || state=failure
+          [ "${{ steps.grade.outcome }}" = "success" ] || state=failure
+          nfail=$(jq '.failed_steps | length' report.json 2> /dev/null || echo "?")
+          nbad=$(jq '.not_supported | length' report.json 2> /dev/null || echo "?")
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -f state="$state" -f context="batch 0027" \
+            -f description="$nfail failed steps, $nbad checks not supported" \
+            -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" > /dev/null
+          # the run is red when the batch is: a refuted or unknown check, or a failed step, is not a green run
+          [ "$state" = success ]
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: report
+          path: |
+            report.md
+            report.json
+          retention-days: 30

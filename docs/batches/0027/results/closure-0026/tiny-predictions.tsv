@@ -1,0 +1,28 @@
+# closure.dl on batch 0026's tiny module (run 37987352103, artifact tiny.zip, patched.wasm), host limits of batch 0026's host: A = 2 GiB, B = 1 GiB, C = 16 MiB
+# sha256 ecd0d55a486aa32f2d436e5c89fdfe3496b9b964707baf4d6c913cd996001c39
+closed	1
+entries_that_may_grow	4
+entries_with_fixed_memory	3
+escapes	0
+exports_func	7
+exports_global	0
+exports_mem	1
+exports_table	0
+final_kib_A	2097152
+final_kib_B	1048576
+imports	0
+live_functions	2653
+mem_bound_kib	2097152
+mem_declared_max_kib	-1
+mem_initial_kib	16512
+module_may_grow	1
+recursive_functions	943
+rejected_A	0
+rejected_B	0
+rejected_C	1
+stack_clear	1
+stack_fits	1
+stack_kib	16384
+start_function	0
+static_fits	1
+table_size	525

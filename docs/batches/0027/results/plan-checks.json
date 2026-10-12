@@ -1,0 +1,286 @@
+{
+ "checks": [
+  {
+   "claim": "the plan of the Llama-style model needs the sort, the scale, and the reduced row echelon form",
+   "id": "llama_needs",
+   "observed": [
+    "canon_GL_rref",
+    "canon_Mono_scale_sort",
+    "canon_Perm_sort"
+   ],
+   "predicted": [
+    "canon_GL_rref",
+    "canon_Mono_scale_sort",
+    "canon_Perm_sort"
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "its residual stream (O) and its query/key spaces (Cplx) have no method",
+   "id": "llama_open",
+   "observed": [
+    "qk:Cplx",
+    "res:O"
+   ],
+   "predicted": [
+    "qk:Cplx",
+    "res:O"
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "the plan with the sub-layer norms needs the sort, the scale and the sign",
+   "id": "bitnet_needs",
+   "observed": [
+    "canon_Mono_scale_sort",
+    "canon_Perm_sort",
+    "canon_SP_sign_sort"
+   ],
+   "predicted": [
+    "canon_Mono_scale_sort",
+    "canon_Perm_sort",
+    "canon_SP_sign_sort"
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "its value/output space (O) and its query/key spaces (Cplx) have no method",
+   "id": "bitnet_open",
+   "observed": [
+    "ov:O",
+    "qk:Cplx"
+   ],
+   "predicted": [
+    "ov:O",
+    "qk:Cplx"
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "every space of the ternary model has a group in Triv, Perm, SP",
+   "id": "bitnet_ternary_groups",
+   "observed": [
+    "Perm",
+    "SP",
+    "Triv"
+   ],
+   "predicted": [
+    "Perm",
+    "SP",
+    "Triv"
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "the plan needs only the sort and the sign",
+   "id": "bitnet_ternary_needs",
+   "observed": [
+    "canon_Perm_sort",
+    "canon_SP_sign_sort"
+   ],
+   "predicted": [
+    "canon_Perm_sort",
+    "canon_SP_sign_sort"
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "no space is without a method",
+   "id": "bitnet_ternary_open",
+   "observed": [],
+   "predicted": [],
+   "verdict": "supported"
+  },
+  {
+   "claim": "every space of the ternary model has a group in Triv, Perm, SP",
+   "id": "bitnet_2b4t_groups",
+   "observed": [
+    "Perm",
+    "SP",
+    "Triv"
+   ],
+   "predicted": [
+    "Perm",
+    "SP",
+    "Triv"
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "the plan needs only the sort and the sign",
+   "id": "bitnet_2b4t_needs",
+   "observed": [
+    "canon_Perm_sort",
+    "canon_SP_sign_sort"
+   ],
+   "predicted": [
+    "canon_Perm_sort",
+    "canon_SP_sign_sort"
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "no space is without a method",
+   "id": "bitnet_2b4t_open",
+   "observed": [],
+   "predicted": [],
+   "verdict": "supported"
+  },
+  {
+   "claim": "every space is joined to the vocabulary by parameter tensors, norm weights and gated products",
+   "id": "llama_anchored",
+   "observed": [],
+   "predicted": [],
+   "verdict": "supported"
+  },
+  {
+   "claim": "no theorem is both proved and refuted",
+   "id": "llama_consistent",
+   "observed": [],
+   "predicted": [],
+   "verdict": "supported"
+  },
+  {
+   "claim": "the checks of the lattice and the library are empty",
+   "id": "llama_library",
+   "observed": [],
+   "predicted": [],
+   "verdict": "supported"
+  },
+  {
+   "claim": "every space is joined to the vocabulary by parameter tensors, norm weights and gated products",
+   "id": "bitnet_anchored",
+   "observed": [],
+   "predicted": [],
+   "verdict": "supported"
+  },
+  {
+   "claim": "no theorem is both proved and refuted",
+   "id": "bitnet_consistent",
+   "observed": [],
+   "predicted": [],
+   "verdict": "supported"
+  },
+  {
+   "claim": "the checks of the lattice and the library are empty",
+   "id": "bitnet_library",
+   "observed": [],
+   "predicted": [],
+   "verdict": "supported"
+  },
+  {
+   "claim": "every space is joined to the vocabulary by parameter tensors, norm weights and gated products",
+   "id": "bitnet_ternary_anchored",
+   "observed": [],
+   "predicted": [],
+   "verdict": "supported"
+  },
+  {
+   "claim": "no theorem is both proved and refuted",
+   "id": "bitnet_ternary_consistent",
+   "observed": [],
+   "predicted": [],
+   "verdict": "supported"
+  },
+  {
+   "claim": "the checks of the lattice and the library are empty",
+   "id": "bitnet_ternary_library",
+   "observed": [],
+   "predicted": [],
+   "verdict": "supported"
+  },
+  {
+   "claim": "every space is joined to the vocabulary by parameter tensors, norm weights and gated products",
+   "id": "bitnet_2b4t_anchored",
+   "observed": [],
+   "predicted": [],
+   "verdict": "supported"
+  },
+  {
+   "claim": "no theorem is both proved and refuted",
+   "id": "bitnet_2b4t_consistent",
+   "observed": [],
+   "predicted": [],
+   "verdict": "supported"
+  },
+  {
+   "claim": "the checks of the lattice and the library are empty",
+   "id": "bitnet_2b4t_library",
+   "observed": [],
+   "predicted": [],
+   "verdict": "supported"
+  },
+  {
+   "claim": "with both theorems proved, every space is supported (1)",
+   "id": "bitnet_ternary_spaces_value",
+   "observed": [
+    1
+   ],
+   "predicted": [
+    1
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "the plan as a whole is unknown (0): the theorem of the stratified composition is not proved",
+   "id": "bitnet_ternary_model_value",
+   "observed": [
+    0
+   ],
+   "predicted": [
+    0
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "with both theorems proved, every space is supported (1)",
+   "id": "bitnet_2b4t_spaces_value",
+   "observed": [
+    1
+   ],
+   "predicted": [
+    1
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "the plan as a whole is unknown (0): the theorem of the stratified composition is not proved",
+   "id": "bitnet_2b4t_model_value",
+   "observed": [
+    0
+   ],
+   "predicted": [
+    0
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "the Llama-style plan is unknown (0): two spaces have no method",
+   "id": "llama_spaces_value",
+   "observed": [
+    0
+   ],
+   "predicted": [
+    0
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "the plan with the sub-layer norms is unknown (0): two spaces have no method",
+   "id": "bitnet_spaces_value",
+   "observed": [
+    0
+   ],
+   "predicted": [
+    0
+   ],
+   "verdict": "supported"
+  }
+ ],
+ "counts": {
+  "refuted": 0,
+  "supported": 28,
+  "unknown": 0
+ },
+ "name": "plan"
+}

@@ -12,3 +12,6 @@ target/
 
 # batch 0026: the generated Rust that wasm.sh copies in
 batches/0026/wasm/src/model.rs
+
+# batch 0027: the Lean build products
+.lake/

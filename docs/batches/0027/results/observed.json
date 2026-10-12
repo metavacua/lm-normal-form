@@ -1,0 +1,600 @@
+{
+ "backend": "wasm",
+ "canon": {
+  "d1e1n3": {
+   "blocks": 19683,
+   "orbits": 680,
+   "seconds": 3.26
+  },
+  "d1e2n2": {
+   "blocks": 6561,
+   "orbits": 903,
+   "seconds": 1.06
+  },
+  "d2e1n2": {
+   "blocks": 59049,
+   "orbits": 8001,
+   "seconds": 9.55
+  }
+ },
+ "checks": [
+  {
+   "claim": "the number of imports",
+   "id": "imports",
+   "observed": 0,
+   "predicted": 0,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the number of exported functions",
+   "id": "exports_func",
+   "observed": 16,
+   "predicted": 16,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the number of exported memories",
+   "id": "exports_mem",
+   "observed": 1,
+   "predicted": 1,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the number of exported tables (reach assumes the host cannot write the table)",
+   "id": "exports_table",
+   "observed": 0,
+   "predicted": 0,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the number of exported globals",
+   "id": "exports_global",
+   "observed": 0,
+   "predicted": 0,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the module instantiates with a linker that defines nothing exactly when it has no imports",
+   "id": "instantiates_with_an_empty_linker",
+   "observed": 1,
+   "predicted": 1,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the module has no start function (closure.dl) and instantiating it uses no fuel: no instruction of the guest runs before the host calls",
+   "id": "no_start_function_nothing_runs_at_instantiation",
+   "observed": 0,
+   "predicted": 0,
+   "verdict": "supported"
+  },
+  {
+   "claim": "closure.dl derives that the active data segments end inside the initial memory, and the instantiation, which checks them, succeeded",
+   "id": "data_segments_fit_the_initial_memory",
+   "observed": 1,
+   "predicted": 1,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the initial memory",
+   "id": "mem_initial_kib",
+   "observed": 128,
+   "predicted": 128,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the maximum that the module declares (-1: none)",
+   "id": "mem_declared_max_kib",
+   "observed": 4096,
+   "predicted": 4096,
+   "verdict": "supported"
+  },
+  {
+   "claim": "a load of the last byte of the memory succeeds",
+   "id": "load_last_byte",
+   "observed": true,
+   "predicted": true,
+   "verdict": "supported"
+  },
+  {
+   "claim": "a load at the end of the memory traps (out of bounds)",
+   "id": "load_past_end_traps",
+   "observed": "oob_memory",
+   "predicted": "oob_memory",
+   "verdict": "supported"
+  },
+  {
+   "claim": "a load at address 0xFFFFFFFF traps (out of bounds)",
+   "id": "load_at_minus_one_traps",
+   "observed": "oob_memory",
+   "predicted": "oob_memory",
+   "verdict": "supported"
+  },
+  {
+   "claim": "a store at the end of the memory traps (out of bounds)",
+   "id": "store_past_end_traps",
+   "observed": "oob_memory",
+   "predicted": "oob_memory",
+   "verdict": "supported"
+  },
+  {
+   "claim": "memory.grow returns the previous size in pages",
+   "id": "grow_returns_old_size",
+   "observed": 2,
+   "predicted": 2,
+   "verdict": "supported"
+  },
+  {
+   "claim": "after a growth by one page the old end is addressable and the new end is not",
+   "id": "grow_moves_the_end",
+   "observed": [
+    null,
+    "oob_memory"
+   ],
+   "predicted": [
+    null,
+    "oob_memory"
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "scenario A (16384 KiB): the instantiation is refused when the initial memory exceeds the limit",
+   "id": "rejected_A",
+   "observed": 0,
+   "predicted": 0,
+   "verdict": "supported"
+  },
+  {
+   "claim": "scenario A (16384 KiB): the memory grows page by page to the least of the three bounds",
+   "id": "final_kib_A",
+   "observed": 4096,
+   "predicted": 4096,
+   "verdict": "supported"
+  },
+  {
+   "claim": "scenario A: at the bound memory.grow returns -1 (no trap) and so does a growth by 100000 pages",
+   "id": "grow_fails_with_minus_one_A",
+   "observed": [
+    4294967295,
+    4294967295
+   ],
+   "predicted": [
+    4294967295,
+    4294967295
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "scenario A: the successful growths return start, start + 1, ... in order, and the size at the end is start plus their number",
+   "id": "growths_are_consecutive_A",
+   "observed": true,
+   "predicted": true,
+   "verdict": "supported"
+  },
+  {
+   "claim": "scenario B (2048 KiB): the instantiation is refused when the initial memory exceeds the limit",
+   "id": "rejected_B",
+   "observed": 0,
+   "predicted": 0,
+   "verdict": "supported"
+  },
+  {
+   "claim": "scenario B (2048 KiB): the memory grows page by page to the least of the three bounds",
+   "id": "final_kib_B",
+   "observed": 2048,
+   "predicted": 2048,
+   "verdict": "supported"
+  },
+  {
+   "claim": "scenario B: at the bound memory.grow returns -1 (no trap) and so does a growth by 100000 pages",
+   "id": "grow_fails_with_minus_one_B",
+   "observed": [
+    4294967295,
+    4294967295
+   ],
+   "predicted": [
+    4294967295,
+    4294967295
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "scenario B: the successful growths return start, start + 1, ... in order, and the size at the end is start plus their number",
+   "id": "growths_are_consecutive_B",
+   "observed": true,
+   "predicted": true,
+   "verdict": "supported"
+  },
+  {
+   "claim": "scenario C (64 KiB): the instantiation is refused when the initial memory exceeds the limit",
+   "id": "rejected_C",
+   "observed": 1,
+   "predicted": 1,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the smallest table index that is out of bounds is the declared minimum",
+   "id": "table_size",
+   "observed": 5,
+   "predicted": 5,
+   "verdict": "supported"
+  },
+  {
+   "claim": "call_indirect on the index of a function of the named signature runs it",
+   "id": "indirect_call_ok",
+   "observed": [
+    6,
+    10
+   ],
+   "predicted": [
+    6,
+    10
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "call_indirect on the index of a function of another signature traps",
+   "id": "indirect_call_wrong_signature",
+   "observed": "sig_mismatch",
+   "predicted": "sig_mismatch",
+   "verdict": "supported"
+  },
+  {
+   "claim": "the scratch buffer lies above the shadow stack (--stack-first)",
+   "id": "static_above_stack",
+   "observed": true,
+   "predicted": true,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the scratch buffer lies inside the initial memory",
+   "id": "static_inside_memory",
+   "observed": true,
+   "predicted": true,
+   "verdict": "supported"
+  },
+  {
+   "claim": "closure.dl derives that no data segment lies below the initial stack pointer, and the bytes below it are zero in a new instance",
+   "id": "stack_area_is_zero_after_instantiation",
+   "observed": true,
+   "predicted": true,
+   "verdict": "supported"
+  },
+  {
+   "claim": "a recursion of depth 10 returns the sum of k mod 256",
+   "id": "recurse_small",
+   "observed": 55,
+   "predicted": 55,
+   "verdict": "supported"
+  },
+  {
+   "claim": "a recursion of depth 2^24 ends in a trap (the shadow stack or the engine's stack)",
+   "id": "recurse_deep_traps",
+   "observed": true,
+   "predicted": true,
+   "verdict": "supported"
+  },
+  {
+   "claim": "when the shadow stack ends the recursion, its frames do not exceed (stack) / (the frame of its prologue), derived from the binary",
+   "id": "recursion_frames_within_derived_bound",
+   "observed": true,
+   "predicted": true,
+   "verdict": "supported"
+  },
+  {
+   "claim": "and they equal it: the recursive function is the only user of the shadow stack (an observation; this check was added after the observation)",
+   "id": "recursion_frames_equal_derived_bound",
+   "observed": 455,
+   "predicted": 455,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the fuel that a loop uses is affine in its iterations (checked at 100, 1100 and 10100; the slope is recorded, not predicted)",
+   "id": "fuel_is_affine_in_the_iterations",
+   "observed": true,
+   "predicted": true,
+   "verdict": "supported"
+  },
+  {
+   "claim": "a loop of 2*10^9 iterations on 10^6 units of fuel ends in a trap",
+   "id": "loop_ends_in_fuel_trap",
+   "observed": "fuel",
+   "predicted": "fuel",
+   "verdict": "supported"
+  },
+  {
+   "claim": "the unreachable instruction traps",
+   "id": "unreachable_traps",
+   "observed": "unreachable",
+   "predicted": "unreachable",
+   "verdict": "supported"
+  },
+  {
+   "claim": "a byte written in one instance is not seen in another",
+   "id": "instances_share_nothing",
+   "observed": [
+    7,
+    0
+   ],
+   "predicted": [
+    7,
+    0
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "every export that changed the size of the memory is one from which closure.dl reaches memory.grow",
+   "id": "changed_exports_are_predicted",
+   "observed": true,
+   "predicted": true,
+   "verdict": "supported"
+  },
+  {
+   "claim": "no export that closure.dl derives to have a fixed memory changed it",
+   "id": "fixed_exports_did_not_change",
+   "observed": true,
+   "predicted": true,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the exports from which closure.dl reaches memory.grow are exactly the ones that changed the memory here",
+   "id": "exports_that_may_grow_are_the_ones_that_grew",
+   "observed": [
+    "probe_mem_grow"
+   ],
+   "predicted": [
+    "probe_mem_grow"
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "closure.dl derives that the memory of the module may grow (some entry reaches memory.grow), and some export changed the size here",
+   "id": "module_may_grow",
+   "observed": 1,
+   "predicted": 1,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the default engine compiles a module that uses memory.copy (bulk memory)",
+   "id": "default_engine_accepts_bulk",
+   "observed": true,
+   "predicted": true,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the engine with the switchable post-1.0 proposals off refuses it",
+   "id": "locked_engine_rejects_bulk",
+   "observed": false,
+   "predicted": false,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the default engine compiles a module that uses i32x4.add (SIMD)",
+   "id": "default_engine_accepts_simd",
+   "observed": true,
+   "predicted": true,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the engine with the switchable post-1.0 proposals off refuses it",
+   "id": "locked_engine_rejects_simd",
+   "observed": false,
+   "predicted": false,
+   "verdict": "supported"
+  },
+  {
+   "claim": "tern_i8 equals the exact integer sums",
+   "id": "tern_i8_exact",
+   "observed": [
+    -117,
+    100,
+    389,
+    -211,
+    -590,
+    -662,
+    -21,
+    64
+   ],
+   "predicted": [
+    -117,
+    100,
+    389,
+    -211,
+    -590,
+    -662,
+    -21,
+    64
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "tern_i8 gives the same sums under 20 permutations of the columns (exact: integer addition is associative)",
+   "id": "tern_i8_permutation_invariant",
+   "observed": 0,
+   "predicted": 0,
+   "verdict": "supported"
+  },
+  {
+   "claim": "tern_f32 changes the bits of some output under some of 20 permutations of the columns (not a theorem)",
+   "id": "tern_f32_permutation_changes_bits",
+   "observed": true,
+   "predicted": true,
+   "verdict": "supported"
+  },
+  {
+   "claim": "16384 columns of +1 times 127 and times -128 give the sums 127n and -128n, which fit an i32 (bound 128n = 2^21)",
+   "id": "tern_i8_extremes",
+   "observed": [
+    2080768,
+    -2097152
+   ],
+   "predicted": [
+    2080768,
+    -2097152
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "nf_units equals leading-trit normalization and sort on all 19683 ordered blocks",
+   "id": "canon_matches_python_d1e1n3",
+   "observed": 0,
+   "predicted": 0,
+   "verdict": "supported"
+  },
+  {
+   "claim": "nf_units is constant on every orbit found by union-find over the generators",
+   "id": "canon_invariant_on_orbits_d1e1n3",
+   "observed": 0,
+   "predicted": 0,
+   "verdict": "supported"
+  },
+  {
+   "claim": "nf_units takes 680 distinct values on 680 orbits",
+   "id": "canon_decisive_d1e1n3",
+   "observed": 680,
+   "predicted": 680,
+   "verdict": "supported"
+  },
+  {
+   "claim": "nf_units applied to its own output changes nothing",
+   "id": "canon_idempotent_d1e1n3",
+   "observed": 0,
+   "predicted": 0,
+   "verdict": "supported"
+  },
+  {
+   "claim": "nf_units equals leading-trit normalization and sort on all 6561 ordered blocks",
+   "id": "canon_matches_python_d1e2n2",
+   "observed": 0,
+   "predicted": 0,
+   "verdict": "supported"
+  },
+  {
+   "claim": "nf_units is constant on every orbit found by union-find over the generators",
+   "id": "canon_invariant_on_orbits_d1e2n2",
+   "observed": 0,
+   "predicted": 0,
+   "verdict": "supported"
+  },
+  {
+   "claim": "nf_units takes 903 distinct values on 903 orbits",
+   "id": "canon_decisive_d1e2n2",
+   "observed": 903,
+   "predicted": 903,
+   "verdict": "supported"
+  },
+  {
+   "claim": "nf_units applied to its own output changes nothing",
+   "id": "canon_idempotent_d1e2n2",
+   "observed": 0,
+   "predicted": 0,
+   "verdict": "supported"
+  },
+  {
+   "claim": "nf_units equals leading-trit normalization and sort on all 59049 ordered blocks",
+   "id": "canon_matches_python_d2e1n2",
+   "observed": 0,
+   "predicted": 0,
+   "verdict": "supported"
+  },
+  {
+   "claim": "nf_units is constant on every orbit found by union-find over the generators",
+   "id": "canon_invariant_on_orbits_d2e1n2",
+   "observed": 0,
+   "predicted": 0,
+   "verdict": "supported"
+  },
+  {
+   "claim": "nf_units takes 8001 distinct values on 8001 orbits",
+   "id": "canon_decisive_d2e1n2",
+   "observed": 8001,
+   "predicted": 8001,
+   "verdict": "supported"
+  },
+  {
+   "claim": "nf_units applied to its own output changes nothing",
+   "id": "canon_idempotent_d2e1n2",
+   "observed": 0,
+   "predicted": 0,
+   "verdict": "supported"
+  }
+ ],
+ "closure": {
+  "addr": [
+   2,
+   3,
+   4
+  ],
+  "buf": [
+   65536,
+   65536
+  ],
+  "changed_memory": [
+   "probe_mem_grow"
+  ],
+  "fuel": {
+   "per_iteration": 10.25,
+   "used": {
+    "100": 1060,
+    "1100": 11310,
+    "10100": 103560
+   }
+  },
+  "recursion": {
+   "deepest_without_trap": 454,
+   "trap_kind_at_2^24": "oob_memory"
+  },
+  "scenario_A": {
+   "final_pages": 64,
+   "growths": 62,
+   "monotone": true
+  },
+  "scenario_B": {
+   "final_pages": 32,
+   "growths": 30,
+   "monotone": true
+  },
+  "scenario_C_error": "memory minimum size of 2 pages exceeds memory limits"
+ },
+ "counts": {
+  "refuted": 0,
+  "supported": 63,
+  "unknown": 0
+ },
+ "engine": {
+  "fuel": true,
+  "max_wasm_stack_kib": 256,
+  "not_switched_off": [],
+  "switched_off": [
+   "wasm_gc",
+   "wasm_exceptions",
+   "wasm_function_references",
+   "wasm_stack_switching",
+   "wasm_component_model",
+   "wasm_component_model_implements",
+   "wasm_component_model_map",
+   "wasm_relaxed_simd",
+   "wasm_simd",
+   "wasm_threads",
+   "shared_memory",
+   "wasm_memory64",
+   "wasm_multi_memory",
+   "wasm_custom_page_sizes",
+   "wasm_tail_call",
+   "wasm_wide_arithmetic",
+   "wasm_bulk_memory",
+   "wasm_multi_value"
+  ]
+ },
+ "kernel": {
+  "changed_outputs_f32": 132,
+  "permutations_with_a_change_f32": 20
+ },
+ "module": "probe.wasm",
+ "scenarios": {
+  "A": 16384,
+  "B": 2048,
+  "C": 64
+ },
+ "seconds": 13.92,
+ "wasmtime": "49.0.0"
+}
