@@ -1,0 +1,4 @@
+llama           spaces    21  needs ['canon_GL_rref', 'canon_Mono_scale_sort', 'canon_Perm_sort']  without a method ['qk:Cplx', 'res:O']  spaces value [0]  model value [0]
+bitnet          spaces    24  needs ['canon_Mono_scale_sort', 'canon_Perm_sort', 'canon_SP_sign_sort']  without a method ['ov:O', 'qk:Cplx']  spaces value [0]  model value [0]
+bitnet_ternary  spaces    24  needs ['canon_Perm_sort', 'canon_SP_sign_sort']  without a method []  spaces value [1]  model value [0]
+bitnet_2b4t     spaces   304  needs ['canon_Perm_sort', 'canon_SP_sign_sort']  without a method []  spaces value [1]  model value [0]

@@ -7,8 +7,8 @@
 | ref-out/ref/ternary-checks.json | 1 | 0 | 0 |
 | wasm-out/wasm/controls-checks.json | 8 | 0 | 0 |
 | lean-out/lean/lean-claims.json | 50 | 0 | 0 |
-| wasm-out/wasm/observed-mock.json | 51 | 0 | 0 |
-| wasm-out/wasm/observed.json | 52 | 0 | 0 |
+| wasm-out/wasm/observed-mock.json | 61 | 0 | 0 |
+| wasm-out/wasm/observed.json | 63 | 0 | 0 |
 
-total: {'supported': 191, 'refuted': 0, 'unknown': 0}
+total: {'supported': 212, 'refuted': 0, 'unknown': 0}
 

@@ -78,7 +78,7 @@
    "verdict": "supported"
   },
   {
-   "claim": "LmnfNormal.unique_normal_form depends on no axiom beyond propext, Classical.choice and Quot.sound (a tuple reaches exactly one irreducible tuple, its normal form)",
+   "claim": "LmnfNormal.unique_normal_form depends on no axiom beyond propext, Classical.choice and Quot.sound (an irreducible tuple reached from a tuple is its normal form (at most one; that one is reached is not proved))",
    "id": "C12",
    "observed": true,
    "predicted": true,
@@ -218,7 +218,7 @@
    "verdict": "supported"
   },
   {
-   "claim": "LmnfNormal.sep_orbit_not_function depends on no axiom beyond propext, Classical.choice and Quot.sound (two blocks with the same function that are not in one orbit of the gauge)",
+   "claim": "LmnfNormal.sep_function_not_orbit depends on no axiom beyond propext, Classical.choice and Quot.sound (two blocks with the same function that are not in one orbit of the gauge)",
    "id": "S03",
    "observed": true,
    "predicted": true,
@@ -309,7 +309,7 @@
    "verdict": "supported"
   },
   {
-   "claim": "LmnfNormal.reduced_polynomial_canonical depends on no axiom beyond propext, Classical.choice and Quot.sound (the reduced polynomials of a finite field are in bijection with its functions)",
+   "claim": "LmnfNormal.reduced_polynomial_canonical depends on no axiom beyond propext, Classical.choice and Quot.sound (the reduced polynomials of a finite field are in bijection with the functions of their variables)",
    "id": "R01",
    "observed": true,
    "predicted": true,
@@ -337,7 +337,7 @@
    "verdict": "supported"
   },
   {
-   "claim": "LmnfNormal.bitnet_2b4t_down_projection_fits_i32 depends on no axiom beyond propext, Classical.choice and Quot.sound (the widest input of BitNet b1.58 2B4T fits an i32)",
+   "claim": "LmnfNormal.ternary_dot_2b4t_down_fits_i32 depends on no axiom beyond propext, Classical.choice and Quot.sound (a ternary row of width 6912 (the intermediate size of BitNet b1.58 2B4T, from its configuration) times int8 activations sums below 2^31)",
    "id": "B03",
    "observed": true,
    "predicted": true,

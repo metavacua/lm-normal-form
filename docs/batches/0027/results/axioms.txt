@@ -29,7 +29,7 @@
 'LmnfNormal.GBlock.F_neg_gate_down_odd' depends on axioms: [propext, Classical.choice, Quot.sound]
 'LmnfNormal.sep_bag_not_function' depends on axioms: [propext, Classical.choice, Quot.sound]
 'LmnfNormal.sep_function_not_bag' depends on axioms: [propext, Classical.choice, Quot.sound]
-'LmnfNormal.sep_orbit_not_function' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LmnfNormal.sep_function_not_orbit' depends on axioms: [propext, Classical.choice, Quot.sound]
 'LmnfNormal.Verdict.val_injective' does not depend on any axioms
 'LmnfNormal.Verdict.val_neg' does not depend on any axioms
 'LmnfNormal.Verdict.val_conj' depends on axioms: [propext]
@@ -46,4 +46,4 @@
 'LmnfNormal.reduced_polynomial_canonical_F3' depends on axioms: [propext, Classical.choice, Quot.sound]
 'LmnfNormal.ternary_dot_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
 'LmnfNormal.ternary_dot_fits_i32' depends on axioms: [propext, Classical.choice, Quot.sound]
-'LmnfNormal.bitnet_2b4t_down_projection_fits_i32' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LmnfNormal.ternary_dot_2b4t_down_fits_i32' depends on axioms: [propext, Classical.choice, Quot.sound]

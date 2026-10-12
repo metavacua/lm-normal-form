@@ -4,17 +4,17 @@
   "d1e1n3": {
    "blocks": 19683,
    "orbits": 680,
-   "seconds": 2.07
+   "seconds": 3.26
   },
   "d1e2n2": {
    "blocks": 6561,
    "orbits": 903,
-   "seconds": 0.67
+   "seconds": 1.06
   },
   "d2e1n2": {
    "blocks": 59049,
    "orbits": 8001,
-   "seconds": 6.09
+   "seconds": 9.55
   }
  },
  "checks": [
@@ -40,8 +40,36 @@
    "verdict": "supported"
   },
   {
-   "claim": "the module instantiates with a linker that defines nothing",
-   "id": "closed",
+   "claim": "the number of exported tables (reach assumes the host cannot write the table)",
+   "id": "exports_table",
+   "observed": 0,
+   "predicted": 0,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the number of exported globals",
+   "id": "exports_global",
+   "observed": 0,
+   "predicted": 0,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the module instantiates with a linker that defines nothing exactly when it has no imports",
+   "id": "instantiates_with_an_empty_linker",
+   "observed": 1,
+   "predicted": 1,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the module has no start function (closure.dl) and instantiating it uses no fuel: no instruction of the guest runs before the host calls",
+   "id": "no_start_function_nothing_runs_at_instantiation",
+   "observed": 0,
+   "predicted": 0,
+   "verdict": "supported"
+  },
+  {
+   "claim": "closure.dl derives that the active data segments end inside the initial memory, and the instantiation, which checks them, succeeded",
+   "id": "data_segments_fit_the_initial_memory",
    "observed": 1,
    "predicted": 1,
    "verdict": "supported"
@@ -136,8 +164,8 @@
    "verdict": "supported"
   },
   {
-   "claim": "scenario A: the growths return the sizes in order and the size is the last one plus one",
-   "id": "memory_never_shrinks_A",
+   "claim": "scenario A: the successful growths return start, start + 1, ... in order, and the size at the end is start plus their number",
+   "id": "growths_are_consecutive_A",
    "observed": true,
    "predicted": true,
    "verdict": "supported"
@@ -170,8 +198,8 @@
    "verdict": "supported"
   },
   {
-   "claim": "scenario B: the growths return the sizes in order and the size is the last one plus one",
-   "id": "memory_never_shrinks_B",
+   "claim": "scenario B: the successful growths return start, start + 1, ... in order, and the size at the end is start plus their number",
+   "id": "growths_are_consecutive_B",
    "observed": true,
    "predicted": true,
    "verdict": "supported"
@@ -225,6 +253,13 @@
    "verdict": "supported"
   },
   {
+   "claim": "closure.dl derives that no data segment lies below the initial stack pointer, and the bytes below it are zero in a new instance",
+   "id": "stack_area_is_zero_after_instantiation",
+   "observed": true,
+   "predicted": true,
+   "verdict": "supported"
+  },
+  {
    "claim": "a recursion of depth 10 returns the sum of k mod 256",
    "id": "recurse_small",
    "observed": 55,
@@ -239,10 +274,17 @@
    "verdict": "supported"
   },
   {
-   "claim": "when the shadow stack ends the recursion, the deepest recursion without a trap needs at most stack/64 frames (a frame holds a 64-byte array)",
-   "id": "recurse_depth_bound",
+   "claim": "when the shadow stack ends the recursion, its frames do not exceed (stack) / (the frame of its prologue), derived from the binary",
+   "id": "recursion_frames_within_derived_bound",
    "observed": true,
    "predicted": true,
+   "verdict": "supported"
+  },
+  {
+   "claim": "and they equal it: the recursive function is the only user of the shadow stack (an observation; this check was added after the observation)",
+   "id": "recursion_frames_equal_derived_bound",
+   "observed": 455,
+   "predicted": 455,
    "verdict": "supported"
   },
   {
@@ -302,6 +344,41 @@
    "predicted": [
     "probe_mem_grow"
    ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "closure.dl derives that the memory of the module may grow (some entry reaches memory.grow), and some export changed the size here",
+   "id": "module_may_grow",
+   "observed": 1,
+   "predicted": 1,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the default engine compiles a module that uses memory.copy (bulk memory)",
+   "id": "default_engine_accepts_bulk",
+   "observed": true,
+   "predicted": true,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the engine with the switchable post-1.0 proposals off refuses it",
+   "id": "locked_engine_rejects_bulk",
+   "observed": false,
+   "predicted": false,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the default engine compiles a module that uses i32x4.add (SIMD)",
+   "id": "default_engine_accepts_simd",
+   "observed": true,
+   "predicted": true,
+   "verdict": "supported"
+  },
+  {
+   "claim": "the engine with the switchable post-1.0 proposals off refuses it",
+   "id": "locked_engine_rejects_simd",
+   "observed": false,
+   "predicted": false,
    "verdict": "supported"
   },
   {
@@ -480,8 +557,33 @@
  },
  "counts": {
   "refuted": 0,
-  "supported": 52,
+  "supported": 63,
   "unknown": 0
+ },
+ "engine": {
+  "fuel": true,
+  "max_wasm_stack_kib": 256,
+  "not_switched_off": [],
+  "switched_off": [
+   "wasm_gc",
+   "wasm_exceptions",
+   "wasm_function_references",
+   "wasm_stack_switching",
+   "wasm_component_model",
+   "wasm_component_model_implements",
+   "wasm_component_model_map",
+   "wasm_relaxed_simd",
+   "wasm_simd",
+   "wasm_threads",
+   "shared_memory",
+   "wasm_memory64",
+   "wasm_multi_memory",
+   "wasm_custom_page_sizes",
+   "wasm_tail_call",
+   "wasm_wide_arithmetic",
+   "wasm_bulk_memory",
+   "wasm_multi_value"
+  ]
  },
  "kernel": {
   "changed_outputs_f32": 132,
@@ -493,6 +595,6 @@
   "B": 2048,
   "C": 64
  },
- "seconds": 8.87,
- "wasmtime": "?"
+ "seconds": 13.92,
+ "wasmtime": "49.0.0"
 }

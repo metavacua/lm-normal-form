@@ -1,9 +1,11 @@
 closed	1
+entries_that_may_grow	1
+entries_with_fixed_memory	15
 escapes	0
 exports_func	16
+exports_global	0
 exports_mem	1
-exports_that_may_grow	1
-exports_with_fixed_memory	15
+exports_table	0
 final_kib_A	4096
 final_kib_B	2048
 imports	0
@@ -12,6 +14,7 @@ mem_bound_kib	4096
 mem_declared_max_kib	4096
 mem_initial_kib	128
 module_may_grow	1
+recursion_frames_bound	455
 recursive_functions	1
 rejected_A	0
 rejected_B	0
