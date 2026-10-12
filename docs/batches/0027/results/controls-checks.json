@@ -1,0 +1,120 @@
+{
+ "checks": [
+  {
+   "claim": "a module with an import and a start function is not closed",
+   "id": "escape_module_not_closed",
+   "observed": [
+    0
+   ],
+   "predicted": [
+    0
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "closure.dl derives two escapes: the import and the start function",
+   "id": "escape_module_escapes",
+   "observed": [
+    2
+   ],
+   "predicted": [
+    2
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "the escapes are an import and a start function",
+   "id": "escape_kinds",
+   "observed": [
+    [
+     "import",
+     "env.host_log:func"
+    ],
+    [
+     "start",
+     "1"
+    ]
+   ],
+   "predicted": [
+    [
+     "import",
+     "env.host_log:func"
+    ],
+    [
+     "start",
+     "1"
+    ]
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "a module with no import and no start function is closed",
+   "id": "open_module_closed",
+   "observed": [
+    1
+   ],
+   "predicted": [
+    1
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "the memory of the open module declares no maximum",
+   "id": "open_module_no_declared_max",
+   "observed": [
+    -1
+   ],
+   "predicted": [
+    -1
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "its bound is the host's limit alone",
+   "id": "open_module_bound_is_the_host",
+   "observed": [
+    16384
+   ],
+   "predicted": [
+    16384
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "the export grow may grow it",
+   "id": "open_module_may_grow",
+   "observed": [
+    [
+     "grow"
+    ]
+   ],
+   "predicted": [
+    [
+     "grow"
+    ]
+   ],
+   "verdict": "supported"
+  },
+  {
+   "claim": "the export size may not",
+   "id": "open_module_fixed",
+   "observed": [
+    [
+     "size"
+    ]
+   ],
+   "predicted": [
+    [
+     "size"
+    ]
+   ],
+   "verdict": "supported"
+  }
+ ],
+ "counts": {
+  "refuted": 0,
+  "supported": 8,
+  "unknown": 0
+ },
+ "name": "closure-controls"
+}

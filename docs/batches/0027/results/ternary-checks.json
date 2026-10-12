@@ -1,0 +1,17 @@
+{
+ "checks": [
+  {
+   "claim": "ternary_small.json equals batches/0027/expected/ternary_small.json (the keys named seconds ignored)",
+   "id": "equal_to_committed",
+   "observed": 0,
+   "predicted": 0,
+   "verdict": "supported"
+  }
+ ],
+ "counts": {
+  "refuted": 0,
+  "supported": 1,
+  "unknown": 0
+ },
+ "name": "ternary_small.json"
+}
