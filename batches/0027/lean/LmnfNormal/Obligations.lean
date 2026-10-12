@@ -34,7 +34,7 @@ namespace LmnfNormal
 theorem canon_Perm_sort {U β : Type*} {n : ℕ} [LinearOrder β] {key : U → β}
     (hkey : Function.Injective key) :
     Canonicalization (TEquiv (n := n) (fun (_ : Unit) (x : U) => x)) (NF (n := n) key id) :=
-  canonicalization hkey ⟨fun _ _ => rfl, fun x => ⟨(), rfl⟩⟩
+  canonicalization hkey ⟨fun _ _ => rfl, fun _ => ⟨(), rfl⟩⟩
 
 /-- `SP`: the gauge is an involution of the items (a sign change); the normal form takes the
 smaller of an item and its negative, then sorts. -/
