@@ -157,24 +157,24 @@ jobs:
           python-version: "3.12"
       - name: Install
         run: |
-          mkdir -p out/$TAG work
+          mkdir -p "out/$TAG" work
           test -x /usr/bin/time || sudo apt-get install --yes time
           python -m pip install --quiet numpy wasmtime
-          python -m pip freeze > out/$TAG/versions.txt
-          df -h / | tee out/$TAG/disk-before.txt
+          python -m pip freeze > "out/$TAG/versions.txt"
+          df -h / | tee "out/$TAG/disk-before.txt"
           # Room for the builds of Burn and a 650 MB weights file: remove what the image carries and this job does not use.
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/share/boost
-          df -h / | tee out/$TAG/disk-cleared.txt
+          df -h / | tee "out/$TAG/disk-cleared.txt"
           rustup toolchain install stable --profile minimal --no-self-update
           rustup default stable
           rustup target add wasm32v1-none
-          { rustc -V; cargo -V; rustc --print target-list | grep -x wasm32v1-none; } | tee out/$TAG/rust.version
-          rustc --print cfg --target wasm32v1-none | tee out/$TAG/target-cfg.txt
+          { rustc -V; cargo -V; rustc --print target-list | grep -x wasm32v1-none; } | tee "out/$TAG/rust.version"
+          rustc --print cfg --target wasm32v1-none | tee "out/$TAG/target-cfg.txt"
           gh release download "$WASM_TOOLS" -R bytecodealliance/wasm-tools -p '*x86_64-linux.tar.gz' -O - | sudo tar -xz -C /usr/local/bin --strip-components=1
-          wasm-tools --version | tee out/$TAG/wasm-tools.version
-          nproc | tee out/$TAG/nproc.txt
-          grep -m1 'model name' /proc/cpuinfo | tee out/$TAG/cpu.txt
-          free -g | tee out/$TAG/memory.txt
+          wasm-tools --version | tee "out/$TAG/wasm-tools.version"
+          nproc | tee "out/$TAG/nproc.txt"
+          grep -m1 'model name' /proc/cpuinfo | tee "out/$TAG/cpu.txt"
+          free -g | tee "out/$TAG/memory.txt"
       - uses: actions/download-artifact@v8
         with:
           name: graph-${{ matrix.tag }}
@@ -191,57 +191,57 @@ jobs:
         run: |
           git clone --quiet https://github.com/tracel-ai/burn-onnx work/burn-onnx
           if [ -n "$REV" ]; then git -C work/burn-onnx checkout --quiet "$REV"; fi
-          git -C work/burn-onnx rev-parse HEAD | tee out/$TAG/burn-onnx.rev
-          grep -m1 -o 'rev = "[0-9a-f]\{40\}"' work/burn-onnx/Cargo.toml | grep -o '[0-9a-f]\{40\}' | tee work/burn.rev out/$TAG/burn.rev
+          git -C work/burn-onnx rev-parse HEAD | tee "out/$TAG/burn-onnx.rev"
+          grep -m1 -o 'rev = "[0-9a-f]\{40\}"' work/burn-onnx/Cargo.toml | grep -o '[0-9a-f]\{40\}' | tee work/burn.rev "out/$TAG/burn.rev"
           mkdir -p work/burn-onnx/crates/burn-onnx/examples
           cp batches/0026/gen_bytes.rs work/burn-onnx/crates/burn-onnx/examples/gen_bytes.rs
           cd work/burn-onnx
-          /usr/bin/time -v cargo build --release --locked -p burn-onnx --bin onnx2burn --example gen_bytes > ../../out/$TAG/tool-build.log 2>&1 || rc=$?
-          tail -n 12 ../../out/$TAG/tool-build.log
+          /usr/bin/time -v cargo build --release --locked -p burn-onnx --bin onnx2burn --example gen_bytes > "../../out/$TAG/tool-build.log" 2>&1 || rc=$?
+          tail -n 12 "../../out/$TAG/tool-build.log"
           exit "${rc:-0}"
       # The reference: batch 0010's native Rust, the File source, built and run as there (burn.sh).
       - id: native_codegen
         name: "native: onnx2burn on the graph, the File source"
         continue-on-error: true
         if: steps.tool.outcome == 'success'
-        run: bash batches/0010/burn.sh codegen $TAG
+        run: bash batches/0010/burn.sh codegen "$TAG"
       - id: native_compile
         name: "native: the generated Rust and batch 0010's runner, built"
         continue-on-error: true
         if: steps.native_codegen.outcome == 'success'
-        run: bash batches/0010/burn.sh compile $TAG
+        run: bash batches/0010/burn.sh compile "$TAG"
       - id: native_run
         name: "native: the logits from the Rust"
         continue-on-error: true
         if: steps.native_compile.outcome == 'success'
-        run: bash batches/0010/burn.sh run $TAG
+        run: bash batches/0010/burn.sh run "$TAG"
       - id: native_compare
         name: "native: the logits, Rust against ONNX Runtime"
         continue-on-error: true
         if: steps.native_run.outcome == 'success'
-        run: bash batches/0010/burn.sh compare $TAG
+        run: bash batches/0010/burn.sh compare "$TAG"
       - id: gen
         name: "gen_bytes on the graph: the Bytes source"
         continue-on-error: true
         if: steps.tool.outcome == 'success'
-        run: bash batches/0026/wasm.sh gen $TAG
+        run: bash batches/0026/wasm.sh gen "$TAG"
       - id: p2
         name: "P2: the Bytes source has no std"
         continue-on-error: true
         if: steps.gen.outcome == 'success'
-        run: bash batches/0026/wasm.sh p2 $TAG
+        run: bash batches/0026/wasm.sh p2 "$TAG"
       - id: build_a
         name: "P3, P4: cargo build --target wasm32v1-none, the Bytes source"
         continue-on-error: true
         if: steps.gen.outcome == 'success'
-        run: bash batches/0026/wasm.sh build $TAG
+        run: bash batches/0026/wasm.sh build "$TAG"
       # An auxiliary change, not a prediction: the build above failed in a dependency (cubecl-environment takes
       # every wasm-family target for a browser), so that dependency is patched and the Bytes source built again.
       - id: patch
         name: "auxiliary: cubecl-environment patched to take target_family wasm for a browser only when target_os is not none"
         continue-on-error: true
         if: steps.gen.outcome == 'success' && steps.build_a.outcome == 'failure'
-        run: bash batches/0026/wasm.sh patch $TAG
+        run: bash batches/0026/wasm.sh patch "$TAG"
       # A second auxiliary change: on the third and fourth runs the patched build passed and validated, and the
       # module trapped in forward; the panic message (run 4) is a Mul of shapes [1,4,6,3] and [1,1,6,4], the
       # rotary embedding's slice to the end, which the generator wrote as the i64 literal 9223372036854775807.
@@ -249,69 +249,69 @@ jobs:
         name: "auxiliary: burn-onnx's slice node writes an open range for an end of i64::MAX, and the Bytes source is generated again"
         continue-on-error: true
         if: steps.patch.outcome == 'success'
-        run: bash batches/0026/wasm.sh genfix $TAG
+        run: bash batches/0026/wasm.sh genfix "$TAG"
       - id: build_p
         name: "P3, P4: the same build with the patched dependency and the regenerated source"
         continue-on-error: true
         if: steps.genfix.outcome == 'success'
-        run: bash batches/0026/wasm.sh build $TAG patched
+        run: bash batches/0026/wasm.sh build "$TAG" patched
       - id: validate
         name: "P5: the module validates as WebAssembly 1.0 plus mutable globals"
         continue-on-error: true
         if: steps.build_a.outcome == 'success' || steps.build_p.outcome == 'success'
-        run: bash batches/0026/wasm.sh validate $TAG
+        run: bash batches/0026/wasm.sh validate "$TAG"
       - id: p1
         name: "P1: the File source does not build for wasm32v1-none, and the error names std"
         continue-on-error: true
         if: steps.native_codegen.outcome == 'success' && (steps.build_a.outcome == 'success' || steps.build_p.outcome == 'success')
-        run: bash batches/0026/wasm.sh p1 $TAG
+        run: bash batches/0026/wasm.sh p1 "$TAG"
       - id: run
         name: "P6: the module run in wasmtime, the weights written into its linear memory"
         continue-on-error: true
         if: steps.build_a.outcome == 'success' || steps.build_p.outcome == 'success'
         run: |
-          mapfile -t ids < work/side/$TAG/ids.txt
-          m=out/$TAG/patched.wasm; [ -f "$m" ] || m=out/$TAG/bytes.wasm
-          sha256sum "$m" work/genb/$TAG/model.bpk | tee out/$TAG/run-inputs.sha256
-          mkdir -p out/$TAG/wasm-logits
-          INPUT_ORDER=$(cat work/side/$TAG/input-order.txt)
+          mapfile -t ids < "work/side/$TAG/ids.txt"
+          m="out/$TAG/patched.wasm"; [ -f "$m" ] || m="out/$TAG/bytes.wasm"
+          sha256sum "$m" "work/genb/$TAG/model.bpk" | tee "out/$TAG/run-inputs.sha256"
+          mkdir -p "out/$TAG/wasm-logits"
+          INPUT_ORDER=$(cat "work/side/$TAG/input-order.txt")
           export INPUT_ORDER
           rc=0
-          /usr/bin/time -v python batches/0026/host.py "$m" work/genb/$TAG/model.bpk out/$TAG/wasm-logits 2048 "${ids[@]}" > out/$TAG/host.log 2>&1 || rc=$?
-          tail -n 40 out/$TAG/host.log
-          awk '/Maximum resident/{print "host_peak_kb="$NF} /Elapsed \(wall/{print "host_elapsed="$NF}' out/$TAG/host.log | tee -a "$GITHUB_OUTPUT"
+          /usr/bin/time -v python batches/0026/host.py "$m" "work/genb/$TAG/model.bpk" "out/$TAG/wasm-logits" 2048 "${ids[@]}" > "out/$TAG/host.log" 2>&1 || rc=$?
+          tail -n 40 "out/$TAG/host.log"
+          awk '/Maximum resident/{print "host_peak_kb="$NF} /Elapsed \(wall/{print "host_elapsed="$NF}' "out/$TAG/host.log" | tee -a "$GITHUB_OUTPUT"
           exit "$rc"
       - id: grade_ort
         name: "P7, P8: the module's logits against ONNX Runtime's, default graph optimization"
         continue-on-error: true
         if: steps.run.outcome == 'success'
-        run: python batches/0026/grade.py out/$TAG/wasm-logits work/side/$TAG/ort-all "$(cat work/side/$TAG/vocab.txt)" | tee out/$TAG/grade-ort.txt
+        run: python batches/0026/grade.py "out/$TAG/wasm-logits" "work/side/$TAG/ort-all" "$(cat "work/side/$TAG/vocab.txt")" | tee "out/$TAG/grade-ort.txt"
       - id: grade_native
         name: "P7, P8: the module's logits against batch 0010's native Rust"
         continue-on-error: true
         if: steps.run.outcome == 'success' && steps.native_run.outcome == 'success'
-        run: python batches/0026/grade.py out/$TAG/wasm-logits out/$TAG/logits "$(cat work/side/$TAG/vocab.txt)" | tee out/$TAG/grade-native.txt
+        run: python batches/0026/grade.py "out/$TAG/wasm-logits" "out/$TAG/logits" "$(cat "work/side/$TAG/vocab.txt")" | tee "out/$TAG/grade-native.txt"
       - id: observe
         name: "observed: the module against ONNX Runtime without graph optimization, as compare.py reports it"
         if: steps.run.outcome == 'success'
         continue-on-error: true
-        run: python batches/0010/compare.py out/$TAG/wasm-logits work/side/$TAG/ort-none "$(cat work/side/$TAG/vocab.txt)" | tee out/$TAG/compare-none.txt
+        run: python batches/0010/compare.py "out/$TAG/wasm-logits" "work/side/$TAG/ort-none" "$(cat "work/side/$TAG/vocab.txt")" | tee "out/$TAG/compare-none.txt"
       - id: control
         name: "compare.py on the module's logits with one value moved by 0.5, which it must report"
         continue-on-error: true
         if: steps.run.outcome == 'success'
         run: |
-          python -c "$PERTURB" out/$TAG/wasm-logits work/perturbed
-          python batches/0010/compare.py out/$TAG/wasm-logits work/perturbed "$(cat work/side/$TAG/vocab.txt)" | tee out/$TAG/control.txt
-          awk '{for(i=1;i<=NF;i++) if($i=="max"){if($(i+1)>0.499 && $(i+1)<0.501) ok=1; break}} END{exit !ok}' out/$TAG/control.txt
+          python -c "$PERTURB" "out/$TAG/wasm-logits" work/perturbed
+          python batches/0010/compare.py "out/$TAG/wasm-logits" work/perturbed "$(cat "work/side/$TAG/vocab.txt")" | tee "out/$TAG/control.txt"
+          awk '{for(i=1;i<=NF;i++) if($i=="max"){if($(i+1)>0.499 && $(i+1)<0.501) ok=1; break}} END{exit !ok}' "out/$TAG/control.txt"
       - name: Disk after
         if: always()
-        run: df -h / | tee out/$TAG/disk-after.txt
+        run: df -h / | tee "out/$TAG/disk-after.txt"
       - name: Outcomes of the observations
         if: always()
         env:
           STEPS: ${{ toJSON(steps) }}
-        run: echo "$STEPS" | tee out/$TAG/outcomes.json
+        run: echo "$STEPS" | tee "out/$TAG/outcomes.json"
       - uses: actions/upload-artifact@v7
         if: always()
         with:
