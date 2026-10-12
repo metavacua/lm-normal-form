@@ -24,6 +24,7 @@ and writes one tab-separated file per relation, for Souffle (closure.dl):
   wuses(func, what)                      what in {memory_grow, memory_size, call_indirect, loop, br_table, unreachable, load, store}
   wnote(what, n)                         what the extractor could not read (element segments in another encoding)
   wcode(func, bytes)                     size of each function body in bytes
+  wframe(func, bytes)                    the shadow-stack frame of a function whose body begins `global.get 0; i32.const N; i32.sub`
 
 Usage: wasm_facts.py MODULE.wasm OUTDIR
 """
@@ -121,6 +122,15 @@ def decode_body(r, end, facts, fidx):
         r.u32()
         r.byte()
     d = r.d
+    # the prologue of a function with a frame in linear memory: global.get 0; i32.const N; i32.sub
+    # (the indices may be padded LEB128 numbers, which wasm-ld leaves for relocation)
+    if d[r.p] == 0x23:
+        probe = Reader(d, r.p + 1, end)
+        if probe.u32() == 0 and d[probe.p] == 0x41:
+            probe.p += 1
+            n = probe.sleb()
+            if d[probe.p] == 0x6B and n > 0:
+                facts["wframe"].append((fidx, n))
     while r.p < end:
         op = d[r.p]
         r.p += 1
@@ -195,6 +205,7 @@ def parse(path):
             "wcallind",
             "wuses",
             "wcode",
+            "wframe",
             "wversion",
             "wnote",
         )

@@ -15,9 +15,10 @@ nonlinearity `s`.  A symmetry of `s` gives more:
 * if `s` is odd, `s (-t) = -s t`, negating the gate row and the down column of a unit does not
   change the function.
 
-`ternary.py` finds exactly these extra symmetries among the 27 nonlinearities of `F_3` (8 even, 2
-odd, 16 neither, and the zero function, which is both) and no other one; SiLU and the squared ReLU
-of BitNet are neither, which is why the gauge of their units is only the sign pair and the
+`ternary.py` checks, for the 27 nonlinearities of `F_3` (8 even, 2 odd, 16 neither, and the zero
+function, which is both), that the table of every unit is unchanged by these symmetries; it does not
+search for others.  SiLU and the squared ReLU of BitNet are neither even nor odd, so these symmetries
+do not apply to them and the gauge of their units that this batch uses is the sign pair and the
 permutations.
 -/
 

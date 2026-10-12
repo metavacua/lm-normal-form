@@ -190,12 +190,20 @@ jobs:
           test "${PIPESTATUS[0]}" -eq 0
           wasm-tools print out/wasm/probe.wasm | grep -E '^\s*\((import|export|memory|table|global|start) ' | tee out/wasm/interface.txt
       - id: fixtures
-        name: "the controls parse and validate"
+        name: "the controls parse; three validate as WebAssembly 1.0 and the two with a later proposal do not"
         continue-on-error: true
         run: |
           for f in mock escape open; do
             wasm-tools parse "batches/0027/fixtures/$f.wat" -o "out/wasm/$f.wasm"
             wasm-tools validate --features=wasm1,mutable-global "out/wasm/$f.wasm"
+          done
+          for f in bulk simd; do
+            wasm-tools parse "batches/0027/fixtures/$f.wat" -o "out/wasm/$f.wasm"
+            if wasm-tools validate --features=wasm1,mutable-global "out/wasm/$f.wasm" 2> "out/wasm/$f.validate.err"; then
+              echo "$f validated as WebAssembly 1.0 and must not"
+              exit 1
+            fi
+            head -n 2 "out/wasm/$f.validate.err"
           done
       - id: facts
         name: "the facts of each module, and closure.dl on each without a warning"
@@ -219,12 +227,12 @@ jobs:
         name: "wasm_host.py on the hand-written module (the control of the host)"
         continue-on-error: true
         if: steps.facts.outcome == 'success'
-        run: python batches/0027/wasm_host.py out/wasm/mock.wasm out/wasm/observed-mock.json --facts out/wasm/mock/facts --predict out/wasm/mock/dl --backend python
+        run: python batches/0027/wasm_host.py out/wasm/mock.wasm out/wasm/observed-mock.json --facts out/wasm/mock/facts --predict out/wasm/mock/dl --controls out/wasm --backend python
       - id: host
         name: "wasm_host.py on the module: what closure.dl derived against what wasmtime does"
         continue-on-error: true
         if: steps.facts.outcome == 'success' && steps.validate.outcome == 'success'
-        run: python batches/0027/wasm_host.py out/wasm/probe.wasm out/wasm/observed.json --facts out/wasm/probe/facts --predict out/wasm/probe/dl
+        run: python batches/0027/wasm_host.py out/wasm/probe.wasm out/wasm/observed.json --facts out/wasm/probe/facts --predict out/wasm/probe/dl --controls out/wasm
       - name: Outcomes of the checks
         if: always()
         env:

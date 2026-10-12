@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // The plan for the normal form of a model, derived from the dataflow of its forward pass (plan_facts.py makes the facts with batch 0019's ir.py) and from three
-// tables that are the mathematics the program takes as given: the lattice of groups and the groups that each role allows (batch 0019's states.dl, included whole,
-// with one role added), the canonicalization method of each group and the theorem that says the method is a canonicalization, and the theorems that are proved.
+// tables that are the mathematics the program takes as given: the lattice of groups and the groups that each role allows (groups.dl: the part of batch 0019's
+// states.dl that derives the group of each space, copied verbatim by make_groups.py, with one role added), the canonicalization method of each group and the theorem that says the method is a canonicalization, and the theorems that are proved.
 //   grp_of(S, G)         batch 0019: the largest group of changes of basis of the index space S that no operation touching S forbids.
-//   mindepth(S, D)       the distance from the vocabulary, whose coordinates are labelled, through the parameter tensors: the order in which the spaces can be canonicalized.
+//   mindepth(S, D)       the distance from the vocabulary, whose coordinates are labelled, through the parameter tensors, the diagonal links of the norm weights and the
+//                        elementwise products: the order in which the spaces can be canonicalized.
 //   plan(S, D, G, M, T)  the method M for the group G of the space S, and the theorem T that M is a canonicalization of the orbits of G.
 //   noplan(S, G)         a space whose group has no method; unanchored(S): a space no chain of parameter tensors joins to the vocabulary.
 //   need(T)              the theorems the plan depends on.
@@ -15,7 +16,7 @@
 // What this does not say: the groups are those of batch 0019's lattice, a conservative subgroup of the true gauge group of the model (the lattice has no element
 // for the sign changes of whole rotary planes, for instance), and the scalars that BitNet keeps next to each ternary matrix are parameters and not index spaces, so the
 // continuous gauge between a scale and the norm weight beside it is not in the model. The plan is a plan for the orbits of the modelled group, which are contained
-// in the classes of functionally equal models.
+// in the classes of functionally equal models (soundness: completeness is not sought, and is false on the finite instances that were decided).
 #include "groups.dl"
 
 // ---- the library: one more role ---------------------------------------------------------------------------------------------------------------------------------

@@ -16,6 +16,8 @@
 //   mem_bound_kib            the least of the specification's bound (2^16 pages), the module's declared maximum and the host's limit: the memory of a
 //                            run never exceeds it (memory.grow fails with -1, and does not trap), and it never shrinks.
 //   recursive(f)             a live function on a cycle of the call graph: only such a function can exhaust the stack by depth.
+//   depth_bound(f, d)        for a recursive function whose prologue takes a frame of b bytes of the shadow stack, no more than d = (the stack) / b of its frames
+//                            are active at once: the stack bound as a number read from the binary.
 //   predict(key, value)      the numbers that wasm_host.py checks against what wasmtime does.
 // Sizes are in KiB, so that 4 GiB (2^22 KiB) fits the 32-bit numbers of Souffle. The module's own constants (page size 64 KiB, limits within
 // 2^16 pages for a memory, one memory, one table, at most one result) are from the W3C Recommendation of 5 December 2019, chapters 2.5, 3.2 and 7.
@@ -55,6 +57,8 @@
 .input wuses
 .decl wcode(f:number, bytes:number)
 .input wcode
+.decl wframe(f:number, bytes:number)
+.input wframe
 .decl wversion(v:number)
 .input wversion
 .decl wnote(what:symbol, n:number)
@@ -147,6 +151,8 @@ final_kib(n, i) :- scenario(n, _), !rejected(n), !any_grow(), mem_initial_kib(i)
 // With --stack-first the shadow stack is the bytes below the initial value of the stack pointer, the first global.
 .decl stack_pointer0(v:number)
 stack_pointer0(v) :- wglobal(0, "i32", 1, 0, v), v >= 0.
+.decl depth_bound(f:number, d:number)
+depth_bound(f, d) :- recursive(f), wframe(f, b), b > 0, stack_pointer0(sp), d = sp / b.
 .decl data_below_stack()
 data_below_stack() :- stack_pointer0(sp), wdata(_, o, _), o >= 0, o < sp.
 .decl stack_clear()
@@ -193,6 +199,7 @@ predict("exports_that_may_grow", n) :- n = count : { may_grow(_) }.
 predict("exports_with_fixed_memory", n) :- n = count : { fixed_memory(_) }.
 predict("live_functions", n) :- n = count : { live(_) }.
 predict("recursive_functions", n) :- n = count : { recursive(_) }.
+predict("recursion_frames_bound", d) :- d = min x : { depth_bound(_, x) }.
 predict(cat("final_kib_", n), k) :- final_kib(n, k).
 predict(cat("rejected_", n), 1) :- rejected(n).
 predict(cat("rejected_", n), 0) :- scenario(n, _), !rejected(n).

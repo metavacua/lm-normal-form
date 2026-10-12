@@ -112,12 +112,51 @@ def read_scenarios(d):
     return out
 
 
+# The proposals after WebAssembly 1.0 (and mutable globals, which the engine always has) that the binding can switch off, in the order that
+# lets each be switched off after the ones that depend on it (simd needs relaxed simd off first). Reference types are not in the list: the
+# engine's component-model-async feature, which the binding does not expose, requires them, and an engine built without them while that
+# feature is on aborts the process.
+LOCKDOWN = (
+    "wasm_gc",
+    "wasm_exceptions",
+    "wasm_function_references",
+    "wasm_stack_switching",
+    "wasm_component_model",
+    "wasm_component_model_implements",
+    "wasm_component_model_map",
+    "wasm_relaxed_simd",
+    "wasm_simd",
+    "wasm_threads",
+    "shared_memory",
+    "wasm_memory64",
+    "wasm_multi_memory",
+    "wasm_custom_page_sizes",
+    "wasm_tail_call",
+    "wasm_wide_arithmetic",
+    "wasm_bulk_memory",
+    "wasm_multi_value",
+)
+
+
+def lock_down(cfg):
+    """Switch off every proposal after WebAssembly 1.0 that the binding can; returns (switched off, not switched off)."""
+    applied, skipped = [], []
+    for name in LOCKDOWN:
+        try:
+            setattr(cfg, name, False)
+            applied.append(name)
+        except Exception as e:
+            skipped.append(f"{name}: {e}")
+    return applied, skipped
+
+
 class Runner:
     """Instances of one module, each in a store of its own."""
 
-    def __init__(self, w, path, fuel=False, stack_kib=None):
+    def __init__(self, w, path, fuel=False, stack_kib=None, lockdown=False):
         self.w = w
         cfg = w.Config()
+        self.lockdown = lock_down(cfg) if lockdown else ([], [])
         if fuel:
             cfg.consume_fuel = True
         if stack_kib is not None:
@@ -363,13 +402,21 @@ def group_closure(run, checks, pred, sets, scen):
             kd in ("oob_memory", "stack_exhausted"),
         )
         detail["recursion"] = {"deepest_without_trap": best, "trap_kind_at_2^24": kd}
-        stack_bytes = (P("stack_kib") or 0) * 1024
-        if stack_bytes and kd == "oob_memory":
+        bound = P("recursion_frames_bound")
+        if bound is not None and kd == "oob_memory":
+            # a recursion of depth n has n + 1 frames of `recurse`; the bound is the stack divided by the frame that its prologue takes
+            frames = best + 1
             checks.add(
-                "recurse_depth_bound",
-                "when the shadow stack ends the recursion, the deepest recursion without a trap needs at most stack/64 frames (a frame holds a 64-byte array)",
+                "recursion_frames_within_derived_bound",
+                "when the shadow stack ends the recursion, its frames do not exceed (stack) / (the frame of its prologue), derived from the binary",
                 True,
-                best <= stack_bytes // 64,
+                frames <= bound,
+            )
+            checks.add(
+                "recursion_frames_equal_derived_bound",
+                "and they equal it: the recursive function is the only user of the shadow stack (an observation; this check was added after the observation)",
+                bound,
+                frames,
             )
 
     # fuel: a loop is bounded by it
@@ -464,6 +511,26 @@ def group_closure(run, checks, pred, sets, scen):
     )
     detail["changed_memory"] = sorted(changed)
     return detail
+
+
+def compiles(w, cfg, path):
+    try:
+        w.Module.from_file(w.Engine(cfg), path)
+        return True
+    except Exception:
+        return False
+
+
+def group_features(w, checks, controls):
+    """The engine configured for WebAssembly 1.0 refuses what the default engine takes: a module with a bulk-memory instruction and one with a SIMD value."""
+    for name, what in (("bulk", "memory.copy (bulk memory)"), ("simd", "i32x4.add (SIMD)")):
+        path = os.path.join(controls, f"{name}.wasm")
+        if not os.path.exists(path):
+            continue
+        locked = w.Config()
+        lock_down(locked)
+        checks.add(f"default_engine_accepts_{name}", f"the default engine compiles a module that uses {what}", True, compiles(w, w.Config(), path))
+        checks.add(f"locked_engine_rejects_{name}", "the engine configured for WebAssembly 1.0 refuses it", False, compiles(w, locked, path))
 
 
 # ---------------------------------------------------------------------------------------------------------------------------- backends
@@ -641,16 +708,19 @@ def main(argv):
     pred, sets = read_predict(predict)
     scen = read_scenarios(facts)
     checks = Checks()
-    run = Runner(w, wasm_path, fuel=True, stack_kib=256)
+    run = Runner(w, wasm_path, fuel=True, stack_kib=256, lockdown=True)
     res = {
         "module": os.path.basename(wasm_path),
         "wasmtime": getattr(w, "__version__", "?"),
         "backend": backend,
         "scenarios": scen,
+        "engine": {"switched_off": run.lockdown[0], "not_switched_off": run.lockdown[1], "fuel": True, "max_wasm_stack_kib": 256},
     }
     t0 = time.time()
     if "closure" in only:
         res["closure"] = group_closure(run, checks, pred, sets, scen)
+        if "controls" in opt:
+            group_features(w, checks, opt["controls"])
     be = PyBackend() if backend == "python" else WasmBackend(run.instantiate())
     if "kernel" in only:
         res["kernel"] = group_kernel(be, checks)
