@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# The nodes of each artifact, by class (Tensor, Node, Value, Function, Statement, Field, KeyValue).
+PREFIX p: <urn:lmnf:b28:p:>
+SELECT ?artifact ?class (COUNT(DISTINCT ?n) AS ?nodes)
+WHERE {
+  ?n a ?class ; p:inArtifact ?artifact .
+}
+GROUP BY ?artifact ?class
+ORDER BY ?artifact ?class
