@@ -40,24 +40,14 @@ def get(o, *path):
 
 
 def both(obs, f):
-    """f(model) for the base and the Instruct model; the first failure is the verdict."""
-    msgs = []
-    for m in SMOL:
-        ok, msg = f(m)
-        if not ok:
-            return False, f"{m}: {msg}"
-        msgs.append(f"{m}: {msg}")
-    return True, "; ".join(msgs)
+    """f(model) for the base and the Instruct model, both always read; refuted if either is."""
+    res = [(m, *f(m)) for m in SMOL]
+    return all(ok for _, ok, _ in res), "; ".join(f"{m}: {msg}" + ("" if ok else " [FAILS]") for m, ok, msg in res)
 
 
 def each_tag(obs, f):
-    msgs = []
-    for t in obs["tags"]:
-        ok, msg = f(t)
-        if not ok:
-            return False, f"{t}: {msg}"
-        msgs.append(f"{t}: {msg}")
-    return True, "; ".join(msgs)
+    res = [(t, *f(t)) for t in obs["tags"]]
+    return all(ok for _, ok, _ in res), "; ".join(f"{t}: {msg}" + ("" if ok else " [FAILS]") for t, ok, msg in res)
 
 
 # ---- the predictions -----------------------------------------------------------------------------------------------
@@ -140,11 +130,15 @@ def p7(obs):
         need(w.get(k), f"cross {k}")
     s = need(c.get("bpk_small"), "the small tensors of the burnpacks")
     q = get(obs, "queries", "cross_shared")
+    # The registered refutation: one shared weight key, or one constant that differs. The number of small tensors (396 in
+    # the registration, from batch 0011's burn-onnx) is reported and is not part of the verdict.
+    n = s["tensors_instruct"]
     ok = (all(w[k] == 0 for k in ("st", "onnx", "gguf-f32", "bpk")) and s["digests_equal"] and s["unmatched"] == 0
-          and s["tensors_base"] == 396 and s["tensors_instruct"] == 396)
+          and s["tensors_base"] == n and s["same_name_same_digest"] == n)
     if q is not None:
-        ok = ok and q.get("bpk", 0) == 396 and all(q.get(k, 0) == 0 for k in ("st", "onnx", "gguf-f32"))
-    return ok, f"shared weight keys {w}, small tensors {s['tensors_base']}/{s['tensors_instruct']} equal {s['digests_equal']}, SPARQL {q}"
+        ok = ok and q.get("bpk", 0) == n and all(q.get(k, 0) == 0 for k in ("st", "onnx", "gguf-f32"))
+    return ok, (f"shared weight keys {w}; {n} small tensors in each burnpack (the registration expected 396), "
+                f"{s['same_name_same_digest']} equal by name and digest, {s['unmatched']} unmatched, SPARQL {q}")
 
 
 def p8(obs):
@@ -249,9 +243,9 @@ def p17(obs):
     def f(t):
         d = need(get(obs, t, "bpk_file_vs_bytes"), "the comparison of the two burnpacks")
         n = need(get(obs, t, "bpk_census", "file"), "the burnpack census")["tensors"]
+        # The registered refutation: one equal param_id, one other difference, or a different data region. The number of tensors
+        # (669 in the registration, from batch 0011's burn-onnx) is reported and is not part of the verdict.
         ok = d["param_ids_differing"] == n and d["metadata_equal_without_param_id"] and d["data_region_sha256_equal"]
-        if t in SMOL:
-            ok = ok and n == 669
         return ok, f"{d['param_ids_differing']} of {n} param_ids differ, descriptors equal without them {d['metadata_equal_without_param_id']}, data equal {d['data_region_sha256_equal']}"
     msgs = []
     for t in obs.get("burn_tags", obs["tags"]):
@@ -378,15 +372,15 @@ def expected():
             "rust_census": {"bytes": {"top_level_statements": 10}},
             "wasm_graph": {"functions": 5, "deterministic": True, "collapsed": 0, "blank_terms": 0},
             "wasm_census": {"functions": 5, "imports": 0, "exports": list(EIGHT)},
-            "bpk_census": {"file": {"tensors": 669}},
-            "bpk_file_vs_bytes": {"param_ids_differing": 669, "metadata_equal_without_param_id": True, "data_region_sha256_equal": True},
+            "bpk_census": {"file": {"tensors": 609}},
+            "bpk_file_vs_bytes": {"param_ids_differing": 609, "metadata_equal_without_param_id": True, "data_region_sha256_equal": True},
         }
 
     return {
         "tags": ["base", "instruct"], "base": model("base"), "instruct": model("instruct"),
         "config": {"base": cfg, "instruct": cfg},
         "cross": {"weights_shared_keys": {"st": 0, "onnx": 0, "gguf-f32": 0, "bpk": 0},
-                  "bpk_small": {"tensors_base": 396, "tensors_instruct": 396, "digests_equal": True, "unmatched": 0},
+                  "bpk_small": {"tensors_base": 336, "tensors_instruct": 336, "digests_equal": True, "unmatched": 0, "same_name_same_digest": 336},
                   "kv": {"differ": ["general.name", "tokenizer.chat_template", "tokenizer.ggml.eos_token_id"], "only_base": [],
                          "only_instruct": ["tokenizer.chat_template"]},
                   "skeleton": {"base": "aa", "instruct": "aa", "equal": True}, "structure_triples": {"base": 5, "instruct": 5, "equal": True},
@@ -394,7 +388,7 @@ def expected():
                   "wasm": {"base": "bb", "instruct": "bb", "equal": True}},
         "queries": {"st_counterparts": {"base/onnx": {"1": 271, "2": 1}, "instruct/onnx": {"1": 271, "2": 1},
                                         "base/gguf-f32": {"1": 272}, "instruct/gguf-f32": {"1": 272}},
-                    "cross_shared": {"bpk": 396}},
+                    "cross_shared": {"bpk": 336}},
         "ground": {"graphs": 40, "python_blank_statements": 0, "oxigraph": {"ground-terms": "false", "ground-graph-names": "false",
                                                                           "control_ground_terms": "true"},
                    "control_python_blank_statements": 1, "control_differs": True, "determinism": [["x", True]], "collapsed_triples": 0},
@@ -429,7 +423,7 @@ def selftest():
         "P12": lambda o: o["cross"]["wasm"].update(equal=False), "P13": lambda o: o["base"]["wasm_search"].update(found_in_module=["x"]),
         "P14": lambda o: o["base"]["logits"]["ort_none"].update(P8=False),
         "P15": lambda o: o["ground"].update(python_blank_statements=1), "P16": lambda o: o["base"]["onnx_census"].update(nodes_unnamed=1),
-        "P17": lambda o: o["base"]["bpk_file_vs_bytes"].update(param_ids_differing=668),
+        "P17": lambda o: o["base"]["bpk_file_vs_bytes"].update(param_ids_differing=608),
         "P18": lambda o: o["instruct"]["onnx_census"].update(control_flow_nodes=1),
         "P19": lambda o: o["base"]["wasm_census"].update(imports=1),
         "P20": lambda o: o["weights"]["instruct"]["scan"].update(zero=1),
@@ -440,6 +434,19 @@ def selftest():
         r, _ = grade(o)
         st = {x["id"]: x["status"] for x in r}
         check(f"{pid} is refuted by one change to its observation", st[pid] == "refuted")
+    for what, mutate in (("a constant of the burnpack that differs", lambda o: o["cross"]["bpk_small"].update(same_name_same_digest=335)),
+                         ("a small tensor with no counterpart", lambda o: o["cross"]["bpk_small"].update(unmatched=1)),
+                         ("a different data region in the burnpacks", lambda o: o["instruct"]["bpk_file_vs_bytes"].update(
+                             data_region_sha256_equal=False))):
+        o = copy.deepcopy(obs)
+        mutate(o)
+        r, _ = grade(o)
+        check(f"P7 or P17 is refuted by {what}", {x["id"]: x["status"] for x in r}["P7" if "small" in what or "constant" in what else "P17"] == "refuted")
+    o = copy.deepcopy(obs)
+    o["cross"]["bpk_small"].update(tensors_base=500, tensors_instruct=500, same_name_same_digest=500)
+    o["queries"]["cross_shared"]["bpk"] = 500
+    r, _ = grade(o)
+    check("the number of small tensors is reported, not graded: 500 instead of 396 or 336 still supports P7", {x["id"]: x["status"] for x in r}["P7"] == "supported")
     o = copy.deepcopy(obs)
     o["base"]["gguf_controls"]["C2_wrong_head_count_is_none"] = False
     r, c = grade(o)

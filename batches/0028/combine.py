@@ -251,9 +251,10 @@ def cross(A, graphs):
         if kind == "bpk":
             large, small = partition_by_bytes(rows, tgt)
             out["weights_shared_keys"][kind] = sum(1 for r in large if r["relation"] != "none")
-            sb = {e["digest"] for e in rb["subject"]["tensors"] if e.get("x-bytes", 0) < 256}
-            si = {e["digest"] for e in tgt if e.get("x-bytes", 0) < 256}
-            out["bpk_small"] = {"tensors_base": len(sb), "tensors_instruct": len(si), "digests_equal": sb == si,
+            sb = {label(e): e["digest"] for e in rb["subject"]["tensors"] if e.get("x-bytes", 0) < 256}
+            si = {label(e): e["digest"] for e in tgt if e.get("x-bytes", 0) < 256}
+            out["bpk_small"] = {"tensors_base": len(sb), "tensors_instruct": len(si), "digests_equal": sorted(sb.values()) == sorted(si.values()),
+                                "same_name_same_digest": sum(1 for k, v in si.items() if sb.get(k) == v),
                                 "relations": rel_counts(small), "unmatched": sum(1 for r in small if r["relation"] == "none")}
         else:
             out["weights_shared_keys"][kind] = sum(1 for r in rows if r["relation"] != "none")
