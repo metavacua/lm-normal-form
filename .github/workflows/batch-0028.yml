@@ -1,0 +1,571 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0028: the graphs of SmolLM2-135M and SmolLM2-135M-Instruct in safetensors, ONNX, GGUF, Burn and wasm32v1-none, the maps
+# between them, and the blank and empty structures of each. Written down in docs/batches/0028.md, whose predictions P1 to P20
+# grade28.py grades at the end; a prediction that is refuted or cannot be checked fails the run.
+#
+# plan       which models each job runs: a push runs the tiny random Llama only; a dispatch runs all three (inputs also takes
+#            `tags` and the burn job `burn_tags`, so that the cheap jobs can run without the 30 minute ones)
+# selftests  every program of the batch on its own fixtures, and batch 0011's identity fixture, before any model is read
+# inputs     per model: the Hub snapshot at the registered revision, Optimum's ONNX export, ONNX Runtime's logits, the identity
+#            records of the safetensors and ONNX files, the ONNX graph as RDF (skeleton, census), the published ONNX of Instruct
+# gguf       per model (not tiny): llama.cpp's converter at the pinned tag in F32 and BF16, two readers, the maps from the
+#            safetensors file, the key-value table against config.json
+# burn       per model: burn-onnx (File and Bytes strategies), the burnpacks, the generated Rust as a graph, the module built for
+#            wasm32v1-none as batch 0026 builds it, run in wasmtime, its census and graph, the search for weights in its bytes
+# closed     batch 0027's module built for wasm32v1-none and put through the same census
+# maps       the graphs and maps as one dataset in Oxigraph, the SPARQL checks, the two models compared, the grader
+name: batch 0028
+
+on:
+  push:
+    branches: ["batch/0028-**"]
+    paths: [".github/workflows/batch-0028.yml", "batches/0028/**", "queries/0028/**"]
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: 'models for the inputs, gguf and maps jobs, a JSON array: ["tiny"], or ["tiny","base","instruct"]'
+        required: false
+        default: '["tiny","base","instruct"]'
+      burn_tags:
+        description: 'models for the burn job (the 30 minute one), a JSON array, default the same as tags'
+        required: false
+        default: ''
+      burn_onnx_rev:
+        description: "burn-onnx commit to build (empty: the head of its default branch)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: batch-0028-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  WASM_TOOLS: v1.259.0
+  LLAMACPP_TAG: b11450
+  # The token ids of each prompt in batches/0010/prompts.txt, one line per prompt, comma separated.
+  TOKENS: >-
+    import sys,transformers as t;k=t.AutoTokenizer.from_pretrained(sys.argv[1]);
+    [print(','.join(map(str,k(l.rstrip('\n')).input_ids)))for l in open(sys.argv[2])]
+
+jobs:
+  plan:
+    name: "00 which models"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      tags: ${{ steps.p.outputs.tags }}
+      burn_tags: ${{ steps.p.outputs.burn_tags }}
+      gguf_tags: ${{ steps.p.outputs.gguf_tags }}
+      run_gguf: ${{ steps.p.outputs.run_gguf }}
+    steps:
+      - id: p
+        env:
+          TAGS: ${{ inputs.tags }}
+          BURN_TAGS: ${{ inputs.burn_tags }}
+        run: |
+          tags='["tiny"]'
+          if [ -n "$TAGS" ]; then tags=$TAGS; fi
+          burn=$tags
+          if [ -n "$BURN_TAGS" ]; then burn=$BURN_TAGS; fi
+          gguf=$(echo "$tags" | jq -c '[.[] | select(. == "base" or . == "instruct")]')
+          run_gguf=$(echo "$gguf" | jq -r 'if length > 0 then "true" else "false" end')
+          echo "tags=$tags burn_tags=$burn gguf_tags=$gguf run_gguf=$run_gguf"
+          {
+            echo "tags=$(echo "$tags" | jq -c .)"
+            echo "burn_tags=$(echo "$burn" | jq -c .)"
+            echo "gguf_tags=$gguf"
+            echo "run_gguf=$run_gguf"
+          } >> "$GITHUB_OUTPUT"
+
+  selftests:
+    name: "00 the programs of the batch on their own fixtures"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p out
+          python -m pip install --quiet numpy ml_dtypes onnx gguf cbor2 oxigraph
+          python -m pip freeze > out/versions.txt
+          gh release download "$WASM_TOOLS" -R bytecodealliance/wasm-tools -p '*x86_64-linux.tar.gz' -O - | sudo tar -xz -C /usr/local/bin --strip-components=1
+          wasm-tools --version | tee out/wasm-tools.version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: "batch 0011's fixture and readers (as there)"
+        run: |
+          python batches/0011/identity_core.py conformance conformance/identity/1 | tail -n 3
+          python batches/0011/identity.py selftest | tail -n 3
+      - name: "the selftest of each program of this batch"
+        run: |
+          cd batches/0028
+          rc=0
+          for m in ground onnxgraph gguf_tools burn_tools logit_grade weights_compare grade28 combine; do
+            echo "== $m"
+            python "$m.py" selftest | tee -a "../../out/selftests.txt" || rc=1
+          done
+          echo "== wasm_tools"
+          python wasm_tools.py selftest wasm-tools | tee -a "../../out/selftests.txt" || rc=1
+          echo "== mini_pipeline: cells 02 to 06 on two synthetic models"
+          python mini_pipeline.py "$(command -v oxigraph)" wasm-tools | tee -a "../../out/selftests.txt" || rc=1
+          if grep -q '^FAIL' ../../out/selftests.txt; then rc=1; fi
+          exit "$rc"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: selftests
+          path: out/
+          retention-days: 7
+
+  inputs:
+    name: "01 the inputs: the ONNX export, ONNX Runtime, the records and graphs, ${{ matrix.tag }}"
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        tag: ${{ fromJSON(needs.plan.outputs.tags) }}
+    env:
+      TAG: ${{ matrix.tag }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p "out/$TAG" work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          bash batches/0028/cells.sh env "$TAG" >> "$GITHUB_ENV"
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet "optimum[onnxruntime]" numpy ml_dtypes cbor2 huggingface_hub
+          python -m pip freeze > "out/$TAG/versions.txt"
+      - name: The revision of the model, and the snapshot at the registered revision
+        run: |
+          curl -sS "https://huggingface.co/api/models/$MODEL" | jq -r .sha | tee "out/$TAG/revision.txt"
+          args=()
+          if [ "$TAG" = tiny ]; then args+=(--bin); fi
+          python batches/0028/fetch.py "$MODEL" "$REV" work/hf "${args[@]}"
+          ls -l work/hf
+      - id: export
+        name: "optimum-cli: export to ONNX, without past"
+        continue-on-error: true
+        run: |
+          /usr/bin/time -v optimum-cli export onnx --model work/hf --task text-generation work/onnx 2> "out/$TAG/export.time" | tail -n 5 | tee "out/$TAG/export.log"
+          du -b work/onnx/* | tee "out/$TAG/onnx-files.txt"
+          sha256sum work/onnx/model.onnx | tee "out/$TAG/model.sha256"
+          jq -r .vocab_size work/onnx/config.json | tee "out/$TAG/vocab.txt"
+      - id: records
+        name: "the identity records and censuses of the safetensors file and the ONNX file"
+        continue-on-error: true
+        run: |
+          python batches/0011/identity_core.py conformance conformance/identity/1 | tail -n 2
+          python batches/0011/identity.py selftest | tail -n 2
+          if [ -f work/hf/model.safetensors ]; then
+            python batches/0011/identity.py st work/hf/model.safetensors "out/$TAG/st-record.json" "out/$TAG/st-census.json" | tail -n 2
+            sha256sum work/hf/model.safetensors | tee "out/$TAG/st.sha256"
+          fi
+          python batches/0011/identity.py onnx work/onnx/model.onnx "out/$TAG/onnx-record.json" "out/$TAG/onnx-census0011.json" | tail -n 2
+      - id: graph
+        name: "the ONNX graph: skeleton, census, ground RDF"
+        continue-on-error: true
+        run: python batches/0028/onnxgraph.py work/onnx/model.onnx "$TAG" onnx "out/$TAG"
+      - id: ids
+        name: "the graph's inputs in order, and the token ids of the prompts"
+        continue-on-error: true
+        run: |
+          python -c "import onnx,sys;print(','.join(i.name for i in onnx.load(sys.argv[1],load_external_data=False).graph.input))" work/onnx/model.onnx | tee "out/$TAG/input-order.txt"
+          python -c "$TOKENS" work/hf batches/0010/prompts.txt | tee "out/$TAG/ids.txt"
+      - id: ort_all
+        name: "ONNX Runtime, default graph optimization: the logits of every position"
+        continue-on-error: true
+        run: |
+          mkdir -p "out/$TAG/ort-all"
+          mapfile -t ids < "out/$TAG/ids.txt"
+          python batches/0010/logits.py work/onnx/model.onnx "out/$TAG/ort-all" all "${ids[@]}" | tee "out/$TAG/ort-all.txt"
+      - id: ort_none
+        name: "ONNX Runtime, no graph optimization: every node as the graph states it"
+        continue-on-error: true
+        run: |
+          mkdir -p "out/$TAG/ort-none"
+          mapfile -t ids < "out/$TAG/ids.txt"
+          python batches/0010/logits.py work/onnx/model.onnx "out/$TAG/ort-none" none "${ids[@]}" | tee "out/$TAG/ort-none.txt"
+      - id: published
+        name: "the published onnx/model.onnx of the Instruct repository: record, census, graph"
+        if: matrix.tag == 'instruct'
+        continue-on-error: true
+        run: |
+          hf download "$MODEL" onnx/model.onnx --revision "$REV" --local-dir work/published
+          python batches/0011/identity.py onnx work/published/onnx/model.onnx "out/$TAG/onnxpub-record.json" "out/$TAG/onnxpub-census0011.json" | tail -n 2
+          python batches/0028/onnxgraph.py work/published/onnx/model.onnx "$TAG" onnxpub "out/$TAG"
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee "out/$TAG/outcomes.json"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: inputs-${{ matrix.tag }}
+          path: out/
+          retention-days: 7
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: onnxfile-${{ matrix.tag }}
+          path: work/onnx/model.onnx
+          retention-days: 1
+
+  gguf:
+    name: "02 llama.cpp's converter and the GGUF files, ${{ matrix.tag }}"
+    needs: plan
+    if: needs.plan.outputs.run_gguf == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        tag: ${{ fromJSON(needs.plan.outputs.gguf_tags) }}
+    env:
+      TAG: ${{ matrix.tag }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p "out/$TAG" work/gguf
+          bash batches/0028/cells.sh env "$TAG" >> "$GITHUB_ENV"
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers numpy safetensors huggingface_hub ml_dtypes sentencepiece protobuf cbor2
+          git clone --quiet --depth 1 --branch "$LLAMACPP_TAG" https://github.com/ggml-org/llama.cpp llama.cpp-src
+          python -m pip install --quiet ./llama.cpp-src/gguf-py
+          git -C llama.cpp-src rev-parse HEAD | tee "out/$TAG/llama.cpp.rev"
+          python -m pip freeze > "out/$TAG/versions.txt"
+      - name: The snapshot at the registered revision
+        run: |
+          python batches/0028/fetch.py "$MODEL" "$REV" work/hf
+          ls -l work/hf
+          sha256sum work/hf/model.safetensors | tee "out/$TAG/st.sha256"
+          cp work/hf/config.json "out/$TAG/config.json"
+      - id: convert_f32
+        name: "convert_hf_to_gguf.py --outtype f32"
+        continue-on-error: true
+        run: python llama.cpp-src/convert_hf_to_gguf.py work/hf --outfile work/gguf/f32.gguf --outtype f32 2>&1 | tail -n 12 | tee "out/$TAG/convert-f32.log"
+      - id: convert_bf16
+        name: "convert_hf_to_gguf.py --outtype bf16"
+        continue-on-error: true
+        run: python llama.cpp-src/convert_hf_to_gguf.py work/hf --outfile work/gguf/bf16.gguf --outtype bf16 2>&1 | tail -n 12 | tee "out/$TAG/convert-bf16.log"
+      - id: analyze
+        name: "the GGUF files read twice, their records, the maps from the safetensors file, the key-value table"
+        continue-on-error: true
+        run: |
+          find work/gguf -type f -printf '%s %p\n' | tee "out/$TAG/gguf-files.txt"
+          python batches/0028/gguf_tools.py analyze "$TAG" work/gguf/f32.gguf work/gguf/bf16.gguf work/hf/model.safetensors work/hf/config.json "out/$TAG"
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee "out/$TAG/outcomes.json"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: gguf-${{ matrix.tag }}
+          path: out/
+          retention-days: 7
+
+  burn:
+    name: "03 the Rust Burn generates, built for wasm32v1-none and run, ${{ matrix.tag }}"
+    needs: [plan, inputs]
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        tag: ${{ fromJSON(needs.plan.outputs.burn_tags) }}
+    env:
+      CARGO_INCREMENTAL: "0"
+      CARGO_TERM_COLOR: never
+      TAG: ${{ matrix.tag }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p "out/$TAG" work
+          test -x /usr/bin/time || sudo apt-get install --yes time
+          python -m pip install --quiet numpy wasmtime onnx ml_dtypes cbor2
+          python -m pip freeze > "out/$TAG/versions.txt"
+          df -h / | tee "out/$TAG/disk-before.txt"
+          # Room for the builds of Burn and a 650 MB weights file twice: remove what the image carries and this job does not use.
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/share/boost
+          df -h / | tee "out/$TAG/disk-cleared.txt"
+          rustup toolchain install stable --profile minimal --no-self-update
+          rustup default stable
+          rustup target add wasm32v1-none
+          { rustc -V; cargo -V; rustc --print target-list | grep -x wasm32v1-none; } | tee "out/$TAG/rust.version"
+          gh release download "$WASM_TOOLS" -R bytecodealliance/wasm-tools -p '*x86_64-linux.tar.gz' -O - | sudo tar -xz -C /usr/local/bin --strip-components=1
+          wasm-tools --version | tee "out/$TAG/wasm-tools.version"
+          nproc | tee "out/$TAG/nproc.txt"
+          grep -m1 'model name' /proc/cpuinfo | tee "out/$TAG/cpu.txt"
+          free -g | tee "out/$TAG/memory.txt"
+      - uses: actions/download-artifact@v8
+        with:
+          name: onnxfile-${{ matrix.tag }}
+          path: work/graph/${{ matrix.tag }}
+      - uses: actions/download-artifact@v8
+        with:
+          name: inputs-${{ matrix.tag }}
+          path: work/side
+      - id: tool
+        name: "cargo: onnx2burn and gen_bytes, built from burn-onnx's default branch"
+        continue-on-error: true
+        env:
+          REV: ${{ inputs.burn_onnx_rev }}
+        run: |
+          git clone --quiet https://github.com/tracel-ai/burn-onnx work/burn-onnx
+          if [ -n "$REV" ]; then git -C work/burn-onnx checkout --quiet "$REV"; fi
+          git -C work/burn-onnx rev-parse HEAD | tee "out/$TAG/burn-onnx.rev"
+          grep -m1 -o 'rev = "[0-9a-f]\{40\}"' work/burn-onnx/Cargo.toml | grep -o '[0-9a-f]\{40\}' | tee work/burn.rev "out/$TAG/burn.rev"
+          mkdir -p work/burn-onnx/crates/burn-onnx/examples
+          cp batches/0026/gen_bytes.rs work/burn-onnx/crates/burn-onnx/examples/gen_bytes.rs
+          cd work/burn-onnx
+          /usr/bin/time -v cargo build --release --locked -p burn-onnx --bin onnx2burn --example gen_bytes > "../../out/$TAG/tool-build.log" 2>&1 || rc=$?
+          tail -n 12 "../../out/$TAG/tool-build.log"
+          exit "${rc:-0}"
+      - id: codegen
+        name: "onnx2burn on the graph: the File source and its burnpack"
+        continue-on-error: true
+        if: steps.tool.outcome == 'success'
+        run: bash batches/0010/burn.sh codegen "$TAG"
+      - id: gen
+        name: "gen_bytes on the graph: the Bytes source and its burnpack"
+        continue-on-error: true
+        if: steps.tool.outcome == 'success'
+        run: bash batches/0026/wasm.sh gen "$TAG"
+      # Batch 0026's two auxiliary changes, unchanged and in its order but without the build that is known to fail first.
+      - id: patch
+        name: "auxiliary (batch 0026): cubecl-environment patched to take target_family wasm for a browser only when target_os is not none"
+        continue-on-error: true
+        if: steps.gen.outcome == 'success'
+        run: bash batches/0026/wasm.sh patch "$TAG"
+      - id: genfix
+        name: "auxiliary (batch 0026): burn-onnx's slice node writes an open range for an end of i64::MAX, and the Bytes source is generated again"
+        continue-on-error: true
+        if: steps.patch.outcome == 'success'
+        run: bash batches/0026/wasm.sh genfix "$TAG"
+      - id: build
+        name: "cargo build --target wasm32v1-none, the Bytes source"
+        continue-on-error: true
+        if: steps.genfix.outcome == 'success'
+        run: bash batches/0026/wasm.sh build "$TAG" patched
+      - id: validate
+        name: "the module validates as WebAssembly 1.0 plus mutable globals"
+        continue-on-error: true
+        if: steps.build.outcome == 'success'
+        run: bash batches/0026/wasm.sh validate "$TAG"
+      - id: run
+        name: "the module run in wasmtime, the weights written into its linear memory"
+        continue-on-error: true
+        if: steps.build.outcome == 'success'
+        run: |
+          mapfile -t ids < "work/side/$TAG/ids.txt"
+          m="out/$TAG/patched.wasm"
+          sha256sum "$m" "work/genb/$TAG/model.bpk" | tee "out/$TAG/run-inputs.sha256"
+          mkdir -p "out/$TAG/wasm-logits"
+          INPUT_ORDER=$(cat "work/side/$TAG/input-order.txt")
+          export INPUT_ORDER
+          rc=0
+          /usr/bin/time -v python batches/0026/host.py "$m" "work/genb/$TAG/model.bpk" "out/$TAG/wasm-logits" 2048 "${ids[@]}" > "out/$TAG/host.log" 2>&1 || rc=$?
+          tail -n 40 "out/$TAG/host.log"
+          awk '/Maximum resident/{print "host_peak_kb="$NF} /Elapsed \(wall/{print "host_elapsed="$NF}' "out/$TAG/host.log" | tee -a "$GITHUB_OUTPUT"
+          exit "$rc"
+      - id: burnpacks
+        name: "the two burnpacks and the two sources: records, censuses, the comparison of the param_ids, the map from ONNX nodes"
+        continue-on-error: true
+        if: steps.gen.outcome == 'success' && steps.codegen.outcome == 'success'
+        run: |
+          python batches/0028/burn_tools.py run "$TAG" "work/graph/$TAG/model.onnx" "work/gen/$TAG/model.bpk" "work/gen/$TAG/model.rs" "work/genb/$TAG/model.bpk" "work/genb/$TAG/model.rs" "out/$TAG"
+      - id: census
+        name: "the module: census of blank and empty constructs, graph of functions"
+        continue-on-error: true
+        if: steps.build.outcome == 'success'
+        run: python batches/0028/wasm_tools.py census "$TAG" wasm "out/$TAG/patched.wasm" "out/$TAG" wasm-tools
+      - id: search
+        name: "the search for weights in the module's bytes, and its controls"
+        continue-on-error: true
+        if: steps.build.outcome == 'success'
+        run: python batches/0028/wasm_tools.py search "out/$TAG/patched.wasm" "work/genb/$TAG/model.bpk" "out/$TAG/weights-search.json"
+      - name: Disk after
+        if: always()
+        run: df -h / | tee "out/$TAG/disk-after.txt"
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee "out/$TAG/outcomes.json"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: burn-${{ matrix.tag }}
+          path: out/
+          retention-days: 7
+
+  closed:
+    name: "04 batch 0027's module, built for wasm32v1-none and put through the same census"
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p out/closed
+          python -m pip install --quiet numpy ml_dtypes cbor2
+          rustup toolchain install stable --profile minimal --no-self-update
+          rustup default stable
+          rustup target add wasm32v1-none
+          { rustc -V; cargo -V; } | tee out/closed/rust.version
+          gh release download "$WASM_TOOLS" -R bytecodealliance/wasm-tools -p '*x86_64-linux.tar.gz' -O - | sudo tar -xz -C /usr/local/bin --strip-components=1
+          wasm-tools --version | tee out/closed/wasm-tools.version
+      - id: build
+        name: "cargo build --target wasm32v1-none, batch 0027's crate"
+        run: |
+          cd batches/0027/wasm
+          cargo build --release --target wasm32v1-none 2>&1 | tail -n 5
+      - id: census
+        name: "the module: census of blank and empty constructs, graph of functions"
+        run: python batches/0028/wasm_tools.py census closed closed batches/0027/wasm/target/wasm32v1-none/release/lmnf_probe.wasm out/closed wasm-tools
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" | tee out/closed/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: wasm27-closed
+          path: out/
+          retention-days: 7
+
+  maps:
+    name: "05 the graphs and maps in Oxigraph, the two models compared, the grader"
+    needs: [plan, selftests, inputs, gguf, burn, closed]
+    if: always() && needs.plan.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      TAGS: ${{ needs.plan.outputs.tags }}
+      BURN_TAGS: ${{ needs.plan.outputs.burn_tags }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          mkdir -p results work
+          python -m pip install --quiet numpy ml_dtypes cbor2 huggingface_hub oxigraph
+          oxigraph --version | tee results/oxigraph.version
+          python -m pip freeze > results/versions.txt
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          pattern: "{selftests,inputs-*,gguf-*,burn-*,wasm27-*}"
+          path: artifacts
+      - name: The two safetensors files, for P1, P20 and the comparison entry by entry
+        id: st
+        continue-on-error: true
+        if: contains(needs.plan.outputs.tags, 'base') && contains(needs.plan.outputs.tags, 'instruct')
+        run: |
+          python batches/0028/fetch.py HuggingFaceTB/SmolLM2-135M 93efa2f097d58c2a74874c7e644dbc9b0cee75a2 work/hf-base
+          python batches/0028/fetch.py HuggingFaceTB/SmolLM2-135M-Instruct 12fd25f77366fa6b3b4b768ec3050bf629380bac work/hf-instruct
+          sha256sum work/hf-base/model.safetensors work/hf-instruct/model.safetensors | tee results/st.sha256
+      - id: weights
+        name: "weights_compare.py: P1's header facts, P20's scan, base against Instruct entry by entry"
+        continue-on-error: true
+        if: steps.st.outcome == 'success'
+        run: python batches/0028/weights_compare.py work/hf-base/model.safetensors work/hf-instruct/model.safetensors results/weights.json
+      - id: combine
+        name: "combine.py: the dataset, Oxigraph, the SPARQL checks, the observations"
+        continue-on-error: true
+        run: |
+          find artifacts -maxdepth 2 | sort | head -n 60
+          python batches/0028/combine.py artifacts results "$TAGS" "$BURN_TAGS" "$(command -v oxigraph)"
+          ls -l results
+      - id: grade
+        name: "grade28.py: P1 to P20 and the controls C1 to C5; fails if a prediction is refuted or not checked"
+        run: |
+          python batches/0028/grade28.py results/observations.json results/grade | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: The tables
+        if: always()
+        run: |
+          if [ -f results/census-table.md ]; then cat results/census-table.md >> "$GITHUB_STEP_SUMMARY"; fi
+          { echo "## outcomes"; echo '```'; echo "$STEPS" | jq -r 'to_entries[] | "\(.key) \(.value.outcome)"'; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+        env:
+          STEPS: ${{ toJSON(steps) }}
+      - name: Outcomes of the observations
+        if: always()
+        env:
+          STEPS: ${{ toJSON(steps) }}
+        run: echo "$STEPS" > results/outcomes.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: results
+          path: results/
+          retention-days: 30
+
+  report:
+    # A commit status named after the batch, so that the pull request's checks tab shows the batch run itself.
+    name: report the batch run on the commit
+    needs: [plan, selftests, inputs, gguf, burn, closed, maps]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RESULTS: ${{ toJSON(needs) }}
+    steps:
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          pattern: "{selftests,inputs-*,gguf-*,burn-*,wasm27-*,results}"
+          path: artifacts
+      - run: |
+          state=success
+          echo "$RESULTS" | jq -e '[.[] | .result] | all(. == "success" or . == "skipped")' > /dev/null || state=failure
+          test -d artifacts || state=failure
+          find artifacts -name outcomes.json 2> /dev/null | sort | while read -r f; do
+            jq -r --arg f "$f" 'to_entries[] | select(.value.outcome == "failure") | "\($f): \(.key)"' "$f"
+          done | tee failed-steps.txt
+          if test -s failed-steps.txt; then state=failure; fi
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -f state="$state" -f context="batch 0028" \
+            -f description="$(echo "$(wc -l < failed-steps.txt) failed steps; $(echo "$RESULTS" | jq -r 'to_entries | map("\(.key) \(.value.result)") | join(", ")')" | cut -c1-140)" \
+            -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" > /dev/null

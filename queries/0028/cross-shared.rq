@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Base against Instruct: the tensors of the Instruct model with a counterpart among the base model's, by format. For
+# the weights of a format the count is 0; for the constants of a burnpack it is not.
+PREFIX p: <urn:lmnf:b28:p:>
+SELECT ?format (COUNT(DISTINCT ?o) AS ?instruct_tensors_with_a_base_counterpart)
+WHERE {
+  ?o (p:identicalTo|p:transposeOf|p:reshapeOf) ?t ;
+     p:inArtifact ?oa .
+  ?t p:inArtifact ?ta .
+  FILTER(STRSTARTS(STR(?oa), "urn:lmnf:b28:a:instruct:") && STRSTARTS(STR(?ta), "urn:lmnf:b28:a:base:"))
+  BIND(STRAFTER(STR(?oa), "urn:lmnf:b28:a:instruct:") AS ?format)
+}
+GROUP BY ?format
+ORDER BY ?format

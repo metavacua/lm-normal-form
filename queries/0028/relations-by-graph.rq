@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# The edges of each map, by relation: identical, transposed, reshaped, permuted by llama.cpp, unmatched, and the
+# map from ONNX nodes to the statements and fields of the generated Rust.
+PREFIX p: <urn:lmnf:b28:p:>
+SELECT ?g ?relation (COUNT(*) AS ?edges)
+WHERE {
+  GRAPH ?g { ?s ?relation ?o }
+  FILTER(?relation IN (p:identicalTo, p:transposeOf, p:reshapeOf, p:llamaCppPermutationOf, p:unmatched, p:generatedAs))
+}
+GROUP BY ?g ?relation
+ORDER BY ?g ?relation

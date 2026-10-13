@@ -1,0 +1,4 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# P15 (a), the terms of the triples: true if any graph of the dataset has a blank node as a subject or an object.
+ASK { GRAPH ?g { ?s ?p ?o } FILTER(isBlank(?s) || isBlank(?o)) }

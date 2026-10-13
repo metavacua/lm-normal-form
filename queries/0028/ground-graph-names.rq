@@ -1,0 +1,4 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# P15 (a), the names of the graphs: true if any graph of the dataset is named by a blank node.
+ASK { GRAPH ?g { ?s ?p ?o } FILTER(isBlank(?g)) }

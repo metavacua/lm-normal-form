@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# For each format and each model: how many safetensors tensors have 0, 1, 2 ... tensors of that format related to them
+# (identical, transposed, reshaped, permuted by llama.cpp). The map is total and one to one up to the tied copy when
+# the histogram is {1: 271, 2: 1} for ONNX and {1: 272} for GGUF.
+PREFIX p: <urn:lmnf:b28:p:>
+PREFIX c: <urn:lmnf:b28:c:>
+SELECT ?model ?format ?counterparts (COUNT(?t) AS ?st_tensors)
+WHERE {
+  {
+    SELECT ?model ?format ?t (COUNT(DISTINCT ?o) AS ?counterparts)
+    WHERE {
+      VALUES (?model ?format) { ("base" "onnx") ("instruct" "onnx") ("base" "gguf-f32") ("instruct" "gguf-f32") }
+      ?t a c:Tensor ; p:inArtifact ?sta .
+      FILTER(?sta = IRI(CONCAT("urn:lmnf:b28:a:", ?model, ":st")))
+      OPTIONAL {
+        ?o (p:identicalTo|p:transposeOf|p:reshapeOf|p:llamaCppPermutationOf) ?t ;
+           p:inArtifact ?oa .
+        FILTER(?oa = IRI(CONCAT("urn:lmnf:b28:a:", ?model, ":", ?format)))
+      }
+    }
+    GROUP BY ?model ?format ?t
+  }
+}
+GROUP BY ?model ?format ?counterparts
+ORDER BY ?model ?format ?counterparts
