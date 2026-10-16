@@ -1,0 +1,149 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0029: the feasibility region of SmolLM2-135M's weights. Written down in docs/batches/0029.md.
+#
+# t1      cell 01: every one of the 49,152 token ids as a one-token prompt, exact; then the null variant (control a)
+#         and the NaN copy on 512 rows (control b).
+# ibp     cell 02: auto_LiRPA interval bounds at lengths 1, 2 and 8 from the hull of the embedding table, the soundness
+#         check against cell 01's exact extrema, and control c.
+# report  the graded table against the registration.
+name: batch 0029
+
+on:
+  push:
+    branches: ["batch/0029-**"]
+    paths: [".github/workflows/batch-0029.yml", "batches/0029/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-0029-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  MODEL: HuggingFaceTB/SmolLM2-135M
+  HF_REVISION: 93efa2f097d58c2a74874c7e644dbc9b0cee75a2
+  AUTO_LIRPA_SHA: e3930353a3589f7d10879f1e71223d1eefb57196
+  LMNF_THREADS: "4"
+
+jobs:
+  t1:
+    name: "01 exact table at length 1, and controls a and b"
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install the Python packages
+        run: |
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet "transformers" "numpy>=2" safetensors huggingface_hub
+          mkdir -p out/t1 && python -m pip freeze > out/t1/versions.txt
+          /bin/grep -m1 'model name' /proc/cpuinfo | tee out/t1/cpu.txt
+          free -m | tee out/t1/memory.txt
+      - name: The model at the registered revision
+        run: |
+          hf download "$MODEL" --revision "$HF_REVISION" --local-dir work/model --exclude "onnx/*" --exclude "*.gguf" >/dev/null
+          sha256sum work/model/model.safetensors work/model/config.json | tee out/t1/inputs.sha256
+      - name: Cell 01, the exact table
+        run: python batches/0029/enumerate_t1.py work/model out/t1 2>&1 | tail -n 30
+      - name: Control a, the null variant
+        run: python batches/0029/enumerate_t1.py work/model out/t1_null --variant null 2>&1 | tail -n 5
+      - name: Control b, the NaN copy on 512 rows
+        run: python batches/0029/enumerate_t1.py work/model out/t1_nan --variant nan --limit 512 2>&1 | tail -n 5
+      - name: Gates of the instrument
+        run: |
+          python - <<'EOF'
+          import json, sys
+          t = json.load(open('out/t1/t1_summary.json')); n = json.load(open('out/t1_nan/t1_summary.json'))
+          assert t['rows'] == t['model']['vocab_size'], t['rows']
+          assert n['finite'] is False, 'the NaN copy was reported finite: the finiteness report cannot fail'
+          print('rows', t['rows'], 'finite', t['finite'], 'distinct rows', t['distinct_rows'], 'distinct argmax', t['distinct_argmax'])
+          EOF
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: batch-0029-t1
+          path: out/
+          retention-days: 1
+
+  ibp:
+    name: "02 sound bounds at lengths 1, 2, 8, and control c"
+    runs-on: ubuntu-latest
+    needs: t1
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install the Python packages, auto_LiRPA at the registered commit
+        run: |
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet "transformers" "numpy>=2" safetensors huggingface_hub
+          python -m pip install --quiet "git+https://github.com/Verified-Intelligence/auto_LiRPA@${AUTO_LIRPA_SHA}" 2>&1 | tail -n 3
+          mkdir -p out/ibp && python -m pip freeze > out/ibp/versions.txt
+          python -c "import auto_LiRPA, torch; print('auto_LiRPA', getattr(auto_LiRPA,'__version__','?'), 'torch', torch.__version__)"
+      - uses: actions/download-artifact@v7
+        with:
+          name: batch-0029-t1
+          path: out/
+      - name: The model at the registered revision
+        run: |
+          hf download "$MODEL" --revision "$HF_REVISION" --local-dir work/model --exclude "onnx/*" --exclude "*.gguf" >/dev/null
+          sha256sum work/model/model.safetensors | tee out/ibp/inputs.sha256
+          diff <(/bin/grep model.safetensors out/t1/inputs.sha256) out/ibp/inputs.sha256
+      - name: Cell 02, the bounds
+        run: python batches/0029/ibp.py work/model out/ibp out/t1/t1_taps.json 2>&1 | tail -n 60
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: batch-0029-ibp
+          path: out/ibp/
+          retention-days: 1
+
+  report:
+    name: "03 the graded table"
+    runs-on: ubuntu-latest
+    needs: [t1, ibp]
+    if: always()
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --quiet "numpy>=2" torch --index-url https://download.pytorch.org/whl/cpu
+      - uses: actions/download-artifact@v7
+        with:
+          name: batch-0029-t1
+          path: out/
+      - uses: actions/download-artifact@v7
+        with:
+          name: batch-0029-ibp
+          path: out/ibp/
+      - name: Grade against the registration
+        run: |
+          python batches/0029/grade29.py out | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: batch-0029-graded
+          path: |
+            out/graded.md
+            out/graded.tsv
+          retention-days: 1
+      - name: The jobs this report depends on
+        run: |
+          echo "t1: ${{ needs.t1.result }}  ibp: ${{ needs.ibp.result }}"
+          test "${{ needs.t1.result }}" = success && test "${{ needs.ibp.result }}" = success
