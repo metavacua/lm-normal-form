@@ -86,6 +86,22 @@ def main():
     okc = c.get("ratio") is not None and c["ratio"] >= 16
     line("control c", "as predicted" if okc else ("refuted" if c.get("ratio") is not None else "not graded (no bound to compare)"), f"{c}",
          "resid.1 bound grows by at least 16 under 2^8 scaling of layer 0 down")
+    # addendum 1: the structural bounds (cell 04)
+    st = rd(root, "structural", "structural_summary.json")
+    if st:
+        bad = {k: v for k, v in st["checks"].items() if not v["contained"]}
+        line("P6", "as predicted" if st["all_contained"] else "refuted",
+             f"taps checked {len(st['checks'])}; not contained: {list(bad)[:8]}; max violation {max((v['max_violation'] for v in st['checks'].values()), default=None)}",
+             "structural bounds contain the exact length-1 extrema at every tapped point")
+        p7 = st["resid_after_last_block_bound_max"] < 1e6 and st["logit_bound_max"] < 1e4
+        line("P7", "as predicted" if p7 else "refuted", f"resid bound after last block {st['resid_after_last_block_bound_max']:.4g}; logit bound {st['logit_bound_max']:.4g}",
+             "residual bound below 1e6, logit bound below 1e4")
+        line("P8", "as predicted" if st["score_bound_max"] < 1e3 else "refuted", f"score bound max {st['score_bound_max']:.4g}", "attention-score bound below 1e3 for every head")
+        cd = st["control_d"]
+        line("control d", "as predicted" if (cd["ratio_is_exact"] and cd["other_blocks_unchanged"]) else "refuted", f"{cd}",
+             "block 1's FFN box scales by exactly 2^8; no other block changes")
+    else:
+        line("P6, P7, P8, control d", "not run", "", "")
     # write
     md = ["# Batch 0029, graded", "", "| line | verdict | measured | criterion |", "|---|---|---|---|"]
     md += [f"| {a} | {b} | {str(c).replace('|', '/')} | {d} |" for a, b, c, d in rows]
@@ -95,6 +111,12 @@ def main():
            "- taps at length 1 (abs max, slack in doublings): " + "; ".join(f"{k} {v['abs_max']:.4g}/{v['slack_doublings'] and round(v['slack_doublings'],1)}" for k, v in t1["taps"].items()),
            "- IBP by length: " + "; ".join(f"T={T}: " + ", ".join(f"{k} |max| {v.get('abs_max')}" for k, v in d.items()) for T, d in ibp["lengths"].items()),
            f"- embedding hull: {ibp['embedding_hull']}; IBP {ibp['seconds']} s, {ibp['peak_rss_mb']} MB; auto_LiRPA {ibp.get('auto_lirpa_version')}"]
+    if st:
+        md += ["- structural bounds (every length), per block: resid bound max / attn box max / ffn box max / score bound max: " +
+               "; ".join(f"{k+1}: {b['resid_bound_max']:.4g}/{b['attn_box_max']:.4g}/{b['ffn_box_max']:.4g}/{b['score_bound_max']:.3g}" for k, b in enumerate(st["per_block"])),
+               "- structural looseness (bound / exact |max|, min over coordinates) at resid.1, resid.12, last resid, gate.12, logits: " +
+               ", ".join(f"{k}={st['checks'][k]['looseness_min']:.3g}" for k in ("resid.1", "resid.12", f"resid.{st['config']['num_hidden_layers']}", "gate.12", "logits") if k in st["checks"]),
+               f"- structural slack in doublings: {st['slack_doublings']}; final-norm bound {st['final_norm_bound_max']:.4g}; {st['seconds']} s"]
     open(os.path.join(root, "graded.md"), "w", encoding="utf-8").write("\n".join(md) + "\n")
     open(os.path.join(root, "graded.tsv"), "w", encoding="utf-8").write("\n".join("\t".join(map(str, r)) for r in rows) + "\n")
     print("\n".join(md))
