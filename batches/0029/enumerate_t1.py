@@ -80,9 +80,24 @@ def main():
                     print(f"{clock.s():7.1f}s rows {start+logits.shape[0]}/{n}  rss {common.peak_rss_mb():.0f} MB", flush=True)
     ent = np.concatenate(ent_all); pmax = np.concatenate(pmax_all)
     tap_summary = taps.summary()
+    # rows that coincide: are they the same input letter (identical embedding rows), and what strings are they?
+    groups = {}
+    for line in open(os.path.join(a.out_dir, "t1_rows.tsv"), encoding="utf-8").read().splitlines()[1:]:
+        f = line.split("\t"); groups.setdefault(f[7], []).append(int(f[0]))
+    dup_groups = []
+    E = model.model.embed_tokens.weight
+    try:
+        from transformers import AutoTokenizer
+        tok = AutoTokenizer.from_pretrained(a.model_dir)
+    except Exception:
+        tok = None
+    for ids_ in sorted(v for v in groups.values() if len(v) > 1):
+        same_emb = all(bool(torch.equal(E[ids_[0]], E[j])) for j in ids_[1:])
+        dup_groups.append({"ids": ids_, "embedding_rows_identical": same_emb,
+                           "tokens": ([tok.convert_ids_to_tokens(j) for j in ids_] if tok else None)})
     summary = {
         "model": facts, "variant": vinfo, "rows": int(n), "finite": bool(finite),
-        "distinct_rows": int(len(row_hashes)), "distinct_argmax": int((argmax_count > 0).sum()),
+        "distinct_rows": int(len(row_hashes)), "duplicate_groups": dup_groups, "distinct_argmax": int((argmax_count > 0).sum()),
         "argmax_top": [(int(i), int(argmax_count[i])) for i in np.argsort(-argmax_count)[:10]],
         "matrix_sha256": matrix_h.hexdigest(),
         "entropy_bits": {"min": float(ent.min()), "median": float(np.median(ent)), "max": float(ent.max())},

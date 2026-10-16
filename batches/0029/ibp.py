@@ -54,9 +54,12 @@ class LlamaPrefix(nn.Module):
             self.register_buffer(f"wd{k}", L.mlp.down_proj.weight.data.t().contiguous())
         self.register_buffer("g_final", model.model.norm.weight.data)
         self.register_buffer("w_head", model.lm_head.weight.data.t().contiguous())
-        # rotary tables for positions 0..T-1, the transformers convention (rotate_half: pairs (i, i + hd/2))
-        theta = float(getattr(cfg, "rope_theta", 10000.0))
-        inv = 1.0 / (theta ** (torch.arange(0, self.hd, 2, dtype=torch.float32) / self.hd))
+        # rotary tables for positions 0..T-1, the transformers convention (rotate_half: pairs (i, i + hd/2)).
+        # The inverse frequencies are taken from the loaded model's own rotary module, not recomputed from a config
+        # field: transformers 5 keeps rope_theta under rope_parameters, and the first run read it as None.
+        inv = model.model.rotary_emb.inv_freq.detach().to(torch.float32).clone()
+        assert inv.shape[-1] == self.hd // 2, (inv.shape, self.hd)
+        self.theta_from_inv_freq = float(inv[1] ** (-self.hd / 2.0)) if inv.numel() > 1 else None
         pos = torch.arange(T, dtype=torch.float32)
         fr = torch.outer(pos, inv)                               # (T, hd/2)
         emb = torch.cat([fr, fr], dim=-1)                        # (T, hd)
@@ -66,8 +69,11 @@ class LlamaPrefix(nn.Module):
         self.register_buffer("mask", mask)
 
     def rms(self, x, g):
+        # x * reciprocal(sqrt(.)) and not x / sqrt(.): auto_LiRPA's BoundDiv.forward has an ad-hoc LayerNorm branch that
+        # fires whenever the divisor is a Sqrt node, assumes the dividend is a mean-subtracted input with a parent node,
+        # and both crashes on a root input and computes the wrong thing for RMSNorm (bivariate.py, BoundDiv, "FIXME").
         var = (x * x).mean(dim=-1, keepdim=True)
-        return x / torch.sqrt(var + self.eps) * g
+        return x * torch.reciprocal(torch.sqrt(var + self.eps)) * g
 
     def rope(self, x):
         half = self.hd // 2
@@ -100,19 +106,29 @@ class LlamaPrefix(nn.Module):
         return x
 
 
-def exactness(model, prefix_logits_T, T, n_tokens, seed=29):
-    """max |logits(prefix module) - logits(transformers)| over n_tokens sequences of length T."""
+def exactness(model, T, n_tokens, seed=29):
+    """The explicit forward against transformers over n_tokens sequences of length T: the max |diff| of the logits,
+    per position, and of the residual after block 1 (to localise a disagreement to attention or to the rest)."""
     g = torch.Generator().manual_seed(seed)
     V = model.config.vocab_size
-    worst = 0.0
+    L = model.config.num_hidden_layers
+    full = LlamaPrefix(model, L, True, T).eval()
+    one = LlamaPrefix(model, 1, False, T).eval()
+    worst = 0.0; per_pos = [0.0] * T; worst_block1 = 0.0
     with torch.inference_mode():
         for i in range(n_tokens):
             ids = torch.randint(0, V, (1, T), generator=g) if T > 1 else torch.tensor([[i * (V // n_tokens)]])
-            ref = model(input_ids=ids).logits.to(torch.float32)
+            out = model(input_ids=ids, output_hidden_states=True)
+            ref = out.logits.to(torch.float32)
             emb = model.model.embed_tokens(ids)
-            got = prefix_logits_T(emb)
-            worst = max(worst, float((ref - got).abs().max()))
-    return worst
+            got = full(emb)
+            d = (ref - got).abs()
+            worst = max(worst, float(d.max()))
+            for p in range(T):
+                per_pos[p] = max(per_pos[p], float(d[0, p].max()))
+            worst_block1 = max(worst_block1, float((out.hidden_states[1].to(torch.float32) - one(emb)).abs().max()))
+    return {"max_abs_diff_logits": worst, "per_position": per_pos, "max_abs_diff_resid_after_block1": worst_block1,
+            "theta_from_inv_freq": full.theta_from_inv_freq}
 
 
 def bounds_for(module, x_lo, x_hi):
@@ -161,9 +177,7 @@ def main():
     # exactness of the explicit forward against transformers, at each length
     for T in lengths:
         try:
-            full = LlamaPrefix(model, L, True, T).eval()
-            with torch.inference_mode():
-                out["exactness"][str(T)] = {"max_abs_diff_logits": exactness(model, lambda emb: full(emb), T, 16 if T > 1 else 64)}
+            out["exactness"][str(T)] = exactness(model, T, 16 if T > 1 else 64)
         except Exception as e:
             out["exactness"][str(T)] = {"error": repr(e), "trace": traceback.format_exc()[-2000:]}
         print(f"{clock.s():7.1f}s exactness T={T}: {out['exactness'][str(T)]}", flush=True)
@@ -196,7 +210,9 @@ def main():
         out["lengths"][str(T)] = res
     # control (c): layer 0's down-projection scaled; bound of resid.1 at length 1 must grow
     try:
-        base = out["lengths"]["1"]["resid.1"]["abs_max"]
+        base = out["lengths"]["1"]["resid.1"].get("abs_max")
+        if base is None:
+            raise RuntimeError("no length-1 bound of resid.1 to compare against: " + str(out["lengths"]["1"]["resid.1"].get("error")))
         w = model.model.layers[0].mlp.down_proj.weight
         w.mul_(a.control_scale)
         mod = LlamaPrefix(model, 1, False, 1).eval()

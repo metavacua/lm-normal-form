@@ -48,7 +48,7 @@ def main():
     # P3
     p3 = t1["finite"] and t1["distinct_rows"] == t1["rows"] and t1["distinct_argmax"] >= 100
     line("P3", "as predicted" if p3 else "refuted",
-         f"finite {t1['finite']}; distinct rows {t1['distinct_rows']}/{t1['rows']}; distinct argmax {t1['distinct_argmax']}",
+         f"finite {t1['finite']}; distinct rows {t1['distinct_rows']}/{t1['rows']}; duplicates {t1.get('duplicate_groups')}; distinct argmax {t1['distinct_argmax']}",
          "finite, all rows distinct, at least 100 argmax values")
     # P4
     p4 = t1["resid_abs_max"] < 1e3 and t1["logit_abs_max"] < 1e2
@@ -84,7 +84,8 @@ def main():
     # control c
     c = ibp.get("control_c", {})
     okc = c.get("ratio") is not None and c["ratio"] >= 16
-    line("control c", "as predicted" if okc else "refuted", f"{c}", "resid.1 bound grows by at least 16 under 2^8 scaling of layer 0 down")
+    line("control c", "as predicted" if okc else ("refuted" if c.get("ratio") is not None else "not graded (no bound to compare)"), f"{c}",
+         "resid.1 bound grows by at least 16 under 2^8 scaling of layer 0 down")
     # write
     md = ["# Batch 0029, graded", "", "| line | verdict | measured | criterion |", "|---|---|---|---|"]
     md += [f"| {a} | {b} | {str(c).replace('|', '/')} | {d} |" for a, b, c, d in rows]

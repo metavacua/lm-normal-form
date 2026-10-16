@@ -67,7 +67,9 @@ def model_facts(model):
     return {
         "hidden_size": cfg.hidden_size, "num_hidden_layers": cfg.num_hidden_layers, "num_attention_heads": cfg.num_attention_heads,
         "num_key_value_heads": cfg.num_key_value_heads, "intermediate_size": cfg.intermediate_size, "vocab_size": cfg.vocab_size,
-        "rms_norm_eps": cfg.rms_norm_eps, "rope_theta": getattr(cfg, "rope_theta", None), "tie_word_embeddings": cfg.tie_word_embeddings,
+        "rms_norm_eps": cfg.rms_norm_eps,
+        "rope_theta": (getattr(cfg, "rope_parameters", None) or {}).get("rope_theta", getattr(cfg, "rope_theta", None)),
+        "tie_word_embeddings": cfg.tie_word_embeddings,
         "head_is_embedding": bool(model.lm_head.weight.data_ptr() == model.model.embed_tokens.weight.data_ptr()),
         "parameters": int(sum(p.numel() for p in model.parameters())),
         "tensors": int(len(list(model.state_dict().keys()))),
