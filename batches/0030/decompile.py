@@ -133,7 +133,7 @@ def main():
     # round trip: serialise from the store and reload, counts must agree
     rt = os.path.join(out_dir, "instance.roundtrip.nt")
     with open(rt, "wb") as f:
-        store.dump(f, ox.RdfFormat.N_TRIPLES)
+        store.dump(f, ox.RdfFormat.N_TRIPLES, from_graph=ox.DefaultGraph())
     store2 = ox.Store(); store2.bulk_load(path=rt, format=ox.RdfFormat.N_TRIPLES); count2 = sum(1 for _ in store2)
     summary = {"triples_written": n_tr, "triples_loaded": count, "triples_after_round_trip": count2, "blank_nodes": blank,
                "tensor_sha256_in_graph_equal_bytes": sha_ok, "nt_bytes": nt_bytes, "safetensors_bytes": st_bytes, "size_ratio": nt_bytes / st_bytes,

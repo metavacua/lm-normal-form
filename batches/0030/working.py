@@ -84,24 +84,30 @@ def main():
         out["onnxruntime"] = {"inputs": names, "max_abs_diff_logits": worst}
     except Exception as e:
         out["errors"]["onnxruntime"] = repr(e)
-    # 02c llama.cpp greedy text
+    # 02c llama.cpp: its own tokenization of each prompt (llama-tokenize --ids), compared with the fast tokenizer's; its
+    # greedy continuation (llama-completion, temperature 0), compared with PyTorch's greedy continuation from the SAME ids
     try:
-        simple = os.path.join(lbin, "llama-simple"); cli = os.path.join(lbin, "llama-cli")
+        tokz = os.path.join(lbin, "llama-tokenize"); comp = os.path.join(lbin, "llama-completion")
         legs = {}
         for p in PROMPTS:
-            if os.path.exists(simple):
-                rc, so, se = run([simple, "-m", gguf, "-n", "16", p])
-                legs[p] = {"tool": "llama-simple", "rc": rc, "stdout": so[-400:], "stderr_tail": se[-300:]}
-            elif os.path.exists(cli):
-                rc, so, se = run([cli, "-m", gguf, "-p", p, "-n", "16", "--temp", "0", "-no-cnv", "--no-display-prompt"])
-                legs[p] = {"tool": "llama-cli", "rc": rc, "stdout": so[-400:], "stderr_tail": se[-300:]}
+            leg = {"tool": "llama-completion" if os.path.exists(comp) else None}
+            rc, so, se = run([tokz, "-m", gguf, "-p", p, "--ids", "--log-disable"])
+            m = re.search(r"\[([0-9,\s]*)\]", so)
+            l_ids = [int(x) for x in m.group(1).split(",")] if m and m.group(1).strip() else None
+            f_ids = tok(p, add_special_tokens=False)["input_ids"]
+            leg.update({"llama_ids": l_ids, "fast_ids": f_ids, "tokenization_equal": l_ids == f_ids, "tokenize_rc": rc})
+            if l_ids:
+                with torch.inference_mode():
+                    g2 = model.generate(torch.tensor([l_ids]), max_new_tokens=16, do_sample=False)
+                leg["pytorch_from_llama_ids"] = {"ids": g2[0][len(l_ids):].tolist(), "text": tok.decode(g2[0][len(l_ids):])}
+            if leg["tool"]:
+                rc, so, se = run([comp, "-m", gguf, "-p", p, "-n", "16", "--temp", "0", "--no-display-prompt", "--no-warmup"])
+                leg.update({"rc": rc, "stdout": so[-400:], "stderr_tail": se[-300:], "continuation": so.strip()})
+                ref = (leg.get("pytorch_from_llama_ids") or greedy[p])["text"].strip()
+                leg["equals_pytorch"] = bool(rc == 0 and so.strip()[:16] == ref[:16])
             else:
-                legs[p] = {"tool": None, "rc": None, "stdout": "", "stderr_tail": "no llama-simple or llama-cli in " + lbin}
-            cont = legs[p]["stdout"]
-            if legs[p]["tool"] == "llama-simple" and cont.startswith(p):
-                cont = cont[len(p):]
-            legs[p]["continuation"] = cont.strip()
-            legs[p]["equals_pytorch"] = bool(legs[p]["rc"] == 0 and cont.strip().startswith(greedy[p]["text"].strip()[:16]))
+                leg.update({"rc": None, "stdout": "", "stderr_tail": "no llama-completion in " + lbin, "continuation": "", "equals_pytorch": False})
+            legs[p] = leg
         out["llamacpp"] = legs
     except Exception as e:
         out["errors"]["llamacpp"] = repr(e)
