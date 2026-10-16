@@ -1,0 +1,134 @@
+# Does an existing tool turn SmolLM2-135M's ONNX graph into RDF without blowing it up,
+# and with no blank nodes?
+#
+# Two existing routes, nothing hand-translated here, each in its own job so that one
+# failing does not hide the other:
+#   onnx2rdf : ONNX2RDF (`onnx-parser`, RML-based) straight from the .onnx
+#   facade-x : ONNX -> protobuf JSON (weights as ONNX external data) -> SPARQL Anything
+#              (Facade-X, `blank-nodes=false`)
+# Measured for each: time and peak memory, size of the RDF against the ONNX, triples,
+# blank nodes (must be none), the longest literal (arrays inlined as text show up here),
+# and whether argument order is kept (rdf:_n container properties).
+
+name: onnx-rdf
+
+on:
+  push:
+    branches: [exp/onnx-rdf]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  MODEL: HuggingFaceTB/SmolLM2-135M
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults: { run: { shell: bash } }
+    steps:
+      - uses: actions/setup-python@v7
+        with: { python-version: '3.12' }
+      - name: Install the exporter
+        run: |
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet "optimum[onnxruntime]" onnx
+          python -m pip list 2>/dev/null | grep -i -E '^(torch|optimum|onnx|onnxruntime|transformers) '
+      - name: Export to ONNX (Optimum)
+        run: |
+          mkdir -p work/onnx
+          /usr/bin/time -v optimum-cli export onnx --model "$MODEL" --task text-generation work/onnx
+          ls -l work/onnx
+      - uses: actions/upload-artifact@v7
+        with: { name: onnx, path: work/onnx, retention-days: 1 }
+
+  onnx2rdf:
+    needs: export
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults: { run: { shell: bash } }
+    steps:
+      - uses: actions/setup-python@v7
+        with: { python-version: '3.12' }
+      - uses: actions/download-artifact@v8
+        with: { name: onnx, path: work/onnx }
+      - name: Install ONNX2RDF and Oxigraph
+        run: |
+          python -m pip install --quiet onnx onnx-2-rdf oxigraph
+          python -m pip list 2>/dev/null | grep -i -E '^(onnx|onnx-2-rdf|oxigraph) '
+      - name: onnx-parser (output capped at 8 GB so a blowup is a measurement, not a full disk)
+        run: |
+          mkdir -p work/rdf; df -h . | tail -1
+          prlimit --fsize=8000000000 /usr/bin/time -v onnx-parser work/onnx/model.onnx --target_path work/rdf --rdf_format nquads
+      - name: Sizes
+        run: |
+          ls -l work/onnx/model.onnx work/rdf
+          o=$(stat -c %s work/onnx/model.onnx); r=$(cat work/rdf/*.nq | wc -c)
+          echo "ONNX bytes: $o   N-Quads bytes: $r   ratio: $(awk -v r="$r" -v o="$o" 'BEGIN{printf "%.2f", r/o}')"
+          echo "quads: $(cat work/rdf/*.nq | wc -l)"
+      - name: Load into Oxigraph and measure
+        run: |
+          cat work/rdf/*.nq > work/all.nq
+          oxigraph load --location work/store --file work/all.nq
+          q() { oxigraph query --location work/store --union-default-graph --results-format tsv --query "$1"; }
+          echo "blank nodes present?"; q 'ASK { { ?s ?p ?o FILTER(isBlank(?s)) } UNION { ?s ?p ?o FILTER(isBlank(?o)) } }'
+          echo "longest literal (characters)"; q 'SELECT (MAX(STRLEN(STR(?o))) AS ?m) WHERE { ?s ?p ?o FILTER(isLiteral(?o)) }'
+          echo "container-membership properties (rdf:_n) in use"; q 'SELECT (COUNT(*) AS ?n) WHERE { ?s ?p ?o FILTER(STRSTARTS(STR(?p), "http://www.w3.org/1999/02/22-rdf-syntax-ns#_")) }'
+          echo "predicates by use"; q 'SELECT ?p (COUNT(*) AS ?n) WHERE { ?s ?p ?o } GROUP BY ?p ORDER BY DESC(?n) LIMIT 30'
+
+  facade-x:
+    needs: export
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults: { run: { shell: bash } }
+    steps:
+      - uses: actions/setup-python@v7
+        with: { python-version: '3.12' }
+      - uses: actions/download-artifact@v8
+        with: { name: onnx, path: work/onnx }
+      - name: Install
+        run: |
+          python -m pip install --quiet onnx oxigraph
+          curl -sSfL -o sparql-anything.jar https://github.com/spice-h2020/sparql.anything/releases/download/v1.2.0/sparql-anything-v1.2.0.jar
+          sha256sum sparql-anything.jar; java -version 2>&1 | head -1
+      - name: ONNX to protobuf JSON, weights as ONNX external data (standard API calls)
+        run: |
+          mkdir -p work/ext
+          python - <<'PY'
+          import onnx
+          from google.protobuf.json_format import MessageToJson
+          m = onnx.load("work/onnx/model.onnx")
+          print("nodes:", len(m.graph.node), "initializers:", len(m.graph.initializer))
+          onnx.save_model(m, "work/ext/model.onnx", save_as_external_data=True,
+                          all_tensors_to_one_file=True, location="weights.bin", size_threshold=1024)
+          g = onnx.load("work/ext/model.onnx", load_external_data=False)
+          open("work/model.json", "w").write(MessageToJson(g))
+          PY
+          ls -l work/onnx/model.onnx work/ext work/model.json
+      - name: SPARQL Anything (Facade-X, IRIs instead of blank nodes)
+        run: |
+          cat > work/q.sparql <<'Q'
+          CONSTRUCT { ?s ?p ?o }
+          WHERE { SERVICE <x-sparql-anything:location=work/model.json,blank-nodes=false> { ?s ?p ?o } }
+          Q
+          /usr/bin/time -v java -jar sparql-anything.jar -q work/q.sparql -f NT -o work/facadex.nt
+          ls -l work/facadex.nt
+      - name: Sizes
+        run: |
+          o=$(stat -c %s work/onnx/model.onnx); r=$(stat -c %s work/facadex.nt); w=$(stat -c %s work/ext/weights.bin); g=$(stat -c %s work/ext/model.onnx)
+          echo "ONNX (inline weights): $o   graph-only ONNX: $g   weights.bin: $w   N-Triples: $r"
+          echo "N-Triples / graph-only ONNX: $(awk -v r="$r" -v g="$g" 'BEGIN{printf "%.2f", r/g}')   N-Triples + weights / original ONNX: $(awk -v r="$r" -v w="$w" -v o="$o" 'BEGIN{printf "%.3f", (r+w)/o}')"
+          echo "triples: $(wc -l < work/facadex.nt)"
+      - name: Load into Oxigraph and measure
+        run: |
+          oxigraph load --location work/store --file work/facadex.nt
+          q() { oxigraph query --location work/store --results-format tsv --query "$1"; }
+          echo "blank nodes present?"; q 'ASK { { ?s ?p ?o FILTER(isBlank(?s)) } UNION { ?s ?p ?o FILTER(isBlank(?o)) } }'
+          echo "longest literal (characters)"; q 'SELECT (MAX(STRLEN(STR(?o))) AS ?m) WHERE { ?s ?p ?o FILTER(isLiteral(?o)) }'
+          echo "container-membership properties (rdf:_n) in use"; q 'SELECT (COUNT(*) AS ?n) WHERE { ?s ?p ?o FILTER(STRSTARTS(STR(?p), "http://www.w3.org/1999/02/22-rdf-syntax-ns#_")) }'
+          echo "predicates by use"; q 'SELECT ?p (COUNT(*) AS ?n) WHERE { ?s ?p ?o } GROUP BY ?p ORDER BY DESC(?n) LIMIT 30'
