@@ -61,10 +61,16 @@ jobs:
         run: |
           python -m pip install --quiet onnx onnx-2-rdf oxigraph
           python -m pip list 2>/dev/null | grep -i -E '^(onnx|onnx-2-rdf|oxigraph) '
+      - name: YARRRML parser (ONNX2RDF shells out to it; documented prerequisite)
+        run: |
+          npm install --global @rmlio/yarrrml-parser
+          yarrrml-parser --version; node --version; java -version 2>&1 | head -1
       - name: onnx-parser (output capped at 8 GB so a blowup is a measurement, not a full disk)
         run: |
           mkdir -p work/rdf; df -h . | tail -1
-          prlimit --fsize=8000000000 /usr/bin/time -v onnx-parser work/onnx/model.onnx --target_path work/rdf --rdf_format nquads
+          prlimit --fsize=8000000000 /usr/bin/time -v onnx-parser work/onnx/model.onnx --target_path work/rdf --rdf_format nquads 2>&1 | tee work/parser.log
+          # the tool exits 0 even when its pipeline failed; its own log is the evidence
+          if grep -q ' - ERROR - ' work/parser.log; then echo "onnx-parser logged errors"; exit 1; fi
       - name: Sizes
         run: |
           ls -l work/onnx/model.onnx work/rdf
