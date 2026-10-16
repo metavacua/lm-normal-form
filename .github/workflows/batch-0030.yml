@@ -1,0 +1,103 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0030: a complete characterization of a small instance of SmolLM2's open term. Written down in docs/batches/0030.md.
+# One job: build the instance; carry it (safetensors, ONNX, GGUF); slot it into transformers, ONNX Runtime and llama.cpp;
+# the exact tables at lengths 1 to 4; batch 0029's structural bounds at every length; the decompilation to ground RDF;
+# the working test; the controls; the graded table.
+name: batch 0030
+
+on:
+  push:
+    branches: ["batch/0030-**"]
+    paths: [".github/workflows/batch-0030.yml", "batches/0030/**", "batches/0029/structural.py", "batches/0029/common.py"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-0030-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  LLAMACPP_TAG: b11450
+  LMNF_THREADS: "4"
+  GUTENBERG_URL: https://www.gutenberg.org/cache/epub/11/pg11.txt
+
+jobs:
+  tiny:
+    name: "the instance, carried, slotted in, enumerated, bounded, decompiled, tested"
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install the Python packages
+        run: |
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers "numpy>=2" safetensors sentencepiece protobuf huggingface_hub onnx onnxruntime "optimum[onnxruntime]" pyoxigraph
+          mkdir -p out work && python -m pip freeze > out/versions.txt
+          /bin/grep -m1 'model name' /proc/cpuinfo | tee out/cpu.txt
+      - name: llama.cpp, the pinned release and its converter
+        run: |
+          curl -sSL -o l.tgz "https://github.com/ggml-org/llama.cpp/releases/download/$LLAMACPP_TAG/llama-$LLAMACPP_TAG-bin-ubuntu-x64.tar.gz"
+          tar xzf l.tgz
+          git clone --quiet --depth 1 --branch "$LLAMACPP_TAG" https://github.com/ggml-org/llama.cpp llama.cpp-src
+          python -m pip install --quiet ./llama.cpp-src/gguf-py
+          find "llama-$LLAMACPP_TAG" -maxdepth 1 -name "llama-*" -printf "%f " | tee out/llama-binaries.txt; echo
+      - name: Cell 01, build the instance
+        run: |
+          python batches/0030/build.py work/tiny
+          cp -r work/tiny out/build
+          ls -la work/tiny
+      - name: Cell 01, the carriers (ONNX by Optimum, GGUF by llama.cpp's converter)
+        run: |
+          optimum-cli export onnx --model work/tiny --task text-generation work/onnx 2>&1 | tail -n 5 || echo "optimum export failed"
+          python llama.cpp-src/convert_hf_to_gguf.py work/tiny --outfile work/tiny.gguf --outtype f32 2>&1 | tail -n 8 || echo "gguf conversion failed"
+          ls -la work/onnx work/tiny.gguf || true
+          python batches/0030/carriers.py work/tiny work/onnx work/tiny.gguf out/carriers.json 2>&1 | tail -n 5 || echo "carriers inventory failed"
+      - name: The English sample for L1
+        run: |
+          curl -sSL -m 60 -o work/english.txt "$GUTENBERG_URL" || true
+          test -s work/english.txt || printf 'alice was beginning to get very tired of sitting by her sister on the bank, and of having nothing to do. %.0s' $(seq 1 200) > work/english.txt
+          wc -c work/english.txt
+      - name: Cells 02 and 06, the harnesses and the working test
+        run: python batches/0030/working.py work/tiny work/onnx work/tiny.gguf "llama-$LLAMACPP_TAG" work/english.txt out/working.json 2>&1 | tail -n 12
+      - name: Cell 03, the exact tables at lengths 1 to 4, and controls a and b
+        run: |
+          python batches/0030/tables.py work/tiny out/tables --max-len 4 2>&1 | tail -n 8
+          python batches/0030/tables.py work/tiny out/tables_null --max-len 1 --variant null 2>&1 | tail -n 2
+          python batches/0030/tables.py work/tiny out/tables_nan --max-len 1 --variant nan 2>&1 | tail -n 2
+      - name: Cell 04, the structural bounds at every length
+        run: |
+          python batches/0029/structural_tiny_check.py
+          for T in 1 2 3 4; do python batches/0029/structural.py work/tiny "out/structural_T$T" "out/tables/taps_T$T.json" 2>&1 | head -n 2; done
+      - name: Cell 05, decompile to ground RDF
+        run: python batches/0030/decompile.py work/tiny out/rdf 2>&1 | tail -n 3
+      - name: The graded table
+        run: python batches/0030/grade30.py out | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Gates of the instrument
+        run: |
+          python - <<'EOF'
+          import json
+          t = json.load(open('out/tables/tables_T1.json')); n = json.load(open('out/tables_nan/tables_T1.json'))
+          assert t['sequences'] == 50 and n['finite'] is False
+          for T in (1, 2, 3, 4):
+              assert json.load(open(f'out/tables/tables_T{T}.json'))['sequences'] == 50 ** T
+          print('gates ok')
+          EOF
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: batch-0030
+          path: out/
+          retention-days: 1
