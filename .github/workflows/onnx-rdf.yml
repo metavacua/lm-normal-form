@@ -83,6 +83,12 @@ jobs:
           oxigraph load --location work/store --file work/all.nq
           q() { oxigraph query --location work/store --union-default-graph --results-format tsv --query "$1"; }
           g() { oxigraph query --location work/store --results-format tsv --query "$1"; }
+          echo "== the raw file: first lines, and a random sample from the middle"
+          head -n 8 work/all.nq | cut -c1-260
+          awk 'NR % 30000 == 7' work/all.nq | cut -c1-260
+          echo "== the same store re-serialised by Oxigraph as N-Quads (a graph term would be printed as a 4th term)"
+          oxigraph dump --location work/store --format nq --file work/redump.nq
+          head -n 3 work/redump.nq | cut -c1-260; echo "redump lines: $(wc -l < work/redump.nq)"
           echo "== datasets: how many graphs does the file hold?"
           echo "lines in the file: $(wc -l < work/all.nq)"
           echo "triples in the default graph"; g 'SELECT (COUNT(*) AS ?n) WHERE { ?s ?p ?o }'
