@@ -37,9 +37,14 @@ def restrict(text):
 def main():
     hf, onnx_dir, gguf, lbin, text_file, out_json = sys.argv[1:7]
     from transformers import AutoModelForCausalLM, AutoTokenizer
-    tok = AutoTokenizer.from_pretrained(hf)
+    out = {"errors": {}}
+    try:
+        tok = AutoTokenizer.from_pretrained(hf)
+    except Exception as e:                       # the same directory through the slow SentencePiece reader
+        out["errors"]["fast_tokenizer"] = repr(e)
+        tok = AutoTokenizer.from_pretrained(hf, use_fast=False)
+    out["tokenizer_class"] = type(tok).__name__
     model = AutoModelForCausalLM.from_pretrained(hf, torch_dtype=torch.float32).eval()
-    out = {"tokenizer_class": type(tok).__name__, "errors": {}}
     # 02a transformers, chat
     try:
         msgs = [{"role": "user", "content": "the capital of france is"}]

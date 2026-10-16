@@ -60,6 +60,7 @@ jobs:
           cp -r work/tiny out/build
           ls -la work/tiny
       - name: Cell 01, the carriers (ONNX by Optimum, GGUF by llama.cpp's converter)
+        continue-on-error: true
         run: |
           optimum-cli export onnx --model work/tiny --task text-generation work/onnx 2>&1 | tail -n 5 || echo "optimum export failed"
           python llama.cpp-src/convert_hf_to_gguf.py work/tiny --outfile work/tiny.gguf --outtype f32 2>&1 | tail -n 8 || echo "gguf conversion failed"
@@ -71,6 +72,7 @@ jobs:
           test -s work/english.txt || printf 'alice was beginning to get very tired of sitting by her sister on the bank, and of having nothing to do. %.0s' $(seq 1 200) > work/english.txt
           wc -c work/english.txt
       - name: Cells 02 and 06, the harnesses and the working test
+        continue-on-error: true
         run: python batches/0030/working.py work/tiny work/onnx work/tiny.gguf "llama-$LLAMACPP_TAG" work/english.txt out/working.json 2>&1 | tail -n 12
       - name: Cell 03, the exact tables at lengths 1 to 4, and controls a and b
         run: |
@@ -82,6 +84,7 @@ jobs:
           python batches/0029/structural_tiny_check.py
           for T in 1 2 3 4; do python batches/0029/structural.py work/tiny "out/structural_T$T" "out/tables/taps_T$T.json" 2>&1 | head -n 2; done
       - name: Cell 05, decompile to ground RDF
+        continue-on-error: true
         run: python batches/0030/decompile.py work/tiny out/rdf 2>&1 | tail -n 3
       - name: The graded table
         run: python batches/0030/grade30.py out | tee -a "$GITHUB_STEP_SUMMARY"

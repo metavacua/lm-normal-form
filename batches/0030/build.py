@@ -67,10 +67,26 @@ def main():
     sp = spm.SentencePieceProcessor(model_file=os.path.join(out, "tokenizer.model"))
     pieces = [sp.id_to_piece(i) for i in range(sp.get_piece_size())]
     assert len(pieces) == 50, pieces
-    tok = LlamaTokenizer(vocab_file=os.path.join(out, "tokenizer.model"), unk_token="<unk>", bos_token="<s>", eos_token="</s>",
-                         pad_token="<pad>", add_bos_token=False, add_eos_token=False, legacy=False, clean_up_tokenization_spaces=False)
+    # The fast tokenizer (tokenizer.json), the path by which transformers reads SmolLM2: a Unigram model over the same 50
+    # pieces with equal scores (every piece is one character, so segmentation is deterministic), Metaspace as
+    # SentencePiece does it. transformers' own converter refuses a `char`-type SentencePiece file ("trained with a
+    # different algorithm", first run 38980018769), so the fast file is built directly. tokenizer.model stays beside it
+    # for llama.cpp's converter, which reads SentencePiece for the Llama architecture.
+    from tokenizers import Tokenizer, models, pre_tokenizers, decoders
+    from transformers import PreTrainedTokenizerFast
+    vocab = [(pc, 0.0 if i >= 4 else -100.0) for i, pc in enumerate(pieces)]
+    tk = Tokenizer(models.Unigram(vocab, unk_id=0, byte_fallback=False))
+    tk.pre_tokenizer = pre_tokenizers.Metaspace(replacement="▁", prepend_scheme="never", split=False)
+    tk.decoder = decoders.Metaspace(replacement="▁", prepend_scheme="never", split=False)
+    tok = PreTrainedTokenizerFast(tokenizer_object=tk, unk_token="<unk>", bos_token="<s>", eos_token="</s>", pad_token="<pad>",
+                                  clean_up_tokenization_spaces=False, model_max_length=64)
     tok.chat_template = CHAT
     tok.save_pretrained(out)
+    # the slow SentencePiece path, as a second reading of the same pieces: ids must agree with the fast tokenizer
+    slow = LlamaTokenizer(vocab_file=os.path.join(out, "tokenizer.model"), unk_token="<unk>", bos_token="<s>", eos_token="</s>",
+                          pad_token="<pad>", add_bos_token=False, add_eos_token=False, legacy=False, clean_up_tokenization_spaces=False)
+    probe = "the capital of france is paris. 0123456789 (a-b), c? d! e: f'g"
+    assert slow(probe, add_special_tokens=False)["input_ids"] == tok(probe, add_special_tokens=False)["input_ids"], "slow and fast tokenizers disagree"
     os.remove(corpus)
     os.remove(os.path.join(out, "tokenizer.vocab")) if os.path.exists(os.path.join(out, "tokenizer.vocab")) else None
     with open(os.path.join(out, "generation_config.json"), "w") as f:
