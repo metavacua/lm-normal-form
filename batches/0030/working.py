@@ -101,7 +101,7 @@ def main():
                     g2 = model.generate(torch.tensor([l_ids]), max_new_tokens=16, do_sample=False)
                 leg["pytorch_from_llama_ids"] = {"ids": g2[0][len(l_ids):].tolist(), "text": tok.decode(g2[0][len(l_ids):])}
             if leg["tool"]:
-                rc, so, se = run([comp, "-m", gguf, "-p", p, "-n", "16", "--temp", "0", "--no-display-prompt", "--no-warmup", "--jinja"])
+                rc, so, se = run([comp, "-m", gguf, "-p", p, "-n", "16", "--temp", "0", "--no-display-prompt", "--no-warmup", "--jinja", "-no-cnv"])
                 leg.update({"rc": rc, "stdout": so[-400:], "stderr_tail": se[-300:], "continuation": so.strip()})
                 ref = (leg.get("pytorch_from_llama_ids") or greedy[p])["text"].strip()
                 leg["equals_pytorch"] = bool(rc == 0 and so.strip()[:16] == ref[:16])
