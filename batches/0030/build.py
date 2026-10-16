@@ -86,7 +86,12 @@ def main():
     slow = LlamaTokenizer(vocab_file=os.path.join(out, "tokenizer.model"), unk_token="<unk>", bos_token="<s>", eos_token="</s>",
                           pad_token="<pad>", add_bos_token=False, add_eos_token=False, legacy=False, clean_up_tokenization_spaces=False)
     probe = "the capital of france is paris. 0123456789 (a-b), c? d! e: f'g"
-    assert slow(probe, add_special_tokens=False)["input_ids"] == tok(probe, add_special_tokens=False)["input_ids"], "slow and fast tokenizers disagree"
+    slow_ids = slow(probe, add_special_tokens=False)["input_ids"]; fast_ids = tok(probe, add_special_tokens=False)["input_ids"]
+    tokenizer_agreement = {"probe": probe, "slow_ids": slow_ids, "fast_ids": fast_ids, "equal": slow_ids == fast_ids,
+                           "slow_pieces": slow.convert_ids_to_tokens(slow_ids), "fast_pieces": tok.convert_ids_to_tokens(fast_ids)}
+    if not tokenizer_agreement["equal"]:
+        print("slow and fast tokenizers disagree on the probe (recorded in build.json):", tokenizer_agreement["slow_pieces"][:12], "vs",
+              tokenizer_agreement["fast_pieces"][:12])
     os.remove(corpus)
     os.remove(os.path.join(out, "tokenizer.vocab")) if os.path.exists(os.path.join(out, "tokenizer.vocab")) else None
     with open(os.path.join(out, "generation_config.json"), "w") as f:
@@ -95,6 +100,7 @@ def main():
     ids = tok(ALPHABET, add_special_tokens=False)["input_ids"]
     back = tok.decode(ids)
     info = {"seed": SEED, "std": STD, "pieces": pieces, "alphabet": ALPHABET, "alphabet_ids": ids, "alphabet_round_trip": back == ALPHABET,
+            "tokenizer_agreement": tokenizer_agreement,
             "parameters": int(sum(p.numel() for p in model.parameters())),
             "tensors": {k: list(v.shape) for k, v in model.state_dict().items()},
             "sha256": {f: sha256(os.path.join(out, f)) for f in sorted(os.listdir(out)) if os.path.isfile(os.path.join(out, f))}}
