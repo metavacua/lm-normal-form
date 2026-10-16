@@ -82,6 +82,16 @@ jobs:
           cat work/rdf/*.nq > work/all.nq
           oxigraph load --location work/store --file work/all.nq
           q() { oxigraph query --location work/store --union-default-graph --results-format tsv --query "$1"; }
+          g() { oxigraph query --location work/store --results-format tsv --query "$1"; }
+          echo "== datasets: how many graphs does the file hold?"
+          echo "lines in the file: $(wc -l < work/all.nq)"
+          echo "triples in the default graph"; g 'SELECT (COUNT(*) AS ?n) WHERE { ?s ?p ?o }'
+          echo "triples in named graphs"; g 'SELECT (COUNT(*) AS ?n) WHERE { GRAPH ?g { ?s ?p ?o } }'
+          echo "distinct named graphs"; g 'SELECT (COUNT(DISTINCT ?g) AS ?graphs) WHERE { GRAPH ?g { ?s ?p ?o } }'
+          echo "graph names that are blank nodes?"; g 'ASK { GRAPH ?g { ?s ?p ?o } FILTER(isBlank(?g)) }'
+          echo "distinct triples across all graphs (the size of the RDF graph as a set)"; q 'SELECT (COUNT(*) AS ?n) WHERE { SELECT DISTINCT ?s ?p ?o WHERE { ?s ?p ?o } }'
+          echo "graph sizes: how many graphs hold 1, 2, 3 ... triples"; g 'SELECT ?size (COUNT(*) AS ?graphs) WHERE { SELECT ?g (COUNT(*) AS ?size) WHERE { GRAPH ?g { ?s ?p ?o } } GROUP BY ?g } GROUP BY ?size ORDER BY ?size LIMIT 15'
+          echo "ten largest graphs"; g 'SELECT ?g (COUNT(*) AS ?n) WHERE { GRAPH ?g { ?s ?p ?o } } GROUP BY ?g ORDER BY DESC(?n) LIMIT 10'
           echo "blank nodes present?"; q 'ASK { { ?s ?p ?o FILTER(isBlank(?s)) } UNION { ?s ?p ?o FILTER(isBlank(?o)) } }'
           echo "longest literal (characters)"; q 'SELECT (MAX(STRLEN(STR(?o))) AS ?m) WHERE { ?s ?p ?o FILTER(isLiteral(?o)) }'
           echo "container-membership properties (rdf:_n) in use"; q 'SELECT (COUNT(*) AS ?n) WHERE { ?s ?p ?o FILTER(STRSTARTS(STR(?p), "http://www.w3.org/1999/02/22-rdf-syntax-ns#_")) }'
