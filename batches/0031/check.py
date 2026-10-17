@@ -54,8 +54,9 @@ def main():
             model.model.embed_tokens.weight[0, 0] = float("nan")
         elif a.control == "null":
             g = model.model.norm.weight
-            v = g[0].item(); g[0] = torch.nextafter(torch.tensor(v), torch.tensor(float("inf"))).item()
-            control.update({"before": v, "after": g[0].item()})
+            c = tok.convert_tokens_to_ids("\u2581is") if a.theory == "T2" else 0      # a coordinate that every prompt's residual uses
+            v = g[c].item(); g[c] = torch.nextafter(torch.tensor(v), torch.tensor(float("inf"))).item()
+            control.update({"coordinate": c, "before": v, "after": g[c].item()})
     theory = T1 if a.theory == "T1" else T2
     subjects = list(CAPITALS) if a.theory == "T1" else WORDS          # candidate X: the 12 countries (T1) or every word (T2)
     taps = common.Taps(model) if a.taps else None

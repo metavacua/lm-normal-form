@@ -67,14 +67,16 @@ def main():
                 rc, so, se = run([tokz, "-m", gguf, "-p", p, "--ids", "--log-disable"])
                 m = re.search(r"\[([0-9,\s]*)\]", so)
                 l_ids = [int(x) for x in m.group(1).split(",")] if m and m.group(1).strip() else None
-                leg.update({"llama_ids": l_ids, "fast_ids": tok(p, add_special_tokens=False)["input_ids"], "tokenize_rc": rc})
+                leg.update({"llama_ids": l_ids, "fast_ids": tok(p, add_special_tokens=False)["input_ids"], "tokenize_rc": rc,
+                            "tokenize_stdout_tail": so[-300:], "tokenize_stderr_tail": se[-300:]})
                 if l_ids:
                     with torch.inference_mode():
                         g2 = model.generate(torch.tensor([l_ids]), max_new_tokens=n_new, do_sample=False, eos_token_id=2, pad_token_id=3)
                     ref = tok.decode(g2[0][len(l_ids):]).strip()
                     leg["pytorch_from_llama_ids"] = ref
                     rc, so, se = run([comp, "-m", gguf, "-p", p, "-n", str(n_new), "--temp", "0", "--no-display-prompt", "--no-warmup", "--jinja", "-no-cnv"])
-                    leg.update({"rc": rc, "continuation": so.strip(), "stderr_tail": se[-200:], "equals_pytorch": bool(rc == 0 and so.strip() == ref)})
+                    err = [l for l in se.splitlines() if "GGML_ASSERT" in l or "error" in l.lower() or "what()" in l]
+                    leg.update({"rc": rc, "continuation": so.strip(), "stderr_tail": se[-200:], "stderr_errors": err[:4], "equals_pytorch": bool(rc == 0 and so.strip() == ref)})
             except Exception as e:
                 leg["error"] = repr(e)
             out["llamacpp"][p] = leg

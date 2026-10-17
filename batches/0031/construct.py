@@ -39,20 +39,13 @@ def word_pieces():
     return SPECIALS + ["▁" + w for w in WORDS]                              # 50 pieces, each word with the metaspace mark
 
 
-def write_tokenizer(out, pieces, kind):
-    """A fast Unigram tokenizer over exactly these pieces (equal scores: segmentation is forced), Metaspace as
-    SentencePiece does it; and a SentencePiece model of the same pieces for llama.cpp's converter."""
+def write_tokenizer(out, kind):
+    """Trains the SentencePiece model first and takes ITS piece order as the piece order of the model (the GGUF converter
+    reads tokenizer.model, so the model's rows must be indexed in that order); then writes a fast tokenizer.json over
+    exactly those pieces. Returns (tokenizer, pieces, info)."""
     from tokenizers import Tokenizer, models, pre_tokenizers, decoders
     from transformers import PreTrainedTokenizerFast
     import sentencepiece as spm
-    vocab = [(p, 0.0 if i >= 4 else -100.0) for i, p in enumerate(pieces)]
-    tk = Tokenizer(models.Unigram(vocab, unk_id=0, byte_fallback=False))
-    scheme = "never" if kind == "char" else "first"
-    tk.pre_tokenizer = pre_tokenizers.Metaspace(replacement="▁", prepend_scheme=scheme, split=(kind == "word"))
-    tk.decoder = decoders.Metaspace(replacement="▁", prepend_scheme=scheme, split=(kind == "word"))
-    tok = PreTrainedTokenizerFast(tokenizer_object=tk, unk_token="<unk>", bos_token="<s>", eos_token="</s>", pad_token="<pad>",
-                                  clean_up_tokenization_spaces=False, model_max_length=64)
-    tok.save_pretrained(out)
     corpus = os.path.join(out, "_corpus.txt")
     with open(corpus, "w", encoding="utf-8") as f:
         if kind == "char":
@@ -66,13 +59,24 @@ def write_tokenizer(out, pieces, kind):
                                    eos_piece="</s>", pad_piece="<pad>", add_dummy_prefix=(kind == "word"), remove_extra_whitespaces=False,
                                    normalization_rule_name="identity", byte_fallback=False, num_threads=1, minloglevel=2)
     os.remove(corpus)
-    for extra in ("tokenizer.vocab",):
-        if os.path.exists(os.path.join(out, extra)):
-            os.remove(os.path.join(out, extra))
-    # the SentencePiece pieces may be ordered differently from ours: the ids in the GGUF then differ from the fast ids.
+    if os.path.exists(os.path.join(out, "tokenizer.vocab")):
+        os.remove(os.path.join(out, "tokenizer.vocab"))
     sp = spm.SentencePieceProcessor(model_file=os.path.join(out, "tokenizer.model"))
-    sp_pieces = [sp.id_to_piece(i) for i in range(sp.get_piece_size())]
-    return tok, {"pieces": pieces, "sentencepiece_pieces": sp_pieces, "sentencepiece_same_order": sp_pieces == pieces}
+    pieces = [sp.id_to_piece(i) for i in range(sp.get_piece_size())]
+    intended = char_pieces() if kind == "char" else word_pieces()
+    assert sorted(pieces) == sorted(intended), (sorted(set(pieces) ^ set(intended)))
+    vocab = [(pc, 0.0 if i >= 4 else -100.0) for i, pc in enumerate(pieces)]
+    tk = Tokenizer(models.Unigram(vocab, unk_id=0, byte_fallback=False))
+    scheme = "never" if kind == "char" else "first"
+    tk.pre_tokenizer = pre_tokenizers.Metaspace(replacement="\u2581", prepend_scheme=scheme, split=(kind == "word"))
+    tk.decoder = decoders.Metaspace(replacement="\u2581", prepend_scheme=scheme, split=(kind == "word"))
+    tok = PreTrainedTokenizerFast(tokenizer_object=tk, unk_token="<unk>", bos_token="<s>", eos_token="</s>", pad_token="<pad>",
+                                  clean_up_tokenization_spaces=False, model_max_length=64)
+    tok.save_pretrained(out)
+    probe = "the capital of france is paris" if kind == "word" else "the capital of france is "
+    sp_ids = sp.encode(probe, out_type=int); fast_ids = tok(probe, add_special_tokens=False)["input_ids"]
+    return tok, pieces, {"pieces": pieces, "same_order_as_sentencepiece": True, "probe": probe, "sentencepiece_ids": sp_ids,
+                         "fast_ids": fast_ids, "ids_equal": sp_ids == fast_ids}
 
 
 # ----------------------------------------------------------------------------------------------- models
@@ -94,9 +98,9 @@ def save_model(out, cfg_kwargs, tensors):
     return int(sum(p.numel() for p in model.parameters()))
 
 
-def m1_tensors():
+def m1_tensors(pieces=None):
     """Zero blocks: the symmetric chain space -> p -> a -> r -> i -> s -> </s>, factored exactly. Returns tensors, cfg, info."""
-    pieces = char_pieces(); idx = {p: i for i, p in enumerate(pieces)}
+    pieces = pieces or char_pieces(); idx = {p: i for i, p in enumerate(pieces)}
     V = 50
     chain = ["▁", "p", "a", "r", "i", "s", "</s>"]
     S = np.zeros((V, V))
@@ -121,9 +125,9 @@ def m1_tensors():
 
 
 def build_m1(out):
-    tensors, cfg, info = m1_tensors(); info = {k: v for k, v in info.items() if k != "S"}
-    info["parameters"] = save_model(out, cfg, tensors)
-    tok, info["tokenizer"] = write_tokenizer(out, char_pieces(), "char")
+    tok, pieces, tinfo = write_tokenizer(out, "char")
+    tensors, cfg, info = m1_tensors(pieces); info = {k: v for k, v in info.items() if k != "S"}
+    info["parameters"] = save_model(out, cfg, tensors); info["tokenizer"] = tinfo
     return info
 
 
@@ -135,10 +139,10 @@ def rope_plane_vectors(d, theta=100000.0):
     return u, w, 1.0
 
 
-def m2_tensors(d, orthogonal, seed=SEED, alpha=5.0, beta=1.0, attn_scale=30.0):
+def m2_tensors(d, orthogonal, seed=SEED, alpha=5.0, beta=1.0, attn_scale=30.0, pieces=None):
     """One block, one head, previous-token attention, o-projection writes the capital's code. d must be even.
     Returns tensors, cfg, info."""
-    pieces = word_pieces(); idx = {p: i for i, p in enumerate(pieces)}
+    pieces = pieces or word_pieces(); idx = {p: i for i, p in enumerate(pieces)}
     V = 50
     rng = np.random.default_rng(seed)
     const = d - 2                                                # the constant coordinate; d-1 unused
@@ -185,9 +189,9 @@ def m2_tensors(d, orthogonal, seed=SEED, alpha=5.0, beta=1.0, attn_scale=30.0):
 
 
 def build_m2(out, d, orthogonal):
-    tensors, cfg, info = m2_tensors(d, orthogonal)
-    info["parameters"] = save_model(out, cfg, tensors)
-    tok, info["tokenizer"] = write_tokenizer(out, word_pieces(), "word")
+    tok, pieces, tinfo = write_tokenizer(out, "word")
+    tensors, cfg, info = m2_tensors(d, orthogonal, pieces=pieces)
+    info["parameters"] = save_model(out, cfg, tensors); info["tokenizer"] = tinfo
     return info
 
 

@@ -50,6 +50,8 @@ jobs:
           tar xzf l.tgz
           git clone --quiet --depth 1 --branch "$LLAMACPP_TAG" https://github.com/ggml-org/llama.cpp llama.cpp-src
           python -m pip install --quiet ./llama.cpp-src/gguf-py
+      - name: The constructions through the explicit numpy forward, before any model file exists
+        run: python batches/0031/construct_numpy_check.py | tee out/numpy_check.txt
       - name: Cell 01, construct
         run: |
           python batches/0031/construct.py out/models
