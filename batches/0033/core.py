@@ -71,7 +71,7 @@ def margin_and_grad(model, tok, X, t):
     z = model(input_ids=prompt_ids(tok, X), use_cache=False).logits[0, -1]
     m, _ = margin_of(z, t)
     m.backward()
-    return float(m)
+    return float(m.detach())
 
 
 def params(model):

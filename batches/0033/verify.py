@@ -99,13 +99,14 @@ def main():
         Emb.data[rows] = saved
     res["V3"] = {"offpath_rows": int(mask.sum()), "nonzero_gradient_entries_offpath": off_nonzero, "perturbed_entries": int(saved.numel()),
                  "margin_before": m0, "margin_after": m2, "abs_change": abs(m2 - m0), "competitor_same": j2 == j}
+    core.dump(out, res)                                     # V1 to V3 are kept even if a later part fails
     # V4: finite perturbations against first order
     ps_list = core.params(model)
     g_all = [p.grad.clone() for _, p in ps_list]
     score = [(gt.abs() * torch.clamp(0.05 * p.data.abs(), min=0.002)).view(-1) for gt, (_, p) in zip(g_all, ps_list)]
     top = []
     for ti, s in enumerate(score):
-        v, i = torch.topk(s, 1000); top.append((v, torch.full_like(i, ti), i))
+        v, i = torch.topk(s, min(1000, s.numel())); top.append((v, torch.full_like(i, ti), i))
     V = torch.cat([x[0] for x in top]); T = torch.cat([x[1] for x in top]); I = torch.cat([x[2] for x in top])
     order = torch.argsort(V, descending=True)
     A = [(int(T[o]), int(I[o])) for o in order[:1000]]
