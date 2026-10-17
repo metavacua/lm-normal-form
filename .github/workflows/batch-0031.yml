@@ -1,0 +1,93 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0031: the smallest models of two stated theories, constructed and checked exhaustively. Written down in
+# docs/batches/0031.md. One job: construct; carry (ONNX, GGUF); check every model against its theory; the ladder;
+# controls; harnesses; structural bounds on M2; the graded table.
+name: batch 0031
+
+on:
+  push:
+    branches: ["batch/0031-**"]
+    paths: [".github/workflows/batch-0031.yml", "batches/0031/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-0031-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  LLAMACPP_TAG: b11450
+  LMNF_THREADS: "4"
+
+jobs:
+  minimal:
+    name: "the smallest models of T1 and T2, constructed, checked, carried, slotted in"
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install the Python packages
+        run: |
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers "numpy>=2" safetensors sentencepiece protobuf huggingface_hub onnx onnxruntime "optimum[onnxruntime]"
+          mkdir -p out work && python -m pip freeze > out/versions.txt
+      - name: llama.cpp, the pinned release and its converter
+        run: |
+          curl -sSL -o l.tgz "https://github.com/ggml-org/llama.cpp/releases/download/$LLAMACPP_TAG/llama-$LLAMACPP_TAG-bin-ubuntu-x64.tar.gz"
+          tar xzf l.tgz
+          git clone --quiet --depth 1 --branch "$LLAMACPP_TAG" https://github.com/ggml-org/llama.cpp llama.cpp-src
+          python -m pip install --quiet ./llama.cpp-src/gguf-py
+      - name: Cell 01, construct
+        run: |
+          python batches/0031/construct.py out/models
+          ls out/models
+      - name: Cell 02, the exhaustive checks, the ladder, the controls
+        run: |
+          python batches/0031/check.py out/models/M1 T1 out/check_M1.json
+          for D in 52 40 32 24 16 12 8; do
+            if [ "$D" = 52 ]; then python batches/0031/check.py out/models/M2_d52 T2 out/check_M2_d52.json --taps out/taps_M2.json
+            else python batches/0031/check.py "out/models/M2_d$D" T2 "out/check_M2_d$D.json"; fi
+          done
+          python batches/0031/check.py out/models/M2_d52 T2 out/check_M2_d52_swap.json --control swap
+          python batches/0031/check.py out/models/M2_d52 T2 out/check_M2_d52_nan.json --control nan
+          python batches/0031/check.py out/models/M2_d52 T2 out/check_M2_d52_null.json --control null
+      - name: Cell 03, carriers and harnesses for M1 and M2 (d=52)
+        continue-on-error: true
+        run: |
+          echo '{}' > out/carriers.json
+          for M in M1 M2_d52; do
+            T=T2; [ "$M" = M1 ] && T=T1
+            optimum-cli export onnx --model "out/models/$M" --task text-generation "work/onnx_$M" 2>&1 | tail -n 3 || echo "optimum export of $M failed"
+            if python llama.cpp-src/convert_hf_to_gguf.py "out/models/$M" --outfile "work/$M.gguf" --outtype f32 > "work/convert_$M.log" 2>&1; then G=true; else G=false; tail -n 4 "work/convert_$M.log"; fi
+            python - "$M" "$G" "work/convert_$M.log" <<'EOF'
+          import json, sys
+          m, g, log = sys.argv[1], sys.argv[2] == "true", sys.argv[3]
+          d = json.load(open('out/carriers.json')); d[m] = {"gguf": g, "convert_log_tail": open(log).read()[-600:]}
+          json.dump(d, open('out/carriers.json', 'w'), indent=1)
+          EOF
+            python batches/0031/harness.py "out/models/$M" "$T" "work/onnx_$M" "work/$M.gguf" "llama-$LLAMACPP_TAG" "out/harness_$M.json" 2>&1 | tail -n 3
+          done
+      - name: Cell 04, structural bounds on M2 over the prompt domain
+        continue-on-error: true
+        run: python batches/0029/structural.py out/models/M2_d52 out/structural_M2 out/taps_M2.json 2>&1 | head -n 3
+      - name: The graded table
+        run: python batches/0031/grade31.py out | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: batch-0031
+          path: out/
+          retention-days: 1
