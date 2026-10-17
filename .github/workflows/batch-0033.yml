@@ -1,0 +1,60 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0033: the algebra of the path through a weight and principled substitutes. Written down in docs/batches/0033.md.
+# verify  cell 0V, first and a gate: are the isolated variables the correct ones.
+# (the substitution cells follow only after the verification has been read)
+name: batch 0033
+
+on:
+  push:
+    branches: ["batch/0033-**"]
+    paths: [".github/workflows/batch-0033.yml", "batches/0033/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-0033-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  MODEL: HuggingFaceTB/SmolLM2-135M
+  HF_REVISION: 93efa2f097d58c2a74874c7e644dbc9b0cee75a2
+  LMNF_THREADS: "4"
+
+jobs:
+  verify:
+    name: "0V the isolated variables are the correct ones"
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install the Python packages
+        run: |
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers "numpy>=2" scipy safetensors huggingface_hub
+          mkdir -p out work && python -m pip freeze > out/versions.txt
+      - name: The model at the registered revision
+        run: |
+          hf download "$MODEL" --revision "$HF_REVISION" --local-dir work/model --exclude "onnx/*" --exclude "*.gguf" >/dev/null
+          sha256sum work/model/model.safetensors | tee out/inputs.sha256
+      - name: Cell 0V
+        run: python batches/0033/verify.py work/model /dev/null out/verify.json 2>&1 | tail -n 14
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: batch-0033-verify
+          path: out/
+          retention-days: 1
