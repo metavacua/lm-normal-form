@@ -83,23 +83,37 @@ def main():
           "head_row_competitor_rel_err": rel(ge[j], a_j) if j not in prompt_tokens else None, "last_down_rel_err": rel(gd, Gd),
           "target_in_prompt": t in prompt_tokens, "competitor_in_prompt": j in prompt_tokens, "entries_down": int(gd.numel())}
     res["V2"] = v2
-    # V3: exact zero off-path
+    # V3: exact zero off-path, and the conditional nature of "off-path" (the margin is a maximum)
     mask = torch.ones(ge.shape[0], dtype=torch.bool); mask[[t, j]] = False
     for p_ in prompt_tokens:
         mask[p_] = False
     off_nonzero = int((ge[mask] != 0).sum())
     gen = torch.Generator().manual_seed(33)
-    rows = torch.nonzero(mask).squeeze(1)[torch.randperm(int(mask.sum()), generator=gen)[:200]]
+    cand_rows = torch.nonzero(mask).squeeze(1)
+    rows = cand_rows[torch.randperm(len(cand_rows), generator=gen)[:1000]]            # 1,000 distinct off-path rows, one entry each
+    cols = torch.randint(0, E.shape[1], (len(rows),), generator=gen)
+    delta = (torch.rand(len(rows), generator=gen) - 0.5) * 0.8
+    shift = delta * (g * n)[cols]                                                       # the exact change of that row's logit
+    keep = (z[rows] + shift) < (z[j] - 1e-3)                                            # the registered condition: stay below the competitor
     ps = dict(core.params(model)); Emb = ps["model.embed_tokens.weight"]
-    saved = Emb.data[rows].clone()
+    saved = Emb.data[rows[keep], cols[keep]].clone()
     with torch.no_grad():
-        Emb.data[rows] += (torch.rand(saved.shape, generator=gen) - 0.5) * 0.4
+        Emb.data[rows[keep], cols[keep]] += delta[keep]
         z2 = model(input_ids=core.prompt_ids(tok, X), use_cache=False).logits[0, -1]
-        m2 = float(core.margin_of(z2, t)[0]); j2 = int(core.margin_of(z2, t)[1])
-        Emb.data[rows] = saved
-    res["V3"] = {"offpath_rows": int(mask.sum()), "nonzero_gradient_entries_offpath": off_nonzero, "perturbed_entries": int(saved.numel()),
-                 "margin_before": m0, "margin_after": m2, "abs_change": abs(m2 - m0), "competitor_same": j2 == j}
+        m2, j2 = core.margin_of(z2, t); m2 = float(m2)
+        Emb.data[rows[keep], cols[keep]] = saved
+        # the crossing: raise one off-path row's logit to the competitor's plus 1; the new margin is predicted exactly
+        v_star = int(rows[0]); ci = int(cols[0]); need = float(z[j] + 1.0 - z[v_star]); dstar = need / float((g * n)[ci])
+        old = float(Emb.data[v_star, ci]); Emb.data[v_star, ci] = old + dstar
+        z3 = model(input_ids=core.prompt_ids(tok, X), use_cache=False).logits[0, -1]
+        m3, j3 = core.margin_of(z3, t); Emb.data[v_star, ci] = old
+    res["V3"] = {"offpath_rows": int(mask.sum()), "nonzero_gradient_entries_offpath": off_nonzero, "perturbed_entries": int(keep.sum()),
+                 "rejected_for_crossing": int((~keep).sum()), "margin_before": m0, "margin_after": m2, "abs_change": abs(m2 - m0), "competitor_same": int(j2) == j,
+                 "crossing": {"row": v_star, "predicted_margin": float(z[t] - (z[j] + 1.0)), "actual_margin": float(m3), "new_competitor": int(j3),
+                              "abs_error": abs(float(m3) - float(z[t] - (z[j] + 1.0)))}}
     core.dump(out, res)                                     # V1 to V3 are kept even if a later part fails
+    if os.environ.get("VERIFY_ONLY") == "v123":
+        print("V3", res["V3"]); return
     # V4: finite perturbations against first order
     ps_list = core.params(model)
     g_all = [p.grad.clone() for _, p in ps_list]
