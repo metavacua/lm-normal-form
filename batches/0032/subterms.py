@@ -7,6 +7,7 @@ rescaled, written or trained. Prefixes and block deletions are homogeneous and c
 group deletions and thinning change one block's shapes and are evaluated in process.
 """
 import copy
+import os
 
 import torch
 import torch.nn as nn
@@ -93,3 +94,13 @@ def save_homogeneous(model, view, out_dir):
     """Save a prefix or block deletion as a standard checkpoint (the config stays homogeneous)."""
     with view as m:
         m.save_pretrained(out_dir, safe_serialization=True)
+
+
+def copy_tokenizer_files(src_dir, dst_dir):
+    """Copy the checkpoint's own tokenizer files unchanged (tokenizer.json, tokenizer_config.json, vocab.json, merges.txt,
+    special_tokens_map.json, generation_config.json): re-saving SmolLM2's tokenizer with transformers 5.20 writes
+    extra_special_tokens as a list, which its own loader then rejects."""
+    import shutil
+    for f in ("tokenizer.json", "tokenizer_config.json", "vocab.json", "merges.txt", "special_tokens_map.json", "generation_config.json"):
+        if os.path.exists(os.path.join(src_dir, f)):
+            shutil.copy(os.path.join(src_dir, f), os.path.join(dst_dir, f))

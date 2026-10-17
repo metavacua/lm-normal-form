@@ -136,7 +136,8 @@ def main():
         for tag in {best, shallow} - {None}:
             view = subterms.prefix(model, int(tag[1:])) if tag.startswith("P") else (subterms.delete_block(model, int(tag[1:])) if tag.startswith("D") else subterms.prefix(model, L))
             d = os.path.join(a.save_best, tag); os.makedirs(d, exist_ok=True)
-            subterms.save_homogeneous(model, view, d); tok.save_pretrained(d)
+            subterms.save_homogeneous(model, view, d)
+            subterms.copy_tokenizer_files(a.model_dir, d)      # the original files: transformers 5.20 does not round-trip its own save of this tokenizer
             print("saved", tag, "->", d)
         json.dump({"best_by_count": best, "shallowest_half": shallow}, open(os.path.join(a.out_dir, "saved.json"), "w"))
 

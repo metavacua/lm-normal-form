@@ -13,6 +13,15 @@ on:
     branches: ["batch/0032-**"]
     paths: [".github/workflows/batch-0032.yml", "batches/0032/**"]
   workflow_dispatch:
+    inputs:
+      validity_only:
+        description: "skip the lattice; rebuild the named sub-term and run cell 03 only"
+        type: boolean
+        default: false
+      subterm:
+        description: "the sub-term for validity_only (Pk or Dj)"
+        type: string
+        default: "D18"
 
 permissions:
   contents: read
@@ -62,17 +71,23 @@ jobs:
           hf download "${{ matrix.model }}" --revision "${{ matrix.revision }}" --local-dir work/model --exclude "onnx/*" --exclude "*.gguf" >/dev/null
           sha256sum work/model/model.safetensors | tee "out/${{ matrix.name }}/inputs.sha256"
       - name: Cell 01, the full model and the controls
+        if: ${{ !inputs.validity_only }}
         run: |
           python batches/0032/evaluate.py work/model "out/${{ matrix.name }}" --only full 2>&1 | tail -n 3
           python batches/0032/evaluate.py work/model "out/${{ matrix.name }}" --only controls 2>&1 | tail -n 3
       - name: Cell 02, prefixes and block deletions (saving the best as checkpoints)
+        if: ${{ !inputs.validity_only }}
         run: |
           python batches/0032/evaluate.py work/model "out/${{ matrix.name }}" --only prefixes 2>&1 | tail -n 36
           python batches/0032/evaluate.py work/model "out/${{ matrix.name }}" --only blocks --save-best "work/saved_${{ matrix.name }}" 2>&1 | tail -n 34
       - name: Cell 02, group deletions and thinnings
+        if: ${{ !inputs.validity_only }}
         run: |
           python batches/0032/evaluate.py work/model "out/${{ matrix.name }}" --only groups 2>&1 | tail -n 12
           python batches/0032/evaluate.py work/model "out/${{ matrix.name }}" --only thin 2>&1 | tail -n 12
+      - name: The named sub-term, when only validity is run
+        if: ${{ inputs.validity_only }}
+        run: python batches/0032/save_subterm.py work/model "${{ inputs.subterm }}" "work/saved_${{ matrix.name }}/${{ inputs.subterm }}"
       - name: Cell 03, validity of the saved sub-terms (ONNX Runtime, llama.cpp)
         continue-on-error: true
         run: |
@@ -96,7 +111,7 @@ jobs:
     name: "the graded table"
     runs-on: ubuntu-latest
     needs: lattice
-    if: always()
+    if: ${{ always() && !inputs.validity_only }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
