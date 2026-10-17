@@ -127,6 +127,9 @@ def main():
         if "full" not in results:                       # the full model was evaluated by another invocation; read it or redo it
             fp = os.path.join(a.out_dir, "eval_full.json")
             results["full"] = json.load(open(fp))["results"]["full"] if os.path.exists(fp) else evaluate(model, tok, atoms, targets)
+        pp = os.path.join(a.out_dir, "eval_prefixes.json")
+        if os.path.exists(pp):
+            results.update({k: v for k, v in json.load(open(pp))["results"].items() if k.startswith("P")})
         cand = {k: v for k, v in results.items() if k[0] in "PD" or k == "full"}
         best = max(cand, key=lambda k: (cand[k]["count"], -len(k)))
         shallow = min((k for k in cand if k.startswith("P") and cand[k]["count"] >= max(1, cand["full"]["count"] // 2)), key=lambda k: int(k[1:]), default=None)

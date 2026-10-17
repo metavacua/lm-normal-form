@@ -67,8 +67,8 @@ jobs:
           python batches/0032/evaluate.py work/model "out/${{ matrix.name }}" --only controls 2>&1 | tail -n 3
       - name: Cell 02, prefixes and block deletions (saving the best as checkpoints)
         run: |
-          python batches/0032/evaluate.py work/model "out/${{ matrix.name }}" --only prefixes --save-best "work/saved_${{ matrix.name }}" 2>&1 | tail -n 36
-          python batches/0032/evaluate.py work/model "out/${{ matrix.name }}" --only blocks 2>&1 | tail -n 32
+          python batches/0032/evaluate.py work/model "out/${{ matrix.name }}" --only prefixes 2>&1 | tail -n 36
+          python batches/0032/evaluate.py work/model "out/${{ matrix.name }}" --only blocks --save-best "work/saved_${{ matrix.name }}" 2>&1 | tail -n 34
       - name: Cell 02, group deletions and thinnings
         run: |
           python batches/0032/evaluate.py work/model "out/${{ matrix.name }}" --only groups 2>&1 | tail -n 12
@@ -76,14 +76,14 @@ jobs:
       - name: Cell 03, validity of the saved sub-terms (ONNX Runtime, llama.cpp)
         continue-on-error: true
         run: |
-          python -m pip install --quiet onnx onnxruntime "optimum[onnxruntime]"
+          python -m pip install --quiet onnx onnxruntime "optimum[onnxruntime]" sentencepiece protobuf
           curl -sSL -o l.tgz "https://github.com/ggml-org/llama.cpp/releases/download/$LLAMACPP_TAG/llama-$LLAMACPP_TAG-bin-ubuntu-x64.tar.gz" && tar xzf l.tgz
           git clone --quiet --depth 1 --branch "$LLAMACPP_TAG" https://github.com/ggml-org/llama.cpp llama.cpp-src && python -m pip install --quiet ./llama.cpp-src/gguf-py
           for D in work/saved_${{ matrix.name }}/*/; do
             T=$(basename "$D"); echo "== $T"
             optimum-cli export onnx --model "$D" --task text-generation "work/onnx_$T" 2>&1 | tail -n 2 || true
             python llama.cpp-src/convert_hf_to_gguf.py "$D" --outfile "work/$T.gguf" --outtype f32 2>&1 | tail -n 2 || true
-            python batches/0032/harness32.py "$D" "work/onnx_$T" "work/$T.gguf" "llama-$LLAMACPP_TAG" "out/${{ matrix.name }}/harness_$T.json" 2>&1 | tail -n 2 || true
+            python batches/0032/harness32.py "$D" "work/onnx_$T" "work/$T.gguf" "llama-$LLAMACPP_TAG" "out/${{ matrix.name }}/harness_$T.json" 2>&1 | tail -n 25 || true
           done
       - uses: actions/upload-artifact@v7
         if: always()
