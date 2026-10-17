@@ -130,9 +130,43 @@ def route(model_dir, out):
 
 
 if __name__ == "__main__":
-    if sys.argv[1] == "v6":
+    if sys.argv[1] == "output":
+        output_path(*sys.argv[2:5])
+    elif sys.argv[1] == "v6":
         v6(sys.argv[2], sys.argv[3])
     elif sys.argv[1] == "route":
         route(sys.argv[2], sys.argv[3])
     else:
         rope(*sys.argv[2:6])
+
+
+def output_path(model_dir, name, out):
+    model, tok = core.load(model_dir)
+    for p in model.parameters():
+        p.requires_grad_(False)
+    L = model.config.num_hidden_layers; ffn = model.config.intermediate_size; eps_n = model.config.rms_norm_eps; d_model = model.config.hidden_size
+    ids = core.prompt_ids(tok, "France")
+    with torch.no_grad():
+        c, z = capture_all(model, ids)
+    E = model.model.embed_tokens.weight.data; g = model.model.norm.weight.data; xL = c["xL"][-1]; r = torch.sqrt((xL ** 2).mean() + eps_n)
+    res = {"model": name, "layers": L}
+    paris = core.target_ids(tok, [("France", dict(core.atoms())["France"])])[0]
+    for label, o in (("output", int(z.argmax())), ("paris", paris)):
+        w = E[o] * g / r
+        comp = {"embedding": float(w @ c["emb"][-1])}
+        for k in range(L):
+            comp[f"attn.{k}"] = float(w @ c["attn"][k][-1]); comp[f"ffn.{k}"] = float(w @ c["mlp"][k][-1])
+        pos = sum(v for v in comp.values() if v > 0)
+        shares = {k: v / pos for k, v in comp.items()}
+        contrib = torch.stack([(w @ model.model.layers[k].mlp.down_proj.weight.data) * c["act"][k][-1] for k in range(L)])
+        top = torch.topk(contrib.view(-1), 10).indices.tolist()
+        units = [{"layer": q // ffn, "unit": q % ffn, "contribution": float(contrib.view(-1)[q]), "gate_pre": float(c["gate"][q // ffn][-1][q % ffn]),
+                  "gate_row": f"model.layers.{q // ffn}.mlp.gate_proj.weight[{q % ffn},:]", "up_row": f"model.layers.{q // ffn}.mlp.up_proj.weight[{q % ffn},:]",
+                  "down_col": f"model.layers.{q // ffn}.mlp.down_proj.weight[:,{q % ffn}]"} for q in top]
+        biggest = sorted(shares.items(), key=lambda kv: -kv[1])[:6]
+        res[label] = {"token": tok.convert_ids_to_tokens(o), "logit": float(z[o]), "sum_components": sum(comp.values()), "components": comp, "positive_mass": pos, "largest_shares": biggest, "top_units": units}
+        print(f"O {name} {label} {tok.convert_ids_to_tokens(o)!r}: logit {float(z[o]):.2f} (sum of components {sum(comp.values()):.2f}) | embedding share {shares['embedding']:.1%} | largest shares {[(k, round(v, 3)) for k, v in biggest]} | "
+              f"top units {[(u['layer'], u['unit'], round(u['contribution'], 2)) for u in units[:6]]}", flush=True)
+    a = {(u["layer"], u["unit"]) for u in res["output"]["top_units"]}; b = {(u["layer"], u["unit"]) for u in res["paris"]["top_units"]}
+    res["top10_common_output_vs_paris"] = len(a & b); print(f"O {name}: units common to the top 10 of the output and of Paris: {len(a & b)}", flush=True)
+    core.dump(out, res)
