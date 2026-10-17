@@ -51,12 +51,14 @@ def v6(model_dir, out):
             for kind, store_a, store_b in (("attn", candA_a, candB_a), ("mlp", candA_f, candB_f)):
                 d_ = c[kind][k][-1]; x1 = x + d_
                 store_a.append(float((E[u] * g / torch.sqrt((x1 ** 2).mean() + eps_n)) @ d_)); store_b.append(lens(x1) - lens(x)); x = x1
+        candC_a = [float((E[u] * g / torch.sqrt((c["attn"][k][-1] ** 2).mean() + eps_n)) @ c["attn"][k][-1]) for k in range(L)]
+        candC_f = [float((E[u] * g / torch.sqrt((c["mlp"][k][-1] ** 2).mean() + eps_n)) @ c["mlp"][k][-1]) for k in range(L)]
         close = lambda a_, b_: sum(1 for k in range(L) if abs(a_[k] - b_[k]) <= max(0.06, 0.02 * abs(b_[k])))
         res["tokens"][name + "_V6d"] = {"A_attn": close(candA_a, tab_attn := [tab[k]["attn"] for k in range(L)]), "A_ffn": close(candA_f, [tab[k]["ffn"] for k in range(L)]),
-                                        "B_attn": close(candB_a, tab_attn), "B_ffn": close(candB_f, [tab[k]["ffn"] for k in range(L)]), "A_attn_values": candA_a, "B_attn_values": candB_a,
+                                        "B_attn": close(candB_a, tab_attn), "B_ffn": close(candB_f, [tab[k]["ffn"] for k in range(L)]), "C_attn": close(candC_a, tab_attn), "C_ffn": close(candC_f, [tab[k]["ffn"] for k in range(L)]), "C_attn_values": candC_a, "C_ffn_values": candC_f, "A_attn_values": candA_a, "B_attn_values": candB_a,
                                         "A_ffn_values": candA_f, "B_ffn_values": candB_f}
         print(f"V6d {name}: layers within 2% of LARQL: (A) attn {res['tokens'][name + '_V6d']['A_attn']} ffn {res['tokens'][name + '_V6d']['A_ffn']} | (B) attn {res['tokens'][name + '_V6d']['B_attn']} ffn {res['tokens'][name + '_V6d']['B_ffn']} | "
-              f"layer 23/29 attn LARQL {tab[23]['attn']}/{tab[29]['attn']} A {candA_a[23]:.2f}/{candA_a[29]:.2f} B {candB_a[23]:.2f}/{candB_a[29]:.2f}", flush=True)
+              f"(C, own-rms) attn {res['tokens'][name + '_V6d']['C_attn']} ffn {res['tokens'][name + '_V6d']['C_ffn']} | layer 23/29 attn LARQL {tab[23]['attn']}/{tab[29]['attn']} A {candA_a[23]:.2f}/{candA_a[29]:.2f} B {candB_a[23]:.2f}/{candB_a[29]:.2f}", flush=True)
         e0 = c["emb"][-1]
         rank_normed = int((((E @ (g * e0 / torch.sqrt((e0 ** 2).mean() + eps_n))) > (E[u] @ (g * e0 / torch.sqrt((e0 ** 2).mean() + eps_n)))).sum()) + 1)
         rank_raw = int(((E @ e0) > (E[u] @ e0)).sum()) + 1
