@@ -47,7 +47,7 @@ def capture_all(model, ids):
 def masked_logits(model, ids, K=None, unit_mode="act", static=None, H=None, head_scores=None, head_mode="static", seed=0):
     """The last-position logits with only K units per (layer, position) and H heads per layer kept."""
     L = model.config.num_hidden_layers; nh = model.config.num_attention_heads; hd = model.config.hidden_size // nh
-    gate_now = {}; hs = []
+    gate_now = {}; hs = []; used_units = {}; used_groups = {}
     gen = torch.Generator().manual_seed(seed)
     for k, Ly in enumerate(model.model.layers):
         if K is not None:
@@ -64,6 +64,7 @@ def masked_logits(model, ids, K=None, unit_mode="act", static=None, H=None, head
                     sc = torch.rand(a.shape, generator=gen)
                 idx = sc.topk(min(K, a.shape[-1]), dim=-1).indices
                 mask = torch.zeros_like(a); mask.scatter_(-1, idx, 1.0)
+                used_units[k] = int((mask.sum(dim=(0, 1)) > 0).sum())
                 return (a * mask,)
             hs.append(Ly.mlp.down_proj.register_forward_pre_hook(pre))
         if H is not None:
@@ -74,13 +75,26 @@ def masked_logits(model, ids, K=None, unit_mode="act", static=None, H=None, head
                 else:
                     sc = torch.rand(nh, generator=gen)
                 mask = torch.zeros(nh); mask[sc.topk(min(H, nh)).indices] = 1.0
+                used_groups[k] = int(len(set((mask.nonzero().squeeze(1) // (nh // model.config.num_key_value_heads)).tolist())))
                 return ((a.view(1, T, nh, hd) * mask[None, None, :, None]).view(1, T, nh * hd),)
             hs.append(Ly.self_attn.o_proj.register_forward_pre_hook(prh))
     with torch.no_grad():
         z = model(input_ids=ids, use_cache=False).logits[0, -1].detach().clone()
     for h in hs:
         h.remove()
+    masked_logits.info = {"units_union_per_layer": [used_units.get(k, model.config.intermediate_size) for k in range(L)],
+                          "kv_groups_per_layer": [used_groups.get(k, model.config.num_key_value_heads) for k in range(L)], "heads_kept": H if H is not None else nh}
     return z
+
+
+def weights_involved(model, info, n_embed_rows):
+    """The number of weights the kept units and heads read: per unit its gate row, up row and down column; per kept head its
+    query rows and output columns, per touched key-value group its key and value rows; the norm gains; the embedding rows."""
+    d = model.config.hidden_size; nh = model.config.num_attention_heads; nkv = model.config.num_key_value_heads; hd = d // nh; L = model.config.num_hidden_layers
+    units = sum(info["units_union_per_layer"]) * 3 * d
+    heads = sum(info["heads_kept"] * 2 * hd * d + g * 2 * hd * d for g in info["kv_groups_per_layer"])
+    norms = L * 2 * d + d
+    return {"units": units, "attention": heads, "norms": norms, "embedding_rows": n_embed_rows * d, "total": units + heads + norms + n_embed_rows * d}
 
 
 def fidelity(z, zfull, t):
@@ -119,14 +133,19 @@ def isolate(model, tok, name, X, C, clock):
         head_scores.append(torch.stack([(Wo[:, h * hd:(h + 1) * hd] @ c["o_in"][k][-1][h * hd:(h + 1) * hd]).norm() for h in range(nh)]))
     # sufficiency: units
     out = {"prompt": X, "target": t, "competitor": j, "positions": T}
-    out["sanity_all_kept"] = fidelity(masked_logits(model, ids, K=ffn, unit_mode="act"), zfull, t)
+    n_rows = len(set(ids[0].tolist()) | {t, j}); total_params = sum(p.numel() for p in model.parameters())
+    out["structural_max"] = {"parameters": total_params, "involved_in_the_output": total_params - (model.config.vocab_size - n_rows) * model.config.hidden_size,
+                             "embedding_rows_involved": n_rows, "layers": L, "per_layer": sum(p.numel() for p in model.model.layers[0].parameters())}
+    def fid(z):
+        f = fidelity(z, zfull, t); f["weights_involved"] = weights_involved(model, masked_logits.info, n_rows); f["fraction_of_parameters"] = f["weights_involved"]["total"] / total_params; return f
+    out["sanity_all_kept"] = fid(masked_logits(model, ids, K=ffn, unit_mode="act"))
     curves = {}
     for crit in ("act", "gate", "static", "random"):
         curves[crit] = {}
         for K in KS + [ffn]:
             if K > ffn:
                 continue
-            curves[crit][K] = fidelity(masked_logits(model, ids, K=K, unit_mode=crit, static=static, seed=7), zfull, t)
+            curves[crit][K] = fid(masked_logits(model, ids, K=K, unit_mode=crit, static=static, seed=7))
     out["unit_curves"] = curves
     kstar = {crit: next((K for K in sorted(curves[crit]) if sufficient(curves[crit][K])), None) for crit in curves}
     out["K_star"] = kstar
@@ -137,12 +156,15 @@ def isolate(model, tok, name, X, C, clock):
         for Hn in [1, 2, 3, 5, nh]:
             if Hn > nh:
                 continue
-            hcurves[hm][Hn] = fidelity(masked_logits(model, ids, H=Hn, head_scores=head_scores, head_mode=hm, seed=7), zfull, t)
+            hcurves[hm][Hn] = fid(masked_logits(model, ids, H=Hn, head_scores=head_scores, head_mode=hm, seed=7))
     out["head_curves"] = hcurves
     out["H_star"] = {hm: next((Hn for Hn in sorted(hcurves[hm]) if sufficient(hcurves[hm][Hn])), None) for hm in hcurves}
     # joint
     Kj = kstar["act"] or ffn; Hj = out["H_star"]["static"] or nh
-    out["joint"] = {"K": Kj, "H": Hj, **fidelity(masked_logits(model, ids, K=Kj, unit_mode="act", H=Hj, head_scores=head_scores, head_mode="static"), zfull, t)}
+    out["joint"] = {"K": Kj, "H": Hj, **fid(masked_logits(model, ids, K=Kj, unit_mode="act", H=Hj, head_scores=head_scores, head_mode="static"))}
+    # the smallest set at which the top-1 token is reproduced, by activation and by static head score
+    k1 = next((K for K in sorted(curves["act"]) if curves["act"][K]["top1_same"]), None); h1 = next((Hn for Hn in sorted(hcurves["static"]) if hcurves["static"][Hn]["top1_same"]), None)
+    out["top1_only"] = {"K": k1, "H": h1, **(fid(masked_logits(model, ids, K=k1, unit_mode="act", H=h1, head_scores=head_scores, head_mode="static")) if k1 and h1 else {})}
     out["joint_fraction_of_units"] = Kj / ffn; out["joint_fraction_of_heads"] = Hj / nh
     # the path graph: nodes at the last position; the exact edges into the gate and up pre-activations of the top units
     comps = [("embedding", c["emb"][-1])] + [(n, v) for k in range(L) for n, v in ((f"attn.{k}", c["attn"][k][-1]), (f"ffn.{k}", c["mlp"][k][-1]))]
@@ -183,7 +205,7 @@ def main():
         core.dump(os.path.join(out_dir, f"path_{name}_{X}.json"), res)
         print(f"{name} {X}: margin {res['margin_full']:.3f} | K* {res['K_star']} of {res['model_shape']['ffn']} | H* {res['H_star']} of {res['model_shape']['heads']} | joint K={res['joint']['K']} H={res['joint']['H']} "
               f"top1 {res['joint']['top1_same']} kl {res['joint']['kl']:.4f} | sanity kl {res['sanity_all_kept']['kl']:.1e} | edge err {res['edge_decomposition_max_abs_err']:.1e} | "
-              f"top5-source share median {float(np.median([u['top5_source_share'] for u in res['path_units'] if u['top5_source_share'] is not None])):.2f} | {res['seconds_isolation']} s", flush=True)
+              f"joint weights {res['joint']['weights_involved']['total']:,} ({res['joint']['fraction_of_parameters']:.1%}) top1-only {res['top1_only'].get('fraction_of_parameters')} | top5-source share median {float(np.median([u['top5_source_share'] for u in res['path_units'] if u['top5_source_share'] is not None])):.2f} | {res['seconds_isolation']} s", flush=True)
 
 
 if __name__ == "__main__":
