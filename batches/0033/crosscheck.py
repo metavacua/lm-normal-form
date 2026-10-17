@@ -129,17 +129,6 @@ def route(model_dir, out):
     core.dump(out, res)
 
 
-if __name__ == "__main__":
-    if sys.argv[1] == "output":
-        output_path(*sys.argv[2:5])
-    elif sys.argv[1] == "v6":
-        v6(sys.argv[2], sys.argv[3])
-    elif sys.argv[1] == "route":
-        route(sys.argv[2], sys.argv[3])
-    else:
-        rope(*sys.argv[2:6])
-
-
 def output_path(model_dir, name, out):
     model, tok = core.load(model_dir)
     for p in model.parameters():
@@ -170,3 +159,15 @@ def output_path(model_dir, name, out):
     a = {(u["layer"], u["unit"]) for u in res["output"]["top_units"]}; b = {(u["layer"], u["unit"]) for u in res["paris"]["top_units"]}
     res["top10_common_output_vs_paris"] = len(a & b); print(f"O {name}: units common to the top 10 of the output and of Paris: {len(a & b)}", flush=True)
     core.dump(out, res)
+
+
+if __name__ == "__main__":
+    if sys.argv[1] == "output":
+        output_path(*sys.argv[2:5])
+    elif sys.argv[1] == "v6":
+        v6(sys.argv[2], sys.argv[3])
+    elif sys.argv[1] == "route":
+        route(sys.argv[2], sys.argv[3])
+    else:
+        rope(*sys.argv[2:6])
+
