@@ -124,6 +124,9 @@ def main():
     json.dump({"model_dir": a.model_dir, "layers": L, "kv_heads": nkv, "targets_first_token": {C: tok.decode([t]) for C, t in targets.items()}, "results": results},
               open(os.path.join(a.out_dir, f"eval_{want}.json"), "w"), indent=1)
     if a.save_best and want in ("all", "prefixes", "blocks"):
+        if "full" not in results:                       # the full model was evaluated by another invocation; read it or redo it
+            fp = os.path.join(a.out_dir, "eval_full.json")
+            results["full"] = json.load(open(fp))["results"]["full"] if os.path.exists(fp) else evaluate(model, tok, atoms, targets)
         cand = {k: v for k, v in results.items() if k[0] in "PD" or k == "full"}
         best = max(cand, key=lambda k: (cand[k]["count"], -len(k)))
         shallow = min((k for k in cand if k.startswith("P") and cand[k]["count"] >= max(1, cand["full"]["count"] // 2)), key=lambda k: int(k[1:]), default=None)
