@@ -123,6 +123,14 @@ def cone_and_flow(model, tok, X, C):
     for h in hs:
         h.remove()
     torch.set_grad_enabled(False)
+    probs_above = max(float(torch.triu(store["probs"][k][0].detach(), diagonal=1).abs().max()) for k in range(L))
+    # causality, read-only: the gradient of an EARLIER position's logit with respect to later positions' embeddings
+    with torch.enable_grad():
+        emb = model.model.embed_tokens(ids).detach().requires_grad_(True)
+        z2 = model(inputs_embeds=emb, use_cache=False).logits[0, 2]
+        z2.max().backward()
+    torch.set_grad_enabled(False)
+    later = float(emb.grad[0, 3:].abs().max()); earlier = float(emb.grad[0, :3].abs().max())
     # cone
     cone = []
     for k in range(L):
@@ -157,6 +165,14 @@ def cone_and_flow(model, tok, X, C):
                 heads.append({"layer": k, "head": h, "kv_group": grp, "source_position": p, "attention": float(w[h, -1, p]), "contribution": per_src[p]})
                 bysrc[p] = bysrc.get(p, 0.0) + per_src[p]
         max_head_err = max(max_head_err, abs(head_sum - comps[f"attn.{k}"]))
+    unit_c = torch.cat([(dvec @ model.model.layers[k].mlp.down_proj.weight.data) * store["act"][k][0, -1].detach() for k in range(L)])
+    def conc(vals, name):
+        a = np.sort(np.abs(np.array(vals, dtype=np.float64)))[::-1]; tot = a.sum(); cs = np.cumsum(a) / tot
+        order = np.argsort(-np.abs(np.array(vals))); sv = np.array(vals)[order]; cum = np.cumsum(sv)
+        return {"elements": int(len(a)), "abs_mass": float(tot), **{f"n_for_{int(q*100)}pct_abs_mass": int(np.searchsorted(cs, q) + 1) for q in (0.5, 0.8, 0.9, 0.99)},
+                "signed_partial_sum_after_n": {str(n): float(cum[min(n, len(cum)) - 1]) for n in (1, 10, 100, 1000, 10000)}, "margin_for_reference": float(margin.detach())}
+    flow_conc = {"feed_forward_units": conc(unit_c.tolist(), "units"), "head_source_pairs": conc([d_["contribution"] for d_ in heads], "heads"),
+                 "all_nodes": conc(unit_c.tolist() + [d_["contribution"] for d_ in heads] + [comps["embedding"]], "all")}
     top = sorted(heads, key=lambda d_: -abs(d_["contribution"]))[:25]
     tokens = tok.convert_ids_to_tokens(ids[0].tolist())
     for d_ in top:
@@ -164,7 +180,9 @@ def cone_and_flow(model, tok, X, C):
     absmass = {p: sum(abs(d_["contribution"]) for d_ in heads if d_["source_position"] == p) for p in range(T)}
     return {"prompt_tokens": tokens, "target": t, "competitor": j, "margin": float(margin.detach()), "cone": cone, "components": comps, "sum_components": sum(comps.values()),
             "head_split_max_err": max_split_err, "head_to_layer_max_err": max_head_err, "top_head_source_contributions": top, "signed_contribution_by_source_position": bysrc,
-            "absolute_contribution_by_source_position": absmass, "prompt_ids": ids[0].tolist()}
+            "absolute_contribution_by_source_position": absmass, "prompt_ids": ids[0].tolist(),
+            "attention_probs_above_diagonal_max_value": probs_above, "causality_earlier_position_grad_to_later_embeddings": later, "causality_earlier_position_grad_to_earlier_embeddings": earlier,
+            "flow_concentration": flow_conc}
 
 
 def write_nt(res, path, name, X):
@@ -223,7 +241,7 @@ def main():
         last = res["cone"][L - 1]
         print(f"{name} {X}: ops {res['n_ops']} acyclic {acyclic} | params read {res['parameters_read_elements']:,}/{res['parameters_total_elements']:,} unread tensors {len(res['parameters_unread'])} partial {res['parameters_partially_read']} | "
               f"cone last layer positions nonzero layer {last['layer_positions_nonzero']} attn {last['attn_positions_nonzero']} mlp {last['mlp_positions_nonzero']} | above-diagonal grad any {any(c.get('attention_prob_nonzero_above_diagonal') for c in res['cone'])} | "
-              f"conservation sum {res['sum_components'] - res['margin']:.1e} head split {res['head_split_max_err']:.1e} head-to-layer {res['head_to_layer_max_err']:.1e} | triples {n} blank {blank} | {res['seconds_total']} s", flush=True)
+              f"probs above diagonal max {res['attention_probs_above_diagonal_max_value']} causality later {res['causality_earlier_position_grad_to_later_embeddings']} earlier {res['causality_earlier_position_grad_to_earlier_embeddings']:.2e} | n for 50/90% of |flow|: units {res['flow_concentration']['feed_forward_units']['n_for_50pct_abs_mass']}/{res['flow_concentration']['feed_forward_units']['n_for_90pct_abs_mass']} of {res['flow_concentration']['feed_forward_units']['elements']}, head-source {res['flow_concentration']['head_source_pairs']['n_for_50pct_abs_mass']}/{res['flow_concentration']['head_source_pairs']['n_for_90pct_abs_mass']} of {res['flow_concentration']['head_source_pairs']['elements']} | conservation sum {res['sum_components'] - res['margin']:.1e} head split {res['head_split_max_err']:.1e} head-to-layer {res['head_to_layer_max_err']:.1e} | triples {n} blank {blank} | {res['seconds_total']} s", flush=True)
 
 
 if __name__ == "__main__":
