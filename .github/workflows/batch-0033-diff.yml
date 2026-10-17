@@ -1,0 +1,74 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0033, cell 09: the differential characterisation along SmolLM2-135M's published pre-training checkpoints and to the
+# Instruct model. Read-only. Written down in docs/batches/0033.md, amendment 6.
+name: batch 0033 diff
+
+on:
+  push:
+    branches: ["batch/0033-**"]
+    paths: [".github/workflows/batch-0033-diff.yml", "batches/0033/diff.py"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-0033-diff-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  LMNF_THREADS: "4"
+  CKPT: HuggingFaceTB/SmolLM2-135M-intermediate-checkpoints
+  FINAL: HuggingFaceTB/SmolLM2-135M
+  FINAL_REV: 93efa2f097d58c2a74874c7e644dbc9b0cee75a2
+  INSTRUCT: HuggingFaceTB/SmolLM2-135M-Instruct
+  INSTRUCT_REV: 12fd25f77366fa6b3b4b768ec3050bf629380bac
+
+jobs:
+  diff:
+    name: "09 the trajectory and the Instruct difference"
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install the Python packages
+        run: |
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers "numpy>=2" scipy safetensors huggingface_hub
+          mkdir -p out work && python -m pip freeze > out/versions.txt
+      - name: The checkpoints, the final model and the Instruct model at their revisions
+        run: |
+          for s in 240000 480000 720000 960000 1200000 1440000 1680000 1920000; do
+            hf download "$CKPT" --revision "step-$s" --local-dir "work/s$s" --exclude "onnx/*" --exclude "*.gguf" >/dev/null
+            sha256sum "work/s$s/model.safetensors" | tee -a out/inputs.sha256
+          done
+          hf download "$FINAL" --revision "$FINAL_REV" --local-dir work/final --exclude "onnx/*" --exclude "*.gguf" >/dev/null
+          hf download "$INSTRUCT" --revision "$INSTRUCT_REV" --local-dir work/instruct --exclude "onnx/*" --exclude "*.gguf" >/dev/null
+          sha256sum work/final/model.safetensors work/instruct/model.safetensors | tee -a out/inputs.sha256
+      - name: Cell 09, the pairs
+        run: |
+          prev=s240000
+          for next in s480000 s720000 s960000 s1200000 s1440000 s1680000 s1920000 final; do
+            python batches/0033/diff.py "out/diff_${prev}_${next}.json" "$prev" "work/$prev" "$next" "work/$next" 2>&1 | tail -n 5
+            prev=$next
+          done
+          python batches/0033/diff.py out/diff_final_instruct.json final work/final instruct work/instruct 2>&1 | tail -n 5
+          python batches/0033/diff.py out/diff_s240000_final.json s240000 work/s240000 final work/final 2>&1 | tail -n 5
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: batch-0033-diff
+          path: out/
+          retention-days: 1
