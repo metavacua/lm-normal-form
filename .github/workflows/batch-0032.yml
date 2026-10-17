@@ -1,0 +1,130 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0032: the sub-terms of SmolLM2-135M's own weights against the capital relation. Written down in docs/batches/0032.md.
+# lattice  one job per model (base, Instruct): the full model, the 31 prefixes, 30 block deletions, 90 group deletions,
+#          90 thinnings, the controls; the best prefix and deletion saved as checkpoints.
+# validity the saved checkpoints through ONNX Runtime and llama.cpp.
+# report   the graded table.
+name: batch 0032
+
+on:
+  push:
+    branches: ["batch/0032-**"]
+    paths: [".github/workflows/batch-0032.yml", "batches/0032/**"]
+  workflow_dispatch:
+    inputs:
+      validity_only:
+        description: "skip the lattice; rebuild the named sub-term and run cell 03 only"
+        type: boolean
+        default: false
+      subterm:
+        description: "the sub-term for validity_only (Pk or Dj)"
+        type: string
+        default: "D18"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-0032-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  LLAMACPP_TAG: b11450
+  LMNF_THREADS: "4"
+
+jobs:
+  lattice:
+    name: "the lattice of ${{ matrix.name }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: base
+            model: HuggingFaceTB/SmolLM2-135M
+            revision: 93efa2f097d58c2a74874c7e644dbc9b0cee75a2
+          - name: instruct
+            model: HuggingFaceTB/SmolLM2-135M-Instruct
+            revision: 12fd25f77366fa6b3b4b768ec3050bf629380bac
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install the Python packages
+        run: |
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers "numpy>=2" safetensors huggingface_hub
+          mkdir -p "out/${{ matrix.name }}" && python -m pip freeze > "out/${{ matrix.name }}/versions.txt"
+      - name: The model at the registered revision
+        run: |
+          hf download "${{ matrix.model }}" --revision "${{ matrix.revision }}" --local-dir work/model --exclude "onnx/*" --exclude "*.gguf" >/dev/null
+          sha256sum work/model/model.safetensors | tee "out/${{ matrix.name }}/inputs.sha256"
+      - name: Cell 01, the full model and the controls
+        if: ${{ !inputs.validity_only }}
+        run: |
+          python batches/0032/evaluate.py work/model "out/${{ matrix.name }}" --only full 2>&1 | tail -n 3
+          python batches/0032/evaluate.py work/model "out/${{ matrix.name }}" --only controls 2>&1 | tail -n 3
+      - name: Cell 02, prefixes and block deletions (saving the best as checkpoints)
+        if: ${{ !inputs.validity_only }}
+        run: |
+          python batches/0032/evaluate.py work/model "out/${{ matrix.name }}" --only prefixes 2>&1 | tail -n 36
+          python batches/0032/evaluate.py work/model "out/${{ matrix.name }}" --only blocks --save-best "work/saved_${{ matrix.name }}" 2>&1 | tail -n 34
+      - name: Cell 02, group deletions and thinnings
+        if: ${{ !inputs.validity_only }}
+        run: |
+          python batches/0032/evaluate.py work/model "out/${{ matrix.name }}" --only groups 2>&1 | tail -n 12
+          python batches/0032/evaluate.py work/model "out/${{ matrix.name }}" --only thin 2>&1 | tail -n 12
+      - name: The named sub-term, when only validity is run
+        if: ${{ inputs.validity_only }}
+        run: python batches/0032/save_subterm.py work/model "${{ inputs.subterm }}" "work/saved_${{ matrix.name }}/${{ inputs.subterm }}"
+      - name: Cell 03, validity of the saved sub-terms (ONNX Runtime, llama.cpp)
+        continue-on-error: true
+        run: |
+          python -m pip install --quiet onnx onnxruntime "optimum[onnxruntime]" sentencepiece protobuf
+          curl -sSL -o l.tgz "https://github.com/ggml-org/llama.cpp/releases/download/$LLAMACPP_TAG/llama-$LLAMACPP_TAG-bin-ubuntu-x64.tar.gz" && tar xzf l.tgz
+          git clone --quiet --depth 1 --branch "$LLAMACPP_TAG" https://github.com/ggml-org/llama.cpp llama.cpp-src && python -m pip install --quiet ./llama.cpp-src/gguf-py
+          for D in work/saved_${{ matrix.name }}/*/; do
+            T=$(basename "$D"); echo "== $T"
+            optimum-cli export onnx --model "$D" --task text-generation "work/onnx_$T" 2>&1 | tail -n 2 || true
+            python llama.cpp-src/convert_hf_to_gguf.py "$D" --outfile "work/$T.gguf" --outtype f32 2>&1 | tail -n 2 || true
+            python batches/0032/harness32.py "$D" "work/onnx_$T" "work/$T.gguf" "llama-$LLAMACPP_TAG" "out/${{ matrix.name }}/harness_$T.json" 2>&1 | tail -n 25 || true
+          done
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: batch-0032-${{ matrix.name }}
+          path: out/
+          retention-days: 1
+
+  report:
+    name: "the graded table"
+    runs-on: ubuntu-latest
+    needs: lattice
+    if: ${{ always() && !inputs.validity_only }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: batch-0032-*
+          path: out/
+          merge-multiple: true
+      - run: python batches/0032/grade32.py out | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: batch-0032-graded
+          path: out/graded.md
+          retention-days: 1
