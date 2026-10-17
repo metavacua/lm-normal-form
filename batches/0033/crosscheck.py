@@ -94,8 +94,45 @@ def rope(model_dir, label, theta, out):
     core.dump(out, res)
 
 
+
+
+def route(model_dir, out):
+    model, tok = core.load(model_dir)
+    for p in model.parameters():
+        p.requires_grad_(False)
+    L = model.config.num_hidden_layers; ffn = model.config.intermediate_size; eps_n = model.config.rms_norm_eps
+    ids = core.prompt_ids(tok, "France"); t = core.target_ids(tok, [("France", dict(core.atoms())["France"])])[0]; j = tok(" the", add_special_tokens=False)["input_ids"][0]
+    with torch.no_grad():
+        c, z = capture_all(model, ids)
+    E = model.model.embed_tokens.weight.data; g = model.model.norm.weight.data; xL = c["xL"][-1]; r = torch.sqrt((xL ** 2).mean() + eps_n); dvec = (E[t] - E[j]) * g / r
+    contrib = torch.stack([(dvec @ model.model.layers[k].mlp.down_proj.weight.data) * c["act"][k][-1] for k in range(L)])
+    gate = torch.stack([c["gate"][k][-1] for k in range(L)]); silu = torch.nn.functional.silu(gate)
+    listed = []
+    for ln in open(os.path.join(HERE, "larql", "05_explain_infer.txt"), encoding="utf-8"):
+        m = re.match(r"\s+L\s*(\d+):\s+F(\d+)\s+gate=([+-][\d.]+)", ln)
+        if m:
+            listed.append((int(m.group(1)), int(m.group(2)), float(m.group(3))))
+    assert len(listed) == 150, len(listed)
+    gate_ok = sum(1 for k, i, gs in listed if abs(float(gate[k, i]) - gs) <= max(0.05, 0.01 * abs(gs)))
+    flat = contrib.abs().view(-1); top150 = set(torch.topk(flat, 150).indices.tolist())
+    lid = [k * ffn + i for k, i, _ in listed]
+    overlap = sum(1 for q in lid if q in top150)
+    share = float(sum(float(flat[q]) for q in lid) / float(flat.sum()))
+    near0 = sum(1 for k, i, _ in listed if abs(float(silu[k, i])) < 0.1)
+    signed = float(sum(float(contrib.view(-1)[q]) for q in lid))
+    best_listed = sorted(((float(contrib[k, i]), k, i, gs, float(silu[k, i])) for k, i, gs in listed), key=lambda x: -abs(x[0]))[:8]
+    res = {"gate_equal": gate_ok, "listed": 150, "overlap_with_top150_abs": overlap, "share_of_total_abs": share, "near_zero_activation": near0, "signed_sum_of_listed": signed, "f": float(z[t] - z[j]),
+           "best_listed": best_listed, "top_true_units": [(int(q // ffn), int(q % ffn), float(contrib.view(-1)[q]), float(gate[q // ffn, q % ffn])) for q in torch.topk(flat, 10).indices.tolist()]}
+    print(f"V7 route: gate scores equal for {gate_ok}/150 | overlap with the 150 largest |contribution| units: {overlap} | share of total |contribution|: {share:.3%} | |silu(gate)|<0.1 for {near0}/150 | signed sum {signed:+.3f} of f {res['f']:+.3f}", flush=True)
+    print("V7 best listed:", [(k, i, round(c_, 3), gs, round(s_, 3)) for c_, k, i, gs, s_ in best_listed], flush=True)
+    print("V7 true top units (layer, index, contribution, gate):", [(a, b, round(c_, 3), round(d_, 2)) for a, b, c_, d_ in res["top_true_units"]], flush=True)
+    core.dump(out, res)
+
+
 if __name__ == "__main__":
     if sys.argv[1] == "v6":
         v6(sys.argv[2], sys.argv[3])
+    elif sys.argv[1] == "route":
+        route(sys.argv[2], sys.argv[3])
     else:
         rope(*sys.argv[2:6])

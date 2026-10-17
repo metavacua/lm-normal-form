@@ -51,6 +51,8 @@ jobs:
           cat batches/0033/larql/revision.txt batches/0033/larql/larql-version.txt
       - name: V6, LARQL's table against the exact decomposition
         run: python batches/0033/crosscheck.py v6 work/final out/v6.json 2>&1 | tail -n 8
+      - name: V7, LARQL's INFER route against the tensors and the exact contributions
+        run: python batches/0033/crosscheck.py route work/final out/route.json 2>&1 | tail -n 6
       - name: The rotary-base control
         run: |
           python batches/0033/crosscheck.py rope work/final final 100000 out/rope_final_100000.json 2>&1 | tail -n 3
