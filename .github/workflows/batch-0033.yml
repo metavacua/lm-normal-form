@@ -7,10 +7,9 @@
 # (the substitution cells follow only after the verification and the record have been read)
 name: batch 0033
 
+# Cells 0V and 05 have run (runs 39049104062 and 39049988947). The substitution cells below are deferred (amendment 3 of
+# docs/batches/0033.md): this workflow now runs only by dispatch, and cell 06 is in batch-0033-path.yml.
 on:
-  push:
-    branches: ["batch/0033-**"]
-    paths: [".github/workflows/batch-0033.yml", "batches/0033/**"]
   workflow_dispatch:
 
 permissions:
