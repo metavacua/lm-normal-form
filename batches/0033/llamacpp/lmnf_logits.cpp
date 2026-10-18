@@ -8,8 +8,11 @@
 #include "ggml-backend.h"
 #include <cstdio>
 #include <cstdlib>
+#include <sstream>
 #include <string>
 #include <vector>
+
+static const int N_CTX = 64;  // the context: the sequence must fit in it
 
 int main(int argc, char ** argv) {
     if (argc < 4) {
@@ -17,15 +20,12 @@ int main(int argc, char ** argv) {
         return 1;
     }
     std::vector<int> ids;
-    {
-        const std::string s = argv[2];
-        size_t p = 0;
-        while (p < s.size()) {
-            size_t q = s.find(',', p);
-            if (q == std::string::npos) q = s.size();
-            ids.push_back(std::atoi(s.substr(p, q - p).c_str()));
-            p = q + 1;
-        }
+    std::stringstream ss(argv[2]);
+    for (std::string tok; std::getline(ss, tok, ','); ) ids.push_back(std::atoi(tok.c_str()));
+    const int n = (int) ids.size();
+    if (n < 1 || n > N_CTX) {
+        fprintf(stderr, "%d tokens; the context holds 1 to %d\n", n, N_CTX);
+        return 1;
     }
     const int threads = argc > 4 ? std::atoi(argv[4]) : 4;
     ggml_backend_load_all();
@@ -37,8 +37,8 @@ int main(int argc, char ** argv) {
         return 3;
     }
     llama_context_params cp = llama_context_default_params();
-    cp.n_ctx = 64;
-    cp.n_batch = 64;
+    cp.n_ctx = N_CTX;
+    cp.n_batch = N_CTX;
     cp.n_threads = threads;
     cp.n_threads_batch = threads;
     cp.type_k = GGML_TYPE_F32;
@@ -50,8 +50,7 @@ int main(int argc, char ** argv) {
         return 4;
     }
     const int n_vocab = llama_vocab_n_tokens(llama_model_get_vocab(model));
-    llama_batch batch = llama_batch_init(64, 0, 1);
-    const int n = (int) ids.size();
+    llama_batch batch = llama_batch_init(n, 0, 1);
     batch.n_tokens = n;
     for (int i = 0; i < n; ++i) {
         batch.token[i] = ids[i];

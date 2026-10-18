@@ -8,7 +8,7 @@ name: batch 0033 synth
 on:
   push:
     branches: ["batch/0033-**"]
-    paths: [".github/workflows/batch-0033-synth.yml", "batches/0033/synth.py", "batches/0033/synthetic_rows_*.json", "batches/0033/llamacpp/lmnf_logits.cpp"]
+    paths: [".github/workflows/batch-0033-synth.yml", "batches/0033/synth.py", "batches/0033/synth_common.py", "batches/0033/synthetic_rows_*.json", "batches/0033/llamacpp/lmnf_logits.cpp"]
   workflow_dispatch:
 
 permissions:
