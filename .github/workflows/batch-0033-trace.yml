@@ -1,0 +1,70 @@
+# SPDX-FileCopyrightText: 2026 Ian Douglas Lawrence Norman McLean
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Batch 0033, cell 07: the read-only isolation of the IO path by tracing the executed computation. Written down in
+# docs/batches/0033.md, amendment 4. Nothing is ablated, masked, patched or written.
+name: batch 0033 trace
+
+on:
+  push:
+    branches: ["batch/0033-**"]
+    paths: [".github/workflows/batch-0033-trace.yml", "batches/0033/trace.py"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-0033-trace-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  LMNF_THREADS: "4"
+
+jobs:
+  trace:
+    name: "07 the trace of ${{ matrix.name }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: base
+            model: HuggingFaceTB/SmolLM2-135M
+            revision: 93efa2f097d58c2a74874c7e644dbc9b0cee75a2
+          - name: instruct
+            model: HuggingFaceTB/SmolLM2-135M-Instruct
+            revision: 12fd25f77366fa6b3b4b768ec3050bf629380bac
+          - name: 360M
+            model: HuggingFaceTB/SmolLM2-360M
+            revision: f8027fd0eaeea54caa13c31d31b9fdc459c38b49
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install the Python packages
+        run: |
+          python -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet transformers "numpy>=2" scipy safetensors huggingface_hub pyoxigraph
+          mkdir -p out work && python -m pip freeze > out/versions.txt
+      - name: The model at the registered revision
+        run: |
+          hf download "${{ matrix.model }}" --revision "${{ matrix.revision }}" --local-dir work/model --exclude "onnx/*" --exclude "*.gguf" >/dev/null
+          sha256sum work/model/model.safetensors | tee out/inputs.sha256
+      - name: Cell 07, the trace
+        run: python batches/0033/trace.py work/model "${{ matrix.name }}" "out/${{ matrix.name }}" France Spain 2>&1 | tail -n 16
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: batch-0033-trace-${{ matrix.name }}
+          path: out/
+          retention-days: 1
